@@ -19,16 +19,16 @@ Tasks:
 - [x] Verify typecheck, lint, build, and local smoke checks.
 
 ## Phase 2: Environment System
-Status: pending.
+Status: done.
 
 Tasks:
-- [ ] Add workspace env runner.
-- [ ] Update app/package scripts to use env runner.
-- [ ] Split local and production env loading behavior.
-- [ ] Add env validation helpers.
-- [ ] Expand `.env.example`.
-- [ ] Document env usage in README and brain.
-- [ ] Verify dev/build with env runner.
+- [x] Add workspace env runner.
+- [x] Update app/package scripts to use env runner.
+- [x] Split local and production env loading behavior.
+- [x] Add env validation helpers.
+- [x] Expand `.env.example`.
+- [x] Document env usage in README and brain.
+- [x] Verify dev/build with env runner.
 
 ## Phase 3: App Shells
 Status: pending.

@@ -2,10 +2,10 @@
   "name": "@afterservice/dashboard",
   "private": true,
   "scripts": {
-    "build": "next build --turbopack",
-    "dev": "next dev --turbopack -p 4101",
+    "build": "bun ../../scripts/with-workspace-env.mjs --mode production -- next build --turbopack",
+    "dev": "bun ../../scripts/with-workspace-env.mjs --mode local -- next dev --turbopack -p 4101",
     "lint": "biome check .",
-    "start": "next start -p 4101",
+    "start": "bun ../../scripts/with-workspace-env.mjs --mode production -- next start -p 4101",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {

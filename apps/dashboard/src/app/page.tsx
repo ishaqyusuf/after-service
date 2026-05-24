@@ -1,3 +1,12 @@
+import { getAppUrls } from "@afterservice/utils";
+
 export default function DashboardPage() {
-  return <main>afterservice dashboard</main>;
+  const urls = getAppUrls();
+
+  return (
+    <main>
+      afterservice dashboard
+      <a href={urls.site}>Back to website</a>
+    </main>
+  );
 }

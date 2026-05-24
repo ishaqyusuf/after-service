@@ -4,7 +4,7 @@
 This file tracks active work.
 
 ## Current
-- None.
+- Phase 3 route shells and API mount.
 
 ## Template
 ```md
