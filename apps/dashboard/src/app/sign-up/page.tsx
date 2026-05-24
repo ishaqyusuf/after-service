@@ -1,12 +1,14 @@
+import { AuthForm } from "@/lib/auth-form";
 import { PageShell } from "@/lib/page-shell";
 
 export default function SignUpPage() {
   return (
     <PageShell
-      actionHref="/onboarding"
-      actionLabel="Start onboarding"
-      description="Account creation will connect this route in Phase 6."
+      description="Create an owner account, then set up the workspace."
+      eyebrow="Authentication"
       title="Sign up"
-    />
+    >
+      <AuthForm mode="sign-up" />
+    </PageShell>
   );
 }

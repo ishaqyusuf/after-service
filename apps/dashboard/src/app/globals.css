@@ -194,6 +194,31 @@ a {
   color: #5e6a62;
 }
 
+.dashboard-form {
+  display: grid;
+  gap: 14px;
+  max-width: 480px;
+  margin-top: 26px;
+  padding: 22px;
+  border: 1px solid #d9ded6;
+  border-radius: 8px;
+  background: #ffffff;
+}
+
+.dashboard-form label {
+  display: grid;
+  gap: 6px;
+  color: #435047;
+  font-size: 14px;
+  font-weight: 650;
+}
+
+.dashboard-form__error {
+  margin: 0;
+  color: #a33b2c;
+  font-size: 14px;
+}
+
 .as-table {
   width: 100%;
   border-collapse: collapse;

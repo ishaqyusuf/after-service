@@ -67,17 +67,17 @@ Tasks:
 - [x] Add seed helper for default templates.
 
 ## Phase 6: Authentication And Workspace Onboarding
-Status: pending.
+Status: done.
 
 Tasks:
-- [ ] Add auth package implementation.
-- [ ] Add sign-up page.
-- [ ] Add sign-in page.
-- [ ] Add session resolver.
-- [ ] Add API auth context.
-- [ ] Add onboarding flow.
-- [ ] Create workspace and owner membership.
-- [ ] Seed default templates after onboarding.
+- [x] Add auth package implementation.
+- [x] Add sign-up page.
+- [x] Add sign-in page.
+- [x] Add session resolver.
+- [x] Add API auth context.
+- [x] Add onboarding flow.
+- [x] Create workspace and owner membership.
+- [x] Seed default templates after onboarding.
 
 ## Phase 7: Customer Management MVP
 Status: pending.

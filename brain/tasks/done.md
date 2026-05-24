@@ -145,3 +145,35 @@ Next Phase Breakdown:
 - Onboarding should create the workspace, owner membership, starter plan state, and default templates in one transaction.
 - API context should resolve user, active workspace, and membership role.
 - Authenticated API routes should reject anonymous requests, and workspace routes should reject users without membership.
+
+### Phase 6: Authentication And Workspace Onboarding
+Completed: 2026-05-24
+
+Summary:
+- Added Better Auth email/password authentication in `@afterservice/auth` with Prisma-backed persistence.
+- Updated auth database tables for Better Auth-compatible user, session, and account fields.
+- Mounted Better Auth under `/api/auth/*` in the Hono API with credentialed CORS.
+- Added sign-up and sign-in dashboard forms that call the API auth endpoints.
+- Added session-aware API context with user, workspace, and membership resolution.
+- Added authenticated onboarding that creates a workspace, owner membership, and default follow-up templates in one transaction.
+- Added Better Auth env examples and trusted-origin support for local and production app URLs.
+
+Verification:
+- `bun run typecheck`
+- `bun run lint`
+- `bun run build`
+- `GET /health` returned 200 from the local API smoke server.
+- `GET /trpc/health` returned 200 from the local API smoke server.
+- `POST /api/auth/sign-up/email` returned 200 and set a Better Auth session cookie.
+- `POST /api/onboarding` returned 200 and created workspace `phase-six-repair-f9b7a6`.
+- Repeating `POST /api/onboarding` with the same session returned the same workspace.
+
+Insight:
+- Auth is now a product boundary rather than a placeholder: user identity, session cookies, workspace ownership, and starter operational data all enter the system through one verified path. That gives the next data features a trustworthy workspace scope to build on.
+
+Next Phase Breakdown:
+- Phase 7 should turn the customers placeholder into the first real workspace CRUD surface.
+- Add customer router procedures for list, create, update, detail, archive, and search.
+- Enforce workspace scoping through the API context before exposing any customer records.
+- Build customer list, empty state, create/edit form, and detail view in the dashboard.
+- Keep the UI dense and operator-focused because customers will become the anchor for jobs and follow-ups in later phases.

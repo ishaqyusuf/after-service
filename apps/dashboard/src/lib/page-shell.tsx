@@ -1,8 +1,10 @@
 import { Badge, EmptyState } from "@afterservice/ui";
+import type { ReactNode } from "react";
 
 type PageShellProps = {
   actionHref?: string;
   actionLabel?: string;
+  children?: ReactNode;
   description: string;
   eyebrow?: string;
   title: string;
@@ -11,6 +13,7 @@ type PageShellProps = {
 export function PageShell({
   actionHref,
   actionLabel,
+  children,
   description,
   eyebrow = "Phase placeholder",
   title,
@@ -27,9 +30,11 @@ export function PageShell({
           <a href={actionHref}>{actionLabel}</a>
         ) : null}
       </header>
-      <EmptyState title={`${title} workspace`}>
-        This area is ready for the next product phase.
-      </EmptyState>
+      {children ?? (
+        <EmptyState title={`${title} workspace`}>
+          This area is ready for the next product phase.
+        </EmptyState>
+      )}
     </main>
   );
 }

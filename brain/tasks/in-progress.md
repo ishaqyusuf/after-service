@@ -4,7 +4,7 @@
 This file tracks active work.
 
 ## Current
-- Phase 6 auth and onboarding.
+- Phase 7 customer management MVP.
 
 ## Template
 ```md

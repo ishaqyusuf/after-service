@@ -18,6 +18,10 @@ export {
 } from "./seed";
 export { PrismaClient };
 
+const globalForDb = globalThis as typeof globalThis & {
+  afterserviceDb?: PrismaClient;
+};
+
 export function createDbClient(connectionString = process.env.DATABASE_URL) {
   if (!connectionString) {
     throw new Error("DATABASE_URL is required to create a Prisma client.");
@@ -26,4 +30,12 @@ export function createDbClient(connectionString = process.env.DATABASE_URL) {
   const adapter = new PrismaPg({ connectionString });
 
   return new PrismaClient({ adapter });
+}
+
+export function getDbClient() {
+  if (!globalForDb.afterserviceDb) {
+    globalForDb.afterserviceDb = createDbClient();
+  }
+
+  return globalForDb.afterserviceDb;
 }
