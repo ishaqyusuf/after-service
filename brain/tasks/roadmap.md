@@ -31,16 +31,16 @@ Tasks:
 - [x] Verify dev/build with env runner.
 
 ## Phase 3: App Shells
-Status: pending.
+Status: done.
 
 Tasks:
-- [ ] Add website routes.
-- [ ] Add dashboard routes.
-- [ ] Add API tRPC mount.
-- [ ] Add auth placeholder routes.
-- [ ] Add Lemon Squeezy webhook placeholder.
-- [ ] Add shared app metadata.
-- [ ] Verify every route boots.
+- [x] Add website routes.
+- [x] Add dashboard routes.
+- [x] Add API tRPC mount.
+- [x] Add auth placeholder routes.
+- [x] Add Lemon Squeezy webhook placeholder.
+- [x] Add shared app metadata.
+- [x] Verify every route boots.
 
 ## Phase 4: Design System And Navigation
 Status: pending.

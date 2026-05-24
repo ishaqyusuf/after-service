@@ -5,7 +5,8 @@ export default function HomePage() {
 
   return (
     <main>
-      afterservice
+      <h1>afterservice</h1>
+      <p>Follow-up software for local service operators.</p>
       <a href={urls.dashboard}>Open dashboard</a>
     </main>
   );

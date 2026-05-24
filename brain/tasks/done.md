@@ -58,3 +58,33 @@ Next Phase Breakdown:
 - Dashboard needs auth-neutral placeholders for onboarding, customers, jobs, follow-ups, templates, billing, and settings.
 - API needs the Hono structure expanded with a tRPC mount placeholder, auth placeholder routes, and Lemon Squeezy webhook placeholder.
 - The goal is route coverage and stable app shape, not database-backed behavior yet.
+
+### Phase 3: App Shells
+Completed: 2026-05-24
+
+Summary:
+- Added website routes for `/`, `/pricing`, `/login`, and `/signup`.
+- Added dashboard placeholders for `/`, `/sign-in`, `/sign-up`, `/onboarding`, `/customers`, `/jobs`, `/follow-ups`, `/templates`, `/billing`, and `/settings`.
+- Added shared app metadata and website/dashboard navigation registries.
+- Mounted the API tRPC handler under `/trpc/*`.
+- Added placeholder routes for `/api/auth/*` and `/webhooks/lemon-squeezy`.
+- Added a dashboard API type bridge to verify dashboard imports API router types.
+
+Verification:
+- `bun install`
+- `bun run typecheck`
+- `bun run lint`
+- `bun run build`
+- Website route smoke: `/`, `/pricing`, `/login`, `/signup` returned 200.
+- Dashboard route smoke: `/`, `/sign-in`, `/sign-up`, `/onboarding`, `/customers`, `/jobs`, `/follow-ups`, `/templates`, `/billing`, `/settings` returned 200.
+- API smoke: `/health`, `/trpc/health`, `/api/auth/session`, and `/webhooks/lemon-squeezy` returned placeholder responses.
+
+Insight:
+- Phase 3 gives the product a navigable skeleton without pretending auth, billing, or data exists yet. That makes the next UI and database work easier because routes and ownership boundaries are already named.
+
+Next Phase Breakdown:
+- Phase 4 should replace the raw shells with a practical operator-focused design system.
+- `@afterservice/ui` needs typed primitives such as Button, Input, Textarea, Select, Dialog, Dropdown, Tabs, Badge, Table, and EmptyState.
+- The dashboard needs a real sidebar/topbar foundation with workspace and billing placeholders.
+- Website and dashboard navigation should use the shared route registries instead of one-off links.
+- The design target is dense, scannable SaaS UI for repeated operator workflows.

@@ -1,12 +1,15 @@
 import { getAppUrls } from "@afterservice/utils";
+import { PageShell } from "@/lib/page-shell";
 
 export default function DashboardPage() {
   const urls = getAppUrls();
 
   return (
-    <main>
-      afterservice dashboard
-      <a href={urls.site}>Back to website</a>
-    </main>
+    <PageShell
+      actionHref={urls.site}
+      actionLabel="Back to website"
+      description="Operator overview shell for follow-up work, customers, and jobs."
+      title="Dashboard"
+    />
   );
 }

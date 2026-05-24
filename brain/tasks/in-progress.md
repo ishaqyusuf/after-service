@@ -4,7 +4,7 @@
 This file tracks active work.
 
 ## Current
-- Phase 3 route shells and API mount.
+- Phase 4 UI component set.
 
 ## Template
 ```md

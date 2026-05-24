@@ -52,6 +52,7 @@
     "apps/website": {
       "name": "@afterservice/website",
       "dependencies": {
+        "@afterservice/site-nav": "workspace:*",
         "@afterservice/ui": "workspace:*",
         "@afterservice/utils": "workspace:*",
         "next": "^16.2.6",
