@@ -114,3 +114,34 @@ Next Phase Breakdown:
 - Every business model should be workspace-scoped from the first migration.
 - Add seed helpers for default follow-up templates, but keep outbound messaging disabled.
 - Verification depends on a reachable local Postgres database for migration application.
+
+### Phase 5: Database Foundation
+Completed: 2026-05-24
+
+Summary:
+- Added Prisma 7 tooling to `@afterservice/db`.
+- Added `prisma.config.ts` with root `DATABASE_URL` support through the workspace env runner.
+- Added Postgres schema covering auth, workspaces, memberships, team invites, customers, service jobs, follow-ups, templates, follow-up events, message logs, subscriptions, and billing events.
+- Added initial migration SQL under `packages/db/prisma/migrations`.
+- Added generated Prisma Client exports and a `createDbClient` helper using the Prisma Postgres adapter.
+- Added starter follow-up template seed helpers.
+- Added an afterservice-specific Docker Postgres service on port `55433`.
+
+Verification:
+- `bun --cwd packages/db prisma -v`
+- `bun run db:validate`
+- `bun run db:generate`
+- `bun run db:migrate` against Docker Postgres at `localhost:55433`
+- `bun run typecheck`
+- `bun run lint`
+- `bun run build`
+
+Insight:
+- The database now encodes the core product boundary: workspace-scoped operational data, auth/account tables, and billing state are separate but connected. That gives Phase 6 a real place to create users, workspaces, memberships, and starter templates.
+
+Next Phase Breakdown:
+- Phase 6 should implement auth/session plumbing without yet building the full customer/job workflows.
+- Sign-up and sign-in pages should stop being placeholders and connect to `@afterservice/auth`.
+- Onboarding should create the workspace, owner membership, starter plan state, and default templates in one transaction.
+- API context should resolve user, active workspace, and membership role.
+- Authenticated API routes should reject anonymous requests, and workspace routes should reject users without membership.

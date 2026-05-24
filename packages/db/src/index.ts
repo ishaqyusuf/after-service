@@ -1,15 +1,29 @@
-export type WorkspacePlan = "starter" | "growth" | "pro";
+import { PrismaPg } from "@prisma/adapter-pg";
+import { PrismaClient } from "../generated/prisma/client";
 
-export type WorkspacePlanStatus =
-  | "active"
-  | "canceled"
-  | "past_due"
-  | "trialing";
+export type { Prisma } from "../generated/prisma/client";
+export {
+  BillingProvider,
+  FollowUpChannel,
+  FollowUpStatus,
+  MembershipRole,
+  ServiceJobStatus,
+  WorkspacePlan,
+  WorkspacePlanStatus,
+} from "../generated/prisma/enums";
+export {
+  buildWorkspaceTemplateSeed,
+  type StarterTemplate,
+  starterFollowUpTemplates,
+} from "./seed";
+export { PrismaClient };
 
-export type WorkspaceIdentity = {
-  id: string;
-  name: string;
-  plan: WorkspacePlan;
-  planStatus: WorkspacePlanStatus;
-  slug: string;
-};
+export function createDbClient(connectionString = process.env.DATABASE_URL) {
+  if (!connectionString) {
+    throw new Error("DATABASE_URL is required to create a Prisma client.");
+  }
+
+  const adapter = new PrismaPg({ connectionString });
+
+  return new PrismaClient({ adapter });
+}

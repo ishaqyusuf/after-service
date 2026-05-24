@@ -4,7 +4,7 @@
 This file tracks active work.
 
 ## Current
-- Phase 5 Prisma/Postgres schema.
+- Phase 6 auth and onboarding.
 
 ## Template
 ```md

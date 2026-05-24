@@ -1,5 +1,9 @@
 {
-  "extends": "@afterservice/tsconfig/node",
-  "include": ["src/**/*.ts"],
+  "extends": "@afterservice/tsconfig/base",
+  "compilerOptions": {
+    "noEmit": true,
+    "types": ["node"]
+  },
+  "include": ["src/**/*.ts", "generated/**/*.ts"],
   "exclude": ["node_modules"]
 }

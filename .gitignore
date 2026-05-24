@@ -3,6 +3,7 @@ node_modules
 .next
 dist
 build
+packages/db/generated
 .env
 .env.local
 .env.production

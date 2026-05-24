@@ -11,6 +11,8 @@
       "!**/dist/**",
       "!**/build",
       "!**/build/**",
+      "!**/generated/prisma",
+      "!**/generated/prisma/**",
       "!**/node_modules",
       "!**/node_modules/**"
     ]

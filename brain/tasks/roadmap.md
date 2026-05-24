@@ -54,17 +54,17 @@ Tasks:
 - [x] Verify dashboard scanability.
 
 ## Phase 5: Database Foundation
-Status: pending.
+Status: done.
 
 Tasks:
-- [ ] Add Prisma.
-- [ ] Configure Postgres datasource.
-- [ ] Add auth/workspace models.
-- [ ] Add customer/job/follow-up/template/event/message models.
-- [ ] Add billing models.
-- [ ] Add initial migration.
-- [ ] Add generated client export.
-- [ ] Add seed helper for default templates.
+- [x] Add Prisma.
+- [x] Configure Postgres datasource.
+- [x] Add auth/workspace models.
+- [x] Add customer/job/follow-up/template/event/message models.
+- [x] Add billing models.
+- [x] Add initial migration.
+- [x] Add generated client export.
+- [x] Add seed helper for default templates.
 
 ## Phase 6: Authentication And Workspace Onboarding
 Status: pending.
