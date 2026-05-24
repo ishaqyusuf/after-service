@@ -2,6 +2,7 @@ import { websiteNavItems } from "@afterservice/site-nav";
 import { appMetadata } from "@afterservice/utils";
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
+import "./globals.css";
 
 export const metadata: Metadata = {
   description: appMetadata.description,
@@ -12,9 +13,11 @@ export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="en">
       <body>
-        <header>
-          <a href="/">{appMetadata.name}</a>
-          <nav aria-label="Website navigation">
+        <header className="site-header">
+          <a className="site-brand" href="/">
+            {appMetadata.name}
+          </a>
+          <nav aria-label="Website navigation" className="site-nav">
             {websiteNavItems.map((item) => (
               <a href={item.href} key={item.href}>
                 {item.label}
@@ -23,8 +26,8 @@ export default function RootLayout({ children }: { children: ReactNode }) {
           </nav>
         </header>
         {children}
-        <footer>
-          <span>{appMetadata.name}</span>
+        <footer className="site-footer">
+          <span className="site-brand">{appMetadata.name}</span>
           <a href="/pricing">Pricing</a>
         </footer>
       </body>

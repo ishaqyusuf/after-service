@@ -43,15 +43,15 @@ Tasks:
 - [x] Verify every route boots.
 
 ## Phase 4: Design System And Navigation
-Status: pending.
+Status: done.
 
 Tasks:
-- [ ] Build base UI components.
-- [ ] Build dashboard shell.
-- [ ] Build website nav/footer.
-- [ ] Build shared nav registry.
-- [ ] Add responsive layout rules.
-- [ ] Verify dashboard scanability.
+- [x] Build base UI components.
+- [x] Build dashboard shell.
+- [x] Build website nav/footer.
+- [x] Build shared nav registry.
+- [x] Add responsive layout rules.
+- [x] Verify dashboard scanability.
 
 ## Phase 5: Database Foundation
 Status: pending.

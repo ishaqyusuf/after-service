@@ -88,3 +88,29 @@ Next Phase Breakdown:
 - The dashboard needs a real sidebar/topbar foundation with workspace and billing placeholders.
 - Website and dashboard navigation should use the shared route registries instead of one-off links.
 - The design target is dense, scannable SaaS UI for repeated operator workflows.
+
+### Phase 4: Design System And Navigation
+Completed: 2026-05-24
+
+Summary:
+- Added typed `@afterservice/ui` primitives: Button, Input, Textarea, Select, Dialog, Dropdown, Tabs, Badge, Table, and EmptyState.
+- Added shared UI class contracts and responsive app-level CSS.
+- Upgraded the dashboard layout into a sidebar/topbar shell with workspace status and route navigation.
+- Upgraded website layout with shared navigation, footer, and responsive page styles.
+- Extended shared navigation registries for website and dashboard routes.
+
+Verification:
+- `bun run typecheck`
+- `bun run lint`
+- `bun run build`
+- Production build confirmed all website and dashboard app routes still prerender.
+
+Insight:
+- The UI package now owns component APIs while each app owns its visual context. That keeps Phase 5 and Phase 6 from coupling database/auth work to ad hoc markup decisions.
+
+Next Phase Breakdown:
+- Phase 5 should introduce Prisma in `packages/db` and make database ownership explicit.
+- Add the Postgres datasource, generated client export, and initial schema for users, sessions, workspaces, memberships, customers, jobs, follow-ups, templates, events, messages, subscriptions, and billing events.
+- Every business model should be workspace-scoped from the first migration.
+- Add seed helpers for default follow-up templates, but keep outbound messaging disabled.
+- Verification depends on a reachable local Postgres database for migration application.

@@ -4,7 +4,7 @@
 This file tracks active work.
 
 ## Current
-- Phase 4 UI component set.
+- Phase 5 Prisma/Postgres schema.
 
 ## Template
 ```md
