@@ -1,0 +1,31 @@
+{
+  "name": "@afterservice/api",
+  "private": true,
+  "type": "module",
+  "exports": {
+    "./context": "./src/context.ts",
+    "./router": "./src/routers/_app.ts"
+  },
+  "scripts": {
+    "build": "tsc --noEmit",
+    "dev": "bun --watch src/index.ts",
+    "lint": "biome check .",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@afterservice/auth": "workspace:*",
+    "@afterservice/db": "workspace:*",
+    "@afterservice/jobs": "workspace:*",
+    "@afterservice/notifications": "workspace:*",
+    "@afterservice/utils": "workspace:*",
+    "@trpc/server": "^11.6.0",
+    "hono": "^4.0.0",
+    "superjson": "^2.2.2",
+    "zod": "^4.3.5"
+  },
+  "devDependencies": {
+    "@afterservice/tsconfig": "workspace:*",
+    "@types/node": "^25.2.3",
+    "typescript": "^5.9.3"
+  }
+}

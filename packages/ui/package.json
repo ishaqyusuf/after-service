@@ -1,0 +1,23 @@
+{
+  "name": "@afterservice/ui",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./button": "./src/components/button.tsx"
+  },
+  "scripts": {
+    "build": "tsc --noEmit",
+    "lint": "biome check .",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "react": "19.1.0"
+  },
+  "devDependencies": {
+    "@afterservice/tsconfig": "workspace:*",
+    "@types/node": "^25.2.3",
+    "@types/react": "~19.1.0",
+    "typescript": "^5.9.3"
+  }
+}

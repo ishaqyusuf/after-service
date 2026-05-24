@@ -1,0 +1,22 @@
+{
+  "name": "@afterservice/auth",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "build": "tsc --noEmit",
+    "lint": "biome check .",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@afterservice/db": "workspace:*",
+    "@afterservice/utils": "workspace:*"
+  },
+  "devDependencies": {
+    "@afterservice/tsconfig": "workspace:*",
+    "@types/node": "^25.2.3",
+    "typescript": "^5.9.3"
+  }
+}
