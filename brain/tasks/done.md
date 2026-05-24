@@ -177,3 +177,26 @@ Next Phase Breakdown:
 - Enforce workspace scoping through the API context before exposing any customer records.
 - Build customer list, empty state, create/edit form, and detail view in the dashboard.
 - Keep the UI dense and operator-focused because customers will become the anchor for jobs and follow-ups in later phases.
+
+### Terminal Script Feature
+Completed: 2026-05-24
+
+Summary:
+- Added `scripts/terminal.mjs` as a discoverable terminal helper for common project commands.
+- Added the root `bun run terminal` package script.
+- Documented usage in `README.md`.
+- Included scripts for dev servers, checks, build, lint, typecheck, and Prisma helpers.
+
+Verification:
+- `bun run terminal`
+- `bun run terminal db:validate`
+- `bun run typecheck`
+- `bun run lint`
+
+Insight:
+- The repo now has one low-friction command surface for recurring terminal work. That should make future phases easier to run and verify without remembering every package-level script.
+
+Next Phase Breakdown:
+- Phase 7 remains the product priority.
+- Customer management should be built against the existing auth/workspace context.
+- Keep using `bun run terminal check` as the broad pre-commit gate once Phase 7 touches API and dashboard behavior.

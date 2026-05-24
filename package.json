@@ -12,6 +12,7 @@
     "dev:website": "bun scripts/with-workspace-env.mjs --mode local -- turbo dev --filter=@afterservice/website",
     "format": "biome format --write .",
     "lint": "turbo lint",
+    "terminal": "bun scripts/terminal.mjs",
     "typecheck": "turbo typecheck"
   },
   "devDependencies": {
