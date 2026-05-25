@@ -1,5 +1,5 @@
 import { dashboardNavItems } from "@afterservice/site-nav";
-import { Badge } from "@afterservice/ui";
+import { Badge, BrandLogo } from "@afterservice/ui";
 import { appMetadata } from "@afterservice/utils";
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
@@ -16,7 +16,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
       <body>
         <aside className="dashboard-sidebar">
           <a className="dashboard-brand" href="/">
-            {appMetadata.name}
+            <BrandLogo name={appMetadata.name} />
           </a>
           <nav aria-label="Dashboard navigation" className="dashboard-nav">
             {dashboardNavItems.map((item) => (

@@ -200,3 +200,26 @@ Next Phase Breakdown:
 - Phase 7 remains the product priority.
 - Customer management should be built against the existing auth/workspace context.
 - Keep using `bun run terminal check` as the broad pre-commit gate once Phase 7 touches API and dashboard behavior.
+
+### Logo And Favicon Integration
+Completed: 2026-05-25
+
+Summary:
+- Added the selected abstract `a` logo direction as a shared `@afterservice/ui` brand component.
+- Added matching `icon.svg` favicon files for the website and dashboard apps.
+- Updated website and dashboard shell branding to use the new logo mark and wordmark.
+
+Verification:
+- `bun run typecheck`
+- `bun run lint`
+- `bun run build`
+- Website `GET /` rendered the logo markup.
+- Dashboard `GET /` rendered the logo markup.
+- Website and dashboard `GET /icon.svg` returned SVG favicons.
+
+Insight:
+- The brand now has a reusable vector source in code rather than a cropped generated image. That gives us a cleaner base for future polish, social images, and app icons.
+
+Next Phase Breakdown:
+- If the mark still feels right after seeing it in context, the next brand step is exporting production asset sizes and adding Open Graph images.
+- Product work can continue with Phase 7 customer management using this mark as the app shell identity.

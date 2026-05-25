@@ -1,4 +1,5 @@
 export { Badge, type BadgeProps } from "./components/badge";
+export { BrandLogo, type BrandLogoProps } from "./components/brand-logo";
 export { Button, type ButtonProps } from "./components/button";
 export { Dialog, type DialogProps } from "./components/dialog";
 export { Dropdown, type DropdownProps } from "./components/dropdown";

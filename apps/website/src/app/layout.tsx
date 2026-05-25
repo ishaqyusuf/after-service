@@ -1,4 +1,5 @@
 import { websiteNavItems } from "@afterservice/site-nav";
+import { BrandLogo } from "@afterservice/ui";
 import { appMetadata } from "@afterservice/utils";
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
@@ -15,7 +16,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
       <body>
         <header className="site-header">
           <a className="site-brand" href="/">
-            {appMetadata.name}
+            <BrandLogo name={appMetadata.name} />
           </a>
           <nav aria-label="Website navigation" className="site-nav">
             {websiteNavItems.map((item) => (
@@ -27,7 +28,9 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         </header>
         {children}
         <footer className="site-footer">
-          <span className="site-brand">{appMetadata.name}</span>
+          <span className="site-brand">
+            <BrandLogo name={appMetadata.name} />
+          </span>
           <a href="/pricing">Pricing</a>
         </footer>
       </body>

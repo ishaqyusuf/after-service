@@ -32,10 +32,33 @@ a {
 }
 
 .dashboard-brand {
-  display: block;
+  display: inline-flex;
+  align-items: center;
   margin-bottom: 22px;
   font-size: 18px;
   font-weight: 700;
+}
+
+.as-brand-logo {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: #17232b;
+  line-height: 1;
+}
+
+.as-brand-logo__mark {
+  width: 30px;
+  height: 30px;
+  flex: 0 0 auto;
+}
+
+.as-brand-logo__dot {
+  fill: #009b98;
+}
+
+.as-brand-logo__wordmark {
+  letter-spacing: 0;
 }
 
 .dashboard-nav {
