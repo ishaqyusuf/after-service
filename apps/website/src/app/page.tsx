@@ -1,13 +1,14 @@
-import { getAppUrls } from "@afterservice/utils";
+import { isLaunched } from "@afterservice/utils";
+import { PreLaunchPage } from "../components/pre-launch";
+import { LaunchedPage } from "../components/launched";
 
 export default function HomePage() {
-  const urls = getAppUrls();
+  const launched = isLaunched();
 
-  return (
-    <main className="site-page">
-      <h1>afterservice</h1>
-      <p>Follow-up software for local service operators.</p>
-      <a href={urls.dashboard}>Open dashboard</a>
-    </main>
-  );
+  if (launched) {
+    return <LaunchedPage />;
+  }
+
+  return <PreLaunchPage />;
 }
+

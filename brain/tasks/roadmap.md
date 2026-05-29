@@ -172,15 +172,16 @@ Tasks:
 - [ ] Verify no accidental outbound messaging.
 
 ## Phase 15: Marketing Website
-Status: pending.
+Status: in-progress.
 
 Tasks:
-- [ ] Build polished home page.
-- [ ] Build pricing page.
-- [ ] Add signup/login CTAs.
+- [x] Build polished home page.
+- [x] Build pricing page.
+- [x] Add signup/login CTAs.
 - [ ] Add optional feature/customer pages.
 - [ ] Add terms/privacy placeholders or pages.
-- [ ] Verify product copy uses afterservice.
+- [x] Verify product copy uses afterservice.
+
 
 ## Phase 16: QA, Verification, And Hardening
 Status: pending.
