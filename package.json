@@ -10,6 +10,8 @@
     "dev:api": "bun scripts/with-workspace-env.mjs --mode local -- turbo dev --filter=@afterservice/api",
     "dev:dashboard": "bun scripts/with-workspace-env.mjs --mode local -- turbo dev --filter=@afterservice/dashboard",
     "dev:website": "bun scripts/with-workspace-env.mjs --mode local -- turbo dev --filter=@afterservice/website",
+    "db:push": "turbo -F @afterservice/db db:push",
+    "db:migrate": "turbo -F @afterservice/db db:migrate",
     "format": "biome format --write .",
     "lint": "turbo lint",
     "terminal": "bun scripts/terminal.mjs",

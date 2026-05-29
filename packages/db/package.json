@@ -9,6 +9,7 @@
     "build": "bun run db:generate && tsc --noEmit",
     "db:generate": "bun ../../scripts/with-workspace-env.mjs --mode local -- prisma generate",
     "db:migrate": "bun ../../scripts/with-workspace-env.mjs --mode local -- prisma migrate dev",
+    "db:push": "bun ../../scripts/with-workspace-env.mjs --mode local -- prisma db push",
     "db:validate": "bun ../../scripts/with-workspace-env.mjs --mode local -- prisma validate",
     "lint": "biome check .",
     "typecheck": "bun run db:generate && tsc --noEmit"
