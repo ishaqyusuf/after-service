@@ -5,10 +5,9 @@ import { LaunchedPage } from "../components/launched";
 export default function HomePage() {
   const launched = isLaunched();
 
-  if (launched) {
+  if (!launched) {
     return <LaunchedPage />;
   }
 
   return <PreLaunchPage />;
 }
-
