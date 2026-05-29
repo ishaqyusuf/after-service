@@ -18,6 +18,13 @@ Use this file to quickly locate the right project brain document.
 ## Product
 - `product/vision.md`: audience, positioning, principles.
 - `product/roadmap.md`: detailed roadmap phases and acceptance criteria.
+- `product/marketing.md`: reusable public-facing marketing copy and messaging angles.
+
+## Marketing
+- `marketing/strategy.md`: prelaunch marketing strategy, ICP, channel rules, cadence, and approval policy.
+- `marketing/content-bank.md`: reusable X/Twitter and LinkedIn drafts.
+- `marketing/experiments.md`: dated marketing experiments, drafts, and outcomes.
+- `marketing/feedback.md`: operator feedback, objections, workflow notes, and learnings.
 
 ## Engineering
 - `engineering/repo-structure.md`: app/package responsibilities.
