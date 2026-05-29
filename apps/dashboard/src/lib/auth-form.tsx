@@ -20,6 +20,7 @@ export function AuthForm({ mode }: AuthFormProps) {
     setIsPending(true);
 
     const apiBaseUrl = getApiBaseUrl();
+    const returnTo = getReturnTo();
     const endpoint =
       mode === "sign-up"
         ? "/api/auth/sign-up/email"
@@ -33,7 +34,7 @@ export function AuthForm({ mode }: AuthFormProps) {
             password: String(formData.get("password") ?? ""),
           }
         : {
-            callbackURL: "/",
+            callbackURL: returnTo,
             email: String(formData.get("email") ?? ""),
             password: String(formData.get("password") ?? ""),
           };
@@ -56,7 +57,7 @@ export function AuthForm({ mode }: AuthFormProps) {
       return;
     }
 
-    window.location.href = mode === "sign-up" ? "/onboarding" : "/";
+    window.location.href = mode === "sign-up" ? "/onboarding" : returnTo;
   }
 
   return (
@@ -91,4 +92,14 @@ export function AuthForm({ mode }: AuthFormProps) {
       </Button>
     </form>
   );
+}
+
+function getReturnTo() {
+  const returnTo = new URLSearchParams(window.location.search).get("return_to");
+
+  if (!returnTo?.startsWith("/")) {
+    return "/";
+  }
+
+  return returnTo;
 }
