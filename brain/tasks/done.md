@@ -223,3 +223,60 @@ Insight:
 Next Phase Breakdown:
 - If the mark still feels right after seeing it in context, the next brand step is exporting production asset sizes and adding Open Graph images.
 - Product work can continue with Phase 7 customer management using this mark as the app shell identity.
+
+### Marketing Home Page Header Redesign
+Completed: 2026-05-30
+
+Summary:
+- Redesigned the marketing homepage header in `launched.tsx` and `pre-launch.tsx` to use the shared `BrandLogo` component from `@afterservice/ui`.
+- Added `@afterservice/ui` CSS class contracts (`as-button`, `as-badge`) with dark-mode support to the website's `globals.css`.
+- Replaced inline SVG logos with `BrandLogo` in both landing page headers and footers.
+- Used `Button` component for "Start Free Trial" CTA and `Badge` for "PRE-LAUNCH" status indicator.
+- Added responsive mobile hamburger menu with nav links and CTAs to `launched.tsx`.
+- Preserved existing Tailwind styling, dark/light theme toggle, and sticky backdrop-blur header design.
+
+Verification:
+- `bun x tsc --noEmit` passed for website app.
+- `bun x biome check` passed for changed files.
+
+Files changed:
+- `apps/website/src/app/globals.css`
+- `apps/website/src/components/launched.tsx`
+- `apps/website/src/components/pre-launch.tsx`
+
+### MVP Implementation And Auth Loop Fix
+Completed: 2026-05-30
+
+Summary:
+- Implemented workspace, customer, service job, follow-up, template, and billing tRPC routers.
+- Replaced dashboard placeholders with functional operator workflows.
+- Added Lemon Squeezy signed webhook handling and idempotent billing event storage.
+- Added Starter/Growth/Pro limits and API-level entitlement enforcement.
+- Added manual-send `MessageLog` creation and `FollowUpEvent` timelines.
+- Added jobs package primitives for due follow-up discovery and missed/overdue dry runs.
+- Added `bun run smoke:mvp` for local MVP journey, permission, entitlement, and Lemon webhook smoke coverage.
+- Fixed dashboard sign-in redirect loops caused by secure-prefixed Better Auth cookies.
+- Added the cron-protected follow-up job endpoint and smoke coverage.
+- Added website feature, customer, privacy, and terms pages.
+- Added dashboard catch-all redirect route required by the Brain architecture rules.
+- Added MVP observability notes.
+- Browser-smoked the website feature/customer/legal routes and the dashboard sign-up/onboarding/home flow.
+- Updated Brain feature docs, API contracts, roadmap status, and MVP handoff.
+
+Verification:
+- `bun run typecheck`
+- `bun run lint`
+- `bun run build`
+- `bun run smoke:mvp`
+- `bunx prisma validate` from `packages/db`
+- `bun run db:generate` from `packages/db`
+- Local auth smoke: sign-up, onboarding, and authenticated dashboard home returned `200`.
+
+Files changed:
+- `apps/api`
+- `apps/dashboard`
+- `packages/auth`
+- `packages/jobs`
+- `packages/notifications`
+- `packages/ui`
+- `brain`

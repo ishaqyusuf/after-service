@@ -54,6 +54,10 @@ const terminalScripts = {
     description: "Run lint across the workspace.",
     steps: [{ command: "bun", args: ["run", "lint"] }],
   },
+  "smoke:mvp": {
+    description: "Run the local MVP auth/API/billing smoke verifier.",
+    steps: [{ command: "bun", args: ["run", "smoke:mvp"] }],
+  },
   typecheck: {
     description: "Run typecheck across the workspace.",
     steps: [{ command: "bun", args: ["run", "typecheck"] }],

@@ -1,5 +1,8 @@
+/* biome-ignore lint/suspicious/noUnknownAtRules: Tailwind directives are compiled by PostCSS. */
 @tailwind base;
+/* biome-ignore lint/suspicious/noUnknownAtRules: Tailwind directives are compiled by PostCSS. */
 @tailwind components;
+/* biome-ignore lint/suspicious/noUnknownAtRules: Tailwind directives are compiled by PostCSS. */
 @tailwind utilities;
 
 :root {
@@ -40,6 +43,11 @@ a {
   border-bottom: 0;
 }
 
+body:has(.fullscreen-landing) .site-header,
+body:has(.fullscreen-landing) .site-footer {
+  display: none;
+}
+
 .site-brand {
   display: inline-flex;
   align-items: center;
@@ -69,6 +77,128 @@ a {
   letter-spacing: 0;
 }
 
+.as-badge {
+  display: inline-flex;
+  align-items: center;
+  width: fit-content;
+  min-height: 24px;
+  padding: 3px 8px;
+  border-radius: 999px;
+  border: 1px solid #d4dbd0;
+  background: #f2f5ef;
+  color: #435047;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.dark .as-badge {
+  border-color: #1b3d2b;
+  background: #122118;
+  color: #54c08b;
+}
+
+.as-badge--success {
+  border-color: #a9d3b7;
+  background: #eef8f0;
+  color: #24583a;
+}
+
+.dark .as-badge--success {
+  border-color: #1b3d2b;
+  background: #122118;
+  color: #54c08b;
+}
+
+.as-badge--warning {
+  border-color: #e4d096;
+  background: #fff8df;
+  color: #6e5617;
+}
+
+.dark .as-badge--warning {
+  border-color: #3d3020;
+  background: #231d10;
+  color: #d4a843;
+}
+
+.as-button,
+.site-page a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 36px;
+  padding: 0 12px;
+  border: 1px solid #233429;
+  border-radius: 8px;
+  background: #233429;
+  color: #ffffff;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 650;
+  cursor: pointer;
+  transition:
+    background-color 0.2s,
+    border-color 0.2s,
+    color 0.2s;
+}
+
+.dark .as-button {
+  border-color: #dfe5dc;
+  background: #eef8f0;
+  color: #18211c;
+}
+
+.as-button:hover {
+  filter: brightness(1.1);
+}
+
+.as-button--secondary {
+  border-color: #cfd8cc;
+  background: #ffffff;
+  color: #233429;
+}
+
+.dark .as-button--secondary {
+  border-color: #1f3026;
+  background: #111814;
+  color: #ffffff;
+}
+
+.as-button--secondary:hover {
+  border-color: #009b98;
+  background: #f0faf8;
+}
+
+.dark .as-button--secondary:hover {
+  border-color: #009b98;
+  background: #122118;
+}
+
+.as-button--ghost {
+  border-color: transparent;
+  background: transparent;
+  color: #233429;
+}
+
+.dark .as-button--ghost {
+  color: #ffffff;
+}
+
+.as-button--ghost:hover {
+  background: #e9eee6;
+}
+
+.dark .as-button--ghost:hover {
+  background: #111814;
+}
+
+.as-button--sm {
+  min-height: 30px;
+  padding: 0 10px;
+  font-size: 13px;
+}
+
 .site-nav {
   display: flex;
   flex-wrap: wrap;
@@ -96,6 +226,23 @@ a {
   color: #55625b;
   font-size: 18px;
   line-height: 1.5;
+}
+
+.site-kicker {
+  display: inline-flex;
+  margin-bottom: 18px;
+  color: #009b98;
+  font-size: 13px;
+  font-weight: 750;
+  letter-spacing: 0;
+  text-transform: uppercase;
+}
+
+.site-page .site-note {
+  max-width: 640px;
+  margin-top: 28px;
+  color: #6c786f;
+  font-size: 14px;
 }
 
 .site-page a {

@@ -4,6 +4,7 @@
   "scripts": {
     "build": "bun ../../scripts/with-workspace-env.mjs --mode production -- next build --turbopack",
     "dev": "bun ../../scripts/with-workspace-env.mjs --mode local -- next dev --turbopack -p 4101",
+    "dev:portless": "PORTLESS_APP_PORT=${PORTLESS_APP_PORT:-4101} PORTLESS_WILDCARD=${PORTLESS_WILDCARD:-1} PORTLESS_SYNC_HOSTS=${PORTLESS_SYNC_HOSTS:-0} portless app-afterservice next dev --turbopack",
     "lint": "biome check .",
     "start": "bun ../../scripts/with-workspace-env.mjs --mode production -- next start -p 4101",
     "typecheck": "tsc --noEmit"
@@ -17,7 +18,8 @@
     "@afterservice/utils": "workspace:*",
     "next": "^16.2.6",
     "react": "19.1.0",
-    "react-dom": "19.1.0"
+    "react-dom": "19.1.0",
+    "zod": "^4.3.5"
   },
   "devDependencies": {
     "@afterservice/tsconfig": "workspace:*",

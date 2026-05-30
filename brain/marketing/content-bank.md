@@ -121,6 +121,30 @@ Is that tracked in your POS, a ticket note, spreadsheet, calendar, phone list, W
 I'm trying to understand the real issue-resolution workflow before shaping the product too much. Public replies are useful, and DMs are welcome if the details are easier to share privately.
 ```
 
+### Salons And Spas Repeat Visit Workflow
+
+X/Twitter:
+```text
+Question for salon and spa owners:
+
+After an appointment is done, how do you make sure the client gets invited back at the right time?
+
+Calendar, receptionist list, booking software reminder, spreadsheet, memory?
+
+Building afterservice prelaunch and looking for real workflows.
+```
+
+LinkedIn:
+```text
+I'm looking for feedback from salon and spa operators while building afterservice prelaunch.
+
+After an appointment is complete, how do you make sure the client gets invited back at the right time for their next visit?
+
+Is that handled from your booking software, a receptionist callback list, calendar reminders, a spreadsheet, WhatsApp/text notes, or mostly staff memory?
+
+I'm trying to understand the real repeat-visit workflow before shaping the product too much. If you run a salon or spa, a public reply with your current setup would really help. DMs are welcome too if you'd rather share privately.
+```
+
 ## Angles To Rotate
 - Current follow-up workflow.
 - Missed follow-ups and their cost.

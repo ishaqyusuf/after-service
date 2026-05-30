@@ -14,6 +14,10 @@ This file defines authorization rules.
 - API health.
 - Lemon Squeezy webhook endpoint with signature verification.
 
+## Internal Routes
+- `POST /api/jobs/follow-ups/dry-run` requires `CRON_SECRET` through a bearer token or `x-cron-secret` header.
+- Internal job routes do not use browser session auth and must not accept untrusted customer-facing side effects.
+
 ## Authenticated Routes
 - Workspace onboarding.
 - Dashboard session.
@@ -36,3 +40,23 @@ Require active membership:
 - Never trust workspace ID from the client without membership lookup.
 - Permission checks must run in API procedures.
 - UI gates are helpful but not security boundaries.
+
+## Auth Proxy Behavior
+- Dashboard proxy:
+  - Public routes: `/sign-in`, `/sign-up`, `/onboarding`, `/api/`, `/_next/`, `/favicon`.
+  - Uses cookie presence for redirect gating.
+  - Accepted session cookie names: `better-auth.session_token`, `__Secure-better-auth.session_token`, `__Host-better-auth.session_token`, `better-auth-session_token`, and `afterservice.session_token`.
+  - Authenticated users on auth routes are redirected to `return_to` or `/`.
+  - Unauthenticated users on protected routes are redirected to `/sign-in` with `return_to`.
+  - Full session validation still happens in Better Auth/server code; proxy gating is only a fast redirect guard.
+- Website proxy:
+  - `/login` and `/sign-in` redirect to dashboard `/sign-in`.
+  - `/signup` and `/sign-up` redirect to dashboard `/sign-up`.
+  - Uses `buildDashboardUrl` from `@afterservice/utils` for correct host resolution.
+- Trusted origins:
+  - Local: `http://localhost:4100`, `http://localhost:4101`, `http://127.0.0.1:4100`, `http://127.0.0.1:4101`.
+  - Portless: `http://afterservice.localhost:1355`, `http://app-afterservice.localhost:1355`.
+  - Env-provided: `BETTER_AUTH_TRUSTED_ORIGINS`, `AUTH_TRUSTED_ORIGINS` (comma-separated).
+- Safe redirect validation:
+  - Only allow same-origin relative paths beginning with `/`.
+  - Reject `//evil.com`, absolute URLs, and backslash variants.

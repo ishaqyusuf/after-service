@@ -5,6 +5,54 @@ This file tracks daily prelaunch marketing experiments for afterservice.
 
 ## Current Experiment Log
 
+### 2026-05-30: Salons And Spas Repeat Visit Workflow
+Status: draft ready.
+
+Audience:
+- Salons and spas.
+
+Hypothesis:
+- Salons and spas have a clear repeat-visit workflow problem where follow-up timing affects rebooking, retention, and revenue, and operators can describe the current system in practical terms.
+
+Learning Goal:
+- Understand how salons and spas currently trigger repeat-visit follow-up after an appointment is completed.
+
+Channels:
+- X/Twitter.
+- LinkedIn.
+
+Drafts:
+
+X/Twitter:
+```text
+Question for salon and spa owners:
+
+After an appointment is done, how do you make sure the client gets invited back at the right time?
+
+Calendar, receptionist list, booking software reminder, spreadsheet, memory?
+
+Building afterservice prelaunch and looking for real workflows.
+```
+
+LinkedIn:
+```text
+I'm looking for feedback from salon and spa operators while building afterservice prelaunch.
+
+After an appointment is complete, how do you make sure the client gets invited back at the right time for their next visit?
+
+Is that handled from your booking software, a receptionist callback list, calendar reminders, a spreadsheet, WhatsApp/text notes, or mostly staff memory?
+
+I'm trying to understand the real repeat-visit workflow before shaping the product too much. If you run a salon or spa, a public reply with your current setup would really help. DMs are welcome too if you'd rather share privately.
+```
+
+Expected Learning:
+- Whether repeat-visit follow-up is owned by front-desk staff, providers, or the owner.
+- Whether salons and spas rely mostly on booking software automation or manual reminders.
+- What usually causes repeat visits to be missed or delayed.
+
+Outcome:
+- TODO: Add post links, replies, DMs, and useful observations after posting.
+
 ### 2026-05-29: Repair Shops Issue Resolution Workflow
 Status: draft ready.
 

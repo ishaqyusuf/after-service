@@ -13,6 +13,7 @@ Use this file to quickly locate the right project brain document.
 ## System
 - `system/overview.md`: product/system overview.
 - `system/architecture.md`: monorepo and runtime architecture.
+- `system/observability.md`: MVP logging, monitoring, and alerting notes.
 - `system/tech-stack.md`: frameworks, tools, and service choices.
 
 ## Product

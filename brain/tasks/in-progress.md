@@ -4,7 +4,11 @@
 This file tracks active work.
 
 ## Current
-- Phase 7 customer management MVP.
+- Post-MVP hardening backlog.
+
+## Notes
+- MVP operator flows for customers, jobs, follow-ups, templates, billing, entitlements, notifications, cron-protected dry-run jobs, and public website legal/feature pages are implemented.
+- Remaining hardening is full Playwright coverage beyond the focused browser smoke, deeper edge-case integration tests, and production provider configuration.
 
 ## Template
 ```md

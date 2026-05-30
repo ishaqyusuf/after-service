@@ -1,5 +1,5 @@
 import { getDbClient } from "@afterservice/db";
-import { getAppUrls } from "@afterservice/utils";
+import { getDevAppUrlStrings } from "@afterservice/utils";
 import { prismaAdapter } from "@better-auth/prisma-adapter";
 import { betterAuth } from "better-auth";
 
@@ -7,6 +7,11 @@ function unique(values: Array<string | undefined>) {
   return [
     ...new Set(values.filter((value): value is string => Boolean(value))),
   ];
+}
+
+function readNonEmptyEnv(name: string) {
+  const value = process.env[name]?.trim();
+  return value ? value : undefined;
 }
 
 export const authRoutes = {
@@ -23,14 +28,20 @@ export const localAuthOrigins = [
   "http://127.0.0.1:4101",
 ] as const;
 
+export const portlessAuthOrigins = [
+  "http://afterservice.localhost:1355",
+  "http://app-afterservice.localhost:1355",
+] as const;
+
 export function getTrustedOrigins() {
-  const urls = getAppUrls();
+  const urls = getDevAppUrlStrings();
 
   return unique(
     [
       urls.site,
       urls.dashboard,
       ...localAuthOrigins,
+      ...portlessAuthOrigins,
       process.env.BETTER_AUTH_TRUSTED_ORIGINS,
       process.env.AUTH_TRUSTED_ORIGINS,
     ].flatMap((value) =>
@@ -40,10 +51,32 @@ export function getTrustedOrigins() {
 }
 
 export function getAuthBaseUrl() {
+  const isLocalRuntime =
+    process.env.AFTERSERVICE_ENV_MODE === "local" ||
+    process.env.NODE_ENV !== "production";
+  const devUrls = isLocalRuntime ? "http://localhost:4102" : undefined;
+
+  if (devUrls) {
+    return readNonEmptyEnv("BETTER_AUTH_LOCAL_URL") ?? devUrls;
+  }
+
   return (
-    process.env.BETTER_AUTH_URL ??
-    process.env.NEXT_PUBLIC_API_URL ??
-    getAppUrls().api
+    readNonEmptyEnv("BETTER_AUTH_URL") ??
+    readNonEmptyEnv("NEXT_PUBLIC_API_URL") ??
+    undefined
+  );
+}
+
+function getAuthSecret() {
+  return (
+    readNonEmptyEnv("BETTER_AUTH_SECRET") ??
+    readNonEmptyEnv("AUTH_SECRET") ??
+    (process.env.NEXT_PHASE === "phase-production-build"
+      ? "afterservice-local-production-build-secret-placeholder"
+      : undefined) ??
+    (process.env.NODE_ENV === "production"
+      ? undefined
+      : "afterservice-local-development-secret")
   );
 }
 
@@ -57,12 +90,7 @@ export const auth = betterAuth({
   emailAndPassword: {
     enabled: true,
   },
-  secret:
-    process.env.BETTER_AUTH_SECRET ??
-    process.env.AUTH_SECRET ??
-    (process.env.NODE_ENV === "production"
-      ? undefined
-      : "afterservice-local-development-secret"),
+  secret: getAuthSecret(),
   trustedOrigins: getTrustedOrigins(),
 });
 

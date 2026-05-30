@@ -1,9 +1,9 @@
 #!/usr/bin/env node
 
+import { spawn } from "node:child_process";
 import { existsSync, readFileSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
-import { spawn } from "node:child_process";
 
 const scriptDir = dirname(fileURLToPath(import.meta.url));
 const workspaceRoot = resolve(scriptDir, "..");
@@ -50,7 +50,9 @@ function parseEnvFile(filePath) {
       continue;
     }
 
-    const match = trimmed.match(/^(?:export\s+)?([A-Za-z_][A-Za-z0-9_]*)=(.*)$/);
+    const match = trimmed.match(
+      /^(?:export\s+)?([A-Za-z_][A-Za-z0-9_]*)=(.*)$/,
+    );
 
     if (!match) {
       continue;

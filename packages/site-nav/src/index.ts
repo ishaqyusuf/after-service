@@ -10,6 +10,8 @@ export const dashboardNavItems = [
 
 export const websiteNavItems = [
   { href: "/", label: "Home" },
+  { href: "/features", label: "Features" },
+  { href: "/customers", label: "Customers" },
   { href: "/pricing", label: "Pricing" },
   { href: "/login", label: "Log in" },
   { href: "/signup", label: "Sign up" },

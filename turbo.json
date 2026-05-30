@@ -4,7 +4,13 @@
   "tasks": {
     "build": {
       "dependsOn": ["^build"],
-      "outputs": [".next/**", "!.next/cache/**", "dist/**", "build/**", "lib/**"]
+      "outputs": [
+        ".next/**",
+        "!.next/cache/**",
+        "dist/**",
+        "build/**",
+        "lib/**"
+      ]
     },
     "clean": {
       "cache": false
@@ -13,11 +19,23 @@
       "cache": false,
       "interactive": true
     },
+    "db:generate": {
+      "cache": false,
+      "outputs": ["packages/db/generated/**"]
+    },
     "db:push": {
       "cache": false,
       "interactive": true
     },
+    "db:validate": {
+      "cache": false,
+      "outputs": []
+    },
     "dev": {
+      "cache": false,
+      "persistent": true
+    },
+    "dev:portless": {
       "cache": false,
       "persistent": true
     },

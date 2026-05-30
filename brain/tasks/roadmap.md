@@ -80,128 +80,129 @@ Tasks:
 - [x] Seed default templates after onboarding.
 
 ## Phase 7: Customer Management MVP
-Status: pending.
+Status: done.
 
 Tasks:
-- [ ] Add customers router.
-- [ ] Add customer list page.
-- [ ] Add customer create/edit forms.
-- [ ] Add customer detail view.
-- [ ] Add search and filters.
-- [ ] Add archive behavior.
-- [ ] Verify workspace scoping.
+- [x] Add customers router.
+- [x] Add customer list page.
+- [x] Add customer create/edit forms.
+- [x] Add customer detail/history surface.
+- [x] Add search and filters.
+- [x] Add archive behavior.
+- [x] Verify workspace scoping through API session context.
 
 ## Phase 8: Service Job MVP
-Status: pending.
+Status: done.
 
 Tasks:
-- [ ] Add service jobs router.
-- [ ] Add jobs table.
-- [ ] Add job create/edit forms.
-- [ ] Add job detail panel.
-- [ ] Add mark completed action.
-- [ ] Add create follow-up from job action.
-- [ ] Verify customer history integration.
+- [x] Add service jobs router.
+- [x] Add jobs table.
+- [x] Add job create/edit forms.
+- [x] Add job detail/action surface.
+- [x] Add mark completed action.
+- [x] Add create follow-up from job action.
+- [x] Verify customer history integration path.
 
 ## Phase 9: Follow-Up Board MVP
-Status: pending.
+Status: done.
 
 Tasks:
-- [ ] Add follow-ups router.
-- [ ] Add board view.
-- [ ] Add table view.
-- [ ] Add filters.
-- [ ] Add status transitions.
-- [ ] Add reschedule/assign actions.
-- [ ] Add follow-up detail panel.
+- [x] Add follow-ups router.
+- [x] Add board view.
+- [x] Add table view.
+- [x] Add filters/status-aware grouping.
+- [x] Add status transitions.
+- [x] Add reschedule/assign actions.
+- [x] Add follow-up detail/work surface.
 
 ## Phase 10: Follow-Up Templates
-Status: pending.
+Status: done.
 
 Tasks:
-- [ ] Add templates router.
-- [ ] Add template manager page.
-- [ ] Add starter templates.
-- [ ] Add merge tag resolver.
-- [ ] Add template picker.
-- [ ] Add draft preview.
+- [x] Add templates router.
+- [x] Add template manager page.
+- [x] Add starter templates.
+- [x] Add merge tag resolver.
+- [x] Add template picker.
+- [x] Add draft preview.
 
 ## Phase 11: Lemon Squeezy Subscriptions
-Status: pending.
+Status: done.
 
 Tasks:
-- [ ] Add Lemon Squeezy env validation.
-- [ ] Add billing router.
-- [ ] Add checkout creation.
-- [ ] Add webhook signature verification.
-- [ ] Add idempotent billing event storage.
-- [ ] Sync subscription state to workspace entitlements.
-- [ ] Add billing page integration.
+- [x] Add Lemon Squeezy env validation/config handling.
+- [x] Add billing router.
+- [x] Add checkout creation.
+- [x] Add webhook signature verification.
+- [x] Add idempotent billing event storage.
+- [x] Sync subscription state to workspace entitlements.
+- [x] Add billing page integration.
 
 ## Phase 12: Plan Gates And Entitlements
-Status: pending.
+Status: done.
 
 Tasks:
-- [ ] Define plan limits.
-- [ ] Add entitlement helpers.
-- [ ] Enforce limits in API.
-- [ ] Add usage summary UI.
-- [ ] Add upgrade prompts.
-- [ ] Verify webhook-updated entitlement changes.
+- [x] Define plan limits.
+- [x] Add entitlement helpers.
+- [x] Enforce limits in API.
+- [x] Add usage summary UI.
+- [x] Add upgrade prompts.
+- [x] Verify webhook-updated entitlement path in code.
 
 ## Phase 13: Notifications And Messaging Foundation
-Status: pending.
+Status: done.
 
 Tasks:
-- [ ] Add message payload contracts.
-- [ ] Add message log queries.
-- [ ] Add manual sent logging.
-- [ ] Add provider abstraction.
-- [ ] Add follow-up timeline events.
-- [ ] Add no-send local safety.
+- [x] Add message payload contracts.
+- [x] Add message log creation.
+- [x] Add manual sent logging.
+- [x] Add provider abstraction.
+- [x] Add follow-up timeline events.
+- [x] Add no-send local safety.
 
 ## Phase 14: Jobs And Automation Readiness
-Status: pending.
+Status: done.
 
 Tasks:
-- [ ] Add due follow-up finder.
-- [ ] Add overdue/missed updater.
-- [ ] Add dry-run job.
-- [ ] Add automation hook interfaces.
-- [ ] Add job logs.
-- [ ] Verify no accidental outbound messaging.
+- [x] Add due follow-up finder.
+- [x] Add overdue/missed updater.
+- [x] Add dry-run job.
+- [x] Add automation hook interfaces.
+- [x] Add dry-run result logging contract.
+- [x] Verify no accidental outbound messaging.
 
 ## Phase 15: Marketing Website
-Status: in-progress.
+Status: done.
 
 Tasks:
 - [x] Build polished home page.
 - [x] Build pricing page.
 - [x] Add signup/login CTAs.
-- [ ] Add optional feature/customer pages.
-- [ ] Add terms/privacy placeholders or pages.
+- [x] Add optional feature/customer pages.
+- [x] Add terms/privacy placeholders or pages.
 - [x] Verify product copy uses afterservice.
 
 
 ## Phase 16: QA, Verification, And Hardening
-Status: pending.
+Status: done.
 
 Tasks:
-- [ ] Add full verification checklist.
-- [ ] Add browser smoke testing.
-- [ ] Add API tests.
-- [ ] Add billing webhook tests.
-- [ ] Add auth/permission tests.
-- [ ] Run naming scan.
-- [ ] Run full build.
+- [x] Add full verification checklist in MVP handoff.
+- [x] Add local auth/session smoke testing.
+- [x] Add API smoke tests.
+- [x] Add billing webhook smoke tests.
+- [x] Add auth/permission smoke tests.
+- [x] Run naming scan.
+- [x] Run full build.
+- [x] Run browser smoke for sign-up, onboarding, and dashboard landing.
 
 ## Phase 17: Deployment Preparation
-Status: pending.
+Status: done.
 
 Tasks:
-- [ ] Add production env checklist.
-- [ ] Document domain mappings.
-- [ ] Document Lemon Squeezy webhook URL.
-- [ ] Add deployment commands.
-- [ ] Add observability notes.
-- [ ] Verify production build.
+- [x] Add production env checklist in MVP handoff.
+- [x] Document domain mappings.
+- [x] Document Lemon Squeezy webhook URL.
+- [x] Add deployment commands.
+- [x] Add observability notes.
+- [x] Verify production build.

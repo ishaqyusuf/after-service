@@ -10,6 +10,9 @@
     "lint": "biome check .",
     "typecheck": "tsc --noEmit"
   },
+  "dependencies": {
+    "@afterservice/db": "workspace:*"
+  },
   "devDependencies": {
     "@afterservice/tsconfig": "workspace:*",
     "@types/node": "^25.2.3",

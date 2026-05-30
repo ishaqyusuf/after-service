@@ -25,9 +25,23 @@ afterservice is after-service follow-up software for local operators. It helps s
 ## Canonical Roadmap
 The canonical detailed roadmap lives in `brain/product/roadmap.md`. The execution checklist lives in `brain/tasks/roadmap.md`.
 
+## Core Engineering Docs
+- AI prompt rules: `brain/AI_PROMPT_RULES.md`
+- Coding standards: `brain/engineering/coding-standards.md`
+- Repo structure: `brain/engineering/repo-structure.md`
+- Reference projects: `brain/system/reference-projects.md`
+
 ## Naming Rules
 - Product: `afterservice`
 - Domain: `afterservice.app`
 - Repo: `after-service`
 - Package namespace: `@afterservice/*`
 - Do not use earlier placeholder names or inherited product branding in product code or docs except when explicitly referencing architecture ancestry.
+
+
+## Important Project References
+- `midday`: `/Users/M1PRO/Documents/code/_kitchen_sink/midday`
+- `gnd`: `/Users/M1PRO/Documents/code/_turbo/gnd`
+- `school-clerk`: `/Users/M1PRO/Documents/code/school-clerk`
+- `halaal-coperative`: `/Users/M1PRO/Documents/code/halaal-coperative`
+- `plot-keys`: `/Users/M1PRO/Documents/code/plot-keys`

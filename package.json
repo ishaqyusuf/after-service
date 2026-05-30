@@ -2,7 +2,10 @@
   "name": "after-service",
   "private": true,
   "packageManager": "bun@1.3.9",
-  "workspaces": ["apps/*", "packages/*"],
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
   "scripts": {
     "build": "bun scripts/with-workspace-env.mjs --mode production -- turbo build",
     "clean": "git clean -xdf node_modules .turbo apps/*/.next apps/*/.turbo packages/*/.turbo",
@@ -11,10 +14,19 @@
     "dev:dashboard": "bun scripts/with-workspace-env.mjs --mode local -- turbo dev --filter=@afterservice/dashboard",
     "dev:website": "bun scripts/with-workspace-env.mjs --mode local -- turbo dev --filter=@afterservice/website",
     "dev:websites": "bun scripts/with-workspace-env.mjs --mode local -- turbo dev --filter=@afterservice/website --filter=@afterservice/dashboard",
-    "db:push": "turbo -F @afterservice/db db:push",
+    "dev:portless": "bun scripts/with-workspace-env.mjs --mode local -- turbo dev:portless --parallel",
+    "dev:website:portless": "bun scripts/with-workspace-env.mjs --mode local -- turbo dev:portless --filter=@afterservice/website",
+    "dev:dashboard:portless": "bun scripts/with-workspace-env.mjs --mode local -- turbo dev:portless --filter=@afterservice/dashboard",
+    "dev:api:portless": "bun scripts/with-workspace-env.mjs --mode local -- turbo dev:portless --filter=@afterservice/api",
+    "dev:websites:portless": "bun scripts/with-workspace-env.mjs --mode local -- turbo dev:portless --filter=@afterservice/website --filter=@afterservice/dashboard",
+    "db:generate": "turbo -F @afterservice/db db:generate",
     "db:migrate": "turbo -F @afterservice/db db:migrate",
+    "db:push": "turbo -F @afterservice/db db:push",
+    "db:validate": "turbo -F @afterservice/db db:validate",
     "format": "biome format --write .",
-    "lint": "turbo lint",
+    "kill:ports": "for port in 1355 4100 4101 4102 5555; do lsof -ti tcp:$port | xargs kill -9 2>/dev/null || true; done",
+    "lint": "biome check package.json turbo.json scripts && turbo lint",
+    "smoke:mvp": "bun scripts/smoke-mvp.mjs",
     "terminal": "bun scripts/terminal.mjs",
     "typecheck": "turbo typecheck"
   },
@@ -22,5 +34,6 @@
     "@biomejs/biome": "^2.3.0",
     "turbo": "^2.5.0",
     "typescript": "^5.9.0"
-  }
+  },
+  "dependencies": {}
 }

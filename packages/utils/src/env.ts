@@ -28,6 +28,7 @@ const productionRequiredKeys = [
   "LEMONSQUEEZY_STORE_ID",
   "LEMONSQUEEZY_WEBHOOK_SECRET",
   "RESEND_API_KEY",
+  "CRON_SECRET",
 ] as const;
 
 function readEnv(env: EnvSource, key: string): string | undefined {
@@ -66,6 +67,19 @@ export function getAppUrls(env: EnvSource = process.env): AppUrls {
     dashboard: requireUrl(env, "NEXT_PUBLIC_DASHBOARD_URL"),
     site: requireUrl(env, "NEXT_PUBLIC_SITE_URL"),
   };
+}
+
+export function getDevAppUrlStrings(env: EnvSource = process.env): AppUrls {
+  if (env.NODE_ENV === "production") {
+    return getAppUrls(env);
+  }
+
+  const api = readEnv(env, "NEXT_PUBLIC_API_URL") ?? "http://localhost:4102";
+  const dashboard =
+    readEnv(env, "NEXT_PUBLIC_DASHBOARD_URL") ?? "http://localhost:4101";
+  const site = readEnv(env, "NEXT_PUBLIC_SITE_URL") ?? "http://localhost:4100";
+
+  return { api, dashboard, site };
 }
 
 export function validateWorkspaceEnv(

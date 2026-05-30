@@ -8,3 +8,4 @@ packages/db/generated
 .env.local
 .env.production
 .DS_Store
+.gstack/

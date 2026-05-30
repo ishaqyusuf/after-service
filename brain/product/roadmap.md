@@ -3,6 +3,9 @@
 ## Purpose
 This file is the canonical product and implementation roadmap for afterservice.
 
+## Current MVP State
+As of 2026-05-30, the local MVP implementation covers phases 1-17 and the core operator journey: sign up, onboard a workspace, manage customers, log jobs, create/work follow-ups, manage templates, view billing/limits, run manual-send messaging logs, and execute cron-protected follow-up job dry-runs. Remaining post-MVP work is deeper automated browser coverage, provider-specific production observability wiring, and production secret/domain configuration.
+
 ## Phase 1: Repo Bootstrap
 Status: complete.
 
@@ -346,6 +349,7 @@ Deliverables:
 - Find due follow-ups.
 - Mark overdue/missed follow-ups.
 - Dry-run command.
+- Cron-protected API endpoint for dry-runs and missed-state execution.
 - Future hooks for post-job completion, pre-due reminder, no-reply follow-up, reply received.
 
 Acceptance:
@@ -391,6 +395,7 @@ Acceptance:
 - `bun run lint` passes.
 - `bun run build` passes.
 - Core journey works: signup, onboarding, customer, job, follow-up, board movement, billing page.
+- Browser smoke verifies sign-up, onboarding, and authenticated dashboard landing.
 
 ## Phase 17: Deployment Preparation
 Goal: prepare production deployment.

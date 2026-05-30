@@ -1,6 +1,6 @@
 "use client";
 
-import { Button, Input } from "@afterservice/ui";
+import { Button, Field, FieldGroup, FieldLabel, Input } from "@afterservice/ui";
 import { useState } from "react";
 import { getApiBaseUrl } from "./api-url";
 
@@ -62,26 +62,28 @@ export function AuthForm({ mode }: AuthFormProps) {
 
   return (
     <form action={handleSubmit} className="dashboard-form">
-      {mode === "sign-up" ? (
-        <label htmlFor={nameId}>
-          Name
-          <Input id={nameId} name="name" required />
-        </label>
-      ) : null}
-      <label htmlFor={emailId}>
-        Email
-        <Input id={emailId} name="email" required type="email" />
-      </label>
-      <label htmlFor={passwordId}>
-        Password
-        <Input
-          id={passwordId}
-          minLength={8}
-          name="password"
-          required
-          type="password"
-        />
-      </label>
+      <FieldGroup>
+        {mode === "sign-up" ? (
+          <Field>
+            <FieldLabel htmlFor={nameId}>Name</FieldLabel>
+            <Input id={nameId} name="name" required />
+          </Field>
+        ) : null}
+        <Field>
+          <FieldLabel htmlFor={emailId}>Email</FieldLabel>
+          <Input id={emailId} name="email" required type="email" />
+        </Field>
+        <Field>
+          <FieldLabel htmlFor={passwordId}>Password</FieldLabel>
+          <Input
+            id={passwordId}
+            minLength={8}
+            name="password"
+            required
+            type="password"
+          />
+        </Field>
+      </FieldGroup>
       {error ? <p className="dashboard-form__error">{error}</p> : null}
       <Button disabled={isPending} type="submit">
         {isPending
