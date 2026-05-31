@@ -5,6 +5,52 @@ This file tracks daily prelaunch marketing experiments for afterservice.
 
 ## Current Experiment Log
 
+### 2026-05-31: Clinics And Wellness Missed Follow-Up Workflow
+Status: draft ready.
+
+Audience:
+- Clinics and wellness operators.
+
+Hypothesis:
+- Clinics and wellness operators have multiple post-visit follow-up jobs, and the easiest public conversation starter is asking which one most often slips through.
+
+Learning Goal:
+- Understand which missed follow-up type is most painful or common after a completed clinic or wellness visit.
+
+Channels:
+- X/Twitter.
+- LinkedIn.
+
+Drafts:
+
+X/Twitter:
+```text
+Question for clinic and wellness operators:
+
+After a visit is complete, what follow-up most often slips through: check-in, review request, next appointment, unresolved concern?
+
+Building afterservice prelaunch and looking for real workflows.
+```
+
+LinkedIn:
+```text
+I'm looking for feedback from clinic and wellness operators while building afterservice prelaunch.
+
+After a visit is complete, what kind of follow-up is most likely to slip through?
+
+Is it a post-visit check-in, review request, next appointment reminder, unresolved concern, care-plan nudge, or something else?
+
+I'm trying to understand where the current workflow breaks before shaping the product too much. If you run a clinic, wellness studio, therapy practice, or similar local service business, a public reply with your current setup would really help. DMs are welcome too if the details are easier to share privately.
+```
+
+Expected Learning:
+- Which post-visit follow-up jobs clinic and wellness operators recognize first.
+- Whether missed follow-ups are clinical/admin, reputation, retention, or issue-resolution problems.
+- Which tools or staff roles currently own post-visit follow-up.
+
+Outcome:
+- TODO: Add post links, replies, DMs, and useful observations after posting.
+
 ### 2026-05-30: Salons And Spas Repeat Visit Workflow
 Status: draft ready.
 

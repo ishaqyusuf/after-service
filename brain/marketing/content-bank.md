@@ -145,6 +145,28 @@ Is that handled from your booking software, a receptionist callback list, calend
 I'm trying to understand the real repeat-visit workflow before shaping the product too much. If you run a salon or spa, a public reply with your current setup would really help. DMs are welcome too if you'd rather share privately.
 ```
 
+### Clinics And Wellness Missed Follow-Up Workflow
+
+X/Twitter:
+```text
+Question for clinic and wellness operators:
+
+After a visit is complete, what follow-up most often slips through: check-in, review request, next appointment, unresolved concern?
+
+Building afterservice prelaunch and looking for real workflows.
+```
+
+LinkedIn:
+```text
+I'm looking for feedback from clinic and wellness operators while building afterservice prelaunch.
+
+After a visit is complete, what kind of follow-up is most likely to slip through?
+
+Is it a post-visit check-in, review request, next appointment reminder, unresolved concern, care-plan nudge, or something else?
+
+I'm trying to understand where the current workflow breaks before shaping the product too much. If you run a clinic, wellness studio, therapy practice, or similar local service business, a public reply with your current setup would really help. DMs are welcome too if the details are easier to share privately.
+```
+
 ## Angles To Rotate
 - Current follow-up workflow.
 - Missed follow-ups and their cost.
