@@ -19,7 +19,7 @@ import {
   markFollowUpSentAction,
   rescheduleFollowUpAction,
 } from "@/lib/dashboard-actions";
-import { formatDate } from "@/lib/dashboard-data";
+import { formatDate } from "@/lib/dashboard-format";
 import { useState } from "react";
 
 export function FollowUpCardSheet({ item, recipient, body }: { item: any, recipient: string, body: string }) {

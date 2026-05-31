@@ -1,6 +1,6 @@
 "use client";
 
-import { Button, Field, FieldGroup, FieldLabel, Input } from "@afterservice/ui";
+import { Button, Input, Label } from "@afterservice/ui";
 import { type FormEvent, useCallback, useRef, useState } from "react";
 import type { QuickFillFormAdapter } from "@/components/dev/quick-fill";
 
@@ -52,41 +52,39 @@ export function SignUpForm({ onSignUp, adapterRef }: Props) {
 
   return (
     <form ref={formRef} onSubmit={handleSubmit} className="auth-form">
-      <FieldGroup>
-        <Field>
-          <FieldLabel htmlFor="sign-up-name">Name</FieldLabel>
-          <Input
-            id="sign-up-name"
-            name="name"
-            required
-            value={values.name}
-            onChange={(e) => setValue("name", e.target.value)}
-          />
-        </Field>
-        <Field>
-          <FieldLabel htmlFor="sign-up-email">Email</FieldLabel>
-          <Input
-            id="sign-up-email"
-            name="email"
-            required
-            type="email"
-            value={values.email}
-            onChange={(e) => setValue("email", e.target.value)}
-          />
-        </Field>
-        <Field>
-          <FieldLabel htmlFor="sign-up-password">Password</FieldLabel>
-          <Input
-            id="sign-up-password"
-            minLength={8}
-            name="password"
-            required
-            type="password"
-            value={values.password}
-            onChange={(e) => setValue("password", e.target.value)}
-          />
-        </Field>
-      </FieldGroup>
+      <div className="auth-form__field">
+        <Label htmlFor="sign-up-name">Name</Label>
+        <Input
+          id="sign-up-name"
+          name="name"
+          required
+          value={values.name}
+          onChange={(e) => setValue("name", e.target.value)}
+        />
+      </div>
+      <div className="auth-form__field">
+        <Label htmlFor="sign-up-email">Email</Label>
+        <Input
+          id="sign-up-email"
+          name="email"
+          required
+          type="email"
+          value={values.email}
+          onChange={(e) => setValue("email", e.target.value)}
+        />
+      </div>
+      <div className="auth-form__field">
+        <Label htmlFor="sign-up-password">Password</Label>
+        <Input
+          id="sign-up-password"
+          minLength={8}
+          name="password"
+          required
+          type="password"
+          value={values.password}
+          onChange={(e) => setValue("password", e.target.value)}
+        />
+      </div>
       {error ? <p className="auth-form__error">{error}</p> : null}
       <Button disabled={isPending} type="submit">
         {isPending ? "Creating account..." : "Create account"}

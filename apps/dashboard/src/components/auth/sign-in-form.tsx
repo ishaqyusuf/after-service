@@ -2,11 +2,8 @@
 
 import {
   Button,
-  Field,
-  FieldDescription,
-  FieldGroup,
-  FieldLabel,
   Input,
+  Label,
 } from "@afterservice/ui";
 import { type FormEvent, useCallback, useRef, useState } from "react";
 
@@ -64,36 +61,35 @@ export function SignInForm({ onSignIn, returnTo, adapterRef }: Props) {
 
   return (
     <form ref={formRef} onSubmit={handleSubmit} className="auth-form">
-      <FieldGroup>
-        {returnTo && returnTo !== "/" ? (
-          <FieldDescription>
-            You'll be redirected to <strong>{returnTo}</strong> after sign-in.
-          </FieldDescription>
-        ) : null}
-        <Field>
-          <FieldLabel htmlFor="sign-in-email">Email</FieldLabel>
-          <Input
-            id="sign-in-email"
-            name="email"
-            required
-            type="email"
-            value={values.email}
-            onChange={(e) => setValue("email", e.target.value)}
-          />
-        </Field>
-        <Field>
-          <FieldLabel htmlFor="sign-in-password">Password</FieldLabel>
-          <Input
-            id="sign-in-password"
-            minLength={8}
-            name="password"
-            required
-            type="password"
-            value={values.password}
-            onChange={(e) => setValue("password", e.target.value)}
-          />
-        </Field>
-      </FieldGroup>
+      {returnTo && returnTo !== "/" ? (
+        <p className="auth-form__hint">
+          You&apos;ll be redirected to <strong>{returnTo}</strong> after
+          sign-in.
+        </p>
+      ) : null}
+      <div className="auth-form__field">
+        <Label htmlFor="sign-in-email">Email</Label>
+        <Input
+          id="sign-in-email"
+          name="email"
+          required
+          type="email"
+          value={values.email}
+          onChange={(e) => setValue("email", e.target.value)}
+        />
+      </div>
+      <div className="auth-form__field">
+        <Label htmlFor="sign-in-password">Password</Label>
+        <Input
+          id="sign-in-password"
+          minLength={8}
+          name="password"
+          required
+          type="password"
+          value={values.password}
+          onChange={(e) => setValue("password", e.target.value)}
+        />
+      </div>
       {error ? <p className="auth-form__error">{error}</p> : null}
       <Button disabled={isPending} type="submit">
         {isPending ? "Signing in..." : "Sign in"}

@@ -1,3 +1,5 @@
+"use client";
+
 import { type RefObject, useRef } from "react";
 
 export function useEnterSubmit(): {

@@ -6,7 +6,7 @@ import {
   TableHeader,
   TableRow,
 } from "@afterservice/ui";
-import { centsToDollars, formatDate } from "@/lib/dashboard-data";
+import { centsToDollars, formatDate } from "@/lib/dashboard-format";
 import { ScheduleFollowUpSheet } from "../sheets/schedule-follow-up-sheet";
 
 export function JobsTable({ jobs, templates, defaultDue }: { jobs: any[], templates: any[], defaultDue: string }) {

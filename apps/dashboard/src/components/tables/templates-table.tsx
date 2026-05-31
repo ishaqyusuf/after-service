@@ -9,7 +9,7 @@ import {
   TableRow,
 } from "@afterservice/ui";
 import { setDefaultTemplateAction } from "@/lib/dashboard-actions";
-import { resolveTemplate } from "@/lib/dashboard-data";
+import { resolveTemplate } from "@/lib/dashboard-format";
 import { TemplateSheet } from "../sheets/template-sheet";
 
 export function TemplatesTable({ templates, workspace, sampleJob, sampleCustomer }: { templates: any[], workspace: any, sampleJob: any, sampleCustomer: any }) {

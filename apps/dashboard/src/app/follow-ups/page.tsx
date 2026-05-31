@@ -1,5 +1,6 @@
 import { Badge, Button } from "@afterservice/ui";
-import { getFollowUpsData, resolveTemplate } from "@/lib/dashboard-data";
+import { getFollowUpsData } from "@/lib/dashboard-data";
+import { resolveTemplate } from "@/lib/dashboard-format";
 import { CreateFollowUpForm } from "@/components/forms/create-follow-up-form";
 import { FollowUpsTable } from "@/components/tables/follow-ups-table";
 import { FollowUpCardSheet } from "@/components/sheets/follow-up-card-sheet";

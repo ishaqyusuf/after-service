@@ -1,6 +1,7 @@
 import { Badge, Button, Card, CardContent, CardHeader, CardTitle } from "@afterservice/ui";
 import { startCheckoutAction } from "@/lib/dashboard-actions";
-import { formatDate, getBillingData } from "@/lib/dashboard-data";
+import { getBillingData } from "@/lib/dashboard-data";
+import { formatDate } from "@/lib/dashboard-format";
 
 export default async function BillingPage() {
   const { limits, plan, planStatus, subscription, usage } =

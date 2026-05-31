@@ -7,7 +7,7 @@ import {
   TableHeader,
   TableRow,
 } from "@afterservice/ui";
-import { formatDate } from "@/lib/dashboard-data";
+import { formatDate } from "@/lib/dashboard-format";
 
 export function FollowUpsTable({ items }: { items: any[] }) {
   return (

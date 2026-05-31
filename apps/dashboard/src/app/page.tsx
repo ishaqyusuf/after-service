@@ -12,7 +12,8 @@ import {
   TableHeader,
   TableRow,
 } from "@afterservice/ui";
-import { formatDate, getDashboardOverview } from "@/lib/dashboard-data";
+import { getDashboardOverview } from "@/lib/dashboard-data";
+import { formatDate } from "@/lib/dashboard-format";
 import Link from "next/link";
 
 export default async function DashboardPage() {

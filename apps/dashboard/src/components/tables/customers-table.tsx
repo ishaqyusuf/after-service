@@ -15,7 +15,7 @@ import {
   archiveCustomerAction,
   updateCustomerAction,
 } from "@/lib/dashboard-actions";
-import { formatDate } from "@/lib/dashboard-data";
+import { formatDate } from "@/lib/dashboard-format";
 import { CustomerSheet } from "../sheets/customer-sheet";
 
 // Assuming Customer type exists or just using any for now in standard refactor
