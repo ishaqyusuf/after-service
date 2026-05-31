@@ -1026,7 +1026,7 @@ const dashboardRouter = t.router({
     });
 
     const customersCount = await db.customer.count({
-      where: { workspaceId: ctx.workspace.id, isArchived: false },
+      where: { archivedAt: null, workspaceId: ctx.workspace.id },
     });
 
     const jobsCount = await db.serviceJob.count({
