@@ -17,7 +17,7 @@ export function UpdateWorkspaceForm() {
   const { data: workspaceData, isLoading } = trpc.workspace.getCurrent.useQuery();
   const utils = trpc.useUtils();
 
-  const updateMutation = trpc.workspace.update.useMutation({
+  const updateMutation = trpc.workspace.updateSettings.useMutation({
     onSuccess: () => {
       utils.workspace.getCurrent.invalidate();
     }

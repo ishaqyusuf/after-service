@@ -877,7 +877,29 @@ const templatesRouter = t.router({
       where: { workspaceId: ctx.workspace.id },
     });
 
-    return { items, nextCursor: null };
+    const workspaceInfo = await db.workspace.findUnique({
+      where: { id: ctx.workspace.id },
+      select: { name: true }
+    });
+
+    const sampleJob = await db.serviceJob.findFirst({
+      where: { workspaceId: ctx.workspace.id },
+      orderBy: { completedAt: "desc" }
+    });
+    
+    const sampleCustomer = sampleJob ? await db.customer.findUnique({
+      where: { id: sampleJob.customerId }
+    }) : await db.customer.findFirst({
+      where: { workspaceId: ctx.workspace.id }
+    });
+
+    return { 
+      items, 
+      nextCursor: null, 
+      workspace: workspaceInfo,
+      sampleJob,
+      sampleCustomer
+    };
   }),
   setDefault: protectedProcedure
     .input(z.object({ id: z.string().min(1) }))

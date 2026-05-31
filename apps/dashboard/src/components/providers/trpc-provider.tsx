@@ -5,7 +5,7 @@ import { httpBatchLink } from "@trpc/client";
 import { createTRPCReact } from "@trpc/react-query";
 import { useState } from "react";
 import superjson from "superjson";
-import type { AppRouter } from "@afterservice/api/src/routers/_app";
+import type { AppRouter } from "@afterservice/api/router";
 
 export const trpc = createTRPCReact<AppRouter>();
 

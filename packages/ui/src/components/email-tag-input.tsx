@@ -1,9 +1,20 @@
 "use client";
 
-import { isValidEmail, parseEmailList } from "@midday/utils";
 import { X } from "lucide-react";
 import * as React from "react";
 import { cn } from "../utils";
+
+export function isValidEmail(email: string): boolean {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+}
+
+export function parseEmailList(value?: string | null): string[] {
+  if (!value) return [];
+  return value
+    .split(/[,;\s]+/)
+    .map((e) => e.trim().toLowerCase())
+    .filter((e) => isValidEmail(e));
+}
 import { Badge } from "./badge";
 
 export interface EmailTagInputProps {
@@ -25,7 +36,7 @@ export function EmailTagInput({
   const inputRef = React.useRef<HTMLInputElement>(null);
 
   // Parse comma-separated emails from value
-  const emails = React.useMemo(() => parseEmailList(value), [value]);
+  const emails = React.useMemo<string[]>(() => parseEmailList(value) || [], [value]);
 
   const updateEmails = (newEmails: string[]) => {
     onChange?.(newEmails.length > 0 ? newEmails.join(", ") : null);

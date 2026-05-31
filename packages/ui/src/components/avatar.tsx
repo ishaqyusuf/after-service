@@ -34,7 +34,7 @@ export const AvatarImageNext = React.forwardRef<
     <Image
       ref={ref}
       className={cn("aspect-square h-full w-full absolute z-10", className)}
-      onError={(e) => {
+      onError={(e: React.SyntheticEvent<HTMLImageElement, Event>) => {
         setHasError(true);
         onError?.(e);
       }}
