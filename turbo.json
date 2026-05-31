@@ -8,6 +8,7 @@
         ".next/**",
         "!.next/cache/**",
         "dist/**",
+        "generated/**",
         "build/**",
         "lib/**"
       ]
@@ -21,7 +22,7 @@
     },
     "db:generate": {
       "cache": false,
-      "outputs": ["packages/db/generated/**"]
+      "outputs": ["generated/**"]
     },
     "db:push": {
       "cache": false,
