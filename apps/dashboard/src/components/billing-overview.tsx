@@ -1,11 +1,27 @@
-import { Badge, Button, Card, CardContent, CardHeader, CardTitle } from "@afterservice/ui";
-import { startCheckoutAction } from "@/lib/dashboard-actions";
-import { getBillingData } from "@/lib/dashboard-data";
-import { formatDate } from "@/lib/dashboard-format";
+"use client";
 
-export default async function BillingPage() {
-  const { limits, plan, planStatus, subscription, usage } =
-    await getBillingData();
+import { Badge, Button, Card, CardContent, CardHeader, CardTitle } from "@afterservice/ui";
+import { formatDate } from "@/lib/dashboard-format";
+import { trpc } from "@/components/providers/trpc-provider";
+import { useRouter } from "next/navigation";
+
+export function BillingOverview() {
+  const { data, isLoading } = trpc.billing.getCurrentPlan.useQuery();
+  const router = useRouter();
+  
+  const checkoutMutation = trpc.billing.createCheckout.useMutation({
+    onSuccess: (data) => {
+      router.push(data.checkoutUrl);
+    }
+  });
+
+  if (isLoading) {
+    return <div className="p-8 text-center text-muted-foreground">Loading billing...</div>;
+  }
+
+  if (!data?.item) return null;
+
+  const { limits, plan, planStatus, subscription, usage } = data.item;
 
   return (
     <div className="space-y-8">
@@ -24,9 +40,9 @@ export default async function BillingPage() {
             entitlement.
           </p>
         </div>
-        <form action={startCheckoutAction}>
-          <Button type="submit">Start checkout</Button>
-        </form>
+        <Button onClick={() => checkoutMutation.mutate()} disabled={checkoutMutation.isPending}>
+          {checkoutMutation.isPending ? "Starting..." : "Start checkout"}
+        </Button>
       </header>
 
       <section className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
@@ -88,4 +104,3 @@ function Metric({ label, value }: { label: string; value: string }) {
     </Card>
   );
 }
-

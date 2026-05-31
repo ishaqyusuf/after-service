@@ -1,25 +1,28 @@
+"use client";
+
 import {
-  Badge,
-  Button,
-  Input,
-  Label,
   Table,
   TableBody,
   TableCell,
   TableHead,
   TableHeader,
   TableRow,
-  Textarea,
 } from "@afterservice/ui";
-import {
-  archiveCustomerAction,
-  updateCustomerAction,
-} from "@/lib/dashboard-actions";
 import { formatDate } from "@/lib/dashboard-format";
-import { CustomerSheet } from "../sheets/customer-sheet";
+import Link from "next/link";
+import { trpc } from "@/components/providers/trpc-provider";
+import { useSearchParams } from "next/navigation";
 
-// Assuming Customer type exists or just using any for now in standard refactor
-export function CustomersTable({ customers }: { customers: any[] }) {
+export function CustomersTable() {
+  const searchParams = useSearchParams();
+  const q = searchParams.get("q") ?? undefined;
+  const { data, isLoading } = trpc.customers.list.useQuery({ search: q, includeArchived: false });
+  const customers = data?.items ?? [];
+
+  if (isLoading) {
+    return <div className="p-8 text-center text-muted-foreground">Loading customers...</div>;
+  }
+
   return (
     <div className="rounded-md border border-border bg-card">
       <Table>
@@ -47,7 +50,9 @@ export function CustomersTable({ customers }: { customers: any[] }) {
               <TableCell>{formatDate(customer.lastServiceAt)}</TableCell>
               <TableCell>{customer.openFollowUpCount}</TableCell>
               <TableCell>
-                <CustomerSheet customer={customer} />
+                <Link href={`?edit_customer=${customer.id}`} scroll={false} className="text-sm font-medium text-muted-foreground hover:text-foreground">
+                  Edit
+                </Link>
               </TableCell>
             </TableRow>
           ))}

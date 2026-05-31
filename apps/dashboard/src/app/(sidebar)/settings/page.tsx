@@ -1,10 +1,7 @@
 import { Badge } from "@afterservice/ui";
-import { getSettingsData } from "@/lib/dashboard-data";
 import { UpdateWorkspaceForm } from "@/components/forms/update-workspace-form";
 
-export default async function SettingsPage() {
-  const { workspace } = await getSettingsData();
-
+export default function SettingsPage() {
   return (
     <div className="space-y-8">
       <header className="flex flex-col gap-4">
@@ -19,7 +16,7 @@ export default async function SettingsPage() {
       </header>
 
       <section>
-        <UpdateWorkspaceForm workspace={workspace} />
+        <UpdateWorkspaceForm />
       </section>
     </div>
   );

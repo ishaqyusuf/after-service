@@ -1,13 +1,10 @@
 import { Badge, Button } from "@afterservice/ui";
-import { getTemplatesData } from "@/lib/dashboard-data";
 import { CreateTemplateForm } from "@/components/forms/create-template-form";
 import { TemplatesTable } from "@/components/tables/templates-table";
 import Link from "next/link";
+import { Suspense } from "react";
 
-export default async function TemplatesPage() {
-  const { sampleCustomer, sampleJob, templates, workspace } =
-    await getTemplatesData();
-
+export default function TemplatesPage() {
   return (
     <div className="space-y-8">
       <header className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
@@ -28,12 +25,9 @@ export default async function TemplatesPage() {
         <CreateTemplateForm />
 
         <section className="min-w-0">
-          <TemplatesTable 
-            templates={templates} 
-            workspace={workspace} 
-            sampleJob={sampleJob} 
-            sampleCustomer={sampleCustomer} 
-          />
+          <Suspense fallback={<div className="p-8 text-center text-muted-foreground">Loading templates...</div>}>
+            <TemplatesTable />
+          </Suspense>
         </section>
       </div>
     </div>

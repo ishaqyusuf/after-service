@@ -1,8 +1,8 @@
 import { Badge, Button, Input } from "@afterservice/ui";
-import { getCustomers } from "@/lib/dashboard-data";
 import { CreateCustomerForm } from "@/components/forms/create-customer-form";
 import { CustomersTable } from "@/components/tables/customers-table";
 import Link from "next/link";
+import { Suspense } from "react";
 
 type CustomersPageProps = {
   searchParams?: Promise<{ q?: string }>;
@@ -12,7 +12,6 @@ export default async function CustomersPage({
   searchParams,
 }: CustomersPageProps) {
   const params = await searchParams;
-  const customers = await getCustomers(params?.q);
 
   return (
     <div className="space-y-8">
@@ -46,7 +45,9 @@ export default async function CustomersPage({
             </Button>
           </form>
 
-          <CustomersTable customers={customers} />
+          <Suspense fallback={<div className="p-8 text-center text-muted-foreground">Loading...</div>}>
+            <CustomersTable />
+          </Suspense>
         </section>
       </div>
     </div>

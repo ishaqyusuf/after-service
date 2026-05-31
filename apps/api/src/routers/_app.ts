@@ -518,6 +518,22 @@ const serviceJobsRouter = t.router({
 });
 
 const followUpsRouter = t.router({
+  get: protectedProcedure
+    .input(z.object({ id: z.string().min(1) }))
+    .query(async ({ ctx, input }) => {
+      const item = await db.followUp.findFirstOrThrow({
+        include: {
+          customer: true,
+          events: true,
+          job: true,
+          messageLogs: true,
+          template: true,
+        },
+        where: { id: input.id, workspaceId: ctx.workspace.id },
+      });
+
+      return { item: followUpDto(item) };
+    }),
   assignOwner: protectedProcedure
     .input(
       z.object({ assigneeId: z.string().min(1).nullable(), id: z.string() }),
@@ -822,6 +838,14 @@ const followUpsRouter = t.router({
 });
 
 const templatesRouter = t.router({
+  get: protectedProcedure
+    .input(z.object({ id: z.string().min(1) }))
+    .query(async ({ ctx, input }) => {
+      const item = await db.followUpTemplate.findFirstOrThrow({
+        where: { id: input.id, workspaceId: ctx.workspace.id },
+      });
+      return { item };
+    }),
   archive: protectedProcedure
     .input(z.object({ id: z.string().min(1) }))
     .mutation(async ({ ctx, input }) => {
@@ -995,9 +1019,57 @@ const billingRouter = t.router({
   }),
 });
 
+const dashboardRouter = t.router({
+  overview: protectedProcedure.query(async ({ ctx }) => {
+    const workspace = await db.workspace.findUniqueOrThrow({
+      where: { id: ctx.workspace.id },
+    });
+
+    const customersCount = await db.customer.count({
+      where: { workspaceId: ctx.workspace.id, isArchived: false },
+    });
+
+    const jobsCount = await db.serviceJob.count({
+      where: { workspaceId: ctx.workspace.id },
+    });
+
+    const followUps = await db.followUp.findMany({
+      include: { customer: true, job: true },
+      where: { workspaceId: ctx.workspace.id },
+      orderBy: { dueAt: "asc" },
+    });
+
+    const todayEnd = new Date();
+    todayEnd.setHours(23, 59, 59, 999);
+
+    const dueToday = followUps.filter(
+      (item) => item.status !== "closed" && item.status !== "replied" && item.dueAt <= todayEnd
+    ).length;
+
+    const openFollowUps = followUps.filter((item) => item.status !== "closed").length;
+
+    const recentFollowUps = followUps
+      .filter((item) => item.status !== "closed")
+      .slice(0, 8)
+      .map((item) => followUpDto(item));
+
+    return {
+      counts: {
+        customers: customersCount,
+        dueToday,
+        jobs: jobsCount,
+        openFollowUps,
+      },
+      recentFollowUps,
+      workspace,
+    };
+  }),
+});
+
 export const appRouter = t.router({
   billing: billingRouter,
   customers: customersRouter,
+  dashboard: dashboardRouter,
   followUps: followUpsRouter,
   health: t.procedure.query(() => ({
     ok: true,

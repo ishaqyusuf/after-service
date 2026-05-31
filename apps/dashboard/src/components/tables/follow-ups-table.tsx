@@ -1,3 +1,5 @@
+"use client";
+
 import {
   Badge,
   Table,
@@ -8,36 +10,59 @@ import {
   TableRow,
 } from "@afterservice/ui";
 import { formatDate } from "@/lib/dashboard-format";
+import Link from "next/link";
+import { trpc } from "@/components/providers/trpc-provider";
 
-export function FollowUpsTable({ items }: { items: any[] }) {
+export function FollowUpsTable() {
+  const { data: tableData, isLoading } = trpc.followUps.listTable.useQuery({});
+  const items = tableData?.items ?? [];
+
+  if (isLoading) {
+    return <div className="p-8 text-center text-muted-foreground">Loading history...</div>;
+  }
+
   return (
     <div className="rounded-md border border-border bg-card">
       <Table>
         <TableHeader>
           <TableRow>
             <TableHead>Customer</TableHead>
-            <TableHead>Service</TableHead>
+            <TableHead>Channel</TableHead>
+            <TableHead>Due date</TableHead>
             <TableHead>Status</TableHead>
-            <TableHead>Due</TableHead>
-            <TableHead>Last event</TableHead>
+            <TableHead className="w-[100px]">Action</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
-          {items.map((followUp) => (
-            <TableRow key={followUp.id}>
-              <TableCell className="font-medium">{followUp.customerName}</TableCell>
-              <TableCell>{followUp.serviceTitle ?? "General"}</TableCell>
+          {items.map((item) => (
+            <TableRow key={item.id}>
               <TableCell>
-                <Badge variant={followUp.status === "sent" ? "default" : "secondary"}>
-                  {followUp.status}
+                <div className="font-semibold">{item.customerName}</div>
+                <div className="text-sm text-muted-foreground truncate max-w-[200px]">
+                  {item.serviceTitle}
+                </div>
+              </TableCell>
+              <TableCell className="uppercase text-xs font-medium">
+                {item.channel}
+              </TableCell>
+              <TableCell>{formatDate(item.dueAt)}</TableCell>
+              <TableCell>
+                <Badge
+                  variant={
+                    item.status === "closed"
+                      ? "secondary"
+                      : item.status === "replied"
+                        ? "default"
+                        : "outline"
+                  }
+                >
+                  {item.status}
                 </Badge>
               </TableCell>
-              <TableCell>{formatDate(followUp.dueAt)}</TableCell>
-              <TableCell className="text-muted-foreground text-sm">
-                {followUp.events[0]?.type ?? "created"}{" "}
-                {followUp.events[0]
-                  ? `on ${formatDate(followUp.events[0].createdAt)}`
-                  : ""}
+              <TableCell>
+                <Link href={`?follow_up_id=${item.id}`} scroll={false} className="text-sm font-medium text-muted-foreground hover:text-foreground">
+                  View
+                </Link>
               </TableCell>
             </TableRow>
           ))}

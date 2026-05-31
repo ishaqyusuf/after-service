@@ -1,3 +1,5 @@
+"use client";
+
 import {
   Badge,
   Button,
@@ -12,12 +14,20 @@ import {
   TableHeader,
   TableRow,
 } from "@afterservice/ui";
-import { getDashboardOverview } from "@/lib/dashboard-data";
 import { formatDate } from "@/lib/dashboard-format";
+import { trpc } from "@/components/providers/trpc-provider";
 import Link from "next/link";
 
-export default async function DashboardPage() {
-  const { counts, recentFollowUps, workspace } = await getDashboardOverview();
+export function DashboardOverview() {
+  const { data, isLoading } = trpc.dashboard.overview.useQuery();
+
+  if (isLoading) {
+    return <div className="p-8 text-center text-muted-foreground">Loading overview...</div>;
+  }
+
+  if (!data) return null;
+
+  const { counts, recentFollowUps, workspace } = data;
 
   return (
     <div className="space-y-8">
@@ -57,6 +67,7 @@ export default async function DashboardPage() {
                 <TableHead>Service</TableHead>
                 <TableHead>Status</TableHead>
                 <TableHead>Due</TableHead>
+                <TableHead className="w-[100px]">Action</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -74,11 +85,16 @@ export default async function DashboardPage() {
                     </Badge>
                   </TableCell>
                   <TableCell>{formatDate(followUp.dueAt)}</TableCell>
+                  <TableCell>
+                    <Link href={`/follow-ups?follow_up_id=${followUp.id}`} className="text-sm font-medium text-muted-foreground hover:text-foreground">
+                      View
+                    </Link>
+                  </TableCell>
                 </TableRow>
               ))}
               {recentFollowUps.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={4} className="h-24 text-center">No open follow-ups yet.</TableCell>
+                  <TableCell colSpan={5} className="h-24 text-center">No open follow-ups yet.</TableCell>
                 </TableRow>
               ) : null}
             </TableBody>

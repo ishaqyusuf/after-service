@@ -1,3 +1,5 @@
+"use client";
+
 import {
   Table,
   TableBody,
@@ -7,9 +9,17 @@ import {
   TableRow,
 } from "@afterservice/ui";
 import { centsToDollars, formatDate } from "@/lib/dashboard-format";
-import { ScheduleFollowUpSheet } from "../sheets/schedule-follow-up-sheet";
+import Link from "next/link";
+import { trpc } from "@/components/providers/trpc-provider";
 
-export function JobsTable({ jobs, templates, defaultDue }: { jobs: any[], templates: any[], defaultDue: string }) {
+export function JobsTable() {
+  const { data: jobsData, isLoading } = trpc.serviceJobs.list.useQuery();
+  const jobs = jobsData?.items ?? [];
+
+  if (isLoading) {
+    return <div className="p-8 text-center text-muted-foreground">Loading jobs...</div>;
+  }
+
   return (
     <div className="rounded-md border border-border bg-card">
       <Table>
@@ -37,7 +47,9 @@ export function JobsTable({ jobs, templates, defaultDue }: { jobs: any[], templa
                 {centsToDollars(job.amountCents) || "Unset"}
               </TableCell>
               <TableCell>
-                <ScheduleFollowUpSheet job={job} templates={templates} defaultDue={defaultDue} />
+                <Link href={`?schedule_follow_up=${job.id}`} scroll={false} className="text-sm font-medium text-muted-foreground hover:text-foreground">
+                  Schedule
+                </Link>
               </TableCell>
             </TableRow>
           ))}

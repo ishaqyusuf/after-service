@@ -1,3 +1,5 @@
+"use client";
+
 import {
   Badge,
   Button,
@@ -8,11 +10,29 @@ import {
   TableHeader,
   TableRow,
 } from "@afterservice/ui";
-import { setDefaultTemplateAction } from "@/lib/dashboard-actions";
 import { resolveTemplate } from "@/lib/dashboard-format";
-import { TemplateSheet } from "../sheets/template-sheet";
+import { trpc } from "@/components/providers/trpc-provider";
+import Link from "next/link";
 
-export function TemplatesTable({ templates, workspace, sampleJob, sampleCustomer }: { templates: any[], workspace: any, sampleJob: any, sampleCustomer: any }) {
+export function TemplatesTable() {
+  const { data, isLoading } = trpc.templates.list.useQuery();
+  const utils = trpc.useUtils();
+  
+  const setDefaultMutation = trpc.templates.setDefault.useMutation({
+    onSuccess: () => {
+      utils.templates.list.invalidate();
+    }
+  });
+
+  if (isLoading) {
+    return <div className="p-8 text-center text-muted-foreground">Loading templates...</div>;
+  }
+
+  const templates = data?.items ?? [];
+  const workspace = data?.workspace;
+  const sampleJob = data?.sampleJob;
+  const sampleCustomer = data?.sampleCustomer;
+
   return (
     <div className="rounded-md border border-border bg-card">
       <Table>
@@ -33,7 +53,7 @@ export function TemplatesTable({ templates, workspace, sampleJob, sampleCustomer
               </TableCell>
               <TableCell className="max-w-[300px] truncate">
                 {resolveTemplate(template.body, {
-                  businessName: workspace.name,
+                  businessName: workspace?.name ?? "Business",
                   completionDate: sampleJob?.completedAt,
                   customerName: sampleCustomer?.name,
                   serviceName: sampleJob?.title,
@@ -43,16 +63,20 @@ export function TemplatesTable({ templates, workspace, sampleJob, sampleCustomer
                 {template.isDefault ? (
                   <Badge variant="default" className="bg-success text-success-foreground hover:bg-success/90">Default</Badge>
                 ) : (
-                  <form action={setDefaultTemplateAction}>
-                    <input name="id" type="hidden" value={template.id} />
-                    <Button size="sm" type="submit" variant="secondary">
-                      Set default
-                    </Button>
-                  </form>
+                  <Button 
+                    size="sm" 
+                    variant="secondary" 
+                    onClick={() => setDefaultMutation.mutate({ id: template.id })}
+                    disabled={setDefaultMutation.isPending}
+                  >
+                    Set default
+                  </Button>
                 )}
               </TableCell>
               <TableCell>
-                <TemplateSheet template={template} />
+                <Link href={`?template_id=${template.id}`} scroll={false} className="text-sm font-medium text-muted-foreground hover:text-foreground">
+                  Edit
+                </Link>
               </TableCell>
             </TableRow>
           ))}
