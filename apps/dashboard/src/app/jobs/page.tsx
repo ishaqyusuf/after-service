@@ -1,24 +1,8 @@
-import {
-  Badge,
-  Button,
-  Field,
-  FieldGroup,
-  FieldLabel,
-  Input,
-  Select,
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-  Textarea,
-} from "@afterservice/ui";
-import {
-  createFollowUpFromJobAction,
-  createJobAction,
-} from "@/lib/dashboard-actions";
-import { centsToDollars, formatDate, getJobsData } from "@/lib/dashboard-data";
+import { Badge, Button } from "@afterservice/ui";
+import { getJobsData } from "@/lib/dashboard-data";
+import { CreateJobForm } from "@/components/forms/create-job-form";
+import { JobsTable } from "@/components/tables/jobs-table";
+import Link from "next/link";
 
 export default async function JobsPage() {
   const { customers, jobs, templates, workspace } = await getJobsData();
@@ -29,161 +13,29 @@ export default async function JobsPage() {
     .slice(0, 10);
 
   return (
-    <main className="dashboard-page">
-      <header className="dashboard-page__header">
-        <Badge>Service jobs</Badge>
-        <div>
-          <h1>Jobs</h1>
-          <p>
+    <div className="space-y-8">
+      <header className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div className="space-y-1">
+          <Badge variant="outline" className="mb-2">Service jobs</Badge>
+          <h1 className="text-3xl font-bold tracking-tight">Jobs</h1>
+          <p className="text-muted-foreground max-w-2xl">
             Log completed work and turn it into follow-up actions using the
             workspace default cadence.
           </p>
         </div>
-        <a href="/follow-ups">Open board</a>
+        <Button asChild>
+          <Link href="/follow-ups">Open board</Link>
+        </Button>
       </header>
 
-      <section className="dashboard-split">
-        <form action={createJobAction} className="dashboard-form">
-          <h2>Log completed job</h2>
-          <FieldGroup>
-            <Field>
-              <FieldLabel htmlFor="job-customer">Customer</FieldLabel>
-              <Select id="job-customer" name="customerId" required>
-                <option value="">Select customer</option>
-                {customers.map((customer) => (
-                  <option key={customer.id} value={customer.id}>
-                    {customer.name}
-                  </option>
-                ))}
-              </Select>
-            </Field>
-            <Field>
-              <FieldLabel htmlFor="job-title">Service title</FieldLabel>
-              <Input id="job-title" name="title" required />
-            </Field>
-            <Field>
-              <FieldLabel htmlFor="job-category">Category</FieldLabel>
-              <Input
-                id="job-category"
-                name="serviceCategory"
-                placeholder="HVAC maintenance"
-              />
-            </Field>
-            <Field>
-              <FieldLabel htmlFor="job-completed-at">Completed date</FieldLabel>
-              <Input
-                id="job-completed-at"
-                defaultValue={new Date().toISOString().slice(0, 10)}
-                name="completedAt"
-                required
-                type="date"
-              />
-            </Field>
-            <Field>
-              <FieldLabel htmlFor="job-amount">Amount</FieldLabel>
-              <Input
-                id="job-amount"
-                name="amountDollars"
-                placeholder="250"
-                type="number"
-              />
-            </Field>
-            <Field>
-              <FieldLabel htmlFor="job-next-follow-up">
-                Next follow-up
-              </FieldLabel>
-              <Input
-                id="job-next-follow-up"
-                defaultValue={defaultDue}
-                name="nextFollowUpAt"
-                type="date"
-              />
-            </Field>
-            <Field>
-              <FieldLabel htmlFor="job-notes">Notes</FieldLabel>
-              <Textarea id="job-notes" name="notes" />
-            </Field>
-          </FieldGroup>
-          <Button disabled={customers.length === 0} type="submit">
-            Create job
-          </Button>
-        </form>
+      <div className="grid grid-cols-1 xl:grid-cols-[400px_1fr] gap-8 items-start">
+        <CreateJobForm customers={customers} defaultDue={defaultDue} />
 
-        <section className="dashboard-section">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Job</TableHead>
-                <TableHead>Customer</TableHead>
-                <TableHead>Completed</TableHead>
-                <TableHead>Value</TableHead>
-                <TableHead>Follow-up</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {jobs.map((job) => (
-                <TableRow key={job.id}>
-                  <TableCell>
-                    <strong>{job.title}</strong>
-                    <span className="muted-block">
-                      {job.serviceCategory ?? job.status}
-                    </span>
-                  </TableCell>
-                  <TableCell>{job.customer.name}</TableCell>
-                  <TableCell>{formatDate(job.completedAt)}</TableCell>
-                  <TableCell>
-                    {centsToDollars(job.amountCents) || "Unset"}
-                  </TableCell>
-                  <TableCell>
-                    <details className="inline-details">
-                      <summary>Schedule</summary>
-                      <form
-                        action={createFollowUpFromJobAction}
-                        className="mini-form"
-                      >
-                        <input name="jobId" type="hidden" value={job.id} />
-                        <Input
-                          defaultValue={defaultDue}
-                          name="dueAt"
-                          type="date"
-                        />
-                        <Select name="channel" defaultValue="email">
-                          <option value="email">Email</option>
-                          <option value="sms">SMS</option>
-                          <option value="phone">Phone</option>
-                          <option value="whatsapp">WhatsApp</option>
-                        </Select>
-                        <Select name="templateId">
-                          <option value="">No template</option>
-                          {templates.map((template) => (
-                            <option key={template.id} value={template.id}>
-                              {template.name}
-                            </option>
-                          ))}
-                        </Select>
-                        <Textarea
-                          name="notes"
-                          defaultValue={`Follow up about ${job.title}.`}
-                        />
-                        <Button size="sm" type="submit">
-                          Create follow-up
-                        </Button>
-                      </form>
-                    </details>
-                  </TableCell>
-                </TableRow>
-              ))}
-              {jobs.length === 0 ? (
-                <TableRow>
-                  <TableCell colSpan={5}>
-                    No jobs yet. Create a customer, then log completed work.
-                  </TableCell>
-                </TableRow>
-              ) : null}
-            </TableBody>
-          </Table>
+        <section className="min-w-0">
+          <JobsTable jobs={jobs} templates={templates} defaultDue={defaultDue} />
         </section>
-      </section>
-    </main>
+      </div>
+    </div>
   );
 }
+

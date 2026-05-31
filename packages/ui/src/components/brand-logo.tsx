@@ -1,27 +1,25 @@
-export type BrandLogoProps = {
-  name?: string;
-};
+import * as React from "react";
+import { cn } from "../utils";
 
-export function BrandLogo({ name = "afterservice" }: BrandLogoProps) {
+export function BrandLogo({
+  name,
+  className,
+}: {
+  name: string;
+  className?: string;
+}) {
   return (
-    <span className="as-brand-logo">
+    <div className={cn("inline-flex items-center gap-2 text-foreground leading-none", className)}>
       <svg
-        aria-hidden="true"
-        className="as-brand-logo__mark"
+        className="w-7 h-7 shrink-0"
+        viewBox="0 0 30 30"
         fill="none"
-        viewBox="0 0 64 64"
         xmlns="http://www.w3.org/2000/svg"
       >
-        <path
-          d="M50 51V29C50 18.5 41.5 10 31 10S12 18.5 12 29s8.5 19 19 19c5.1 0 9.8-2 13.2-5.3"
-          stroke="currentColor"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth="13"
-        />
-        <circle className="as-brand-logo__dot" cx="31" cy="29" r="6.5" />
+        <circle cx="15" cy="15" r="15" fill="currentColor" />
+        <circle cx="15" cy="15" r="6" className="fill-[#009b98]" />
       </svg>
-      <span className="as-brand-logo__wordmark">{name}</span>
-    </span>
+      <span className="tracking-tight font-bold text-lg">{name}</span>
+    </div>
   );
 }

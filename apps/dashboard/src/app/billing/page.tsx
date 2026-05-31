@@ -1,4 +1,4 @@
-import { Badge, Button } from "@afterservice/ui";
+import { Badge, Button, Card, CardContent, CardHeader, CardTitle } from "@afterservice/ui";
 import { startCheckoutAction } from "@/lib/dashboard-actions";
 import { formatDate, getBillingData } from "@/lib/dashboard-data";
 
@@ -7,14 +7,17 @@ export default async function BillingPage() {
     await getBillingData();
 
   return (
-    <main className="dashboard-page">
-      <header className="dashboard-page__header">
-        <Badge tone={planStatus === "active" ? "success" : "warning"}>
-          {planStatus}
-        </Badge>
-        <div>
-          <h1>Billing</h1>
-          <p>
+    <div className="space-y-8">
+      <header className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div className="space-y-1">
+          <Badge 
+            variant={planStatus === "active" ? "default" : "outline"} 
+            className="mb-2"
+          >
+            {planStatus}
+          </Badge>
+          <h1 className="text-3xl font-bold tracking-tight">Billing</h1>
+          <p className="text-muted-foreground max-w-2xl">
             Subscription state is persisted from verified Lemon Squeezy
             webhooks. Checkout can start here, but redirects do not grant
             entitlement.
@@ -25,7 +28,7 @@ export default async function BillingPage() {
         </form>
       </header>
 
-      <section className="metric-grid">
+      <section className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <Metric label="Plan" value={plan} />
         <Metric
           label="Customers"
@@ -41,38 +44,47 @@ export default async function BillingPage() {
         />
       </section>
 
-      <section className="dashboard-section">
-        <h2>Subscription</h2>
-        <dl className="detail-list">
-          <div>
-            <dt>Provider subscription</dt>
-            <dd>
-              {subscription?.providerSubId ?? "No provider subscription yet"}
-            </dd>
-          </div>
-          <div>
-            <dt>Current period end</dt>
-            <dd>{formatDate(subscription?.currentPeriodEnd)}</dd>
-          </div>
-          <div>
-            <dt>Webhook status</dt>
-            <dd>
-              {subscription
-                ? "Last provider event synced"
-                : "Waiting for first verified billing event"}
-            </dd>
-          </div>
-        </dl>
+      <section className="space-y-4">
+        <h2 className="text-xl font-semibold tracking-tight">Subscription</h2>
+        <Card>
+          <CardContent className="p-0">
+            <dl className="divide-y divide-border">
+              <div className="flex items-center justify-between p-4 sm:p-6">
+                <dt className="text-sm font-medium text-muted-foreground">Provider subscription</dt>
+                <dd className="text-sm font-medium">
+                  {subscription?.providerSubId ?? "No provider subscription yet"}
+                </dd>
+              </div>
+              <div className="flex items-center justify-between p-4 sm:p-6">
+                <dt className="text-sm font-medium text-muted-foreground">Current period end</dt>
+                <dd className="text-sm font-medium">{formatDate(subscription?.currentPeriodEnd)}</dd>
+              </div>
+              <div className="flex items-center justify-between p-4 sm:p-6">
+                <dt className="text-sm font-medium text-muted-foreground">Webhook status</dt>
+                <dd className="text-sm font-medium">
+                  {subscription
+                    ? "Last provider event synced"
+                    : "Waiting for first verified billing event"}
+                </dd>
+              </div>
+            </dl>
+          </CardContent>
+        </Card>
       </section>
-    </main>
+    </div>
   );
 }
 
 function Metric({ label, value }: { label: string; value: string }) {
   return (
-    <div className="metric-card">
-      <span>{label}</span>
-      <strong>{value}</strong>
-    </div>
+    <Card>
+      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+        <CardTitle className="text-sm font-medium text-muted-foreground">{label}</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <div className="text-2xl font-bold">{value}</div>
+      </CardContent>
+    </Card>
   );
 }
+

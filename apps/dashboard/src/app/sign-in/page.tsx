@@ -103,20 +103,22 @@ function AuthLayout({
   title: string;
 }) {
   return (
-    <div className="auth-layout">
-      <div className="auth-card">
-        <div className="auth-card__brand">
+    <div className="min-h-screen flex items-center justify-center bg-muted/40 p-4">
+      <div className="w-full max-w-[400px] bg-background border border-border shadow-sm rounded-xl p-6 sm:p-8">
+        <div className="flex justify-center mb-6">
           <BrandLogo name={appMetadata.name} />
         </div>
-        <h1 className="auth-card__title">{title}</h1>
-        <p className="auth-card__description">{description}</p>
+        <div className="text-center mb-6">
+          <h1 className="text-2xl font-semibold tracking-tight text-foreground">{title}</h1>
+          <p className="text-sm text-muted-foreground mt-2">{description}</p>
+        </div>
         {children}
-        {footer ? <div className="auth-card__footer">{footer}</div> : null}
+        {footer ? <div className="mt-6 pt-6 border-t border-border">{footer}</div> : null}
       </div>
     </div>
   );
 }
 
 function AuthFooter({ children }: { children: React.ReactNode }) {
-  return <div style={{ fontSize: 14, color: "#5e6a62" }}>{children}</div>;
+  return <div className="text-sm text-center text-muted-foreground">{children}</div>;
 }

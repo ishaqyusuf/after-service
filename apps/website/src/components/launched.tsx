@@ -61,11 +61,11 @@ export function LaunchedPage() {
   ];
 
   return (
-    <div className="fullscreen-landing relative min-h-screen bg-[#fbfcf8] dark:bg-[#070c08] text-[#18211c] dark:text-white overflow-hidden flex flex-col justify-between transition-colors duration-300">
+    <div className="fullscreen-landing relative min-h-screen bg-background text-foreground overflow-hidden flex flex-col justify-between transition-colors duration-300">
       {/* Background radial gradients for high-end glow */}
-      <div className="absolute top-[-10%] left-[-10%] w-[60%] h-[60%] rounded-full bg-[#009b98] opacity-[0.03] dark:opacity-[0.07] blur-[150px] pointer-events-none" />
-      <div className="absolute top-[40%] right-[-10%] w-[50%] h-[50%] rounded-full bg-[#009b98] opacity-[0.02] dark:opacity-[0.05] blur-[150px] pointer-events-none" />
-      <div className="absolute bottom-[-10%] left-[20%] w-[60%] h-[60%] rounded-full bg-[#009b98] opacity-[0.02] dark:opacity-[0.06] blur-[150px] pointer-events-none" />
+      <div className="absolute top-[-10%] left-[-10%] w-[60%] h-[60%] rounded-full bg-primary opacity-[0.03] dark:opacity-[0.07] blur-[150px] pointer-events-none" />
+      <div className="absolute top-[40%] right-[-10%] w-[50%] h-[50%] rounded-full bg-primary opacity-[0.02] dark:opacity-[0.05] blur-[150px] pointer-events-none" />
+      <div className="absolute bottom-[-10%] left-[20%] w-[60%] h-[60%] rounded-full bg-primary opacity-[0.02] dark:opacity-[0.06] blur-[150px] pointer-events-none" />
 
       {/* Subtle grid background */}
       <div
@@ -77,13 +77,13 @@ export function LaunchedPage() {
       />
 
       {/* Navigation Header */}
-      <header className="sticky top-0 z-50 w-full border-b border-[#dfe5dc] dark:border-[#1f3026] bg-[#fbfcf8]/85 dark:bg-[#070c08]/85 backdrop-blur-md">
+      <header className="sticky top-0 z-50 w-full border-b border-border bg-background/85 backdrop-blur-md">
         <div className="max-w-7xl mx-auto px-6 sm:px-8 h-18 flex items-center justify-between">
           <a href="/" className="inline-flex items-center">
             <BrandLogo name={appMetadata.name} />
           </a>
 
-          <nav className="hidden md:flex items-center gap-8 text-sm font-medium text-[#55625b] dark:text-[#8fa397]">
+          <nav className="hidden md:flex items-center gap-8 text-sm font-medium text-muted-foreground">
             <a
               href="#features"
               className="hover:text-[#18211c] dark:hover:text-white transition-colors"
@@ -114,7 +114,7 @@ export function LaunchedPage() {
             <button
               type="button"
               onClick={toggleTheme}
-              className="p-2 rounded-lg bg-white dark:bg-[#111814] border border-[#dfe5dc] dark:border-[#1f3026] hover:border-[#009b98]/40 transition-all duration-200 shadow-sm"
+              className="p-2 rounded-lg bg-card border border-border hover:border-[#009b98]/40 transition-all duration-200 shadow-sm"
               aria-label="Toggle Theme"
             >
               {theme === "dark" ? (
@@ -133,7 +133,7 @@ export function LaunchedPage() {
                 </svg>
               ) : (
                 <svg
-                  className="w-5 h-5 text-[#009b98]"
+                  className="w-5 h-5 text-primary"
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"
@@ -150,7 +150,7 @@ export function LaunchedPage() {
 
             <a
               href="/login"
-              className="text-sm font-medium text-[#55625b] dark:text-[#8fa397] hover:text-[#18211c] dark:hover:text-white transition-colors"
+              className="text-sm font-medium text-muted-foreground hover:text-[#18211c] dark:hover:text-white transition-colors"
             >
               Sign In
             </a>
@@ -164,7 +164,7 @@ export function LaunchedPage() {
             <button
               type="button"
               onClick={toggleTheme}
-              className="p-2 rounded-lg bg-white dark:bg-[#111814] border border-[#dfe5dc] dark:border-[#1f3026] hover:border-[#009b98]/40 transition-all duration-200 shadow-sm"
+              className="p-2 rounded-lg bg-card border border-border hover:border-[#009b98]/40 transition-all duration-200 shadow-sm"
               aria-label="Toggle Theme"
             >
               {theme === "dark" ? (
@@ -183,7 +183,7 @@ export function LaunchedPage() {
                 </svg>
               ) : (
                 <svg
-                  className="w-5 h-5 text-[#009b98]"
+                  className="w-5 h-5 text-primary"
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"
@@ -201,11 +201,11 @@ export function LaunchedPage() {
             <button
               type="button"
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="p-2 rounded-lg bg-white dark:bg-[#111814] border border-[#dfe5dc] dark:border-[#1f3026] hover:border-[#009b98]/40 transition-all duration-200 shadow-sm"
+              className="p-2 rounded-lg bg-card border border-border hover:border-[#009b98]/40 transition-all duration-200 shadow-sm"
               aria-label={mobileMenuOpen ? "Close menu" : "Open menu"}
             >
               <svg
-                className="w-5 h-5 text-[#18211c] dark:text-white"
+                className="w-5 h-5 text-foreground"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
@@ -231,41 +231,41 @@ export function LaunchedPage() {
 
         {/* Mobile menu */}
         {mobileMenuOpen && (
-          <div className="md:hidden border-t border-[#dfe5dc] dark:border-[#1f3026] bg-[#fbfcf8]/95 dark:bg-[#070c08]/95 backdrop-blur-md">
+          <div className="md:hidden border-t border-border bg-background/95 backdrop-blur-md">
             <nav className="flex flex-col gap-1 px-6 py-4">
               <a
                 href="#features"
                 onClick={() => setMobileMenuOpen(false)}
-                className="py-3 px-4 rounded-lg text-sm font-medium text-[#55625b] dark:text-[#8fa397] hover:text-[#18211c] dark:hover:text-white hover:bg-[#e9eee6] dark:hover:bg-[#111814] transition-colors"
+                className="py-3 px-4 rounded-lg text-sm font-medium text-muted-foreground hover:text-[#18211c] dark:hover:text-white hover:bg-[#e9eee6] dark:hover:bg-[#111814] transition-colors"
               >
                 Features
               </a>
               <a
                 href="#how-it-works"
                 onClick={() => setMobileMenuOpen(false)}
-                className="py-3 px-4 rounded-lg text-sm font-medium text-[#55625b] dark:text-[#8fa397] hover:text-[#18211c] dark:hover:text-white hover:bg-[#e9eee6] dark:hover:bg-[#111814] transition-colors"
+                className="py-3 px-4 rounded-lg text-sm font-medium text-muted-foreground hover:text-[#18211c] dark:hover:text-white hover:bg-[#e9eee6] dark:hover:bg-[#111814] transition-colors"
               >
                 How it Works
               </a>
               <a
                 href="#pricing"
                 onClick={() => setMobileMenuOpen(false)}
-                className="py-3 px-4 rounded-lg text-sm font-medium text-[#55625b] dark:text-[#8fa397] hover:text-[#18211c] dark:hover:text-white hover:bg-[#e9eee6] dark:hover:bg-[#111814] transition-colors"
+                className="py-3 px-4 rounded-lg text-sm font-medium text-muted-foreground hover:text-[#18211c] dark:hover:text-white hover:bg-[#e9eee6] dark:hover:bg-[#111814] transition-colors"
               >
                 Pricing
               </a>
               <a
                 href="#faqs"
                 onClick={() => setMobileMenuOpen(false)}
-                className="py-3 px-4 rounded-lg text-sm font-medium text-[#55625b] dark:text-[#8fa397] hover:text-[#18211c] dark:hover:text-white hover:bg-[#e9eee6] dark:hover:bg-[#111814] transition-colors"
+                className="py-3 px-4 rounded-lg text-sm font-medium text-muted-foreground hover:text-[#18211c] dark:hover:text-white hover:bg-[#e9eee6] dark:hover:bg-[#111814] transition-colors"
               >
                 FAQs
               </a>
-              <div className="border-t border-[#dfe5dc] dark:border-[#1f3026] mt-2 pt-4 flex flex-col gap-3 px-4">
+              <div className="border-t border-border mt-2 pt-4 flex flex-col gap-3 px-4">
                 <a
                   href="/login"
                   onClick={() => setMobileMenuOpen(false)}
-                  className="text-sm font-medium text-[#55625b] dark:text-[#8fa397] hover:text-[#18211c] dark:hover:text-white transition-colors"
+                  className="text-sm font-medium text-muted-foreground hover:text-[#18211c] dark:hover:text-white transition-colors"
                 >
                   Sign In
                 </a>
@@ -280,19 +280,19 @@ export function LaunchedPage() {
 
       {/* Hero Section */}
       <section className="relative z-10 max-w-7xl mx-auto w-full px-6 sm:px-8 pt-20 pb-16 text-center">
-        <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#eef8f0] dark:bg-[#122118] border border-[#a9d3b7] dark:border-[#1b3d2b] text-sm text-[#24583a] dark:text-[#009b98] font-medium mb-8 hover:border-[#009b98]/40 transition-all duration-300">
-          <span className="w-2 h-2 rounded-full bg-[#009b98] animate-pulse" />
+        <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-sm text-primary font-medium mb-8 hover:border-[#009b98]/40 transition-all duration-300">
+          <span className="w-2 h-2 rounded-full bg-primary animate-pulse" />
           <span>v1.0 is officially live for operators</span>
         </div>
 
-        <h1 className="text-4xl sm:text-6xl lg:text-7xl font-extrabold tracking-tight text-[#18211c] dark:text-white mb-6 max-w-5xl mx-auto leading-[1.05]">
+        <h1 className="text-4xl sm:text-6xl lg:text-7xl font-extrabold tracking-tight text-foreground mb-6 max-w-5xl mx-auto leading-[1.05]">
           Turn Every Service Job Into <br />
           <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#009b98] via-[#4bbbaa] to-[#a9d3b7]">
             Customer Lifetime Value
           </span>
         </h1>
 
-        <p className="text-lg sm:text-xl text-[#55625b] dark:text-[#8fa397] max-w-3xl mx-auto mb-10 leading-relaxed">
+        <p className="text-lg sm:text-xl text-muted-foreground max-w-3xl mx-auto mb-10 leading-relaxed">
           The post-service automation platform built for plumbers, HVAC techs,
           electricians, and local operators. Automatically follow up, collect
           5-star reviews, resolve disputes privately, and reactivate repeat
@@ -302,7 +302,7 @@ export function LaunchedPage() {
         <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-20">
           <a
             href="/signup"
-            className="w-full sm:w-auto px-8 py-4 bg-[#009b98] hover:bg-[#00b0ad] active:scale-[0.98] text-white font-bold rounded-xl transition-all duration-200 shadow-lg shadow-[#009b98]/20 flex items-center justify-center gap-2"
+            className="w-full sm:w-auto px-8 py-4 bg-primary hover:bg-[#00b0ad] active:scale-[0.98] text-white font-bold rounded-xl transition-all duration-200 shadow-lg shadow-[#009b98]/20 flex items-center justify-center gap-2"
           >
             <span>Start Your 14-Day Free Trial</span>
             <svg
@@ -321,28 +321,28 @@ export function LaunchedPage() {
           </a>
           <a
             href="#pricing"
-            className="w-full sm:w-auto px-8 py-4 bg-white dark:bg-[#111814]/80 border border-[#dfe5dc] dark:border-[#1f3026] text-[#55625b] dark:text-[#8fa397] hover:text-[#18211c] dark:hover:text-white font-bold rounded-xl transition-all duration-200 flex items-center justify-center"
+            className="w-full sm:w-auto px-8 py-4 bg-card border border-border text-muted-foreground hover:text-[#18211c] dark:hover:text-white font-bold rounded-xl transition-all duration-200 flex items-center justify-center"
           >
             See Pricing & Plans
           </a>
         </div>
 
         {/* Dashboard Showcase Mockup */}
-        <div className="relative max-w-5xl mx-auto bg-white dark:bg-[#0d1410] border border-[#dfe5dc] dark:border-[#1f3026] rounded-2xl p-4 shadow-xl dark:shadow-2xl backdrop-blur-sm overflow-hidden group transition-colors duration-300">
+        <div className="relative max-w-5xl mx-auto bg-card border border-border rounded-2xl p-4 shadow-xl dark:shadow-2xl backdrop-blur-sm overflow-hidden group transition-colors duration-300">
           {/* Decorative browser dots */}
-          <div className="flex items-center gap-2 mb-4 border-b border-[#dfe5dc] dark:border-[#1b3d2b] pb-3">
+          <div className="flex items-center gap-2 mb-4 border-b border-border pb-3">
             <span className="w-3 h-3 rounded-full bg-red-500/80" />
             <span className="w-3 h-3 rounded-full bg-yellow-500/80" />
             <span className="w-3 h-3 rounded-full bg-green-500/80" />
-            <span className="ml-4 text-xs text-[#7c8e82] dark:text-[#566e60] font-mono">
+            <span className="ml-4 text-xs text-muted-foreground font-mono">
               dashboard.afterservice.app
             </span>
           </div>
 
           {/* Dummy UI Showcase */}
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4 text-left">
-            <div className="md:col-span-1 border-r border-[#dfe5dc] dark:border-[#1b3d2b] pr-4 hidden md:flex flex-col gap-3 text-xs text-[#55625b] dark:text-[#8fa397]">
-              <div className="p-2 rounded bg-[#eef8f0] dark:bg-[#122118] text-[#009b98] font-bold">
+            <div className="md:col-span-1 border-r border-border pr-4 hidden md:flex flex-col gap-3 text-xs text-muted-foreground">
+              <div className="p-2 rounded bg-primary/10 text-primary font-bold">
                 🎯 Follow-Up Board
               </div>
               <div className="p-2 hover:bg-[#eef8f0]/50 dark:hover:bg-[#122118]/40 rounded transition-colors">
@@ -360,65 +360,65 @@ export function LaunchedPage() {
             </div>
 
             <div className="md:col-span-3 flex flex-col gap-4">
-              <div className="flex items-center justify-between border-b border-[#dfe5dc] dark:border-[#1b3d2b] pb-2">
-                <h4 className="font-bold text-[#009b98]">
+              <div className="flex items-center justify-between border-b border-border pb-2">
+                <h4 className="font-bold text-primary">
                   Active Follow-Up Pipeline
                 </h4>
-                <span className="text-xs text-[#7c8e82] dark:text-[#566e60]">
+                <span className="text-xs text-muted-foreground">
                   Updated just now
                 </span>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                <div className="bg-[#fcfdfa] dark:bg-[#122118]/50 border border-[#dfe5dc] dark:border-[#1b3d2b] p-3 rounded-xl flex flex-col justify-between min-h-32">
+                <div className="bg-card border border-border p-3 rounded-xl flex flex-col justify-between min-h-32">
                   <div>
                     <span className="text-[10px] uppercase font-bold text-yellow-600 dark:text-yellow-500 px-2 py-0.5 rounded bg-yellow-100 dark:bg-yellow-950/30 border border-yellow-200 dark:border-yellow-800/40">
                       DUE TODAY
                     </span>
-                    <h5 className="font-bold text-sm mt-2 text-[#18211c] dark:text-white">
+                    <h5 className="font-bold text-sm mt-2 text-foreground">
                       HVAC Maintenance
                     </h5>
-                    <p className="text-xs text-[#55625b] dark:text-[#8fa397]">
+                    <p className="text-xs text-muted-foreground">
                       John Doe - Rapid Cooling
                     </p>
                   </div>
                   <div className="flex items-center justify-between mt-4">
-                    <span className="text-[10px] text-[#7c8e82] dark:text-[#566e60]">
+                    <span className="text-[10px] text-muted-foreground">
                       SMS Queued
                     </span>
                     <span className="w-2.5 h-2.5 rounded-full bg-yellow-500" />
                   </div>
                 </div>
 
-                <div className="bg-[#fcfdfa] dark:bg-[#122118]/50 border border-[#dfe5dc] dark:border-[#1b3d2b] p-3 rounded-xl flex flex-col justify-between min-h-32">
+                <div className="bg-card border border-border p-3 rounded-xl flex flex-col justify-between min-h-32">
                   <div>
-                    <span className="text-[10px] uppercase font-bold text-[#009b98] px-2 py-0.5 rounded bg-[#009b98]/10 border border-[#009b98]/20">
+                    <span className="text-[10px] uppercase font-bold text-primary px-2 py-0.5 rounded bg-primary/10 border border-[#009b98]/20">
                       SENT
                     </span>
-                    <h5 className="font-bold text-sm mt-2 text-[#18211c] dark:text-white">
+                    <h5 className="font-bold text-sm mt-2 text-foreground">
                       Plumbing Install
                     </h5>
-                    <p className="text-xs text-[#55625b] dark:text-[#8fa397]">
+                    <p className="text-xs text-muted-foreground">
                       Sarah Smith - Shower Leak
                     </p>
                   </div>
                   <div className="flex items-center justify-between mt-4">
-                    <span className="text-[10px] text-[#7c8e82] dark:text-[#566e60]">
+                    <span className="text-[10px] text-muted-foreground">
                       Sent 2h ago
                     </span>
-                    <span className="w-2.5 h-2.5 rounded-full bg-[#009b98]" />
+                    <span className="w-2.5 h-2.5 rounded-full bg-primary" />
                   </div>
                 </div>
 
-                <div className="bg-[#fcfdfa] dark:bg-[#122118]/50 border border-[#dfe5dc] dark:border-[#1b3d2b] p-3 rounded-xl flex flex-col justify-between min-h-32">
+                <div className="bg-card border border-border p-3 rounded-xl flex flex-col justify-between min-h-32">
                   <div>
                     <span className="text-[10px] uppercase font-bold text-green-600 dark:text-green-500 px-2 py-0.5 rounded bg-green-100 dark:bg-green-950/30 border border-green-200 dark:border-green-800/40">
                       REPLIED
                     </span>
-                    <h5 className="font-bold text-sm mt-2 text-[#18211c] dark:text-white">
+                    <h5 className="font-bold text-sm mt-2 text-foreground">
                       Electrical Panel
                     </h5>
-                    <p className="text-xs text-[#55625b] dark:text-[#8fa397]">
+                    <p className="text-xs text-muted-foreground">
                       Robert Lee - Breaker Box
                     </p>
                   </div>
@@ -436,37 +436,37 @@ export function LaunchedPage() {
       </section>
 
       {/* Metrics Section */}
-      <section className="relative z-10 border-y border-[#dfe5dc] dark:border-[#1f3026] bg-[#f5f6f2] dark:bg-[#0b100d]/60 py-12 transition-colors duration-300">
+      <section className="relative z-10 border-y border-border bg-muted py-12 transition-colors duration-300">
         <div className="max-w-7xl mx-auto px-6 sm:px-8 grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
           <div>
-            <h3 className="text-3xl sm:text-4xl font-extrabold text-[#18211c] dark:text-white mb-2">
+            <h3 className="text-3xl sm:text-4xl font-extrabold text-foreground mb-2">
               $48M+
             </h3>
-            <p className="text-xs sm:text-sm text-[#55625b] dark:text-[#8fa397] uppercase tracking-wider font-semibold">
+            <p className="text-xs sm:text-sm text-muted-foreground uppercase tracking-wider font-semibold">
               Service Revenue Tracked
             </p>
           </div>
           <div>
-            <h3 className="text-3xl sm:text-4xl font-extrabold text-[#009b98] mb-2">
+            <h3 className="text-3xl sm:text-4xl font-extrabold text-primary mb-2">
               +31%
             </h3>
-            <p className="text-xs sm:text-sm text-[#55625b] dark:text-[#8fa397] uppercase tracking-wider font-semibold">
+            <p className="text-xs sm:text-sm text-muted-foreground uppercase tracking-wider font-semibold">
               Repeat Booking Rate
             </p>
           </div>
           <div>
-            <h3 className="text-3xl sm:text-4xl font-extrabold text-[#18211c] dark:text-white mb-2">
+            <h3 className="text-3xl sm:text-4xl font-extrabold text-foreground mb-2">
               14,200+
             </h3>
-            <p className="text-xs sm:text-sm text-[#55625b] dark:text-[#8fa397] uppercase tracking-wider font-semibold">
+            <p className="text-xs sm:text-sm text-muted-foreground uppercase tracking-wider font-semibold">
               5-Star Reviews Driven
             </p>
           </div>
           <div>
-            <h3 className="text-3xl sm:text-4xl font-extrabold text-[#009b98] mb-2">
+            <h3 className="text-3xl sm:text-4xl font-extrabold text-primary mb-2">
               99.2%
             </h3>
-            <p className="text-xs sm:text-sm text-[#55625b] dark:text-[#8fa397] uppercase tracking-wider font-semibold">
+            <p className="text-xs sm:text-sm text-muted-foreground uppercase tracking-wider font-semibold">
               Conflict Resolution Rate
             </p>
           </div>
@@ -479,18 +479,18 @@ export function LaunchedPage() {
         className="relative z-10 max-w-7xl mx-auto w-full px-6 sm:px-8 py-24"
       >
         <div className="text-center mb-16">
-          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-[#18211c] dark:text-white mb-4">
+          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-foreground mb-4">
             Built for Local Service Experts
           </h2>
-          <p className="text-[#55625b] dark:text-[#8fa397] max-w-xl mx-auto">
+          <p className="text-muted-foreground max-w-xl mx-auto">
             Everything you need to automate check-ins, build trust, and ensure
             customers call you first next time.
           </p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          <div className="bg-white dark:bg-[#111814]/40 border border-[#dfe5dc] dark:border-[#1f3026] hover:border-[#009b98]/40 p-8 rounded-2xl shadow-sm dark:shadow-none transition-all duration-300 group">
-            <div className="w-12 h-12 rounded-xl bg-[#f0faf8] dark:bg-[#122118] border border-[#d7f3ed] dark:border-[#1b3d2b] flex items-center justify-center mb-6 text-[#009b98] group-hover:scale-110 transition-transform duration-300">
+          <div className="bg-card border border-border hover:border-[#009b98]/40 p-8 rounded-2xl shadow-sm dark:shadow-none transition-all duration-300 group">
+            <div className="w-12 h-12 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center mb-6 text-primary group-hover:scale-110 transition-transform duration-300">
               <svg
                 className="w-6 h-6"
                 fill="none"
@@ -505,17 +505,17 @@ export function LaunchedPage() {
                 />
               </svg>
             </div>
-            <h3 className="text-xl font-bold mb-3 text-[#18211c] dark:text-white">
+            <h3 className="text-xl font-bold mb-3 text-foreground">
               Automated Check-Ins
             </h3>
-            <p className="text-[#55625b] dark:text-[#8fa397] leading-relaxed text-sm">
+            <p className="text-muted-foreground leading-relaxed text-sm">
               Instantly send personalized follow-up texts or emails once a job
               is finished. No manual input, no writing messages.
             </p>
           </div>
 
-          <div className="bg-white dark:bg-[#111814]/40 border border-[#dfe5dc] dark:border-[#1f3026] hover:border-[#009b98]/40 p-8 rounded-2xl shadow-sm dark:shadow-none transition-all duration-300 group">
-            <div className="w-12 h-12 rounded-xl bg-[#f0faf8] dark:bg-[#122118] border border-[#d7f3ed] dark:border-[#1b3d2b] flex items-center justify-center mb-6 text-[#009b98] group-hover:scale-110 transition-transform duration-300">
+          <div className="bg-card border border-border hover:border-[#009b98]/40 p-8 rounded-2xl shadow-sm dark:shadow-none transition-all duration-300 group">
+            <div className="w-12 h-12 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center mb-6 text-primary group-hover:scale-110 transition-transform duration-300">
               <svg
                 className="w-6 h-6"
                 fill="none"
@@ -530,17 +530,17 @@ export function LaunchedPage() {
                 />
               </svg>
             </div>
-            <h3 className="text-xl font-bold mb-3 text-[#18211c] dark:text-white">
+            <h3 className="text-xl font-bold mb-3 text-foreground">
               Google Review Funnel
             </h3>
-            <p className="text-[#55625b] dark:text-[#8fa397] leading-relaxed text-sm">
+            <p className="text-muted-foreground leading-relaxed text-sm">
               Happy customers are automatically routed to your Google and Yelp
               pages to leave glowing reviews, dramatically boosting your SEO.
             </p>
           </div>
 
-          <div className="bg-white dark:bg-[#111814]/40 border border-[#dfe5dc] dark:border-[#1f3026] hover:border-[#009b98]/40 p-8 rounded-2xl shadow-sm dark:shadow-none transition-all duration-300 group">
-            <div className="w-12 h-12 rounded-xl bg-[#f0faf8] dark:bg-[#122118] border border-[#d7f3ed] dark:border-[#1b3d2b] flex items-center justify-center mb-6 text-[#009b98] group-hover:scale-110 transition-transform duration-300">
+          <div className="bg-card border border-border hover:border-[#009b98]/40 p-8 rounded-2xl shadow-sm dark:shadow-none transition-all duration-300 group">
+            <div className="w-12 h-12 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center mb-6 text-primary group-hover:scale-110 transition-transform duration-300">
               <svg
                 className="w-6 h-6"
                 fill="none"
@@ -555,18 +555,18 @@ export function LaunchedPage() {
                 />
               </svg>
             </div>
-            <h3 className="text-xl font-bold mb-3 text-[#18211c] dark:text-white">
+            <h3 className="text-xl font-bold mb-3 text-foreground">
               Private Conflict Resolution
             </h3>
-            <p className="text-[#55625b] dark:text-[#8fa397] leading-relaxed text-sm">
+            <p className="text-muted-foreground leading-relaxed text-sm">
               If a client had an issue, they are directed to a private form to
               speak directly with you. Resolve disputes privately before they
               hurt your public rating.
             </p>
           </div>
 
-          <div className="bg-white dark:bg-[#111814]/40 border border-[#dfe5dc] dark:border-[#1f3026] hover:border-[#009b98]/40 p-8 rounded-2xl shadow-sm dark:shadow-none transition-all duration-300 group">
-            <div className="w-12 h-12 rounded-xl bg-[#f0faf8] dark:bg-[#122118] border border-[#d7f3ed] dark:border-[#1b3d2b] flex items-center justify-center mb-6 text-[#009b98] group-hover:scale-110 transition-transform duration-300">
+          <div className="bg-card border border-border hover:border-[#009b98]/40 p-8 rounded-2xl shadow-sm dark:shadow-none transition-all duration-300 group">
+            <div className="w-12 h-12 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center mb-6 text-primary group-hover:scale-110 transition-transform duration-300">
               <svg
                 className="w-6 h-6"
                 fill="none"
@@ -581,17 +581,17 @@ export function LaunchedPage() {
                 />
               </svg>
             </div>
-            <h3 className="text-xl font-bold mb-3 text-[#18211c] dark:text-white">
+            <h3 className="text-xl font-bold mb-3 text-foreground">
               Repeat Visit Reminders
             </h3>
-            <p className="text-[#55625b] dark:text-[#8fa397] leading-relaxed text-sm">
+            <p className="text-muted-foreground leading-relaxed text-sm">
               Schedule smart seasonal maintenance alerts, follow-up inspection
               prompts, or warranty checks based on the job completed.
             </p>
           </div>
 
-          <div className="bg-white dark:bg-[#111814]/40 border border-[#dfe5dc] dark:border-[#1f3026] hover:border-[#009b98]/40 p-8 rounded-2xl shadow-sm dark:shadow-none transition-all duration-300 group">
-            <div className="w-12 h-12 rounded-xl bg-[#f0faf8] dark:bg-[#122118] border border-[#d7f3ed] dark:border-[#1b3d2b] flex items-center justify-center mb-6 text-[#009b98] group-hover:scale-110 transition-transform duration-300">
+          <div className="bg-card border border-border hover:border-[#009b98]/40 p-8 rounded-2xl shadow-sm dark:shadow-none transition-all duration-300 group">
+            <div className="w-12 h-12 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center mb-6 text-primary group-hover:scale-110 transition-transform duration-300">
               <svg
                 className="w-6 h-6"
                 fill="none"
@@ -606,17 +606,17 @@ export function LaunchedPage() {
                 />
               </svg>
             </div>
-            <h3 className="text-xl font-bold mb-3 text-[#18211c] dark:text-white">
+            <h3 className="text-xl font-bold mb-3 text-foreground">
               Staff Leaderboards
             </h3>
-            <p className="text-[#55625b] dark:text-[#8fa397] leading-relaxed text-sm">
+            <p className="text-muted-foreground leading-relaxed text-sm">
               See which technician or operator drives the most 5-star reviews
               and has the highest customer satisfaction scores.
             </p>
           </div>
 
-          <div className="bg-white dark:bg-[#111814]/40 border border-[#dfe5dc] dark:border-[#1f3026] hover:border-[#009b98]/40 p-8 rounded-2xl shadow-sm dark:shadow-none transition-all duration-300 group">
-            <div className="w-12 h-12 rounded-xl bg-[#f0faf8] dark:bg-[#122118] border border-[#d7f3ed] dark:border-[#1b3d2b] flex items-center justify-center mb-6 text-[#009b98] group-hover:scale-110 transition-transform duration-300">
+          <div className="bg-card border border-border hover:border-[#009b98]/40 p-8 rounded-2xl shadow-sm dark:shadow-none transition-all duration-300 group">
+            <div className="w-12 h-12 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center mb-6 text-primary group-hover:scale-110 transition-transform duration-300">
               <svg
                 className="w-6 h-6"
                 fill="none"
@@ -631,10 +631,10 @@ export function LaunchedPage() {
                 />
               </svg>
             </div>
-            <h3 className="text-xl font-bold mb-3 text-[#18211c] dark:text-white">
+            <h3 className="text-xl font-bold mb-3 text-foreground">
               Enterprise Grade Security
             </h3>
-            <p className="text-[#55625b] dark:text-[#8fa397] leading-relaxed text-sm">
+            <p className="text-muted-foreground leading-relaxed text-sm">
               Role-based workspace scopes protect customer data. Secure
               authentication keeps your client list locked down.
             </p>
@@ -645,14 +645,14 @@ export function LaunchedPage() {
       {/* How It Works Section */}
       <section
         id="how-it-works"
-        className="relative z-10 bg-[#f5f6f2]/80 dark:bg-[#0b100d]/40 border-y border-[#dfe5dc] dark:border-[#1f3026] py-24 transition-colors duration-300"
+        className="relative z-10 bg-muted border-y border-border py-24 transition-colors duration-300"
       >
         <div className="max-w-7xl mx-auto px-6 sm:px-8">
           <div className="text-center mb-20">
-            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-[#18211c] dark:text-white mb-4">
+            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-foreground mb-4">
               Three Steps to Automated Success
             </h2>
-            <p className="text-[#55625b] dark:text-[#8fa397] max-w-xl mx-auto">
+            <p className="text-muted-foreground max-w-xl mx-auto">
               How afterservice saves time and generates recurring work in the
               background.
             </p>
@@ -660,39 +660,39 @@ export function LaunchedPage() {
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-12 relative">
             <div className="text-center flex flex-col items-center">
-              <div className="w-16 h-16 rounded-full bg-[#f0faf8] dark:bg-[#122118] border border-[#d7f3ed] dark:border-[#1b3d2b] flex items-center justify-center text-xl font-bold text-[#009b98] mb-6">
+              <div className="w-16 h-16 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center text-xl font-bold text-primary mb-6">
                 1
               </div>
-              <h3 className="text-xl font-bold mb-2 text-[#18211c] dark:text-white">
+              <h3 className="text-xl font-bold mb-2 text-foreground">
                 Job Completion
               </h3>
-              <p className="text-sm text-[#55625b] dark:text-[#8fa397] max-w-xs leading-relaxed">
+              <p className="text-sm text-muted-foreground max-w-xs leading-relaxed">
                 Log a job in your dashboard or let your existing CRM signal
                 completion automatically.
               </p>
             </div>
 
             <div className="text-center flex flex-col items-center">
-              <div className="w-16 h-16 rounded-full bg-[#f0faf8] dark:bg-[#122118] border border-[#d7f3ed] dark:border-[#1b3d2b] flex items-center justify-center text-xl font-bold text-[#009b98] mb-6">
+              <div className="w-16 h-16 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center text-xl font-bold text-primary mb-6">
                 2
               </div>
-              <h3 className="text-xl font-bold mb-2 text-[#18211c] dark:text-white">
+              <h3 className="text-xl font-bold mb-2 text-foreground">
                 Automated Dispatch
               </h3>
-              <p className="text-sm text-[#55625b] dark:text-[#8fa397] max-w-xs leading-relaxed">
+              <p className="text-sm text-muted-foreground max-w-xs leading-relaxed">
                 Our follow-up engine sends an email or text template customized
                 to the job type.
               </p>
             </div>
 
             <div className="text-center flex flex-col items-center">
-              <div className="w-16 h-16 rounded-full bg-[#f0faf8] dark:bg-[#122118] border border-[#d7f3ed] dark:border-[#1b3d2b] flex items-center justify-center text-xl font-bold text-[#009b98] mb-6">
+              <div className="w-16 h-16 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center text-xl font-bold text-primary mb-6">
                 3
               </div>
-              <h3 className="text-xl font-bold mb-2 text-[#18211c] dark:text-white">
+              <h3 className="text-xl font-bold mb-2 text-foreground">
                 Growth & Reactivation
               </h3>
-              <p className="text-sm text-[#55625b] dark:text-[#8fa397] max-w-xs leading-relaxed">
+              <p className="text-sm text-muted-foreground max-w-xs leading-relaxed">
                 Collect Google reviews directly, while our scheduler plans your
                 next maintenance alert.
               </p>
@@ -707,27 +707,27 @@ export function LaunchedPage() {
         className="relative z-10 max-w-7xl mx-auto w-full px-6 sm:px-8 py-24"
       >
         <div className="text-center mb-16">
-          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-[#18211c] dark:text-white mb-4">
+          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-foreground mb-4">
             Transparent, ROI-Driven Pricing
           </h2>
-          <p className="text-[#55625b] dark:text-[#8fa397] max-w-lg mx-auto mb-8">
+          <p className="text-muted-foreground max-w-lg mx-auto mb-8">
             Choose the plan that matches your business size. Save 20% by billing
             annually.
           </p>
 
           {/* Pricing Cycle Toggle */}
-          <div className="inline-flex p-1 rounded-xl bg-white dark:bg-[#111814] border border-[#dfe5dc] dark:border-[#1f3026] mb-12 shadow-sm">
+          <div className="inline-flex p-1 rounded-xl bg-card border border-border mb-12 shadow-sm">
             <button
               type="button"
               onClick={() => setBillingCycle("monthly")}
-              className={`px-4 py-2 rounded-lg text-sm font-bold transition-all ${billingCycle === "monthly" ? "bg-[#009b98] text-white" : "text-[#55625b] dark:text-[#8fa397] hover:text-[#18211c] dark:hover:text-white"}`}
+              className={`px-4 py-2 rounded-lg text-sm font-bold transition-all ${billingCycle === "monthly" ? "bg-primary text-white" : "text-muted-foreground hover:text-[#18211c] dark:hover:text-white"}`}
             >
               Monthly
             </button>
             <button
               type="button"
               onClick={() => setBillingCycle("annually")}
-              className={`px-4 py-2 rounded-lg text-sm font-bold transition-all ${billingCycle === "annually" ? "bg-[#009b98] text-white" : "text-[#55625b] dark:text-[#8fa397] hover:text-[#18211c] dark:hover:text-white"}`}
+              className={`px-4 py-2 rounded-lg text-sm font-bold transition-all ${billingCycle === "annually" ? "bg-primary text-white" : "text-muted-foreground hover:text-[#18211c] dark:hover:text-white"}`}
             >
               Annually (Save 20%)
             </button>
@@ -736,32 +736,32 @@ export function LaunchedPage() {
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 items-stretch max-w-6xl mx-auto">
           {/* Plan 1 */}
-          <div className="bg-white dark:bg-[#111814]/40 border border-[#dfe5dc] dark:border-[#1f3026] p-8 rounded-2xl flex flex-col justify-between shadow-sm dark:shadow-none backdrop-blur-sm">
+          <div className="bg-card border border-border p-8 rounded-2xl flex flex-col justify-between shadow-sm dark:shadow-none backdrop-blur-sm">
             <div>
-              <span className="text-xs font-bold text-[#009b98] tracking-widest uppercase">
+              <span className="text-xs font-bold text-primary tracking-widest uppercase">
                 STARTER
               </span>
-              <h3 className="text-2xl font-bold mt-2 text-[#18211c] dark:text-white">
+              <h3 className="text-2xl font-bold mt-2 text-foreground">
                 Starter Plan
               </h3>
-              <p className="text-sm text-[#55625b] dark:text-[#8fa397] mt-2">
+              <p className="text-sm text-muted-foreground mt-2">
                 Perfect for independent owner-operators.
               </p>
 
               <div className="my-6">
-                <span className="text-5xl font-extrabold text-[#18211c] dark:text-white">
+                <span className="text-5xl font-extrabold text-foreground">
                   ${billingCycle === "monthly" ? "49" : "39"}
                 </span>
-                <span className="text-sm text-[#55625b] dark:text-[#8fa397]">
+                <span className="text-sm text-muted-foreground">
                   {" "}
                   / month
                 </span>
               </div>
 
-              <ul className="space-y-3.5 text-sm text-[#55625b] dark:text-[#8fa397] border-t border-[#dfe5dc] dark:border-[#1b3d2b] pt-6">
+              <ul className="space-y-3.5 text-sm text-muted-foreground border-t border-border pt-6">
                 <li className="flex items-center gap-2.5">
                   <svg
-                    className="w-4 h-4 text-[#009b98] shrink-0"
+                    className="w-4 h-4 text-primary shrink-0"
                     fill="none"
                     viewBox="0 0 24 24"
                     stroke="currentColor"
@@ -777,7 +777,7 @@ export function LaunchedPage() {
                 </li>
                 <li className="flex items-center gap-2.5">
                   <svg
-                    className="w-4 h-4 text-[#009b98] shrink-0"
+                    className="w-4 h-4 text-primary shrink-0"
                     fill="none"
                     viewBox="0 0 24 24"
                     stroke="currentColor"
@@ -793,7 +793,7 @@ export function LaunchedPage() {
                 </li>
                 <li className="flex items-center gap-2.5">
                   <svg
-                    className="w-4 h-4 text-[#009b98] shrink-0"
+                    className="w-4 h-4 text-primary shrink-0"
                     fill="none"
                     viewBox="0 0 24 24"
                     stroke="currentColor"
@@ -827,42 +827,42 @@ export function LaunchedPage() {
             </div>
             <a
               href="/signup"
-              className="mt-8 block w-full text-center px-4 py-3 bg-[#eef8f0] dark:bg-[#122118] border border-[#a9d3b7] dark:border-[#1b3d2b] hover:border-[#009b98]/40 text-[#24583a] dark:text-[#009b98] hover:text-white font-bold rounded-xl transition-all"
+              className="mt-8 block w-full text-center px-4 py-3 bg-primary/10 border border-primary/20 hover:border-[#009b98]/40 text-primary hover:text-white font-bold rounded-xl transition-all"
             >
               Get Started
             </a>
           </div>
 
           {/* Plan 2 - Featured */}
-          <div className="bg-white dark:bg-[#111814]/80 border-2 border-[#009b98] p-8 rounded-2xl flex flex-col justify-between relative shadow-lg dark:shadow-2xl dark:shadow-[#009b98]/10 transform md:-translate-y-2">
-            <span className="absolute top-0 right-1/2 translate-x-1/2 -translate-y-1/2 bg-[#009b98] text-white text-[10px] uppercase font-extrabold px-3 py-1 rounded-full tracking-wider">
+          <div className="bg-card border-2 border-[#009b98] p-8 rounded-2xl flex flex-col justify-between relative shadow-lg dark:shadow-2xl dark:shadow-primary/10 transform md:-translate-y-2">
+            <span className="absolute top-0 right-1/2 translate-x-1/2 -translate-y-1/2 bg-primary text-white text-[10px] uppercase font-extrabold px-3 py-1 rounded-full tracking-wider">
               MOST POPULAR
             </span>
             <div>
-              <span className="text-xs font-bold text-[#009b98] tracking-widest uppercase">
+              <span className="text-xs font-bold text-primary tracking-widest uppercase">
                 GROWTH
               </span>
-              <h3 className="text-2xl font-bold mt-2 text-[#18211c] dark:text-white">
+              <h3 className="text-2xl font-bold mt-2 text-foreground">
                 Growth Plan
               </h3>
-              <p className="text-sm text-[#55625b] dark:text-[#8fa397] mt-2">
+              <p className="text-sm text-muted-foreground mt-2">
                 Ideal for expanding residential teams.
               </p>
 
               <div className="my-6">
-                <span className="text-5xl font-extrabold text-[#18211c] dark:text-white">
+                <span className="text-5xl font-extrabold text-foreground">
                   ${billingCycle === "monthly" ? "99" : "79"}
                 </span>
-                <span className="text-sm text-[#55625b] dark:text-[#8fa397]">
+                <span className="text-sm text-muted-foreground">
                   {" "}
                   / month
                 </span>
               </div>
 
-              <ul className="space-y-3.5 text-sm text-[#55625b] dark:text-[#8fa397] border-t border-[#dfe5dc] dark:border-[#1b3d2b] pt-6">
+              <ul className="space-y-3.5 text-sm text-muted-foreground border-t border-border pt-6">
                 <li className="flex items-center gap-2.5">
                   <svg
-                    className="w-4 h-4 text-[#009b98] shrink-0"
+                    className="w-4 h-4 text-primary shrink-0"
                     fill="none"
                     viewBox="0 0 24 24"
                     stroke="currentColor"
@@ -878,7 +878,7 @@ export function LaunchedPage() {
                 </li>
                 <li className="flex items-center gap-2.5">
                   <svg
-                    className="w-4 h-4 text-[#009b98] shrink-0"
+                    className="w-4 h-4 text-primary shrink-0"
                     fill="none"
                     viewBox="0 0 24 24"
                     stroke="currentColor"
@@ -894,7 +894,7 @@ export function LaunchedPage() {
                 </li>
                 <li className="flex items-center gap-2.5">
                   <svg
-                    className="w-4 h-4 text-[#009b98] shrink-0"
+                    className="w-4 h-4 text-primary shrink-0"
                     fill="none"
                     viewBox="0 0 24 24"
                     stroke="currentColor"
@@ -910,7 +910,7 @@ export function LaunchedPage() {
                 </li>
                 <li className="flex items-center gap-2.5">
                   <svg
-                    className="w-4 h-4 text-[#009b98] shrink-0"
+                    className="w-4 h-4 text-primary shrink-0"
                     fill="none"
                     viewBox="0 0 24 24"
                     stroke="currentColor"
@@ -928,39 +928,39 @@ export function LaunchedPage() {
             </div>
             <a
               href="/signup"
-              className="mt-8 block w-full text-center px-4 py-3 bg-[#009b98] hover:bg-[#00b0ad] active:scale-[0.98] text-white font-bold rounded-xl transition-all shadow-md shadow-[#009b98]/20"
+              className="mt-8 block w-full text-center px-4 py-3 bg-primary hover:bg-[#00b0ad] active:scale-[0.98] text-white font-bold rounded-xl transition-all shadow-md shadow-[#009b98]/20"
             >
               Start Free Trial
             </a>
           </div>
 
           {/* Plan 3 */}
-          <div className="bg-white dark:bg-[#111814]/40 border border-[#dfe5dc] dark:border-[#1f3026] p-8 rounded-2xl flex flex-col justify-between shadow-sm dark:shadow-none backdrop-blur-sm">
+          <div className="bg-card border border-border p-8 rounded-2xl flex flex-col justify-between shadow-sm dark:shadow-none backdrop-blur-sm">
             <div>
-              <span className="text-xs font-bold text-[#009b98] tracking-widest uppercase">
+              <span className="text-xs font-bold text-primary tracking-widest uppercase">
                 PRO
               </span>
-              <h3 className="text-2xl font-bold mt-2 text-[#18211c] dark:text-white">
+              <h3 className="text-2xl font-bold mt-2 text-foreground">
                 Pro Plan
               </h3>
-              <p className="text-sm text-[#55625b] dark:text-[#8fa397] mt-2">
+              <p className="text-sm text-muted-foreground mt-2">
                 Built for multi-region operators.
               </p>
 
               <div className="my-6">
-                <span className="text-5xl font-extrabold text-[#18211c] dark:text-white">
+                <span className="text-5xl font-extrabold text-foreground">
                   ${billingCycle === "monthly" ? "199" : "159"}
                 </span>
-                <span className="text-sm text-[#55625b] dark:text-[#8fa397]">
+                <span className="text-sm text-muted-foreground">
                   {" "}
                   / month
                 </span>
               </div>
 
-              <ul className="space-y-3.5 text-sm text-[#55625b] dark:text-[#8fa397] border-t border-[#dfe5dc] dark:border-[#1b3d2b] pt-6">
+              <ul className="space-y-3.5 text-sm text-muted-foreground border-t border-border pt-6">
                 <li className="flex items-center gap-2.5">
                   <svg
-                    className="w-4 h-4 text-[#009b98] shrink-0"
+                    className="w-4 h-4 text-primary shrink-0"
                     fill="none"
                     viewBox="0 0 24 24"
                     stroke="currentColor"
@@ -976,7 +976,7 @@ export function LaunchedPage() {
                 </li>
                 <li className="flex items-center gap-2.5">
                   <svg
-                    className="w-4 h-4 text-[#009b98] shrink-0"
+                    className="w-4 h-4 text-primary shrink-0"
                     fill="none"
                     viewBox="0 0 24 24"
                     stroke="currentColor"
@@ -992,7 +992,7 @@ export function LaunchedPage() {
                 </li>
                 <li className="flex items-center gap-2.5">
                   <svg
-                    className="w-4 h-4 text-[#009b98] shrink-0"
+                    className="w-4 h-4 text-primary shrink-0"
                     fill="none"
                     viewBox="0 0 24 24"
                     stroke="currentColor"
@@ -1008,7 +1008,7 @@ export function LaunchedPage() {
                 </li>
                 <li className="flex items-center gap-2.5">
                   <svg
-                    className="w-4 h-4 text-[#009b98] shrink-0"
+                    className="w-4 h-4 text-primary shrink-0"
                     fill="none"
                     viewBox="0 0 24 24"
                     stroke="currentColor"
@@ -1026,7 +1026,7 @@ export function LaunchedPage() {
             </div>
             <a
               href="/signup"
-              className="mt-8 block w-full text-center px-4 py-3 bg-[#eef8f0] dark:bg-[#122118] border border-[#a9d3b7] dark:border-[#1b3d2b] hover:border-[#009b98]/40 text-[#24583a] dark:text-[#009b98] hover:text-white font-bold rounded-xl transition-all"
+              className="mt-8 block w-full text-center px-4 py-3 bg-primary/10 border border-primary/20 hover:border-[#009b98]/40 text-primary hover:text-white font-bold rounded-xl transition-all"
             >
               Get Started
             </a>
@@ -1037,13 +1037,13 @@ export function LaunchedPage() {
       {/* FAQ Section */}
       <section
         id="faqs"
-        className="relative z-10 max-w-4xl mx-auto w-full px-6 sm:px-8 py-24 border-t border-[#dfe5dc] dark:border-[#1f3026]"
+        className="relative z-10 max-w-4xl mx-auto w-full px-6 sm:px-8 py-24 border-t border-border"
       >
         <div className="text-center mb-16">
-          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-[#18211c] dark:text-white mb-4">
+          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-foreground mb-4">
             Frequently Asked Questions
           </h2>
-          <p className="text-[#55625b] dark:text-[#8fa397]">
+          <p className="text-muted-foreground">
             Find answers to common questions about setting up and running
             afterservice.
           </p>
@@ -1053,19 +1053,19 @@ export function LaunchedPage() {
           {faqs.map((faq, idx) => (
             <div
               key={faq.q}
-              className="bg-white dark:bg-[#111814]/40 border border-[#dfe5dc] dark:border-[#1f3026] rounded-xl overflow-hidden shadow-sm dark:shadow-none transition-all duration-300"
+              className="bg-card border border-border rounded-xl overflow-hidden shadow-sm dark:shadow-none transition-all duration-300"
             >
               <button
                 type="button"
                 onClick={() => setActiveFaq(activeFaq === idx ? null : idx)}
-                className="w-full flex items-center justify-between p-6 text-left font-bold text-lg text-[#18211c] dark:text-white hover:text-[#009b98] dark:hover:text-[#009b98] transition-colors"
+                className="w-full flex items-center justify-between p-6 text-left font-bold text-lg text-foreground hover:text-primary dark:hover:text-primary transition-colors"
               >
                 <span>{faq.q}</span>
                 <span
                   className={`transform transition-transform duration-300 ${activeFaq === idx ? "rotate-180" : ""}`}
                 >
                   <svg
-                    className="w-5 h-5 text-[#009b98]"
+                    className="w-5 h-5 text-primary"
                     fill="none"
                     viewBox="0 0 24 24"
                     stroke="currentColor"
@@ -1081,9 +1081,9 @@ export function LaunchedPage() {
               </button>
 
               <div
-                className={`transition-all duration-300 ease-in-out overflow-hidden ${activeFaq === idx ? "max-h-48 border-t border-[#dfe5dc] dark:border-[#1b3d2b]" : "max-h-0"}`}
+                className={`transition-all duration-300 ease-in-out overflow-hidden ${activeFaq === idx ? "max-h-48 border-t border-border" : "max-h-0"}`}
               >
-                <p className="p-6 text-sm text-[#55625b] dark:text-[#8fa397] leading-relaxed">
+                <p className="p-6 text-sm text-muted-foreground leading-relaxed">
                   {faq.a}
                 </p>
               </div>
@@ -1094,19 +1094,19 @@ export function LaunchedPage() {
 
       {/* Bottom CTA */}
       <section className="relative z-10 max-w-6xl mx-auto w-full px-6 sm:px-8 pb-32 pt-16">
-        <div className="bg-gradient-to-r from-white to-[#fcfdfa] dark:from-[#111814]/80 dark:to-[#122118]/80 border border-[#dfe5dc] dark:border-[#1f3026] rounded-3xl p-12 text-center relative overflow-hidden shadow-lg dark:shadow-2xl transition-colors duration-300">
-          <div className="absolute top-[-50%] left-[-50%] w-[100%] h-[100%] rounded-full bg-[#009b98]/10 blur-[100px] pointer-events-none opacity-[0.2] dark:opacity-[1]" />
+        <div className="bg-gradient-to-r from-card to-card/80 border border-border rounded-3xl p-12 text-center relative overflow-hidden shadow-lg dark:shadow-2xl transition-colors duration-300">
+          <div className="absolute top-[-50%] left-[-50%] w-[100%] h-[100%] rounded-full bg-primary/10 blur-[100px] pointer-events-none opacity-[0.2] dark:opacity-[1]" />
 
-          <h2 className="text-3xl sm:text-5xl font-extrabold mb-4 leading-tight text-[#18211c] dark:text-white">
+          <h2 className="text-3xl sm:text-5xl font-extrabold mb-4 leading-tight text-foreground">
             Ready to Reactivate <br className="sm:hidden" /> Your Customer Base?
           </h2>
-          <p className="text-[#55625b] dark:text-[#8fa397] max-w-xl mx-auto mb-8 text-base">
+          <p className="text-muted-foreground max-w-xl mx-auto mb-8 text-base">
             Start protecting your online reputation and driving organic referral
             and repeat jobs today. Setting up takes minutes.
           </p>
           <a
             href="/signup"
-            className="inline-flex px-8 py-4 bg-[#009b98] hover:bg-[#00b0ad] active:scale-[0.98] text-white font-bold rounded-xl transition-all shadow-lg shadow-[#009b98]/20 text-base"
+            className="inline-flex px-8 py-4 bg-primary hover:bg-[#00b0ad] active:scale-[0.98] text-white font-bold rounded-xl transition-all shadow-lg shadow-[#009b98]/20 text-base"
           >
             Start Your 14-Day Free Trial
           </a>
@@ -1114,20 +1114,20 @@ export function LaunchedPage() {
       </section>
 
       {/* Footer */}
-      <footer className="relative z-10 border-t border-[#dfe5dc] dark:border-[#1f3026] bg-[#fbfcf8] dark:bg-[#070c08] py-16 transition-colors duration-300">
+      <footer className="relative z-10 border-t border-border bg-background py-16 transition-colors duration-300">
         <div className="max-w-7xl mx-auto px-6 sm:px-8 flex flex-col md:flex-row items-center justify-between gap-8">
           <div className="flex items-center gap-3">
             <BrandLogo name={appMetadata.name} />
           </div>
 
-          <div className="text-xs text-[#7c8e82] dark:text-[#566e60] text-center md:text-left">
+          <div className="text-xs text-muted-foreground text-center md:text-left">
             <p>© 2026 afterservice. All rights reserved.</p>
             <p className="mt-1">
               Built for local operators in the USA & Canada.
             </p>
           </div>
 
-          <div className="flex gap-6 text-xs text-[#7c8e82] dark:text-[#566e60]">
+          <div className="flex gap-6 text-xs text-muted-foreground">
             <a
               href="/privacy"
               className="hover:text-[#18211c] dark:hover:text-white transition-colors"

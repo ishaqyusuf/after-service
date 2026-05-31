@@ -35,112 +35,141 @@ export async function getWorkspaceSummary() {
   try {
     const caller = await getServerCaller();
     return caller.workspace.getCurrent();
-  } catch {
-    redirect("/onboarding");
+  } catch (error) {
+    redirectOnWorkspaceOnboardingRequired(error);
   }
 }
 
 export async function getDashboardOverview() {
-  const caller = await getServerCaller();
-  const workspace = await caller.workspace.getCurrent();
-  const customers = await caller.customers.list({ includeArchived: false });
-  const jobs = await caller.serviceJobs.list();
-  const followUps = await caller.followUps.listTable({});
-  const todayEnd = new Date();
-  todayEnd.setHours(23, 59, 59, 999);
+  try {
+    const caller = await getServerCaller();
+    const workspace = await caller.workspace.getCurrent();
+    const customers = await caller.customers.list({ includeArchived: false });
+    const jobs = await caller.serviceJobs.list();
+    const followUps = await caller.followUps.listTable({});
+    const todayEnd = new Date();
+    todayEnd.setHours(23, 59, 59, 999);
 
-  return {
-    counts: {
-      customers: customers.items.length,
-      dueToday: followUps.items.filter(
-        (item) =>
-          item.status !== "closed" &&
-          item.status !== "replied" &&
-          new Date(item.dueAt) <= todayEnd,
-      ).length,
-      jobs: jobs.items.length,
-      openFollowUps: followUps.items.filter((item) => item.status !== "closed")
-        .length,
-    },
-    recentFollowUps: followUps.items.slice(0, 8),
-    workspace: workspace.item,
-  };
+    return {
+      counts: {
+        customers: customers.items.length,
+        dueToday: followUps.items.filter(
+          (item) =>
+            item.status !== "closed" &&
+            item.status !== "replied" &&
+            new Date(item.dueAt) <= todayEnd,
+        ).length,
+        jobs: jobs.items.length,
+        openFollowUps: followUps.items.filter(
+          (item) => item.status !== "closed",
+        ).length,
+      },
+      recentFollowUps: followUps.items.slice(0, 8),
+      workspace: workspace.item,
+    };
+  } catch (error) {
+    redirectOnWorkspaceOnboardingRequired(error);
+  }
 }
 
 export async function getCustomers(search?: string) {
-  const caller = await getServerCaller();
-  const result = await caller.customers.list({
-    includeArchived: false,
-    search,
-  });
+  try {
+    const caller = await getServerCaller();
+    const result = await caller.customers.list({
+      includeArchived: false,
+      search,
+    });
 
-  return result.items;
+    return result.items;
+  } catch (error) {
+    redirectOnWorkspaceOnboardingRequired(error);
+  }
 }
 
 export async function getJobsData() {
-  const caller = await getServerCaller();
-  const customers = await caller.customers.list({ includeArchived: false });
-  const jobs = await caller.serviceJobs.list();
-  const templates = await caller.templates.list();
-  const workspace = await caller.workspace.getCurrent();
+  try {
+    const caller = await getServerCaller();
+    const customers = await caller.customers.list({ includeArchived: false });
+    const jobs = await caller.serviceJobs.list();
+    const templates = await caller.templates.list();
+    const workspace = await caller.workspace.getCurrent();
 
-  return {
-    customers: customers.items,
-    jobs: jobs.items,
-    templates: templates.items,
-    workspace: workspace.item,
-  };
+    return {
+      customers: customers.items,
+      jobs: jobs.items,
+      templates: templates.items,
+      workspace: workspace.item,
+    };
+  } catch (error) {
+    redirectOnWorkspaceOnboardingRequired(error);
+  }
 }
 
 export async function getFollowUpsData() {
-  const caller = await getServerCaller();
-  const customers = await caller.customers.list({ includeArchived: false });
-  const jobs = await caller.serviceJobs.list();
-  const templates = await caller.templates.list();
-  const board = await caller.followUps.listBoard();
-  const table = await caller.followUps.listTable({});
-  const workspace = await caller.workspace.getCurrent();
+  try {
+    const caller = await getServerCaller();
+    const customers = await caller.customers.list({ includeArchived: false });
+    const jobs = await caller.serviceJobs.list();
+    const templates = await caller.templates.list();
+    const board = await caller.followUps.listBoard();
+    const table = await caller.followUps.listTable({});
+    const workspace = await caller.workspace.getCurrent();
 
-  return {
-    columns: board.columns,
-    customers: customers.items,
-    followUps: table.items,
-    jobs: jobs.items,
-    templates: templates.items,
-    workspace: workspace.item,
-  };
+    return {
+      columns: board.columns,
+      customers: customers.items,
+      followUps: table.items,
+      jobs: jobs.items,
+      templates: templates.items,
+      workspace: workspace.item,
+    };
+  } catch (error) {
+    redirectOnWorkspaceOnboardingRequired(error);
+  }
 }
 
 export async function getTemplatesData() {
-  const caller = await getServerCaller();
-  const templates = await caller.templates.list();
-  const customers = await caller.customers.list({ includeArchived: false });
-  const jobs = await caller.serviceJobs.list();
-  const workspace = await caller.workspace.getCurrent();
+  try {
+    const caller = await getServerCaller();
+    const templates = await caller.templates.list();
+    const customers = await caller.customers.list({ includeArchived: false });
+    const jobs = await caller.serviceJobs.list();
+    const workspace = await caller.workspace.getCurrent();
 
-  return {
-    sampleCustomer: customers.items[0] ?? null,
-    sampleJob: jobs.items[0] ?? null,
-    templates: templates.items,
-    workspace: workspace.item,
-  };
+    return {
+      sampleCustomer: customers.items[0] ?? null,
+      sampleJob: jobs.items[0] ?? null,
+      templates: templates.items,
+      workspace: workspace.item,
+    };
+  } catch (error) {
+    redirectOnWorkspaceOnboardingRequired(error);
+  }
 }
 
 export async function getBillingData() {
-  const caller = await getServerCaller();
-  const billing = await caller.billing.getCurrentPlan();
+  try {
+    const caller = await getServerCaller();
+    const billing = await caller.billing.getCurrentPlan();
 
-  return {
-    checkoutUrl: process.env.LEMON_SQUEEZY_CHECKOUT_URL ?? null,
-    ...billing.item,
-  };
+    return {
+      checkoutUrl: process.env.LEMON_SQUEEZY_CHECKOUT_URL ?? null,
+      ...billing.item,
+    };
+  } catch (error) {
+    redirectOnWorkspaceOnboardingRequired(error);
+  }
 }
 
 export async function getSettingsData() {
-  const caller = await getServerCaller();
-  const workspace = await caller.workspace.getCurrent();
+  try {
+    const caller = await getServerCaller();
+    const workspace = await caller.workspace.getCurrent();
 
-  return { workspace: workspace.item };
+    return { workspace: workspace.item };
+  } catch (error) {
+    redirectOnWorkspaceOnboardingRequired(error);
+  }
 }
 
 export function formatDate(date: Date | string | null | undefined) {
@@ -177,4 +206,23 @@ export function resolveTemplate(
       "{{completion_date}}",
       input.completionDate ? formatDate(input.completionDate) : "recently",
     );
+}
+
+function redirectOnWorkspaceOnboardingRequired(error: unknown): never {
+  if (isWorkspaceOnboardingRequiredError(error)) {
+    redirect("/onboarding");
+  }
+
+  throw error;
+}
+
+function isWorkspaceOnboardingRequiredError(error: unknown) {
+  if (!error || typeof error !== "object") return false;
+
+  const maybeError = error as { code?: unknown; message?: unknown };
+
+  return (
+    maybeError.code === "FORBIDDEN" &&
+    maybeError.message === "Workspace onboarding is required."
+  );
 }

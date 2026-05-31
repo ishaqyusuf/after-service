@@ -2,9 +2,6 @@
 
 import {
   Button,
-  Field,
-  FieldGroup,
-  FieldLabel,
   Input,
   Select,
 } from "@afterservice/ui";
@@ -53,46 +50,47 @@ export function OnboardingForm() {
   }
 
   return (
-    <form action={handleSubmit} className="dashboard-form">
-      <FieldGroup>
-        <Field>
-          <FieldLabel htmlFor={businessNameId}>Business name</FieldLabel>
+    <form action={handleSubmit} className="space-y-6">
+      <div className="space-y-4">
+        <div className="space-y-2">
+          <label htmlFor={businessNameId} className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">Business name</label>
           <Input id={businessNameId} name="businessName" required />
-        </Field>
-        <Field>
-          <FieldLabel htmlFor={businessTypeId}>Business type</FieldLabel>
+        </div>
+        <div className="space-y-2">
+          <label htmlFor={businessTypeId} className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">Business type</label>
           <Input
             id={businessTypeId}
             name="businessType"
             placeholder="Repair shop, clinic, salon"
           />
-        </Field>
-        <Field>
-          <FieldLabel htmlFor={serviceCategoryId}>Service category</FieldLabel>
+        </div>
+        <div className="space-y-2">
+          <label htmlFor={serviceCategoryId} className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">Service category</label>
           <Input
             id={serviceCategoryId}
             name="serviceCategory"
             placeholder="Appliance repair"
           />
-        </Field>
-        <Field>
-          <FieldLabel htmlFor={followUpDelayId}>
+        </div>
+        <div className="space-y-2">
+          <label htmlFor={followUpDelayId} className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
             Default follow-up delay
-          </FieldLabel>
-          <Select
+          </label>
+          <select
             defaultValue="7"
             id={followUpDelayId}
             name="defaultFollowUpDelayDays"
+            className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-base shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 md:text-sm"
           >
             <option value="3">3 days</option>
             <option value="7">7 days</option>
             <option value="14">14 days</option>
             <option value="30">30 days</option>
-          </Select>
-        </Field>
-      </FieldGroup>
-      {error ? <p className="dashboard-form__error">{error}</p> : null}
-      <Button disabled={isPending} type="submit">
+          </select>
+        </div>
+      </div>
+      {error ? <p className="text-[0.8rem] font-medium text-destructive">{error}</p> : null}
+      <Button disabled={isPending} type="submit" className="w-full">
         {isPending ? "Creating workspace..." : "Create workspace"}
       </Button>
     </form>

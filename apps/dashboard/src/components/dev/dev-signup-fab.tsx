@@ -65,13 +65,13 @@ export function DevSignupFab({ onFill }: Props) {
         >
           Quick fill sign-up
         </div>
-        <button
+        <Button
           type="button"
           onClick={() => {
             onFill(makeRandomPreset());
             setOpen(false);
           }}
-          className="as-button as-button--ghost"
+          variant="ghost"
           style={{
             width: "100%",
             justifyContent: "flex-start",
@@ -80,7 +80,7 @@ export function DevSignupFab({ onFill }: Props) {
           }}
         >
           Random new user
-        </button>
+        </Button>
       </div>
       <Button size="sm" variant="secondary" onClick={() => setOpen((o) => !o)}>
         {open ? "Close" : "Quick fill"}
