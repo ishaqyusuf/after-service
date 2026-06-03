@@ -1,0 +1,85 @@
+"use client";
+
+import {
+  Avatar,
+  AvatarFallback,
+  AvatarImage,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@afterservice/ui";
+import { LogOut, Settings, User } from "lucide-react";
+import { useState } from "react";
+
+export function UserMenu({ isExpanded }: { isExpanded: boolean }) {
+  const [isPending, setIsPending] = useState(false);
+
+  const handleSignOut = async () => {
+    setIsPending(true);
+    try {
+      await fetch("/api/auth/sign-out", { method: "POST" });
+      window.location.href = "/sign-in";
+    } catch (error) {
+      console.error("Sign out failed", error);
+    } finally {
+      setIsPending(false);
+    }
+  };
+
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <button
+          type="button"
+          className={`flex w-full px-4 py-3 items-center hover:bg-accent hover:text-accent-foreground transition-colors outline-none focus-visible:ring-2 focus-visible:ring-ring ${
+            isExpanded ? "justify-start" : "justify-center"
+          }`}
+        >
+          <Avatar className="h-8 w-8">
+            <AvatarImage src="" />
+            <AvatarFallback className="bg-primary/10 text-primary font-medium text-xs">
+              U
+            </AvatarFallback>
+          </Avatar>
+          {isExpanded && (
+            <div className="ml-3 flex flex-col items-start overflow-hidden">
+              <span className="text-sm font-medium leading-none">Workspace</span>
+              <span className="text-xs text-muted-foreground mt-1 truncate max-w-full">
+                user@example.com
+              </span>
+            </div>
+          )}
+        </button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent
+        align={isExpanded ? "end" : "center"}
+        side="right"
+        className="w-56"
+        sideOffset={16}
+      >
+        <DropdownMenuLabel>My Account</DropdownMenuLabel>
+        <DropdownMenuSeparator />
+        <DropdownMenuItem>
+          <User className="mr-2 h-4 w-4" />
+          <span>Profile</span>
+        </DropdownMenuItem>
+        <DropdownMenuItem>
+          <Settings className="mr-2 h-4 w-4" />
+          <span>Settings</span>
+        </DropdownMenuItem>
+        <DropdownMenuSeparator />
+        <DropdownMenuItem
+          onClick={handleSignOut}
+          disabled={isPending}
+          className="text-red-600 focus:text-red-600 focus:bg-red-50"
+        >
+          <LogOut className="mr-2 h-4 w-4" />
+          <span>{isPending ? "Signing out..." : "Sign out"}</span>
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
+}

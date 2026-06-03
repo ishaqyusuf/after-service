@@ -4,6 +4,7 @@ import { BrandLogo } from "@afterservice/ui";
 import Link from "next/link";
 import { useState } from "react";
 import { MainMenu } from "./main-menu";
+import { UserMenu } from "./user-menu";
 
 export function Sidebar() {
   const [isExpanded, setIsExpanded] = useState(false);
@@ -31,12 +32,8 @@ export function Sidebar() {
         <MainMenu isExpanded={isExpanded} />
       </div>
 
-      <div className={`flex w-full px-4 items-center ${isExpanded ? "justify-start" : "justify-center"}`}>
-        {/* Placeholder for TeamDropdown equivalent */}
-        <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center">
-          <span className="text-xs font-bold">U</span>
-        </div>
-        {isExpanded && <span className="ml-3 text-sm font-medium">Workspace</span>}
+      <div className="flex w-full mt-auto mb-2 px-2">
+        <UserMenu isExpanded={isExpanded} />
       </div>
     </aside>
   );
