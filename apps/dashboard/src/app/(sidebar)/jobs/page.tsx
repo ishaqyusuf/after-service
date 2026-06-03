@@ -1,31 +1,49 @@
-import { Badge } from "@afterservice/ui";
-import { CreateJobForm } from "@/components/forms/create-job-form";
-import { JobsTable } from "@/components/tables/jobs-table";
+import type { Metadata } from "next";
+import { ErrorBoundary } from "next/dist/client/components/error-boundary";
+import type { SearchParams } from "nuqs";
 import { Suspense } from "react";
+import { ErrorFallback } from "@/components/error-fallback";
+import { ScrollableContent } from "@/components/scrollable-content";
+import { JobsHeader } from "@/components/jobs-header";
+import { DataTable } from "@/components/tables/jobs/data-table";
+import { loadJobFilterParams } from "@/hooks/use-job-filter-params";
+import { loadSortParams } from "@/hooks/use-sort-params";
+import { batchPrefetch, HydrateClient, trpc } from "@/trpc/server";
 
-export default async function JobsPage() {
-  const defaultDue = new Date();
-  defaultDue.setDate(defaultDue.getDate() + 7);
+export const metadata: Metadata = {
+  title: "Jobs | After Service",
+  description: "Record completed services.",
+};
+
+type Props = {
+  searchParams: Promise<SearchParams>;
+};
+
+export default async function JobsPage(props: Props) {
+  const searchParams = await props.searchParams;
+
+  const filter = loadJobFilterParams(searchParams);
+  const { sort } = loadSortParams(searchParams);
+
+  batchPrefetch([
+    trpc.serviceJobs.list.queryOptions({
+      search: filter.q ?? undefined,
+    }),
+  ]);
 
   return (
-    <div className="space-y-8">
-      <header className="space-y-1">
-        <Badge variant="outline" className="mb-2">Service logging</Badge>
-        <h1 className="text-3xl font-bold tracking-tight">Jobs</h1>
-        <p className="text-muted-foreground max-w-2xl">
-          Record completed services and automatically schedule the appropriate follow-ups.
-        </p>
-      </header>
+    <HydrateClient>
+      <ScrollableContent>
+        <div className="flex flex-col gap-6">
+          <JobsHeader />
 
-      <div className="grid grid-cols-1 xl:grid-cols-[400px_1fr] gap-8 items-start">
-        <CreateJobForm defaultDue={defaultDue.toISOString().slice(0, 10)} />
-
-        <section className="space-y-4 min-w-0">
-          <Suspense fallback={<div className="p-8 text-center text-muted-foreground">Loading...</div>}>
-            <JobsTable />
-          </Suspense>
-        </section>
-      </div>
-    </div>
+          <ErrorBoundary errorComponent={ErrorFallback}>
+            <Suspense fallback={<div className="p-8 text-center text-muted-foreground">Loading jobs...</div>}>
+              <DataTable />
+            </Suspense>
+          </ErrorBoundary>
+        </div>
+      </ScrollableContent>
+    </HydrateClient>
   );
 }

@@ -1,9 +1,23 @@
 import { Badge } from "@afterservice/ui";
 import { UpdateWorkspaceForm } from "@/components/forms/update-workspace-form";
+import { Suspense } from "react";
+import { ErrorBoundary } from "@/components/error-boundary";
+import type { Metadata } from "next";
 
-export default function SettingsPage() {
+export async function generateMetadata(): Promise<Metadata> {
+  return {
+    title: "Settings | After Service",
+    description: "Manage workspace settings.",
+  };
+}
+
+export default async function SettingsPage() {
+  // TODO: Add trpc prefetch here when ready
+  // await trpc.workspace.get.prefetch();
+
   return (
-    <div className="space-y-8">
+    <ErrorBoundary>
+      <div className="space-y-8">
       <header className="flex flex-col gap-4">
         <div className="space-y-1">
           <Badge variant="outline" className="mb-2 w-fit">Workspace</Badge>
@@ -19,6 +33,7 @@ export default function SettingsPage() {
         <UpdateWorkspaceForm />
       </section>
     </div>
+    </ErrorBoundary>
   );
 }
 

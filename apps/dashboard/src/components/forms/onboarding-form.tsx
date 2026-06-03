@@ -7,27 +7,28 @@ import {
 } from "@afterservice/ui";
 import { useState } from "react";
 
+import { onboardingSchema } from "@afterservice/api/schemas";
+import { useZodForm } from "@/hooks/use-zod-form";
+import { z } from "zod";
+
 export function OnboardingForm() {
   const [error, setError] = useState<string | null>(null);
-  const [isPending, setIsPending] = useState(false);
-  const businessNameId = "onboarding-business-name";
-  const businessTypeId = "onboarding-business-type";
-  const serviceCategoryId = "onboarding-service-category";
-  const followUpDelayId = "onboarding-follow-up-delay";
+  
+  const form = useZodForm({
+    schema: onboardingSchema,
+    defaultValues: {
+      businessName: "",
+      businessType: "",
+      serviceCategory: "",
+      defaultFollowUpDelayDays: 7,
+    }
+  });
 
-  async function handleSubmit(formData: FormData) {
+  async function onSubmit(data: z.infer<typeof onboardingSchema>) {
     setError(null);
-    setIsPending(true);
 
     const response = await fetch("/api/onboarding", {
-      body: JSON.stringify({
-        businessName: String(formData.get("businessName") ?? ""),
-        businessType: String(formData.get("businessType") ?? ""),
-        defaultFollowUpDelayDays: Number(
-          formData.get("defaultFollowUpDelayDays") ?? 7,
-        ),
-        serviceCategory: String(formData.get("serviceCategory") ?? ""),
-      }),
+      body: JSON.stringify(data),
       credentials: "include",
       headers: {
         "Content-Type": "application/json",
@@ -42,45 +43,48 @@ export function OnboardingForm() {
 
     if (!response.ok) {
       setError("Workspace setup failed.");
-      setIsPending(false);
       return;
     }
 
     window.location.href = "/";
   }
 
+  const isPending = form.formState.isSubmitting;
+
   return (
-    <form action={handleSubmit} className="space-y-6">
+    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
       <div className="space-y-4">
         <div className="space-y-2">
-          <label htmlFor={businessNameId} className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">Business name</label>
-          <Input id={businessNameId} name="businessName" required />
+          <label htmlFor="onboarding-business-name" className="text-sm font-medium leading-none">Business name</label>
+          <Input id="onboarding-business-name" {...form.register("businessName")} />
+          {form.formState.errors.businessName && (
+            <p className="text-sm text-destructive">{form.formState.errors.businessName.message}</p>
+          )}
         </div>
         <div className="space-y-2">
-          <label htmlFor={businessTypeId} className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">Business type</label>
+          <label htmlFor="onboarding-business-type" className="text-sm font-medium leading-none">Business type</label>
           <Input
-            id={businessTypeId}
-            name="businessType"
+            id="onboarding-business-type"
             placeholder="Repair shop, clinic, salon"
+            {...form.register("businessType")}
           />
         </div>
         <div className="space-y-2">
-          <label htmlFor={serviceCategoryId} className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">Service category</label>
+          <label htmlFor="onboarding-service-category" className="text-sm font-medium leading-none">Service category</label>
           <Input
-            id={serviceCategoryId}
-            name="serviceCategory"
+            id="onboarding-service-category"
             placeholder="Appliance repair"
+            {...form.register("serviceCategory")}
           />
         </div>
         <div className="space-y-2">
-          <label htmlFor={followUpDelayId} className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+          <label htmlFor="onboarding-follow-up-delay" className="text-sm font-medium leading-none">
             Default follow-up delay
           </label>
           <select
-            defaultValue="7"
-            id={followUpDelayId}
-            name="defaultFollowUpDelayDays"
-            className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-base shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 md:text-sm"
+            id="onboarding-follow-up-delay"
+            className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-base shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 md:text-sm"
+            {...form.register("defaultFollowUpDelayDays", { valueAsNumber: true })}
           >
             <option value="3">3 days</option>
             <option value="7">7 days</option>

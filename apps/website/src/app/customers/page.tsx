@@ -1,4 +1,13 @@
-export default function CustomersPage() {
+import type { Metadata } from "next";
+
+export async function generateMetadata(): Promise<Metadata> {
+  return {
+    title: "Customers | After Service",
+    description: "Keep every service customer ready for the next follow-up.",
+  };
+}
+
+export default async function CustomersPage() {
   return (
     <main className="site-page">
       <span className="site-kicker">Customer operations</span>

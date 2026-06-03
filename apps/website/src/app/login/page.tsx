@@ -1,5 +1,13 @@
 import { buildDashboardUrl } from "@afterservice/utils";
 import { headers } from "next/headers";
+import type { Metadata } from "next";
+
+export async function generateMetadata(): Promise<Metadata> {
+  return {
+    title: "Log in | After Service",
+    description: "Log in to your workspace.",
+  };
+}
 
 export default async function LoginPage() {
   const headerList = await headers();

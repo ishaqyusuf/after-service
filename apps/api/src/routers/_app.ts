@@ -307,8 +307,10 @@ const customersRouter = t.router({
         .object({
           includeArchived: z.boolean().default(false),
           search: z.string().trim().optional(),
+          cursor: z.string().nullish(),
+          limit: z.number().min(1).max(100).default(50),
         })
-        .default({ includeArchived: false }),
+        .default({ includeArchived: false, limit: 50 }),
     )
     .query(async ({ ctx, input }) => {
       const items = await db.customer.findMany({
@@ -467,11 +469,20 @@ const serviceJobsRouter = t.router({
 
       return { item };
     }),
-  list: protectedProcedure.query(async ({ ctx }) => {
+  list: protectedProcedure
+    .input(z.object({ 
+      search: z.string().trim().optional(),
+      cursor: z.string().nullish(),
+      limit: z.number().min(1).max(100).default(50),
+    }).default({ limit: 50 }))
+    .query(async ({ ctx, input }) => {
     const items = await db.serviceJob.findMany({
       include: { customer: true, followUps: true },
       orderBy: { completedAt: "desc" },
-      where: { workspaceId: ctx.workspace.id },
+      where: { 
+        workspaceId: ctx.workspace.id,
+        title: input.search ? { contains: input.search, mode: "insensitive" } : undefined
+      },
     });
 
     return { items, nextCursor: null };
@@ -680,8 +691,11 @@ const followUpsRouter = t.router({
       z
         .object({
           status: followUpStatusSchema.optional(),
+          search: z.string().trim().optional(),
+          cursor: z.string().nullish(),
+          limit: z.number().min(1).max(100).default(50),
         })
-        .default({}),
+        .default({ limit: 50 }),
     )
     .query(async ({ ctx, input }) => {
       const items = await db.followUp.findMany({
@@ -693,7 +707,11 @@ const followUpsRouter = t.router({
           template: true,
         },
         orderBy: { dueAt: "asc" },
-        where: { status: input.status, workspaceId: ctx.workspace.id },
+        where: { 
+          status: input.status, 
+          workspaceId: ctx.workspace.id,
+          customer: input.search ? { name: { contains: input.search, mode: "insensitive" } } : undefined
+        },
       });
 
       return { items: items.map(followUpDto), nextCursor: null };
@@ -871,10 +889,19 @@ const templatesRouter = t.router({
       });
       return { item };
     }),
-  list: protectedProcedure.query(async ({ ctx }) => {
+  list: protectedProcedure
+    .input(z.object({ 
+      search: z.string().trim().optional(),
+      cursor: z.string().nullish(),
+      limit: z.number().min(1).max(100).default(50),
+    }).default({ limit: 50 }))
+    .query(async ({ ctx, input }) => {
     const items = await db.followUpTemplate.findMany({
       orderBy: [{ sortOrder: "asc" }, { name: "asc" }],
-      where: { workspaceId: ctx.workspace.id },
+      where: { 
+        workspaceId: ctx.workspace.id,
+        name: input.search ? { contains: input.search, mode: "insensitive" } : undefined
+      },
     });
 
     const workspaceInfo = await db.workspace.findUnique({

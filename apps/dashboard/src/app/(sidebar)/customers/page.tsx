@@ -1,56 +1,51 @@
-import { Badge, Button, Input } from "@afterservice/ui";
-import { CreateCustomerForm } from "@/components/forms/create-customer-form";
-import { CustomersTable } from "@/components/tables/customers-table";
-import Link from "next/link";
+import type { Metadata } from "next";
+import { ErrorBoundary } from "next/dist/client/components/error-boundary";
+import type { SearchParams } from "nuqs";
 import { Suspense } from "react";
+import { ErrorFallback } from "@/components/error-fallback";
+import { ScrollableContent } from "@/components/scrollable-content";
+import { CustomersHeader } from "@/components/customers-header";
+import { DataTable } from "@/components/tables/customers/data-table";
+import { loadCustomerFilterParams } from "@/hooks/use-customer-filter-params";
+import { loadSortParams } from "@/hooks/use-sort-params";
+import { batchPrefetch, HydrateClient, trpc } from "@/trpc/server";
 
-type CustomersPageProps = {
-  searchParams?: Promise<{ q?: string }>;
+export const metadata: Metadata = {
+  title: "Customers | After Service",
+  description: "Manage your customer base.",
 };
 
-export default async function CustomersPage({
-  searchParams,
-}: CustomersPageProps) {
-  const params = await searchParams;
+type Props = {
+  searchParams: Promise<SearchParams>;
+};
+
+export default async function CustomersPage(props: Props) {
+  const searchParams = await props.searchParams;
+
+  const filter = loadCustomerFilterParams(searchParams);
+  const { sort } = loadSortParams(searchParams);
+
+  batchPrefetch([
+    trpc.customers.list.queryOptions({
+      search: filter.q ?? undefined,
+      includeArchived: false,
+    }),
+  ]);
 
   return (
-    <div className="space-y-8">
-      <header className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div className="space-y-1">
-          <Badge variant="outline" className="mb-2">Customer management</Badge>
-          <h1 className="text-3xl font-bold tracking-tight">Customers</h1>
-          <p className="text-muted-foreground max-w-2xl">
-            Maintain the customer base that jobs, follow-ups, messages, and
-            repeat-business prompts attach to.
-          </p>
+    <HydrateClient>
+      <ScrollableContent>
+        <div className="flex flex-col gap-6">
+          <CustomersHeader />
+
+          <ErrorBoundary errorComponent={ErrorFallback}>
+            <Suspense fallback={<div className="p-8 text-center text-muted-foreground">Loading customers...</div>}>
+              <DataTable />
+            </Suspense>
+          </ErrorBoundary>
         </div>
-        <Button asChild>
-          <Link href="/jobs">Log job</Link>
-        </Button>
-      </header>
-
-      <div className="grid grid-cols-1 xl:grid-cols-[400px_1fr] gap-8 items-start">
-        <CreateCustomerForm />
-
-        <section className="space-y-4 min-w-0">
-          <form className="flex items-center gap-2" action="/customers">
-            <Input
-              defaultValue={params?.q ?? ""}
-              name="q"
-              placeholder="Search customers..."
-              className="max-w-md"
-            />
-            <Button type="submit" variant="secondary">
-              Search
-            </Button>
-          </form>
-
-          <Suspense fallback={<div className="p-8 text-center text-muted-foreground">Loading...</div>}>
-            <CustomersTable />
-          </Suspense>
-        </section>
-      </div>
-    </div>
+      </ScrollableContent>
+    </HydrateClient>
   );
 }
 

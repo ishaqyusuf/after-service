@@ -1,4 +1,13 @@
-export default function FeaturesPage() {
+import type { Metadata } from "next";
+
+export async function generateMetadata(): Promise<Metadata> {
+  return {
+    title: "Features | After Service",
+    description: "Follow-up workflows for the work that already happened.",
+  };
+}
+
+export default async function FeaturesPage() {
   return (
     <main className="site-page">
       <span className="site-kicker">Features</span>

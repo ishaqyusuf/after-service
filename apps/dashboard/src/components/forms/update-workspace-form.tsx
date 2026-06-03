@@ -6,12 +6,8 @@ import { useZodForm } from "@/hooks/use-zod-form";
 import { z } from "zod";
 import { useEffect } from "react";
 
-const updateWorkspaceSchema = z.object({
-  name: z.string().trim().min(1, "Name is required"),
-  businessType: z.string().trim().optional(),
-  serviceCategory: z.string().trim().optional(),
-  defaultFollowUpDelayDays: z.coerce.number().int().min(1).default(7),
-});
+import { updateWorkspaceSettingsSchema } from "@afterservice/api/schemas";
+
 
 export function UpdateWorkspaceForm() {
   const { data: workspaceData, isLoading } = trpc.workspace.getCurrent.useQuery();
@@ -24,7 +20,7 @@ export function UpdateWorkspaceForm() {
   });
 
   const form = useZodForm({
-    schema: updateWorkspaceSchema,
+    schema: updateWorkspaceSettingsSchema,
     defaultValues: {
       name: "",
       businessType: "",

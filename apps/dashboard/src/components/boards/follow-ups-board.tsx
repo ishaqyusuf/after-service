@@ -7,13 +7,7 @@ import { resolveTemplate } from "@/lib/dashboard-format";
 type BoardItem = any; // Type comes from tRPC router ideally
 
 export function FollowUpsBoard() {
-  const { data: boardData, isLoading } = trpc.followUps.listBoard.useQuery();
-
-  if (isLoading) {
-    return <div className="p-8 text-center text-muted-foreground">Loading board...</div>;
-  }
-
-  const columns = boardData?.columns;
+  const [{ columns }] = trpc.followUps.listBoard.useSuspenseQuery();
 
   if (!columns) return null;
 

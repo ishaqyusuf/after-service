@@ -4,7 +4,8 @@
   "type": "module",
   "exports": {
     "./context": "./src/context.ts",
-    "./router": "./src/routers/_app.ts"
+    "./router": "./src/routers/_app.ts",
+    "./schemas": "./src/schemas/index.ts"
   },
   "scripts": {
     "build": "tsc --noEmit",

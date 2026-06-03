@@ -1,6 +1,7 @@
 import { Sidebar } from "@/components/sidebar";
 import type { ReactNode } from "react";
 import { Badge } from "@afterservice/ui";
+import { AuthGuard } from "@/components/auth-guard";
 
 export default function SidebarLayout({ children }: { children: ReactNode }) {
   return (
@@ -17,7 +18,9 @@ export default function SidebarLayout({ children }: { children: ReactNode }) {
         </header>
         <main className="flex-1 px-4 md:px-8 py-6">
           <div className="mx-auto max-w-6xl w-full">
-            {children}
+            <AuthGuard rules={[]}>
+              {children}
+            </AuthGuard>
           </div>
         </main>
       </div>

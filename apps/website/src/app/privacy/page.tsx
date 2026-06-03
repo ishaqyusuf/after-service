@@ -1,6 +1,14 @@
 import { appMetadata } from "@afterservice/utils";
+import type { Metadata } from "next";
 
-export default function PrivacyPage() {
+export async function generateMetadata(): Promise<Metadata> {
+  return {
+    title: "Privacy Policy | After Service",
+    description: "Our privacy policy.",
+  };
+}
+
+export default async function PrivacyPage() {
   return (
     <main className="site-page">
       <span className="site-kicker">Legal</span>

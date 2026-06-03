@@ -1,36 +1,49 @@
-import { Badge, Button } from "@afterservice/ui";
-import { CreateTemplateForm } from "@/components/forms/create-template-form";
-import { TemplatesTable } from "@/components/tables/templates-table";
-import Link from "next/link";
+import type { Metadata } from "next";
+import { ErrorBoundary } from "next/dist/client/components/error-boundary";
+import type { SearchParams } from "nuqs";
 import { Suspense } from "react";
+import { ErrorFallback } from "@/components/error-fallback";
+import { ScrollableContent } from "@/components/scrollable-content";
+import { TemplatesHeader } from "@/components/templates-header";
+import { DataTable } from "@/components/tables/templates/data-table";
+import { loadTemplateFilterParams } from "@/hooks/use-template-filter-params";
+import { loadSortParams } from "@/hooks/use-sort-params";
+import { batchPrefetch, HydrateClient, trpc } from "@/trpc/server";
 
-export default function TemplatesPage() {
+export const metadata: Metadata = {
+  title: "Templates | After Service",
+  description: "Manage your follow-up templates.",
+};
+
+type Props = {
+  searchParams: Promise<SearchParams>;
+};
+
+export default async function TemplatesPage(props: Props) {
+  const searchParams = await props.searchParams;
+
+  const filter = loadTemplateFilterParams(searchParams);
+  const { sort } = loadSortParams(searchParams);
+
+  batchPrefetch([
+    trpc.templates.list.queryOptions({
+      search: filter.q ?? undefined,
+    }),
+  ]);
+
   return (
-    <div className="space-y-8">
-      <header className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div className="space-y-1">
-          <Badge variant="outline" className="mb-2">Message drafts</Badge>
-          <h1 className="text-3xl font-bold tracking-tight">Templates</h1>
-          <p className="text-muted-foreground max-w-2xl">
-            Manage reusable follow-up drafts. Applying a template creates an
-            editable draft; afterservice does not send messages automatically.
-          </p>
+    <HydrateClient>
+      <ScrollableContent>
+        <div className="flex flex-col gap-6">
+          <TemplatesHeader />
+
+          <ErrorBoundary errorComponent={ErrorFallback}>
+            <Suspense fallback={<div className="p-8 text-center text-muted-foreground">Loading templates...</div>}>
+              <DataTable />
+            </Suspense>
+          </ErrorBoundary>
         </div>
-        <Button asChild>
-          <Link href="/follow-ups">Use on board</Link>
-        </Button>
-      </header>
-
-      <div className="grid grid-cols-1 xl:grid-cols-[400px_1fr] gap-8 items-start">
-        <CreateTemplateForm />
-
-        <section className="min-w-0">
-          <Suspense fallback={<div className="p-8 text-center text-muted-foreground">Loading templates...</div>}>
-            <TemplatesTable />
-          </Suspense>
-        </section>
-      </div>
-    </div>
+      </ScrollableContent>
+    </HydrateClient>
   );
 }
-

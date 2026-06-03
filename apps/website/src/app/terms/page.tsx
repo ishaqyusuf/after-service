@@ -1,6 +1,14 @@
 import { appMetadata } from "@afterservice/utils";
+import type { Metadata } from "next";
 
-export default function TermsPage() {
+export async function generateMetadata(): Promise<Metadata> {
+  return {
+    title: "Terms of Service | After Service",
+    description: "Our terms of service.",
+  };
+}
+
+export default async function TermsPage() {
   return (
     <main className="site-page">
       <span className="site-kicker">Legal</span>

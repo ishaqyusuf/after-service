@@ -1,47 +1,60 @@
-import { Badge, Button } from "@afterservice/ui";
-import { CreateFollowUpForm } from "@/components/forms/create-follow-up-form";
-import { FollowUpsTable } from "@/components/tables/follow-ups-table";
-import { FollowUpsBoard } from "@/components/boards/follow-ups-board";
-import Link from "next/link";
+import type { Metadata } from "next";
+import { ErrorBoundary } from "next/dist/client/components/error-boundary";
+import type { SearchParams } from "nuqs";
 import { Suspense } from "react";
+import { ErrorFallback } from "@/components/error-fallback";
+import { ScrollableContent } from "@/components/scrollable-content";
+import { FollowUpsHeader } from "@/components/follow-ups-header";
+import { DataTable } from "@/components/tables/follow-ups/data-table";
+import { FollowUpsBoard } from "@/components/boards/follow-ups-board";
+import { loadFollowUpFilterParams } from "@/hooks/use-follow-up-filter-params";
+import { loadSortParams } from "@/hooks/use-sort-params";
+import { batchPrefetch, HydrateClient, trpc } from "@/trpc/server";
 
-export default async function FollowUpsPage() {
-  const defaultDue = new Date();
-  defaultDue.setDate(defaultDue.getDate() + 7);
+export const metadata: Metadata = {
+  title: "Follow-ups | After Service",
+  description: "Manage and track follow-ups.",
+};
+
+type Props = {
+  searchParams: Promise<SearchParams>;
+};
+
+export default async function FollowUpsPage(props: Props) {
+  const searchParams = await props.searchParams;
+
+  const filter = loadFollowUpFilterParams(searchParams);
+  const { sort } = loadSortParams(searchParams);
+
+  batchPrefetch([
+    trpc.followUps.listTable.queryOptions({
+      search: filter.q ?? undefined,
+    }),
+    trpc.followUps.listBoard.queryOptions(),
+  ]);
 
   return (
-    <div className="space-y-8">
-      <header className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div className="space-y-1">
-          <Badge variant="outline" className="mb-2">Core board</Badge>
-          <h1 className="text-3xl font-bold tracking-tight">Follow-ups</h1>
-          <p className="text-muted-foreground max-w-2xl">
-            Work every post-service check-in from due, upcoming, waiting,
-            replied, and closed states.
-          </p>
+    <HydrateClient>
+      <ScrollableContent>
+        <div className="flex flex-col gap-6">
+          <FollowUpsHeader />
+
+          <ErrorBoundary errorComponent={ErrorFallback}>
+            <section className="space-y-8 min-w-0">
+              <Suspense fallback={<div className="p-8 text-center text-muted-foreground">Loading board...</div>}>
+                <FollowUpsBoard />
+              </Suspense>
+
+              <div className="space-y-4">
+                <h2 className="text-xl font-semibold tracking-tight">Follow-up history</h2>
+                <Suspense fallback={<div className="p-8 text-center text-muted-foreground">Loading history...</div>}>
+                  <DataTable />
+                </Suspense>
+              </div>
+            </section>
+          </ErrorBoundary>
         </div>
-        <Button asChild>
-          <Link href="/templates">Manage templates</Link>
-        </Button>
-      </header>
-
-      <div className="grid grid-cols-1 xl:grid-cols-[400px_1fr] gap-8 items-start">
-        <CreateFollowUpForm defaultDue={defaultDue.toISOString().slice(0, 10)} />
-
-        <section className="space-y-8 min-w-0">
-          <Suspense fallback={<div className="p-8 text-center text-muted-foreground">Loading board...</div>}>
-            <FollowUpsBoard />
-          </Suspense>
-
-          <div className="space-y-4">
-            <h2 className="text-xl font-semibold tracking-tight">Follow-up history</h2>
-            <Suspense fallback={<div className="p-8 text-center text-muted-foreground">Loading history...</div>}>
-              <FollowUpsTable />
-            </Suspense>
-          </div>
-        </section>
-      </div>
-    </div>
+      </ScrollableContent>
+    </HydrateClient>
   );
 }
-

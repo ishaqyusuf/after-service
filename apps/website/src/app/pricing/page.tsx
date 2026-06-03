@@ -1,4 +1,13 @@
-export default function PricingPage() {
+import type { Metadata } from "next";
+
+export async function generateMetadata(): Promise<Metadata> {
+  return {
+    title: "Pricing | After Service",
+    description: "Starter, growth, and pro plans.",
+  };
+}
+
+export default async function PricingPage() {
   return (
     <main className="site-page">
       <h1>Pricing</h1>
