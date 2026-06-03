@@ -37,8 +37,8 @@ export function LandingHowItWorks() {
               Automated Dispatch
             </h3>
             <p className="text-sm text-muted-foreground max-w-xs leading-relaxed">
-              Our follow-up engine sends an email or text template customized
-              to the job type.
+              Our follow-up engine sends an email or text template customized to
+              the job type.
             </p>
           </div>
 

@@ -5,10 +5,15 @@ import { Check } from "lucide-react";
 import { useState } from "react";
 
 export function LandingPricing() {
-  const [billingCycle, setBillingCycle] = useState<"monthly" | "annually">("monthly");
+  const [billingCycle, setBillingCycle] = useState<"monthly" | "annually">(
+    "monthly",
+  );
 
   return (
-    <section id="pricing" className="relative z-10 max-w-7xl mx-auto w-full px-6 sm:px-8 py-24">
+    <section
+      id="pricing"
+      className="relative z-10 max-w-7xl mx-auto w-full px-6 sm:px-8 py-24"
+    >
       <div className="text-center mb-16">
         <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-foreground mb-4">
           Transparent, ROI-Driven Pricing
@@ -68,26 +73,41 @@ export function LandingPricing() {
 
             <ul className="space-y-3.5 text-sm text-muted-foreground border-t border-border pt-6">
               <li className="flex items-center gap-2.5">
-                <Check className="w-4 h-4 text-primary shrink-0" strokeWidth={3} />
+                <Check
+                  className="w-4 h-4 text-primary shrink-0"
+                  strokeWidth={3}
+                />
                 Up to 100 customers
               </li>
               <li className="flex items-center gap-2.5">
-                <Check className="w-4 h-4 text-primary shrink-0" strokeWidth={3} />
+                <Check
+                  className="w-4 h-4 text-primary shrink-0"
+                  strokeWidth={3}
+                />
                 Email follow-ups
               </li>
               <li className="flex items-center gap-2.5">
-                <Check className="w-4 h-4 text-primary shrink-0" strokeWidth={3} />
+                <Check
+                  className="w-4 h-4 text-primary shrink-0"
+                  strokeWidth={3}
+                />
                 Standard review routing
               </li>
               <li className="flex items-center gap-2.5 opacity-40">
-                <Check className="w-4 h-4 text-zinc-500 shrink-0" strokeWidth={3} />
+                <Check
+                  className="w-4 h-4 text-zinc-500 shrink-0"
+                  strokeWidth={3}
+                />
                 SMS check-ins
               </li>
             </ul>
           </div>
           <div className="mt-8">
             <a href="/signup" className="block w-full">
-              <Button variant="outline" className="w-full h-12 text-primary font-bold">
+              <Button
+                variant="outline"
+                className="w-full h-12 text-primary font-bold"
+              >
                 Get Started
               </Button>
             </a>
@@ -119,19 +139,31 @@ export function LandingPricing() {
 
             <ul className="space-y-3.5 text-sm text-muted-foreground border-t border-border pt-6">
               <li className="flex items-center gap-2.5">
-                <Check className="w-4 h-4 text-primary shrink-0" strokeWidth={3} />
+                <Check
+                  className="w-4 h-4 text-primary shrink-0"
+                  strokeWidth={3}
+                />
                 Up to 1,000 customers
               </li>
               <li className="flex items-center gap-2.5">
-                <Check className="w-4 h-4 text-primary shrink-0" strokeWidth={3} />
+                <Check
+                  className="w-4 h-4 text-primary shrink-0"
+                  strokeWidth={3}
+                />
                 SMS & Email outreach
               </li>
               <li className="flex items-center gap-2.5">
-                <Check className="w-4 h-4 text-primary shrink-0" strokeWidth={3} />
+                <Check
+                  className="w-4 h-4 text-primary shrink-0"
+                  strokeWidth={3}
+                />
                 Private dispute resolver
               </li>
               <li className="flex items-center gap-2.5">
-                <Check className="w-4 h-4 text-primary shrink-0" strokeWidth={3} />
+                <Check
+                  className="w-4 h-4 text-primary shrink-0"
+                  strokeWidth={3}
+                />
                 Up to 5 team seats
               </li>
             </ul>
@@ -167,26 +199,41 @@ export function LandingPricing() {
 
             <ul className="space-y-3.5 text-sm text-muted-foreground border-t border-border pt-6">
               <li className="flex items-center gap-2.5">
-                <Check className="w-4 h-4 text-primary shrink-0" strokeWidth={3} />
+                <Check
+                  className="w-4 h-4 text-primary shrink-0"
+                  strokeWidth={3}
+                />
                 Unlimited customers
               </li>
               <li className="flex items-center gap-2.5">
-                <Check className="w-4 h-4 text-primary shrink-0" strokeWidth={3} />
+                <Check
+                  className="w-4 h-4 text-primary shrink-0"
+                  strokeWidth={3}
+                />
                 All messaging channels
               </li>
               <li className="flex items-center gap-2.5">
-                <Check className="w-4 h-4 text-primary shrink-0" strokeWidth={3} />
+                <Check
+                  className="w-4 h-4 text-primary shrink-0"
+                  strokeWidth={3}
+                />
                 Advanced automation hooks
               </li>
               <li className="flex items-center gap-2.5">
-                <Check className="w-4 h-4 text-primary shrink-0" strokeWidth={3} />
+                <Check
+                  className="w-4 h-4 text-primary shrink-0"
+                  strokeWidth={3}
+                />
                 Unlimited team seats
               </li>
             </ul>
           </div>
           <div className="mt-8">
             <a href="/signup" className="block w-full">
-              <Button variant="outline" className="w-full h-12 text-primary font-bold">
+              <Button
+                variant="outline"
+                className="w-full h-12 text-primary font-bold"
+              >
                 Get Started
               </Button>
             </a>

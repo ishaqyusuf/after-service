@@ -43,7 +43,11 @@ export function LandingFAQ() {
       <div className="bg-card border border-border rounded-xl p-6 shadow-sm dark:shadow-none">
         <Accordion type="single" collapsible className="w-full">
           {faqs.map((faq, idx) => (
-            <AccordionItem key={idx} value={`item-${idx}`} className={idx === faqs.length - 1 ? "border-b-0" : ""}>
+            <AccordionItem
+              key={idx}
+              value={`item-${idx}`}
+              className={idx === faqs.length - 1 ? "border-b-0" : ""}
+            >
               <AccordionTrigger className="text-left font-bold text-lg text-foreground hover:text-primary transition-colors">
                 {faq.q}
               </AccordionTrigger>

@@ -1,7 +1,7 @@
 import { isLaunched } from "@afterservice/utils";
+import type { Metadata } from "next";
 import { LaunchedPage } from "../components/launched";
 import { PreLaunchPage } from "../components/pre-launch";
-import type { Metadata } from "next";
 
 export async function generateMetadata(): Promise<Metadata> {
   return {

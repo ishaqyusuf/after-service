@@ -27,13 +27,20 @@ export function LandingHero() {
 
       <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-20">
         <a href="/signup" className="w-full sm:w-auto">
-          <Button size="lg" className="w-full sm:w-auto text-base h-14 px-8 font-bold shadow-lg shadow-[#009b98]/20 flex items-center justify-center gap-2">
+          <Button
+            size="lg"
+            className="w-full sm:w-auto text-base h-14 px-8 font-bold shadow-lg shadow-[#009b98]/20 flex items-center justify-center gap-2"
+          >
             Start Your 14-Day Free Trial
             <ArrowRight className="w-5 h-5 ml-1" />
           </Button>
         </a>
         <a href="#pricing" className="w-full sm:w-auto">
-          <Button variant="outline" size="lg" className="w-full sm:w-auto text-base h-14 px-8 font-bold">
+          <Button
+            variant="outline"
+            size="lg"
+            className="w-full sm:w-auto text-base h-14 px-8 font-bold"
+          >
             See Pricing & Plans
           </Button>
         </a>

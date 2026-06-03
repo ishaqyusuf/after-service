@@ -1,15 +1,15 @@
 /* biome-ignore-all lint/a11y/noSvgWithoutTitle: Inline icons are decorative and paired with visible text. */
 /* biome-ignore-all lint/a11y/useValidAnchor: Hash links navigate to page sections and close the mobile menu. */
 
+import { LandingCTA } from "./landing/cta";
+import { LandingFAQ } from "./landing/faq";
+import { LandingFeatures } from "./landing/features";
+import { LandingFooter } from "./landing/footer";
 import { LandingHeader } from "./landing/header";
 import { LandingHero } from "./landing/hero";
-import { LandingMetrics } from "./landing/metrics";
-import { LandingFeatures } from "./landing/features";
 import { LandingHowItWorks } from "./landing/how-it-works";
+import { LandingMetrics } from "./landing/metrics";
 import { LandingPricing } from "./landing/pricing";
-import { LandingFAQ } from "./landing/faq";
-import { LandingCTA } from "./landing/cta";
-import { LandingFooter } from "./landing/footer";
 
 export function LaunchedPage() {
   return (

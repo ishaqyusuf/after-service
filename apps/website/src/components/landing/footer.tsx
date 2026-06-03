@@ -11,9 +11,7 @@ export function LandingFooter() {
 
         <div className="text-xs text-muted-foreground text-center md:text-left">
           <p>© {new Date().getFullYear()} afterservice. All rights reserved.</p>
-          <p className="mt-1">
-            Built for local operators in the USA & Canada.
-          </p>
+          <p className="mt-1">Built for local operators in the USA & Canada.</p>
         </div>
 
         <div className="flex gap-6 text-xs text-muted-foreground">

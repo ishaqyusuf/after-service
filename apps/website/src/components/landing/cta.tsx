@@ -14,7 +14,10 @@ export function LandingCTA() {
           and repeat jobs today. Setting up takes minutes.
         </p>
         <a href="/signup" className="inline-block">
-          <Button size="lg" className="h-14 px-8 text-base font-bold shadow-lg shadow-[#009b98]/20">
+          <Button
+            size="lg"
+            className="h-14 px-8 text-base font-bold shadow-lg shadow-[#009b98]/20"
+          >
             Start Your 14-Day Free Trial
           </Button>
         </a>

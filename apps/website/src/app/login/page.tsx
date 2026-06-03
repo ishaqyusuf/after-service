@@ -1,6 +1,6 @@
 import { buildDashboardUrl } from "@afterservice/utils";
-import { headers } from "next/headers";
 import type { Metadata } from "next";
+import { headers } from "next/headers";
 
 export async function generateMetadata(): Promise<Metadata> {
   return {
