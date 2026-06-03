@@ -13,6 +13,7 @@
     "@afterservice/api": "workspace:*",
     "@afterservice/auth": "workspace:*",
     "@afterservice/db": "workspace:*",
+    "@afterservice/events": "workspace:*",
     "@afterservice/site-nav": "workspace:*",
     "@afterservice/ui": "workspace:*",
     "@afterservice/utils": "workspace:*",

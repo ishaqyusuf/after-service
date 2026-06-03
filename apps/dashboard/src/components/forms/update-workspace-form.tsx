@@ -5,6 +5,8 @@ import { trpc } from "@/components/providers/trpc-provider";
 import { useZodForm } from "@/hooks/use-zod-form";
 import { z } from "zod";
 import { useEffect } from "react";
+import { track } from "@afterservice/events/client";
+import { LogEvents } from "@afterservice/events";
 
 import { updateWorkspaceSettingsSchema } from "@afterservice/api/schemas";
 
@@ -16,6 +18,7 @@ export function UpdateWorkspaceForm() {
   const updateMutation = trpc.workspace.updateSettings.useMutation({
     onSuccess: () => {
       utils.workspace.getCurrent.invalidate();
+      track({ event: LogEvents.WorkspaceUpdated.name, channel: LogEvents.WorkspaceUpdated.channel });
     }
   });
 

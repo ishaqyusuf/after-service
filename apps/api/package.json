@@ -17,6 +17,7 @@
   "dependencies": {
     "@afterservice/auth": "workspace:*",
     "@afterservice/db": "workspace:*",
+    "@afterservice/events": "workspace:*",
     "@afterservice/jobs": "workspace:*",
     "@afterservice/notifications": "workspace:*",
     "@afterservice/utils": "workspace:*",

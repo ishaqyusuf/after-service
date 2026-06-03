@@ -6,6 +6,8 @@ import { Badge, BrandLogo, Button, Input } from "@afterservice/ui";
 import { appMetadata } from "@afterservice/utils";
 import Link from "next/link";
 import { useState } from "react";
+import { track } from "@afterservice/events/client";
+import { LogEvents } from "@afterservice/events";
 
 export function PreLaunchPage() {
   const [email, setEmail] = useState("");
@@ -22,6 +24,12 @@ export function PreLaunchPage() {
 
     setLoading(true);
     setError("");
+    
+    track({
+      event: LogEvents.CTA.name,
+      channel: LogEvents.CTA.channel,
+      form: "prelaunch_waitlist",
+    });
 
     // Simulate API call to register waitlist
     await new Promise((resolve) => setTimeout(resolve, 1000));

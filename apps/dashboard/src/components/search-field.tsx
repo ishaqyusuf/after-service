@@ -4,6 +4,8 @@ import { Icons } from "@afterservice/ui/icons";
 import { Input } from "@afterservice/ui/input";
 import { useQueryState } from "nuqs";
 import { useHotkeys } from "react-hotkeys-hook";
+import { track } from "@afterservice/events/client";
+import { LogEvents } from "@afterservice/events";
 
 type Props = {
   placeholder: string;
@@ -38,6 +40,9 @@ export function SearchField({ placeholder }: Props) {
         autoCapitalize="none"
         autoCorrect="off"
         spellCheck="false"
+        onFocus={() => {
+          track({ event: LogEvents.SearchOpened.name, channel: LogEvents.SearchOpened.channel });
+        }}
       />
     </div>
   );

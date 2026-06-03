@@ -6,6 +6,8 @@
 import { BrandLogo, Button } from "@afterservice/ui";
 import { appMetadata } from "@afterservice/utils";
 import { useEffect, useState } from "react";
+import { track } from "@afterservice/events/client";
+import { LogEvents } from "@afterservice/events";
 
 export function LandingHeader() {
   const [theme, setTheme] = useState<"light" | "dark">("dark");
@@ -112,10 +114,14 @@ export function LandingHeader() {
           <a
             href="/login"
             className="text-sm font-medium text-muted-foreground hover:text-[#18211c] dark:hover:text-white transition-colors"
+            onClick={() => track({ event: LogEvents.CTA.name, channel: LogEvents.CTA.channel, location: "header_signin" })}
           >
             Sign In
           </a>
-          <a href="/signup">
+          <a 
+            href="/signup"
+            onClick={() => track({ event: LogEvents.CTA.name, channel: LogEvents.CTA.channel, location: "header_signup" })}
+          >
             <Button size="sm">Start Free Trial</Button>
           </a>
         </div>
@@ -223,12 +229,21 @@ export function LandingHeader() {
             <div className="border-t border-border mt-2 pt-4 flex flex-col gap-3 px-4">
               <a
                 href="/login"
-                onClick={() => setMobileMenuOpen(false)}
+                onClick={() => {
+                  setMobileMenuOpen(false);
+                  track({ event: LogEvents.CTA.name, channel: LogEvents.CTA.channel, location: "mobile_menu_signin" });
+                }}
                 className="text-sm font-medium text-muted-foreground hover:text-[#18211c] dark:hover:text-white transition-colors"
               >
                 Sign In
               </a>
-              <a href="/signup" onClick={() => setMobileMenuOpen(false)}>
+              <a 
+                href="/signup" 
+                onClick={() => {
+                  setMobileMenuOpen(false);
+                  track({ event: LogEvents.CTA.name, channel: LogEvents.CTA.channel, location: "mobile_menu_signup" });
+                }}
+              >
                 <Button size="sm" className="w-full">
                   Start Free Trial
                 </Button>

@@ -13,6 +13,7 @@ export const metadata: Metadata = {
 import { TRPCProvider } from "@/components/providers/trpc-provider";
 import { GlobalSheetsProvider } from "@/components/sheets/global-sheets-provider";
 import { GlobalModalsProvider } from "@/components/modals/global-modals-provider";
+import { Provider as OpenPanelProvider } from "@afterservice/events/client";
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
@@ -21,6 +22,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         <TRPCProvider>
           <GlobalSheetsProvider />
           <GlobalModalsProvider />
+          <OpenPanelProvider />
           {children}
         </TRPCProvider>
       </body>

@@ -6,6 +6,7 @@ import { Geist } from "next/font/google";
 import type { ReactNode } from "react";
 import "@afterservice/ui/globals.css";
 import Link from "next/link";
+import { Provider as AnalyticsProvider } from "@afterservice/events/client";
 
 const geist = Geist({ subsets: ["latin"], variable: "--font-sans" });
 
@@ -22,6 +23,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
       suppressHydrationWarning
     >
       <body className="min-h-screen flex flex-col bg-background text-foreground">
+        <AnalyticsProvider />
         <header className="sticky top-0 z-50 w-full border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
           <div className="container mx-auto px-4 h-16 flex items-center justify-between">
             <Link href="/" className="flex items-center space-x-2">

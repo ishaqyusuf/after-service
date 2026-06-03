@@ -3,6 +3,8 @@ import { initTRPC, TRPCError } from "@trpc/server";
 import superjson from "superjson";
 import { z } from "zod";
 import type { ApiContext } from "../context";
+import { setupAnalytics } from "@afterservice/events/server";
+import { LogEvents } from "@afterservice/events";
 
 const t = initTRPC.context<ApiContext>().create({
   transformer: superjson,
@@ -266,6 +268,14 @@ const customersRouter = t.router({
         },
       });
 
+      const analytics = await setupAnalytics();
+      analytics.track({
+        event: LogEvents.CustomerCreated.name,
+        channel: LogEvents.CustomerCreated.channel,
+        profileId: ctx.user?.id,
+        workspaceId: ctx.workspace.id,
+      });
+
       return { item: customerDto({ ...item, followUps: [] }) };
     }),
   get: protectedProcedure
@@ -400,6 +410,14 @@ const serviceJobsRouter = t.router({
         where: { id: customer.id },
       });
 
+      const analytics = await setupAnalytics();
+      analytics.track({
+        event: LogEvents.ServiceJobCreated.name,
+        channel: LogEvents.ServiceJobCreated.channel,
+        profileId: ctx.user?.id,
+        workspaceId: ctx.workspace.id,
+      });
+
       return { item };
     }),
   createFollowUp: protectedProcedure
@@ -493,6 +511,14 @@ const serviceJobsRouter = t.router({
       const item = await db.serviceJob.update({
         data: { completedAt: new Date(), status: "completed" },
         where: { id: input.id, workspaceId: ctx.workspace.id },
+      });
+
+      const analytics = await setupAnalytics();
+      analytics.track({
+        event: LogEvents.ServiceJobStatusUpdated.name,
+        channel: LogEvents.ServiceJobStatusUpdated.channel,
+        profileId: ctx.user?.id,
+        workspaceId: ctx.workspace.id,
       });
 
       return { item };
@@ -601,6 +627,14 @@ const followUpsRouter = t.router({
         where: { id: input.id, workspaceId: ctx.workspace.id },
       });
 
+      const analytics = await setupAnalytics();
+      analytics.track({
+        event: LogEvents.FollowUpStatusUpdated.name,
+        channel: LogEvents.FollowUpStatusUpdated.channel,
+        profileId: ctx.user?.id,
+        workspaceId: ctx.workspace.id,
+      });
+
       return { item: followUpDto(item) };
     }),
   create: protectedProcedure
@@ -646,6 +680,14 @@ const followUpsRouter = t.router({
           messageLogs: true,
           template: true,
         },
+      });
+
+      const analytics = await setupAnalytics();
+      analytics.track({
+        event: LogEvents.FollowUpCreated.name,
+        channel: LogEvents.FollowUpCreated.channel,
+        profileId: ctx.user?.id,
+        workspaceId: ctx.workspace.id,
       });
 
       return { item: followUpDto(item) };
@@ -742,6 +784,14 @@ const followUpsRouter = t.router({
         where: { id: input.id, workspaceId: ctx.workspace.id },
       });
 
+      const analytics = await setupAnalytics();
+      analytics.track({
+        event: LogEvents.FollowUpStatusUpdated.name,
+        channel: LogEvents.FollowUpStatusUpdated.channel,
+        profileId: ctx.user?.id,
+        workspaceId: ctx.workspace.id,
+      });
+
       return { item: followUpDto(item) };
     }),
   markSent: protectedProcedure
@@ -789,6 +839,20 @@ const followUpsRouter = t.router({
           template: true,
         },
         where: { id: input.id, workspaceId: ctx.workspace.id },
+      });
+
+      const analytics = await setupAnalytics();
+      analytics.track({
+        event: LogEvents.MessageSent.name,
+        channel: LogEvents.MessageSent.channel,
+        profileId: ctx.user?.id,
+        workspaceId: ctx.workspace.id,
+      });
+      analytics.track({
+        event: LogEvents.FollowUpStatusUpdated.name,
+        channel: LogEvents.FollowUpStatusUpdated.channel,
+        profileId: ctx.user?.id,
+        workspaceId: ctx.workspace.id,
       });
 
       return { item: followUpDto(item) };

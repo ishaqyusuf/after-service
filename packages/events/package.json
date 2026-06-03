@@ -1,20 +1,27 @@
 {
-  "name": "@afterservice/notifications",
+  "name": "@afterservice/events",
+  "version": "0.1.0",
   "private": true,
   "type": "module",
   "exports": {
-    ".": "./src/index.ts"
+    ".": "./src/index.ts",
+    "./client": "./src/client.tsx",
+    "./server": "./src/server.ts"
   },
   "scripts": {
     "build": "tsc --noEmit",
     "lint": "biome check .",
     "typecheck": "tsc --noEmit"
   },
+  "dependencies": {
+    "@openpanel/nextjs": "latest",
+    "server-only": "^0.0.1"
+  },
   "devDependencies": {
-    "@afterservice/db": "workspace:*",
     "@afterservice/tsconfig": "workspace:*",
     "@types/node": "^25.2.3",
+    "@types/react": "^19.0.0",
     "typescript": "^5.9.3",
-    "zod": "^4.4.3"
+    "react": "^19.0.0"
   }
 }

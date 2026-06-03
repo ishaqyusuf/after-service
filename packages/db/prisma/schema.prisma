@@ -166,6 +166,7 @@ model Customer {
   phone         String?
   email         String?
   companyName   String?
+  preferredChannel FollowUpChannel @default(email)
   tags          String[]     @default([])
   notes         String?
   lastServiceAt DateTime?
@@ -272,6 +273,7 @@ model MessageLog {
   body        String
   provider    String?
   providerId  String?
+  errorDetails Json?
   status      String          @default("draft")
   sentAt      DateTime?
   createdAt   DateTime        @default(now())

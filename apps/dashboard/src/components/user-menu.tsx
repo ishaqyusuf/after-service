@@ -13,6 +13,8 @@ import {
 } from "@afterservice/ui";
 import { LogOut, Settings, User } from "lucide-react";
 import { useState } from "react";
+import { track } from "@afterservice/events/client";
+import { LogEvents } from "@afterservice/events";
 
 export function UserMenu({ isExpanded }: { isExpanded: boolean }) {
   const [isPending, setIsPending] = useState(false);
@@ -20,6 +22,7 @@ export function UserMenu({ isExpanded }: { isExpanded: boolean }) {
   const handleSignOut = async () => {
     setIsPending(true);
     try {
+      track({ event: LogEvents.SignOut.name, channel: LogEvents.SignOut.channel });
       await fetch("/api/auth/sign-out", { method: "POST" });
       window.location.href = "/sign-in";
     } catch (error) {

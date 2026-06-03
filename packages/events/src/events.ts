@@ -1,0 +1,78 @@
+export const LogEvents = {
+  CTA: {
+    name: "CTA Clicked",
+    channel: "marketing",
+  },
+  SignIn: {
+    name: "User Signed In",
+    channel: "login",
+  },
+  SignOut: {
+    name: "User Signed Out",
+    channel: "login",
+  },
+  WorkspaceCreated: {
+    name: "Workspace Created",
+    channel: "workspace",
+  },
+  WorkspaceUpdated: {
+    name: "Workspace Updated",
+    channel: "workspace",
+  },
+  TeamInviteSent: {
+    name: "Team Invite Sent",
+    channel: "team",
+  },
+  TeamInviteAccepted: {
+    name: "Team Invite Accepted",
+    channel: "team",
+  },
+  CustomerCreated: {
+    name: "Customer Created",
+    channel: "customer",
+  },
+  ServiceJobCreated: {
+    name: "Service Job Created",
+    channel: "job",
+  },
+  ServiceJobStatusUpdated: {
+    name: "Service Job Status Updated",
+    channel: "job",
+  },
+  FollowUpCreated: {
+    name: "Follow Up Created",
+    channel: "followup",
+  },
+  FollowUpStatusUpdated: {
+    name: "Follow Up Status Updated",
+    channel: "followup",
+  },
+  MessageSent: {
+    name: "Message Sent",
+    channel: "messaging",
+  },
+  FollowUpTemplateCreated: {
+    name: "Follow Up Template Created",
+    channel: "messaging",
+  },
+  SubscriptionStarted: {
+    name: "Subscription Started",
+    channel: "billing",
+  },
+  SubscriptionCanceled: {
+    name: "Subscription Canceled",
+    channel: "billing",
+  },
+  PlanUpgraded: {
+    name: "Plan Upgraded",
+    channel: "billing",
+  },
+  SearchOpened: {
+    name: "Search Opened",
+    channel: "general",
+  },
+  SearchPerformed: {
+    name: "Search Performed",
+    channel: "general",
+  },
+};
