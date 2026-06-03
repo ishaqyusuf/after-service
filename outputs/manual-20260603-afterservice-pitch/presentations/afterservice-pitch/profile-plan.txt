@@ -1,0 +1,31 @@
+Task mode: create
+Primary deck-profile: product-platform
+Secondary gates: gtm-growth, monetization story
+
+Required proof objects:
+- Platform/workflow map showing completed job -> follow-up queue -> operator action -> business outcome.
+- Customer journey visual for post-job follow-up.
+- Segment focus table for first ICP.
+- Monetization bridge from free beta to paid tiers.
+- Roadmap slide showing what is free now, what unlocks later, and what to delay.
+
+Source/asset requirements:
+- Use project Brain files as source of truth.
+- Use afterservice brand name and afterservice.app domain.
+- No invented traction metrics.
+- Use current market anchors from Brain research and cite source names in notes/appendix.
+
+Brand authenticity constraints:
+- Do not use unofficial logos for competitors.
+- Express brand through text, workflow diagrams, and afterservice teal/ink palette.
+
+Profile-specific QA gates:
+- Each slide needs one claim and one proof object.
+- No generic feature-card grid.
+- Pricing must be framed as recommendation, not a final locked decision.
+- Free beta must not imply free forever.
+
+Known missing inputs:
+- No confirmed customer traction.
+- No final chosen ICP beyond the recommended small installers/repair shops/home-service wedge.
+- No final fundraising amount or investor ask specified.

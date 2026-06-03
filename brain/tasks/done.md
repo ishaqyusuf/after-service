@@ -4,6 +4,38 @@
 This file records completed work.
 
 ## Completed
+### Fix Landing CTA Server Event Handler Error
+Completed: 2026-06-03
+
+Summary:
+- Marked the landing bottom CTA component as a client component so its click tracking handler can run at the client boundary.
+- Marked the shared events client entrypoint as a client module because it uses OpenPanel client hooks.
+- Replaced the shared `track()` client helper with `useTrack()` so OpenPanel hooks run during component render instead of click handlers.
+
+Files changed:
+- `apps/website/src/components/landing/cta.tsx`
+- `apps/website/src/components/landing/header.tsx`
+- `apps/dashboard/src/components/forms/onboarding-form.tsx`
+- `apps/dashboard/src/components/forms/update-workspace-form.tsx`
+- `apps/dashboard/src/components/search-field.tsx`
+- `apps/dashboard/src/components/user-menu.tsx`
+- `packages/events/src/client.tsx`
+
+### Remove IS_LAUNCHED Website Flag
+Completed: 2026-06-03
+
+Summary:
+- Removed the website homepage `IS_LAUNCHED` gate.
+- Updated the homepage to render the main launched landing page directly.
+- Removed the unused prelaunch homepage component and waitlist form.
+- Removed `isLaunched` from `@afterservice/utils` and dropped `IS_LAUNCHED` from `.env.example`.
+
+Files changed:
+- `apps/website/src/app/page.tsx`
+- `apps/website/src/components/pre-launch.tsx`
+- `packages/utils/src/env.ts`
+- `.env.example`
+
 ### Project Brain Initialization
 Completed: 2026-05-24
 

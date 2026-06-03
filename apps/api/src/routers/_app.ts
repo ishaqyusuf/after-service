@@ -5,12 +5,14 @@ import { z } from "zod";
 import type { ApiContext } from "../context";
 import { setupAnalytics } from "@afterservice/events/server";
 import { LogEvents } from "@afterservice/events";
+import { Notifications } from "@afterservice/notifications";
 
 const t = initTRPC.context<ApiContext>().create({
   transformer: superjson,
 });
 
 const db = getDbClient();
+const notifications = new Notifications(db);
 
 const channelSchema = z.enum(["email", "sms", "phone", "whatsapp"]);
 const followUpStatusSchema = z.enum([
@@ -521,6 +523,21 @@ const serviceJobsRouter = t.router({
         workspaceId: ctx.workspace.id,
       });
 
+      const customer = await db.customer.findUniqueOrThrow({ where: { id: item.customerId }});
+      
+      // Async dispatch notification
+      notifications.send("job_completed_checkin", ctx.workspace.id, {
+        users: [{ 
+          id: customer.id, 
+          email: customer.email || "", 
+          phone: customer.phone || undefined, 
+          workspace_id: ctx.workspace.id 
+        }],
+        jobId: item.id,
+        customerId: item.customerId,
+        completedAt: item.completedAt.toISOString(),
+      }).catch(console.error);
+
       return { item };
     }),
   update: protectedProcedure
@@ -690,6 +707,20 @@ const followUpsRouter = t.router({
         workspaceId: ctx.workspace.id,
       });
 
+      notifications.send("followup_scheduled", ctx.workspace.id, {
+        users: [{
+          id: item.customer.id,
+          email: item.customer.email || "",
+          phone: item.customer.phone || undefined,
+          workspace_id: ctx.workspace.id
+        }],
+        jobId: item.jobId || undefined,
+        customerId: item.customerId,
+        dueAt: item.dueAt.toISOString(),
+        notes: item.notes || undefined,
+        channel: item.channel,
+      }).catch(console.error);
+
       return { item: followUpDto(item) };
     }),
   listBoard: protectedProcedure.query(async ({ ctx }) => {
@@ -811,25 +842,6 @@ const followUpsRouter = t.router({
         data: {
           sentAt: new Date(),
           status: "sent",
-          events: {
-            create: {
-              actorId: ctx.user?.id,
-              type: "manual_send_logged",
-              workspaceId: ctx.workspace.id,
-            },
-          },
-          messageLogs: {
-            create: {
-              body: input.body,
-              channel: followUp.channel,
-              customerId: followUp.customerId,
-              recipient: input.recipient,
-              status: "sent",
-              subject: input.subject || null,
-              sentAt: new Date(),
-              workspaceId: ctx.workspace.id,
-            },
-          },
         },
         include: {
           customer: true,
@@ -848,6 +860,21 @@ const followUpsRouter = t.router({
         profileId: ctx.user?.id,
         workspaceId: ctx.workspace.id,
       });
+
+      notifications.send("followup_message_sent", ctx.workspace.id, {
+        users: [{
+          id: item.customer.id,
+          email: item.customer.email || "",
+          phone: item.customer.phone || undefined,
+          workspace_id: ctx.workspace.id
+        }],
+        followUpId: item.id,
+        customerId: item.customerId,
+        body: input.body,
+        channel: followUp.channel,
+        recipient: input.recipient,
+      }, { channels: [followUp.channel] }).catch(console.error);
+
       analytics.track({
         event: LogEvents.FollowUpStatusUpdated.name,
         channel: LogEvents.FollowUpStatusUpdated.channel,

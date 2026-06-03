@@ -13,11 +13,12 @@ import {
 } from "@afterservice/ui";
 import { LogOut, Settings, User } from "lucide-react";
 import { useState } from "react";
-import { track } from "@afterservice/events/client";
+import { useTrack } from "@afterservice/events/client";
 import { LogEvents } from "@afterservice/events";
 
 export function UserMenu({ isExpanded }: { isExpanded: boolean }) {
   const [isPending, setIsPending] = useState(false);
+  const track = useTrack();
 
   const handleSignOut = async () => {
     setIsPending(true);

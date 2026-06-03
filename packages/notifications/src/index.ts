@@ -108,14 +108,57 @@ export class Notifications {
       let whatsappSent = 0;
       let whatsappFailed = 0;
 
-      // TODO: Replace with #emailService.sendBulk
-      emailsSent = emailDispatches.length;
+      // Log Emails
+      for (const dispatch of emailDispatches) {
+        await this.#db.messageLog.create({
+          data: {
+            workspaceId: workspaceId,
+            customerId: dispatch.data?.customerId,
+            followUpId: dispatch.data?.followUpId,
+            channel: "email",
+            recipient: dispatch.user.email,
+            subject: dispatch.subject,
+            body: typeof dispatch.data?.body === 'string' ? dispatch.data.body : JSON.stringify(dispatch.data),
+            status: "sent",
+            sentAt: new Date(),
+          }
+        });
+        emailsSent++;
+      }
 
-      // TODO: Replace with #smsService.sendBulk
-      smsSent = smsDispatches.length;
+      // Log SMS
+      for (const dispatch of smsDispatches) {
+        await this.#db.messageLog.create({
+          data: {
+            workspaceId: workspaceId,
+            customerId: dispatch.data?.customerId,
+            followUpId: dispatch.data?.followUpId,
+            channel: "sms",
+            recipient: dispatch.user.phone || dispatch.user.email,
+            body: dispatch.body,
+            status: "sent",
+            sentAt: new Date(),
+          }
+        });
+        smsSent++;
+      }
 
-      // TODO: Replace with #whatsappService.sendBulk
-      whatsappSent = whatsappDispatches.length;
+      // Log WhatsApp
+      for (const dispatch of whatsappDispatches) {
+        await this.#db.messageLog.create({
+          data: {
+            workspaceId: workspaceId,
+            customerId: dispatch.data?.customerId,
+            followUpId: dispatch.data?.followUpId,
+            channel: "whatsapp",
+            recipient: dispatch.user.phone || dispatch.user.email,
+            body: dispatch.body,
+            status: "sent",
+            sentAt: new Date(),
+          }
+        });
+        whatsappSent++;
+      }
 
       return {
         type: String(type),

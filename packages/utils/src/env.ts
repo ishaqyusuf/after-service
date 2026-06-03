@@ -143,7 +143,3 @@ export function assertWorkspaceEnv(
 
   throw new Error(`Invalid afterservice environment (${mode}): ${details}`);
 }
-
-export function isLaunched(env: EnvSource = process.env): boolean {
-  return env.IS_LAUNCHED === "true";
-}

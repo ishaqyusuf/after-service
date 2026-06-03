@@ -5,7 +5,7 @@ import { trpc } from "@/components/providers/trpc-provider";
 import { useZodForm } from "@/hooks/use-zod-form";
 import { z } from "zod";
 import { useEffect } from "react";
-import { track } from "@afterservice/events/client";
+import { useTrack } from "@afterservice/events/client";
 import { LogEvents } from "@afterservice/events";
 
 import { updateWorkspaceSettingsSchema } from "@afterservice/api/schemas";
@@ -14,6 +14,7 @@ import { updateWorkspaceSettingsSchema } from "@afterservice/api/schemas";
 export function UpdateWorkspaceForm() {
   const { data: workspaceData, isLoading } = trpc.workspace.getCurrent.useQuery();
   const utils = trpc.useUtils();
+  const track = useTrack();
 
   const updateMutation = trpc.workspace.updateSettings.useMutation({
     onSuccess: () => {

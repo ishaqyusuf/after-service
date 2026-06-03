@@ -4,7 +4,7 @@ import { Icons } from "@afterservice/ui/icons";
 import { Input } from "@afterservice/ui/input";
 import { useQueryState } from "nuqs";
 import { useHotkeys } from "react-hotkeys-hook";
-import { track } from "@afterservice/events/client";
+import { useTrack } from "@afterservice/events/client";
 import { LogEvents } from "@afterservice/events";
 
 type Props = {
@@ -13,6 +13,7 @@ type Props = {
 
 export function SearchField({ placeholder }: Props) {
   const [search, setSearch] = useQueryState("q");
+  const track = useTrack();
 
   useHotkeys("esc", () => setSearch(null), {
     enableOnFormTags: true,

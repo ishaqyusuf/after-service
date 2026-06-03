@@ -10,11 +10,12 @@ import { useState } from "react";
 import { onboardingSchema } from "@afterservice/api/schemas";
 import { useZodForm } from "@/hooks/use-zod-form";
 import { z } from "zod";
-import { track } from "@afterservice/events/client";
+import { useTrack } from "@afterservice/events/client";
 import { LogEvents } from "@afterservice/events";
 
 export function OnboardingForm() {
   const [error, setError] = useState<string | null>(null);
+  const track = useTrack();
   
   const form = useZodForm({
     schema: onboardingSchema,

@@ -1,7 +1,5 @@
-import { isLaunched } from "@afterservice/utils";
 import type { Metadata } from "next";
 import { LaunchedPage } from "../components/launched";
-import { PreLaunchPage } from "../components/pre-launch";
 
 export async function generateMetadata(): Promise<Metadata> {
   return {
@@ -11,11 +9,5 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function HomePage() {
-  const launched = isLaunched();
-
-  if (!launched) {
-    return <LaunchedPage />;
-  }
-
-  return <PreLaunchPage />;
+  return <LaunchedPage />;
 }

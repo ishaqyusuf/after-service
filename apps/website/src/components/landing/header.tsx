@@ -6,12 +6,13 @@
 import { BrandLogo, Button } from "@afterservice/ui";
 import { appMetadata } from "@afterservice/utils";
 import { useEffect, useState } from "react";
-import { track } from "@afterservice/events/client";
+import { useTrack } from "@afterservice/events/client";
 import { LogEvents } from "@afterservice/events";
 
 export function LandingHeader() {
   const [theme, setTheme] = useState<"light" | "dark">("dark");
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const track = useTrack();
 
   useEffect(() => {
     const savedTheme = localStorage.getItem("theme") as "light" | "dark" | null;

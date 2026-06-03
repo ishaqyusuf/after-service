@@ -6,6 +6,8 @@ This file is the canonical product and implementation roadmap for afterservice.
 ## Current MVP State
 As of 2026-05-30, the local MVP implementation covers phases 1-17 and the core operator journey: sign up, onboard a workspace, manage customers, log jobs, create/work follow-ups, manage templates, view billing/limits, run manual-send messaging logs, and execute cron-protected follow-up job dry-runs. Remaining post-MVP work is deeper automated browser coverage, provider-specific production observability wiring, and production secret/domain configuration.
 
+As of 2026-06-03, the public website no longer uses an `IS_LAUNCHED` release flag or prelaunch homepage branch. The root marketing page renders the main afterservice landing experience directly.
+
 ## Phase 1: Repo Bootstrap
 Status: complete.
 

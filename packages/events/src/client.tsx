@@ -1,3 +1,5 @@
+"use client";
+
 import {
   OpenPanelComponent,
   type TrackProperties,
@@ -15,17 +17,21 @@ const Provider = () => (
   />
 );
 
-const track = (options: { event: string } & TrackProperties) => {
+type TrackOptions = { event: string } & TrackProperties;
+
+const useTrack = () => {
   const { track: openTrack } = useOpenPanel();
 
-  if (!isProd) {
-    console.log("Track", options);
-    return;
-  }
+  return (options: TrackOptions) => {
+    if (!isProd) {
+      console.log("Track", options);
+      return;
+    }
 
-  const { event, ...rest } = options;
+    const { event, ...rest } = options;
 
-  openTrack(event, rest);
+    openTrack(event, rest);
+  };
 };
 
-export { Provider, track };
+export { Provider, useTrack };

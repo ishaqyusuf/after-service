@@ -175,3 +175,11 @@ I'm trying to understand where the current workflow breaks before shaping the pr
 - Issue resolution after service.
 - Tools currently used: spreadsheets, calendars, WhatsApp, email, CRM, staff memory.
 - Segment-specific versions for repair shops, salons/spas, clinics/wellness, contractors, installers, and field service teams.
+
+## Pitch Assets
+
+### afterservice Pitch Deck
+- Created: 2026-06-03.
+- Path: `outputs/manual-20260603-afterservice-pitch/presentations/afterservice-pitch/output/afterservice-pitch-deck.pptx`.
+- Purpose: founder/investor-style narrative for free beta, paid pricing path, small service-shop wedge, and 30-day validation plan.
+- Notes: no fake traction metrics; market/pricing story is based on Brain research and pricing strategy notes.

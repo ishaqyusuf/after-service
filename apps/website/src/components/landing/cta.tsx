@@ -1,8 +1,12 @@
+"use client";
+
 import { Button } from "@afterservice/ui";
-import { track } from "@afterservice/events/client";
+import { useTrack } from "@afterservice/events/client";
 import { LogEvents } from "@afterservice/events";
 
 export function LandingCTA() {
+  const track = useTrack();
+
   return (
     <section className="relative z-10 max-w-6xl mx-auto w-full px-6 sm:px-8 pb-32 pt-16">
       <div className="bg-gradient-to-r from-card to-card/80 border border-border rounded-3xl p-12 text-center relative overflow-hidden shadow-lg dark:shadow-2xl transition-colors duration-300">
