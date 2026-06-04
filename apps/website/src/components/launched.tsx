@@ -9,6 +9,7 @@ import { LandingHeader } from "./landing/header";
 import { LandingHero } from "./landing/hero";
 import { LandingHowItWorks } from "./landing/how-it-works";
 import { LandingMetrics } from "./landing/metrics";
+import { MobileLandingPrompts } from "./landing/mobile-landing-prompts";
 import { LandingPricing } from "./landing/pricing";
 
 export function LaunchedPage() {
@@ -32,6 +33,7 @@ export function LaunchedPage() {
       <LandingFAQ />
       <LandingCTA />
       <LandingFooter />
+      <MobileLandingPrompts />
     </div>
   );
 }

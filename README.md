@@ -5,7 +5,7 @@ After-service follow-up software for local operators.
 ## Apps
 
 - Website: `afterservice.app`
-- Dashboard: `app.afterservice.app`
+- Dashboard: `dashboard.afterservice.app`
 - API: `api.afterservice.app`
 
 ## Local Development
@@ -78,7 +78,7 @@ signature/idempotency behavior.
 ## Deployment Notes
 
 - Website: `https://afterservice.app`
-- Dashboard: `https://app.afterservice.app`
+- Dashboard: `https://dashboard.afterservice.app`
 - API: `https://api.afterservice.app`
 - Lemon webhook: `https://api.afterservice.app/webhooks/lemon-squeezy`
 - Follow-up cron job: `POST https://api.afterservice.app/api/jobs/follow-ups/dry-run` with `CRON_SECRET`

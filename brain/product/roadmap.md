@@ -489,7 +489,7 @@ Deliverables:
 Domains:
 
 - `afterservice.app`: website.
-- `app.afterservice.app`: dashboard.
+- `dashboard.afterservice.app`: dashboard.
 - `api.afterservice.app`: API.
 
 Acceptance:

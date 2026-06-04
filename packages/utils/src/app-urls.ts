@@ -5,7 +5,7 @@ import {
 } from "./runtime-url";
 
 export const siteRootDomain = "afterservice.app";
-export const dashboardRootDomain = "app.afterservice.app";
+export const dashboardRootDomain = "dashboard.afterservice.app";
 export const apiRootDomain = "api.afterservice.app";
 
 export const sitePortlessRootDomain = "afterservice.localhost";

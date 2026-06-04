@@ -15,6 +15,22 @@ export const LogEvents = {
     name: "Planned Paid Plan Interest Clicked",
     channel: "marketing",
   },
+  PwaInstallPromptShown: {
+    name: "PWA Install Prompt Shown",
+    channel: "marketing",
+  },
+  PwaInstallClicked: {
+    name: "PWA Install Clicked",
+    channel: "marketing",
+  },
+  PwaInstallAccepted: {
+    name: "PWA Install Accepted",
+    channel: "marketing",
+  },
+  PwaInstallDismissed: {
+    name: "PWA Install Dismissed",
+    channel: "marketing",
+  },
   SignIn: {
     name: "User Signed In",
     channel: "login",

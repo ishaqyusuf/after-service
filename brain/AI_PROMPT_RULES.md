@@ -6,7 +6,7 @@ This file captures persistent instructions for AI agents working on afterservice
 ## Product Rules
 - Always call the product `afterservice`.
 - Use `afterservice.app` for the marketing domain.
-- Use `app.afterservice.app` for dashboard references.
+- Use `dashboard.afterservice.app` for dashboard references.
 - Use `api.afterservice.app` for API references.
 - Do not use earlier placeholder names.
 

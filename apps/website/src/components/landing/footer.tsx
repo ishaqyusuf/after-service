@@ -3,7 +3,7 @@ import { appMetadata } from "@afterservice/utils";
 
 export function LandingFooter() {
   return (
-    <footer className="relative z-10 border-t border-border bg-background py-16 transition-colors duration-300">
+    <footer className="relative z-10 border-t border-border bg-background pb-[calc(8rem+env(safe-area-inset-bottom))] pt-16 transition-colors duration-300 md:py-16">
       <div className="max-w-7xl mx-auto px-6 sm:px-8 flex flex-col md:flex-row items-center justify-between gap-8">
         <div className="flex items-center gap-3">
           <BrandLogo name={appMetadata.name} />

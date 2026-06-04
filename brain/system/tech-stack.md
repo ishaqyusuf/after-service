@@ -31,5 +31,5 @@ This file records core technology choices.
 
 ## Domains
 - Website: `afterservice.app`
-- Dashboard: `app.afterservice.app`
+- Dashboard: `dashboard.afterservice.app`
 - API: `api.afterservice.app`

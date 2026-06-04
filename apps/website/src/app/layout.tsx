@@ -1,3 +1,4 @@
+import { Provider as AnalyticsProvider } from "@afterservice/events/client";
 import { websiteNavItems } from "@afterservice/site-nav";
 import { BrandLogo, cn } from "@afterservice/ui";
 import { appMetadata } from "@afterservice/utils";
@@ -6,8 +7,8 @@ import { Geist } from "next/font/google";
 import { headers } from "next/headers";
 import Link from "next/link";
 import type { ReactNode } from "react";
-import "@afterservice/ui/globals.css";
-import { Provider as AnalyticsProvider } from "@afterservice/events/client";
+import { PwaServiceWorkerRegister } from "../components/pwa-service-worker-register";
+import "./globals.css";
 
 const geist = Geist({ subsets: ["latin"], variable: "--font-sans" });
 
@@ -33,6 +34,7 @@ export default async function RootLayout({
     >
       <body className="min-h-screen flex flex-col bg-background text-foreground">
         <AnalyticsProvider />
+        <PwaServiceWorkerRegister />
         {!hasLandingShell && (
           <header className="sticky top-0 z-50 w-full border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
             <div className="container mx-auto px-4 h-16 flex items-center justify-between">

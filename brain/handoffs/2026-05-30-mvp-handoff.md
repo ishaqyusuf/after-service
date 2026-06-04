@@ -48,12 +48,12 @@ The dashboard proxy only checked `better-auth.session_token` and `afterservice.s
 
 ## Production Env Checklist
 - `NEXT_PUBLIC_SITE_URL=https://afterservice.app`
-- `NEXT_PUBLIC_DASHBOARD_URL=https://app.afterservice.app`
+- `NEXT_PUBLIC_DASHBOARD_URL=https://dashboard.afterservice.app`
 - `NEXT_PUBLIC_API_URL=https://api.afterservice.app`
 - `DATABASE_URL`
 - `BETTER_AUTH_SECRET`
 - `BETTER_AUTH_URL=https://api.afterservice.app`
-- `BETTER_AUTH_TRUSTED_ORIGINS=https://afterservice.app,https://app.afterservice.app`
+- `BETTER_AUTH_TRUSTED_ORIGINS=https://afterservice.app,https://dashboard.afterservice.app`
 - `LEMONSQUEEZY_API_KEY`
 - `LEMONSQUEEZY_STORE_ID`
 - `LEMONSQUEEZY_WEBHOOK_SECRET`
@@ -63,7 +63,7 @@ The dashboard proxy only checked `better-auth.session_token` and `afterservice.s
 
 ## Deployment Notes
 - Website domain: `afterservice.app`.
-- Dashboard domain: `app.afterservice.app`.
+- Dashboard domain: `dashboard.afterservice.app`.
 - API domain: `api.afterservice.app`.
 - Lemon webhook target: `https://api.afterservice.app/webhooks/lemon-squeezy`.
 - Cron follow-up job target: `https://api.afterservice.app/api/jobs/follow-ups/dry-run`.

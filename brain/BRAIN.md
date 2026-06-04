@@ -15,7 +15,7 @@ This is the durable project memory for afterservice. It gives humans and AI agen
 - Architecture target: Plot Keys-style Bun/Turbo monorepo.
 - Apps:
   - `apps/website`: marketing site for `afterservice.app`.
-  - `apps/dashboard`: operator dashboard for `app.afterservice.app`.
+  - `apps/dashboard`: operator dashboard for `dashboard.afterservice.app`.
   - `apps/api`: Hono/tRPC API for `api.afterservice.app`.
 - Shared packages exist as placeholders under `packages/*`.
 

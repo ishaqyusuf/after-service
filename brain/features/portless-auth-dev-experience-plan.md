@@ -157,7 +157,7 @@ Steps:
 6. Add tests if a test harness exists. If not, add a small validation script or cover through typecheck plus explicit manual cases in docs.
 
 Coding guide:
-- Do not hardcode `http://localhost:4101` or `https://app.afterservice.app` in UI components.
+- Do not hardcode `http://localhost:4101` or `https://dashboard.afterservice.app` in UI components.
 - Do not parse hosts ad hoc inside pages or forms.
 - Components should call helper functions, passing `window.location.origin` only at the edge.
 - Server code should pass request headers/host/protocol into helpers.

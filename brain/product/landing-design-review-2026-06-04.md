@@ -48,3 +48,7 @@ The page has a solid SaaS visual foundation: clear typography, calm spacing, usa
 ## Implementation Update
 
 2026-06-04: Implemented the duplicate-shell fix for the website by making the root layout suppress its generic header/footer on landing-shell routes (`/` and `/pricing`). Updated the shared brand mark to use the actual afterservice icon geometry from the app icon and tuned the landing header, hero mock, and bottom CTA for a more intentional dark-mode version.
+
+2026-06-04: Added a mobile-only sticky beta CTA decision based on the BeyondAfrica mobile reference: after the visitor scrolls beyond the hero, show a compact bottom sheet with free-beta context and a `/signup` CTA while preserving desktop layout and keeping footer content clear of the fixed sheet.
+
+2026-06-04: Added a real mobile PWA install top-sheet decision: afterservice should expose a manifest, app icons, and service worker so supported mobile browsers can show an `Install now` prompt; while that install sheet is visible, it takes priority over the bottom beta CTA to keep the mobile viewport focused.
