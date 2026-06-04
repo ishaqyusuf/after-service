@@ -1,4 +1,4 @@
-import type { NotificationHandler, UserData, TeamContext } from "../base";
+import type { NotificationHandler, TeamContext, UserData } from "../base";
 import { followUpMessageSentSchema, type NotificationTypes } from "../schemas";
 
 type Data = NotificationTypes["followup_message_sent"];
@@ -23,12 +23,12 @@ export const followUpMessageSent: NotificationHandler<Data> = {
     subject: `Update from ${team.name}`,
     template: "followup-message",
   }),
-  createSms: (data: Data, user: UserData, team: TeamContext) => ({
+  createSms: (data: Data, user: UserData, _team: TeamContext) => ({
     user,
     data,
     body: data.body,
   }),
-  createWhatsApp: (data: Data, user: UserData, team: TeamContext) => ({
+  createWhatsApp: (data: Data, user: UserData, _team: TeamContext) => ({
     user,
     data,
     body: data.body,

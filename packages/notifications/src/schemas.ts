@@ -1,5 +1,4 @@
 import { z } from "zod";
-import type { UserData } from "./base";
 
 export const followUpScheduledSchema = z.object({
   users: z.array(z.any()), // will be strongly typed in use

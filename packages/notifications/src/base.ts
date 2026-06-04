@@ -1,5 +1,4 @@
-import { z } from "zod";
-import type { PrismaClient } from "@afterservice/db";
+import type { z } from "zod";
 
 export interface TeamContext {
   id: string;
@@ -20,42 +19,38 @@ export interface CreateActivityInput {
   followUpId?: string;
   actorId?: string;
   type: string;
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
 }
 
 export type EmailInput = {
   template?: string;
   user: UserData;
-  data: Record<string, any>;
+  data: Record<string, unknown>;
   subject: string;
   from?: string;
 };
 
 export type SmsInput = {
   user: UserData;
-  data: Record<string, any>;
+  data: Record<string, unknown>;
   body: string;
 };
 
 export type WhatsAppInput = {
   user: UserData;
-  data: Record<string, any>;
-  body: string;
+  data: Record<string, unknown>;
+  body?: string;
+  template?: {
+    name: string;
+    variables: Record<string, string>;
+  };
 };
 
-export interface NotificationHandler<T = any> {
+export interface NotificationHandler<T = unknown> {
   schema: z.ZodSchema<T>;
   createActivity: (data: T, user: UserData) => CreateActivityInput;
-  createEmail?: (
-    data: T,
-    user: UserData,
-    team: TeamContext,
-  ) => EmailInput;
-  createSms?: (
-    data: T,
-    user: UserData,
-    team: TeamContext,
-  ) => SmsInput;
+  createEmail?: (data: T, user: UserData, team: TeamContext) => EmailInput;
+  createSms?: (data: T, user: UserData, team: TeamContext) => SmsInput;
   createWhatsApp?: (
     data: T,
     user: UserData,

@@ -9,19 +9,23 @@ export function LandingFAQ() {
   const faqs = [
     {
       q: "How does afterservice integrate with my existing workflow?",
-      a: "afterservice integrates directly with your existing field management tools or CRMs via API and Zapier. You can also log jobs directly in our lightweight operator dashboard in under 10 seconds.",
+      a: "During beta, you can log jobs directly in the operator dashboard. CSV import, Zapier/webhook intake, and job-source integrations are planned for paid plans once the core workflow is proven.",
     },
     {
       q: "Can my field staff use this on the go?",
-      a: "Yes! The operator dashboard is fully optimized for mobile devices. Staff can easily complete a job, add customer details, and schedule follow-ups from their phones while still in the field.",
+      a: "Yes. The dashboard is built to work on mobile and desktop so owners, office admins, and staff can add customers, log completed jobs, and schedule follow-ups.",
     },
     {
-      q: "How does the private dispute resolution work?",
-      a: "When a check-in message is sent, the customer is prompted to rate their experience. Ratings of 4 or 5 stars are instantly routed to your public Google, Yelp, or Facebook pages. Ratings under 4 stars open a private feedback channel, allowing you to resolve issues before they become public reviews.",
+      q: "How do review requests work safely?",
+      a: "afterservice is designed around honest feedback for every customer. Public review requests should not be gated by sentiment; issue recovery is tracked as a separate follow-up workflow.",
     },
     {
       q: "What channels are supported for follow-ups?",
-      a: "Currently, we support email and SMS messaging. WhatsApp and automated phone outreach are currently in private beta and will be rolled out to Growth and Pro plans soon.",
+      a: "The beta focuses on planning, templates, and manual send logging. Provider-powered email, SMS, WhatsApp, and automation rules are planned after beta for teams that need scale.",
+    },
+    {
+      q: "When will paid plans launch?",
+      a: "Paid plans launch after the beta proves weekly usage and paid intent. Beta users can use the core board for free and will keep founder-rate pricing when paid plans launch.",
     },
   ];
 
@@ -44,8 +48,8 @@ export function LandingFAQ() {
         <Accordion type="single" collapsible className="w-full">
           {faqs.map((faq, idx) => (
             <AccordionItem
-              key={idx}
-              value={`item-${idx}`}
+              key={faq.q}
+              value={faq.q}
               className={idx === faqs.length - 1 ? "border-b-0" : ""}
             >
               <AccordionTrigger className="text-left font-bold text-lg text-foreground hover:text-primary transition-colors">

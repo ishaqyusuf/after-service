@@ -1,49 +1,73 @@
 "use client";
 
+import { LogEvents } from "@afterservice/events";
+import { useTrack } from "@afterservice/events/client";
 import { Button } from "@afterservice/ui";
 import { ArrowRight } from "lucide-react";
 
 export function LandingHero() {
+  const track = useTrack();
+
+  const showPricing = () => {
+    track({
+      event: LogEvents.PricingViewed.name,
+      channel: LogEvents.PricingViewed.channel,
+      location: "landing_hero",
+    });
+
+    document.getElementById("pricing")?.scrollIntoView({ behavior: "smooth" });
+  };
+
   return (
     <section className="relative z-10 max-w-7xl mx-auto w-full px-6 sm:px-8 pt-20 pb-16 text-center">
       <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-sm text-primary font-medium mb-8 hover:border-[#009b98]/40 transition-all duration-300">
         <span className="w-2 h-2 rounded-full bg-primary animate-pulse" />
-        <span>v1.0 is officially live for operators</span>
+        <span>Free early access for service operators</span>
       </div>
 
       <h1 className="text-4xl sm:text-6xl lg:text-7xl font-extrabold tracking-tight text-foreground mb-6 max-w-5xl mx-auto leading-[1.05]">
-        Turn Every Service Job Into <br />
+        One board for every <br />
         <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#009b98] via-[#4bbbaa] to-[#a9d3b7]">
-          Customer Lifetime Value
+          post-job follow-up
         </span>
       </h1>
 
       <p className="text-lg sm:text-xl text-muted-foreground max-w-3xl mx-auto mb-10 leading-relaxed">
-        The post-service automation platform built for plumbers, HVAC techs,
-        electricians, and local operators. Automatically follow up, collect
-        5-star reviews, resolve disputes privately, and reactivate repeat
-        bookings.
+        afterservice helps repair shops, installers, contractors, and local
+        service teams remember every customer check-in, review-safe request,
+        issue follow-up, referral ask, and repeat-service reminder.
       </p>
 
       <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-20">
-        <a href="/signup" className="w-full sm:w-auto">
-          <Button
-            size="lg"
-            className="w-full sm:w-auto text-base h-14 px-8 font-bold shadow-lg shadow-[#009b98]/20 flex items-center justify-center gap-2"
+        <Button
+          asChild
+          size="lg"
+          className="w-full sm:w-auto text-base h-14 px-8 font-bold shadow-lg shadow-[#009b98]/20 flex items-center justify-center gap-2"
+        >
+          <a
+            href="/signup"
+            className="w-full sm:w-auto"
+            onClick={() =>
+              track({
+                event: LogEvents.JoinFreeBeta.name,
+                channel: LogEvents.JoinFreeBeta.channel,
+                location: "landing_hero",
+              })
+            }
           >
-            Start Your 14-Day Free Trial
+            Join Free Beta
             <ArrowRight className="w-5 h-5 ml-1" />
-          </Button>
-        </a>
-        <a href="#pricing" className="w-full sm:w-auto">
-          <Button
-            variant="outline"
-            size="lg"
-            className="w-full sm:w-auto text-base h-14 px-8 font-bold"
-          >
-            See Pricing & Plans
-          </Button>
-        </a>
+          </a>
+        </Button>
+        <Button
+          type="button"
+          variant="outline"
+          size="lg"
+          className="w-full sm:w-auto text-base h-14 px-8 font-bold"
+          onClick={showPricing}
+        >
+          See Pricing & Plans
+        </Button>
       </div>
 
       {/* Dashboard Showcase Mockup */}
@@ -103,7 +127,7 @@ export function LandingHero() {
                 </div>
                 <div className="flex items-center justify-between mt-4">
                   <span className="text-[10px] text-muted-foreground">
-                    SMS Queued
+                    Call reminder
                   </span>
                   <span className="w-2.5 h-2.5 rounded-full bg-yellow-500" />
                 </div>
@@ -143,7 +167,7 @@ export function LandingHero() {
                 </div>
                 <div className="flex items-center justify-between mt-4">
                   <span className="text-[10px] text-green-600 dark:text-green-400 font-bold">
-                    5-Star Review Left
+                    Customer replied
                   </span>
                   <span className="w-2.5 h-2.5 rounded-full bg-green-500" />
                 </div>

@@ -3,11 +3,11 @@
 
 "use client";
 
+import { LogEvents } from "@afterservice/events";
+import { useTrack } from "@afterservice/events/client";
 import { BrandLogo, Button } from "@afterservice/ui";
 import { appMetadata } from "@afterservice/utils";
 import { useEffect, useState } from "react";
-import { useTrack } from "@afterservice/events/client";
-import { LogEvents } from "@afterservice/events";
 
 export function LandingHeader() {
   const [theme, setTheme] = useState<"light" | "dark">("dark");
@@ -115,15 +115,27 @@ export function LandingHeader() {
           <a
             href="/login"
             className="text-sm font-medium text-muted-foreground hover:text-[#18211c] dark:hover:text-white transition-colors"
-            onClick={() => track({ event: LogEvents.CTA.name, channel: LogEvents.CTA.channel, location: "header_signin" })}
+            onClick={() =>
+              track({
+                event: LogEvents.CTA.name,
+                channel: LogEvents.CTA.channel,
+                location: "header_signin",
+              })
+            }
           >
             Sign In
           </a>
-          <a 
+          <a
             href="/signup"
-            onClick={() => track({ event: LogEvents.CTA.name, channel: LogEvents.CTA.channel, location: "header_signup" })}
+            onClick={() =>
+              track({
+                event: LogEvents.JoinFreeBeta.name,
+                channel: LogEvents.JoinFreeBeta.channel,
+                location: "header_signup",
+              })
+            }
           >
-            <Button size="sm">Start Free Trial</Button>
+            <Button size="sm">Join Free Beta</Button>
           </a>
         </div>
 
@@ -232,21 +244,29 @@ export function LandingHeader() {
                 href="/login"
                 onClick={() => {
                   setMobileMenuOpen(false);
-                  track({ event: LogEvents.CTA.name, channel: LogEvents.CTA.channel, location: "mobile_menu_signin" });
+                  track({
+                    event: LogEvents.CTA.name,
+                    channel: LogEvents.CTA.channel,
+                    location: "mobile_menu_signin",
+                  });
                 }}
                 className="text-sm font-medium text-muted-foreground hover:text-[#18211c] dark:hover:text-white transition-colors"
               >
                 Sign In
               </a>
-              <a 
-                href="/signup" 
+              <a
+                href="/signup"
                 onClick={() => {
                   setMobileMenuOpen(false);
-                  track({ event: LogEvents.CTA.name, channel: LogEvents.CTA.channel, location: "mobile_menu_signup" });
+                  track({
+                    event: LogEvents.JoinFreeBeta.name,
+                    channel: LogEvents.JoinFreeBeta.channel,
+                    location: "mobile_menu_signup",
+                  });
                 }}
               >
                 <Button size="sm" className="w-full">
-                  Start Free Trial
+                  Join Free Beta
                 </Button>
               </a>
             </div>

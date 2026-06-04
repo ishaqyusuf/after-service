@@ -1,4 +1,4 @@
-import type { NotificationHandler, UserData, TeamContext } from "../base";
+import type { NotificationHandler, TeamContext, UserData } from "../base";
 import { jobCompletedCheckInSchema, type NotificationTypes } from "../schemas";
 
 type Data = NotificationTypes["job_completed_checkin"];

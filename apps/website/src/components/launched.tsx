@@ -14,11 +14,6 @@ import { LandingPricing } from "./landing/pricing";
 export function LaunchedPage() {
   return (
     <div className="fullscreen-landing relative min-h-screen bg-background text-foreground overflow-hidden flex flex-col justify-between transition-colors duration-300">
-      {/* Background radial gradients for high-end glow */}
-      <div className="absolute top-[-10%] left-[-10%] w-[60%] h-[60%] rounded-full bg-primary opacity-[0.03] dark:opacity-[0.07] blur-[150px] pointer-events-none" />
-      <div className="absolute top-[40%] right-[-10%] w-[50%] h-[50%] rounded-full bg-primary opacity-[0.02] dark:opacity-[0.05] blur-[150px] pointer-events-none" />
-      <div className="absolute bottom-[-10%] left-[20%] w-[60%] h-[60%] rounded-full bg-primary opacity-[0.02] dark:opacity-[0.06] blur-[150px] pointer-events-none" />
-
       {/* Subtle grid background */}
       <div
         className="absolute inset-0 opacity-[0.01] dark:opacity-[0.02] pointer-events-none"

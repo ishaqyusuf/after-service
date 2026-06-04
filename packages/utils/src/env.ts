@@ -29,6 +29,9 @@ const productionRequiredKeys = [
   "LEMONSQUEEZY_WEBHOOK_SECRET",
   "RESEND_API_KEY",
   "CRON_SECRET",
+  "TWILIO_ACCOUNT_SID",
+  "TWILIO_AUTH_TOKEN",
+  "TWILIO_WHATSAPP_NUMBER",
 ] as const;
 
 function readEnv(env: EnvSource, key: string): string | undefined {

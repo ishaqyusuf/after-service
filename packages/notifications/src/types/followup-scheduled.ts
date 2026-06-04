@@ -1,4 +1,4 @@
-import type { NotificationHandler, UserData, TeamContext } from "../base";
+import type { NotificationHandler, TeamContext, UserData } from "../base";
 import { followUpScheduledSchema, type NotificationTypes } from "../schemas";
 
 type Data = NotificationTypes["followup_scheduled"];
@@ -15,7 +15,7 @@ export const followUpScheduled: NotificationHandler<Data> = {
       channel: data.channel,
     },
   }),
-  createEmail: (data: Data, user: UserData, team: TeamContext) => ({
+  createEmail: (data: Data, user: UserData, _team: TeamContext) => ({
     user,
     data: {
       customerId: data.customerId,
@@ -25,7 +25,7 @@ export const followUpScheduled: NotificationHandler<Data> = {
     subject: "Follow Up Scheduled",
     template: "followup-scheduled",
   }),
-  createSms: (data: Data, user: UserData, team: TeamContext) => ({
+  createSms: (data: Data, user: UserData, _team: TeamContext) => ({
     user,
     data,
     body: `Follow-up scheduled for customer ${data.customerId} on ${data.dueAt}.`,

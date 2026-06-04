@@ -1,11 +1,11 @@
 import { getDbClient, type WorkspacePlan } from "@afterservice/db";
+import { LogEvents } from "@afterservice/events";
+import { setupAnalytics } from "@afterservice/events/server";
+import { Notifications } from "@afterservice/notifications";
 import { initTRPC, TRPCError } from "@trpc/server";
 import superjson from "superjson";
 import { z } from "zod";
 import type { ApiContext } from "../context";
-import { setupAnalytics } from "@afterservice/events/server";
-import { LogEvents } from "@afterservice/events";
-import { Notifications } from "@afterservice/notifications";
 
 const t = initTRPC.context<ApiContext>().create({
   transformer: superjson,
@@ -39,16 +39,16 @@ const planLimits: Record<
   }
 > = {
   growth: {
-    customers: 1000,
-    followUps: 3000,
+    customers: 2000,
+    followUps: 7500,
     teamMembers: 5,
-    templates: 25,
+    templates: 50,
   },
   pro: {
     customers: 10000,
-    followUps: 25000,
-    teamMembers: 25,
-    templates: 100,
+    followUps: 30000,
+    teamMembers: 15,
+    templates: 150,
   },
   starter: {
     customers: 100,
@@ -57,6 +57,17 @@ const planLimits: Record<
     templates: 5,
   },
 };
+
+function publicPlanName(plan: WorkspacePlan, planStatus?: string | null) {
+  if (plan === "starter") {
+    return planStatus === "active" ? "Starter" : "Free Beta";
+  }
+
+  if (plan === "growth") return "Shop";
+  if (plan === "pro") return "Growth";
+
+  return plan;
+}
 
 function iso(date: Date | null | undefined) {
   return date?.toISOString() ?? null;
@@ -128,7 +139,7 @@ async function assertUnderLimit(
   if (count >= workspace.limits[key]) {
     throw new TRPCError({
       code: "FORBIDDEN",
-      message: `Your ${workspace.plan} plan limit for ${key} has been reached.`,
+      message: `Your ${publicPlanName(workspace.plan, workspace.planStatus)} plan limit for ${key} has been reached.`,
     });
   }
 }
@@ -490,23 +501,29 @@ const serviceJobsRouter = t.router({
       return { item };
     }),
   list: protectedProcedure
-    .input(z.object({ 
-      search: z.string().trim().optional(),
-      cursor: z.string().nullish(),
-      limit: z.number().min(1).max(100).default(50),
-    }).default({ limit: 50 }))
+    .input(
+      z
+        .object({
+          search: z.string().trim().optional(),
+          cursor: z.string().nullish(),
+          limit: z.number().min(1).max(100).default(50),
+        })
+        .default({ limit: 50 }),
+    )
     .query(async ({ ctx, input }) => {
-    const items = await db.serviceJob.findMany({
-      include: { customer: true, followUps: true },
-      orderBy: { completedAt: "desc" },
-      where: { 
-        workspaceId: ctx.workspace.id,
-        title: input.search ? { contains: input.search, mode: "insensitive" } : undefined
-      },
-    });
+      const items = await db.serviceJob.findMany({
+        include: { customer: true, followUps: true },
+        orderBy: { completedAt: "desc" },
+        where: {
+          workspaceId: ctx.workspace.id,
+          title: input.search
+            ? { contains: input.search, mode: "insensitive" }
+            : undefined,
+        },
+      });
 
-    return { items, nextCursor: null };
-  }),
+      return { items, nextCursor: null };
+    }),
   markCompleted: protectedProcedure
     .input(z.object({ id: z.string().min(1) }))
     .mutation(async ({ ctx, input }) => {
@@ -523,20 +540,26 @@ const serviceJobsRouter = t.router({
         workspaceId: ctx.workspace.id,
       });
 
-      const customer = await db.customer.findUniqueOrThrow({ where: { id: item.customerId }});
-      
+      const customer = await db.customer.findUniqueOrThrow({
+        where: { id: item.customerId },
+      });
+
       // Async dispatch notification
-      notifications.send("job_completed_checkin", ctx.workspace.id, {
-        users: [{ 
-          id: customer.id, 
-          email: customer.email || "", 
-          phone: customer.phone || undefined, 
-          workspace_id: ctx.workspace.id 
-        }],
-        jobId: item.id,
-        customerId: item.customerId,
-        completedAt: item.completedAt.toISOString(),
-      }).catch(console.error);
+      notifications
+        .send("job_completed_checkin", ctx.workspace.id, {
+          users: [
+            {
+              id: customer.id,
+              email: customer.email || "",
+              phone: customer.phone || undefined,
+              workspace_id: ctx.workspace.id,
+            },
+          ],
+          jobId: item.id,
+          customerId: item.customerId,
+          completedAt: item.completedAt.toISOString(),
+        })
+        .catch(console.error);
 
       return { item };
     }),
@@ -707,19 +730,23 @@ const followUpsRouter = t.router({
         workspaceId: ctx.workspace.id,
       });
 
-      notifications.send("followup_scheduled", ctx.workspace.id, {
-        users: [{
-          id: item.customer.id,
-          email: item.customer.email || "",
-          phone: item.customer.phone || undefined,
-          workspace_id: ctx.workspace.id
-        }],
-        jobId: item.jobId || undefined,
-        customerId: item.customerId,
-        dueAt: item.dueAt.toISOString(),
-        notes: item.notes || undefined,
-        channel: item.channel,
-      }).catch(console.error);
+      notifications
+        .send("followup_scheduled", ctx.workspace.id, {
+          users: [
+            {
+              id: item.customer.id,
+              email: item.customer.email || "",
+              phone: item.customer.phone || undefined,
+              workspace_id: ctx.workspace.id,
+            },
+          ],
+          jobId: item.jobId || undefined,
+          customerId: item.customerId,
+          dueAt: item.dueAt.toISOString(),
+          notes: item.notes || undefined,
+          channel: item.channel,
+        })
+        .catch(console.error);
 
       return { item: followUpDto(item) };
     }),
@@ -780,10 +807,12 @@ const followUpsRouter = t.router({
           template: true,
         },
         orderBy: { dueAt: "asc" },
-        where: { 
-          status: input.status, 
+        where: {
+          status: input.status,
           workspaceId: ctx.workspace.id,
-          customer: input.search ? { name: { contains: input.search, mode: "insensitive" } } : undefined
+          customer: input.search
+            ? { name: { contains: input.search, mode: "insensitive" } }
+            : undefined,
         },
       });
 
@@ -861,19 +890,28 @@ const followUpsRouter = t.router({
         workspaceId: ctx.workspace.id,
       });
 
-      notifications.send("followup_message_sent", ctx.workspace.id, {
-        users: [{
-          id: item.customer.id,
-          email: item.customer.email || "",
-          phone: item.customer.phone || undefined,
-          workspace_id: ctx.workspace.id
-        }],
-        followUpId: item.id,
-        customerId: item.customerId,
-        body: input.body,
-        channel: followUp.channel,
-        recipient: input.recipient,
-      }, { channels: [followUp.channel] }).catch(console.error);
+      notifications
+        .send(
+          "followup_message_sent",
+          ctx.workspace.id,
+          {
+            users: [
+              {
+                id: item.customer.id,
+                email: item.customer.email || "",
+                phone: item.customer.phone || undefined,
+                workspace_id: ctx.workspace.id,
+              },
+            ],
+            followUpId: item.id,
+            customerId: item.customerId,
+            body: input.body,
+            channel: followUp.channel,
+            recipient: input.recipient,
+          },
+          { channels: [followUp.channel] },
+        )
+        .catch(console.error);
 
       analytics.track({
         event: LogEvents.FollowUpStatusUpdated.name,
@@ -981,44 +1019,52 @@ const templatesRouter = t.router({
       return { item };
     }),
   list: protectedProcedure
-    .input(z.object({ 
-      search: z.string().trim().optional(),
-      cursor: z.string().nullish(),
-      limit: z.number().min(1).max(100).default(50),
-    }).default({ limit: 50 }))
+    .input(
+      z
+        .object({
+          search: z.string().trim().optional(),
+          cursor: z.string().nullish(),
+          limit: z.number().min(1).max(100).default(50),
+        })
+        .default({ limit: 50 }),
+    )
     .query(async ({ ctx, input }) => {
-    const items = await db.followUpTemplate.findMany({
-      orderBy: [{ sortOrder: "asc" }, { name: "asc" }],
-      where: { 
-        workspaceId: ctx.workspace.id,
-        name: input.search ? { contains: input.search, mode: "insensitive" } : undefined
-      },
-    });
+      const items = await db.followUpTemplate.findMany({
+        orderBy: [{ sortOrder: "asc" }, { name: "asc" }],
+        where: {
+          workspaceId: ctx.workspace.id,
+          name: input.search
+            ? { contains: input.search, mode: "insensitive" }
+            : undefined,
+        },
+      });
 
-    const workspaceInfo = await db.workspace.findUnique({
-      where: { id: ctx.workspace.id },
-      select: { name: true }
-    });
+      const workspaceInfo = await db.workspace.findUnique({
+        where: { id: ctx.workspace.id },
+        select: { name: true },
+      });
 
-    const sampleJob = await db.serviceJob.findFirst({
-      where: { workspaceId: ctx.workspace.id },
-      orderBy: { completedAt: "desc" }
-    });
-    
-    const sampleCustomer = sampleJob ? await db.customer.findUnique({
-      where: { id: sampleJob.customerId }
-    }) : await db.customer.findFirst({
-      where: { workspaceId: ctx.workspace.id }
-    });
+      const sampleJob = await db.serviceJob.findFirst({
+        where: { workspaceId: ctx.workspace.id },
+        orderBy: { completedAt: "desc" },
+      });
 
-    return { 
-      items, 
-      nextCursor: null, 
-      workspace: workspaceInfo,
-      sampleJob,
-      sampleCustomer
-    };
-  }),
+      const sampleCustomer = sampleJob
+        ? await db.customer.findUnique({
+            where: { id: sampleJob.customerId },
+          })
+        : await db.customer.findFirst({
+            where: { workspaceId: ctx.workspace.id },
+          });
+
+      return {
+        items,
+        nextCursor: null,
+        workspace: workspaceInfo,
+        sampleJob,
+        sampleCustomer,
+      };
+    }),
   setDefault: protectedProcedure
     .input(z.object({ id: z.string().min(1) }))
     .mutation(async ({ ctx, input }) => {
@@ -1112,6 +1158,10 @@ const billingRouter = t.router({
   createCheckout: protectedProcedure.mutation(async ({ ctx }) => {
     requireOwnerOrAdmin(ctx);
 
+    if (process.env.AFTERSERVICE_PAID_CHECKOUT_ENABLED !== "true") {
+      return { checkoutUrl: "/billing?checkout=beta" };
+    }
+
     const checkoutUrl =
       process.env.LEMON_SQUEEZY_CHECKOUT_URL ??
       process.env.LEMON_SQUEEZY_STARTER_CHECKOUT_URL ??
@@ -1142,8 +1192,11 @@ const billingRouter = t.router({
 
     return {
       item: {
+        isCheckoutEnabled:
+          process.env.AFTERSERVICE_PAID_CHECKOUT_ENABLED === "true",
         limits: workspace.limits,
         plan: workspace.plan,
+        planDisplayName: publicPlanName(workspace.plan, workspace.planStatus),
         planStatus: workspace.planStatus,
         subscription,
         usage,
@@ -1183,10 +1236,15 @@ const dashboardRouter = t.router({
     todayEnd.setHours(23, 59, 59, 999);
 
     const dueToday = followUps.filter(
-      (item) => item.status !== "closed" && item.status !== "replied" && item.dueAt <= todayEnd
+      (item) =>
+        item.status !== "closed" &&
+        item.status !== "replied" &&
+        item.dueAt <= todayEnd,
     ).length;
 
-    const openFollowUps = followUps.filter((item) => item.status !== "closed").length;
+    const openFollowUps = followUps.filter(
+      (item) => item.status !== "closed",
+    ).length;
 
     const recentFollowUps = followUps
       .filter((item) => item.status !== "closed")

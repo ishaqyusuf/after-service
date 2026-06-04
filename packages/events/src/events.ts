@@ -3,6 +3,18 @@ export const LogEvents = {
     name: "CTA Clicked",
     channel: "marketing",
   },
+  JoinFreeBeta: {
+    name: "Join Free Beta Clicked",
+    channel: "marketing",
+  },
+  PricingViewed: {
+    name: "Pricing Viewed",
+    channel: "marketing",
+  },
+  PlannedPaidPlanInterest: {
+    name: "Planned Paid Plan Interest Clicked",
+    channel: "marketing",
+  },
   SignIn: {
     name: "User Signed In",
     channel: "login",

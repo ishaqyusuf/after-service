@@ -164,6 +164,7 @@
       "devDependencies": {
         "@afterservice/db": "workspace:*",
         "@afterservice/tsconfig": "workspace:*",
+        "@afterservice/whatsapp": "workspace:*",
         "@types/node": "^25.2.3",
         "typescript": "^5.9.3",
         "zod": "^4.4.3",
@@ -263,6 +264,14 @@
         "typescript": "^5.9.3",
       },
     },
+    "packages/whatsapp": {
+      "name": "@afterservice/whatsapp",
+      "devDependencies": {
+        "@afterservice/tsconfig": "workspace:*",
+        "@types/node": "^25.2.3",
+        "typescript": "^5.9.3",
+      },
+    },
   },
   "packages": {
     "@afterservice/api": ["@afterservice/api@workspace:apps/api"],
@@ -288,6 +297,8 @@
     "@afterservice/utils": ["@afterservice/utils@workspace:packages/utils"],
 
     "@afterservice/website": ["@afterservice/website@workspace:apps/website"],
+
+    "@afterservice/whatsapp": ["@afterservice/whatsapp@workspace:packages/whatsapp"],
 
     "@alloc/quick-lru": ["@alloc/quick-lru@5.2.0", "", {}, "sha512-UrcABB+4bUrFABwbluTIBErXwvbsU/V7TZWfmbgJfbkwiBuziS9gxdODUyuiecfdGQ85jglMW6juS3+z5TsKLw=="],
 

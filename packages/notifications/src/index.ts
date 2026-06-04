@@ -1,16 +1,14 @@
-import type { PrismaClient } from "@afterservice/db";
+import type { Prisma, PrismaClient } from "@afterservice/db";
+import { WhatsAppService } from "@afterservice/whatsapp";
 import type {
-  EmailInput,
   NotificationHandler,
   NotificationOptions,
   NotificationResult,
-  SmsInput,
   UserData,
-  WhatsAppInput,
 } from "./base";
-import { type NotificationTypes, followUpScheduledSchema, followUpMessageSentSchema, jobCompletedCheckInSchema } from "./schemas";
-import { followUpScheduled } from "./types/followup-scheduled";
+import type { NotificationTypes } from "./schemas";
 import { followUpMessageSent } from "./types/followup-message-sent";
+import { followUpScheduled } from "./types/followup-scheduled";
 import { jobCompletedCheckIn } from "./types/job-completed-checkin";
 
 const handlers = {
@@ -19,11 +17,45 @@ const handlers = {
   job_completed_checkin: jobCompletedCheckIn,
 } as const;
 
+type ParsedNotificationPayload = {
+  users?: UserData[];
+} & Record<string, unknown>;
+
+function stringField(data: Record<string, unknown> | undefined, key: string) {
+  const value = data?.[key];
+  return typeof value === "string" ? value : undefined;
+}
+
+function jsonObject(
+  data: Record<string, unknown> | undefined,
+): Prisma.InputJsonObject | undefined {
+  if (!data) {
+    return undefined;
+  }
+
+  return Object.fromEntries(
+    Object.entries(data).filter(([, value]) => value !== undefined),
+  ) as Prisma.InputJsonObject;
+}
+
 export class Notifications {
   #db: PrismaClient;
+  #whatsappService: WhatsAppService | null = null;
 
   constructor(db: PrismaClient) {
     this.#db = db;
+    // We optionally initialize it if env vars exist
+    if (
+      process.env.TWILIO_ACCOUNT_SID &&
+      process.env.TWILIO_AUTH_TOKEN &&
+      process.env.TWILIO_WHATSAPP_NUMBER
+    ) {
+      this.#whatsappService = new WhatsAppService(
+        process.env.TWILIO_ACCOUNT_SID,
+        process.env.TWILIO_AUTH_TOKEN,
+        process.env.TWILIO_WHATSAPP_NUMBER,
+      );
+    }
   }
 
   async send<T extends keyof NotificationTypes>(
@@ -32,7 +64,9 @@ export class Notifications {
     payload: NotificationTypes[T],
     options?: NotificationOptions,
   ): Promise<NotificationResult> {
-    const handler = handlers[type] as unknown as NotificationHandler;
+    const handler = handlers[
+      type
+    ] as unknown as NotificationHandler<ParsedNotificationPayload>;
 
     if (!handler) {
       throw new Error(`Unknown notification type: ${String(type)}`);
@@ -40,7 +74,7 @@ export class Notifications {
 
     try {
       // 1. Validate Payload
-      const validatedData = handler.schema.parse(payload) as any;
+      const validatedData = handler.schema.parse(payload);
 
       // 2. Fetch Team/Workspace Info
       const workspace = await this.#db.workspace.findUniqueOrThrow({
@@ -54,9 +88,11 @@ export class Notifications {
       };
 
       // 3. Prepare Activities and Dispatches
-      const users = validatedData.users || [];
+      const users = Array.isArray(validatedData.users)
+        ? validatedData.users
+        : [];
       const activitiesToCreate = [];
-      
+
       const emailDispatches = [];
       const smsDispatches = [];
       const whatsappDispatches = [];
@@ -69,7 +105,11 @@ export class Notifications {
         const channels = options?.channels || ["email"]; // default channel
 
         if (channels.includes("email") && handler.createEmail) {
-          const emailInput = handler.createEmail(validatedData, user, teamContext);
+          const emailInput = handler.createEmail(
+            validatedData,
+            user,
+            teamContext,
+          );
           emailDispatches.push(emailInput);
         }
 
@@ -79,7 +119,11 @@ export class Notifications {
         }
 
         if (channels.includes("whatsapp") && handler.createWhatsApp) {
-          const whatsappInput = handler.createWhatsApp(validatedData, user, teamContext);
+          const whatsappInput = handler.createWhatsApp(
+            validatedData,
+            user,
+            teamContext,
+          );
           whatsappDispatches.push(whatsappInput);
         }
       }
@@ -87,41 +131,46 @@ export class Notifications {
       // 4. Save Activities
       for (const activity of activitiesToCreate) {
         // Find existing follow up or job to tie event
-        if (activity.metadata?.followUpId) {
+        const followUpId = stringField(activity.metadata, "followUpId");
+
+        if (followUpId) {
           await this.#db.followUpEvent.create({
             data: {
               type: activity.type,
               workspaceId: activity.workspaceId,
-              followUpId: activity.metadata.followUpId,
-              metadata: activity.metadata,
+              followUpId,
+              metadata: jsonObject(activity.metadata),
               actorId: activity.actorId,
-            }
+            },
           });
         }
       }
 
       // 5. Execute Dispatches (Mocked for now, to be replaced by actual Services)
       let emailsSent = 0;
-      let emailsFailed = 0;
+      const emailsFailed = 0;
       let smsSent = 0;
-      let smsFailed = 0;
+      const smsFailed = 0;
       let whatsappSent = 0;
-      let whatsappFailed = 0;
+      const whatsappFailed = 0;
 
       // Log Emails
       for (const dispatch of emailDispatches) {
         await this.#db.messageLog.create({
           data: {
             workspaceId: workspaceId,
-            customerId: dispatch.data?.customerId,
-            followUpId: dispatch.data?.followUpId,
+            customerId: stringField(dispatch.data, "customerId"),
+            followUpId: stringField(dispatch.data, "followUpId"),
             channel: "email",
             recipient: dispatch.user.email,
             subject: dispatch.subject,
-            body: typeof dispatch.data?.body === 'string' ? dispatch.data.body : JSON.stringify(dispatch.data),
+            body:
+              typeof dispatch.data?.body === "string"
+                ? dispatch.data.body
+                : JSON.stringify(dispatch.data),
             status: "sent",
             sentAt: new Date(),
-          }
+          },
         });
         emailsSent++;
       }
@@ -131,31 +180,53 @@ export class Notifications {
         await this.#db.messageLog.create({
           data: {
             workspaceId: workspaceId,
-            customerId: dispatch.data?.customerId,
-            followUpId: dispatch.data?.followUpId,
+            customerId: stringField(dispatch.data, "customerId"),
+            followUpId: stringField(dispatch.data, "followUpId"),
             channel: "sms",
             recipient: dispatch.user.phone || dispatch.user.email,
             body: dispatch.body,
             status: "sent",
             sentAt: new Date(),
-          }
+          },
         });
         smsSent++;
       }
 
       // Log WhatsApp
       for (const dispatch of whatsappDispatches) {
+        let providerId: string | undefined;
+        let finalStatus = "sent";
+
+        if (
+          this.#whatsappService &&
+          (dispatch.user.phone || dispatch.user.email)
+        ) {
+          try {
+            const result = await this.#whatsappService.send({
+              to: dispatch.user.phone || dispatch.user.email,
+              body: dispatch.body,
+              template: dispatch.template,
+            });
+            providerId = result.providerId;
+            finalStatus = result.status;
+          } catch (err: unknown) {
+            console.error("WhatsApp delivery failed:", err);
+            finalStatus = "failed";
+          }
+        }
+
         await this.#db.messageLog.create({
           data: {
             workspaceId: workspaceId,
-            customerId: dispatch.data?.customerId,
-            followUpId: dispatch.data?.followUpId,
+            customerId: stringField(dispatch.data, "customerId"),
+            followUpId: stringField(dispatch.data, "followUpId"),
             channel: "whatsapp",
             recipient: dispatch.user.phone || dispatch.user.email,
-            body: dispatch.body,
-            status: "sent",
+            body: dispatch.body || "",
+            status: finalStatus,
+            providerId: providerId || null,
             sentAt: new Date(),
-          }
+          },
         });
         whatsappSent++;
       }
@@ -181,8 +252,8 @@ export type {
   NotificationHandler,
   NotificationOptions,
   NotificationResult,
-  UserData,
   SmsInput,
+  UserData,
   WhatsAppInput,
 } from "./base";
 export type { NotificationTypes } from "./schemas";

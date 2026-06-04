@@ -1,31 +1,31 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@afterservice/ui";
 import {
-  Bot,
-  Lock,
+  CalendarCheck,
   MessageSquare,
   RefreshCw,
   ShieldAlert,
-  Trophy,
+  ShieldCheck,
+  Users,
 } from "lucide-react";
 
 export function LandingFeatures() {
   const features = [
     {
-      title: "Automated Check-Ins",
+      title: "Post-Job Follow-Up Board",
       description:
-        "Instantly send personalized follow-up texts or emails once a job is finished. No manual input, no writing messages.",
-      icon: <Bot className="w-6 h-6" />,
+        "See every open, scheduled, sent, replied, missed, and closed follow-up in one operator-friendly board.",
+      icon: <CalendarCheck className="w-6 h-6" />,
     },
     {
-      title: "Google Review Funnel",
+      title: "Review-Safe Requests",
       description:
-        "Happy customers are automatically routed to your Google and Yelp pages to leave glowing reviews, dramatically boosting your SEO.",
+        "Ask every customer for honest feedback and keep public-review prompts separate from issue recovery.",
       icon: <MessageSquare className="w-6 h-6" />,
     },
     {
-      title: "Private Conflict Resolution",
+      title: "Issue Recovery Workflow",
       description:
-        "If a client had an issue, they are directed to a private form to speak directly with you. Resolve disputes privately before they hurt your public rating.",
+        "Track callbacks, concerns, warranty checks, and unresolved promises before they disappear into memory.",
       icon: <ShieldAlert className="w-6 h-6" />,
     },
     {
@@ -35,16 +35,16 @@ export function LandingFeatures() {
       icon: <RefreshCw className="w-6 h-6" />,
     },
     {
-      title: "Staff Leaderboards",
+      title: "Team Ownership",
       description:
-        "See which technician or operator drives the most 5-star reviews and has the highest customer satisfaction scores.",
-      icon: <Trophy className="w-6 h-6" />,
+        "Assign follow-ups to the owner, admin, or staff member who should close the loop with the customer.",
+      icon: <Users className="w-6 h-6" />,
     },
     {
-      title: "Enterprise Grade Security",
+      title: "Workspace Security",
       description:
         "Role-based workspace scopes protect customer data. Secure authentication keeps your client list locked down.",
-      icon: <Lock className="w-6 h-6" />,
+      icon: <ShieldCheck className="w-6 h-6" />,
     },
   ];
 
@@ -58,15 +58,15 @@ export function LandingFeatures() {
           Built for Local Service Experts
         </h2>
         <p className="text-muted-foreground max-w-xl mx-auto">
-          Everything you need to automate check-ins, build trust, and ensure
-          customers call you first next time.
+          A manual-first workflow for the customer moments that happen after a
+          repair, install, appointment, or service visit is complete.
         </p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-        {features.map((feature, i) => (
+        {features.map((feature) => (
           <Card
-            key={i}
+            key={feature.title}
             className="hover:border-[#009b98]/40 shadow-sm dark:shadow-none transition-all duration-300 group bg-card"
           >
             <CardHeader>

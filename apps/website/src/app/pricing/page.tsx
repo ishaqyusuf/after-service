@@ -1,18 +1,22 @@
 import type { Metadata } from "next";
+import { LandingFooter } from "../../components/landing/footer";
+import { LandingHeader } from "../../components/landing/header";
+import { LandingPricing } from "../../components/landing/pricing";
 
 export async function generateMetadata(): Promise<Metadata> {
   return {
-    title: "Pricing | After Service",
-    description: "Starter, growth, and pro plans.",
+    title: "Pricing | afterservice",
+    description:
+      "Free early access now, with simple paid plans planned for service teams.",
   };
 }
 
 export default async function PricingPage() {
   return (
-    <main className="site-page">
-      <h1>Pricing</h1>
-      <p>Starter, growth, and pro plans will be available for operators.</p>
-      <a href="/signup">Start setup</a>
+    <main className="min-h-screen bg-background text-foreground">
+      <LandingHeader />
+      <LandingPricing />
+      <LandingFooter />
     </main>
   );
 }

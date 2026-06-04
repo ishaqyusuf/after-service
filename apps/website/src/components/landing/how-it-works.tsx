@@ -7,11 +7,11 @@ export function LandingHowItWorks() {
       <div className="max-w-7xl mx-auto px-6 sm:px-8">
         <div className="text-center mb-20">
           <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-foreground mb-4">
-            Three Steps to Automated Success
+            Three Steps to a Cleaner Follow-Up Habit
           </h2>
           <p className="text-muted-foreground max-w-xl mx-auto">
-            How afterservice saves time and generates recurring work in the
-            background.
+            Start with the manual workflow that proves value before turning on
+            deeper automation.
           </p>
         </div>
 
@@ -21,11 +21,11 @@ export function LandingHowItWorks() {
               1
             </div>
             <h3 className="text-xl font-bold mb-2 text-foreground">
-              Job Completion
+              Log Completed Work
             </h3>
             <p className="text-sm text-muted-foreground max-w-xs leading-relaxed">
-              Log a job in your dashboard or let your existing CRM signal
-              completion automatically.
+              Add the customer, service date, job notes, and the next touch you
+              promised after the work is done.
             </p>
           </div>
 
@@ -34,11 +34,11 @@ export function LandingHowItWorks() {
               2
             </div>
             <h3 className="text-xl font-bold mb-2 text-foreground">
-              Automated Dispatch
+              Work the Board
             </h3>
             <p className="text-sm text-muted-foreground max-w-xs leading-relaxed">
-              Our follow-up engine sends an email or text template customized to
-              the job type.
+              Use due dates, statuses, templates, and ownership so no check-in
+              depends on memory.
             </p>
           </div>
 
@@ -47,11 +47,11 @@ export function LandingHowItWorks() {
               3
             </div>
             <h3 className="text-xl font-bold mb-2 text-foreground">
-              Growth & Reactivation
+              Close the Loop
             </h3>
             <p className="text-sm text-muted-foreground max-w-xs leading-relaxed">
-              Collect Google reviews directly, while our scheduler plans your
-              next maintenance alert.
+              Log sends and replies, recover issues, request honest feedback,
+              and schedule future service reminders.
             </p>
           </div>
         </div>
