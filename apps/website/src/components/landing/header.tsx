@@ -7,15 +7,42 @@ import { LogEvents } from "@afterservice/events";
 import { useTrack } from "@afterservice/events/client";
 import { BrandLogo, Button } from "@afterservice/ui";
 import { appMetadata } from "@afterservice/utils";
+import { Menu, Moon, Sun, X } from "lucide-react";
 import { useEffect, useState } from "react";
 
+function ThemeToggle({
+  theme,
+  onToggle,
+}: {
+  theme: "light" | "dark";
+  onToggle: () => void;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onToggle}
+      className="inline-flex h-10 w-10 items-center justify-center rounded-lg border border-border bg-card text-foreground shadow-sm transition-colors hover:border-[#009b98]/50 hover:bg-[#eef8f0] dark:bg-[#101713] dark:hover:bg-[#122118]"
+      aria-label="Toggle theme"
+    >
+      {theme === "dark" ? (
+        <Sun className="h-5 w-5 text-[#f3c96a]" />
+      ) : (
+        <Moon className="h-5 w-5 text-[#009b98]" />
+      )}
+    </button>
+  );
+}
+
 export function LandingHeader() {
-  const [theme, setTheme] = useState<"light" | "dark">("dark");
+  const [theme, setTheme] = useState<"light" | "dark">("light");
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const track = useTrack();
 
   useEffect(() => {
-    const savedTheme = localStorage.getItem("theme") as "light" | "dark" | null;
+    const savedTheme =
+      typeof window.localStorage === "undefined"
+        ? null
+        : (window.localStorage.getItem("theme") as "light" | "dark" | null);
     const prefersDark = window.matchMedia(
       "(prefers-color-scheme: dark)",
     ).matches;
@@ -32,7 +59,9 @@ export function LandingHeader() {
   const toggleTheme = () => {
     const nextTheme = theme === "dark" ? "light" : "dark";
     setTheme(nextTheme);
-    localStorage.setItem("theme", nextTheme);
+    if (typeof window.localStorage !== "undefined") {
+      window.localStorage.setItem("theme", nextTheme);
+    }
     if (nextTheme === "dark") {
       document.documentElement.classList.add("dark");
     } else {
@@ -41,9 +70,12 @@ export function LandingHeader() {
   };
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-border bg-background/85 backdrop-blur-md">
-      <div className="max-w-7xl mx-auto px-6 sm:px-8 h-18 flex items-center justify-between">
-        <a href="/" className="inline-flex items-center">
+    <header className="sticky top-0 z-50 w-full border-b border-border bg-background/85 backdrop-blur-md dark:bg-[#070b09]/86 dark:supports-[backdrop-filter]:bg-[#070b09]/72">
+      <div className="max-w-7xl mx-auto px-6 sm:px-8 h-[72px] flex items-center justify-between">
+        <a
+          href="/"
+          className="inline-flex items-center rounded-lg outline-none transition-colors focus-visible:ring-2 focus-visible:ring-[#009b98]/60"
+        >
           <BrandLogo name={appMetadata.name} />
         </a>
 
@@ -75,42 +107,7 @@ export function LandingHeader() {
         </nav>
 
         <div className="hidden md:flex items-center gap-4">
-          <button
-            type="button"
-            onClick={toggleTheme}
-            className="p-2 rounded-lg bg-card border border-border hover:border-[#009b98]/40 transition-all duration-200 shadow-sm"
-            aria-label="Toggle Theme"
-          >
-            {theme === "dark" ? (
-              <svg
-                className="w-5 h-5 text-yellow-500"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                strokeWidth={2}
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707m0-12.728l.707.707m12.728 12.728l.707-.707M12 8a4 4 0 100 8 4 4 0 000-8z"
-                />
-              </svg>
-            ) : (
-              <svg
-                className="w-5 h-5 text-primary"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                strokeWidth={2}
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"
-                />
-              </svg>
-            )}
-          </button>
+          <ThemeToggle theme={theme} onToggle={toggleTheme} />
 
           <a
             href="/login"
@@ -140,76 +137,25 @@ export function LandingHeader() {
         </div>
 
         <div className="flex items-center gap-3 md:hidden">
-          <button
-            type="button"
-            onClick={toggleTheme}
-            className="p-2 rounded-lg bg-card border border-border hover:border-[#009b98]/40 transition-all duration-200 shadow-sm"
-            aria-label="Toggle Theme"
-          >
-            {theme === "dark" ? (
-              <svg
-                className="w-5 h-5 text-yellow-500"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                strokeWidth={2}
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707m0-12.728l.707.707m12.728 12.728l.707-.707M12 8a4 4 0 100 8 4 4 0 000-8z"
-                />
-              </svg>
-            ) : (
-              <svg
-                className="w-5 h-5 text-primary"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                strokeWidth={2}
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"
-                />
-              </svg>
-            )}
-          </button>
+          <ThemeToggle theme={theme} onToggle={toggleTheme} />
 
           <button
             type="button"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="p-2 rounded-lg bg-card border border-border hover:border-[#009b98]/40 transition-all duration-200 shadow-sm"
+            className="inline-flex h-10 w-10 items-center justify-center rounded-lg border border-border bg-card text-foreground shadow-sm transition-colors hover:border-[#009b98]/50 hover:bg-[#eef8f0] dark:bg-[#101713] dark:hover:bg-[#122118]"
             aria-label={mobileMenuOpen ? "Close menu" : "Open menu"}
           >
-            <svg
-              className="w-5 h-5 text-foreground"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-              strokeWidth={2}
-            >
-              {mobileMenuOpen ? (
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M6 18L18 6M6 6l12 12"
-                />
-              ) : (
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M4 6h16M4 12h16M4 18h16"
-                />
-              )}
-            </svg>
+            {mobileMenuOpen ? (
+              <X className="h-5 w-5" />
+            ) : (
+              <Menu className="h-5 w-5" />
+            )}
           </button>
         </div>
       </div>
 
       {mobileMenuOpen && (
-        <div className="md:hidden border-t border-border bg-background/95 backdrop-blur-md">
+        <div className="md:hidden border-t border-border bg-background/95 backdrop-blur-md dark:bg-[#070b09]/95">
           <nav className="flex flex-col gap-1 px-6 py-4">
             <a
               href="#features"

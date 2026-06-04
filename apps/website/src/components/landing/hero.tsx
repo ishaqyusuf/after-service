@@ -20,8 +20,8 @@ export function LandingHero() {
 
   return (
     <section className="relative z-10 max-w-7xl mx-auto w-full px-6 sm:px-8 pt-20 pb-16 text-center">
-      <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-sm text-primary font-medium mb-8 hover:border-[#009b98]/40 transition-all duration-300">
-        <span className="w-2 h-2 rounded-full bg-primary animate-pulse" />
+      <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#eef8f0] border border-[#009b98]/25 text-sm text-[#17232b] font-medium mb-8 transition-colors duration-300 dark:bg-[#0c1815] dark:text-[#dff8ee] dark:border-[#009b98]/35">
+        <span className="w-2 h-2 rounded-full bg-[#009b98] animate-pulse" />
         <span>Free early access for service operators</span>
       </div>
 
@@ -71,7 +71,7 @@ export function LandingHero() {
       </div>
 
       {/* Dashboard Showcase Mockup */}
-      <div className="relative max-w-5xl mx-auto bg-card border border-border rounded-2xl p-4 shadow-xl dark:shadow-2xl backdrop-blur-sm overflow-hidden group transition-colors duration-300">
+      <div className="relative max-w-5xl mx-auto bg-card border border-border rounded-2xl p-4 shadow-xl backdrop-blur-sm overflow-hidden group transition-colors duration-300 dark:bg-[#0b100e] dark:border-[#17332d] dark:shadow-[0_24px_80px_rgba(0,155,152,0.14)]">
         {/* Decorative browser dots */}
         <div className="flex items-center gap-2 mb-4 border-b border-border pb-3">
           <span className="w-3 h-3 rounded-full bg-red-500/80" />
@@ -85,20 +85,20 @@ export function LandingHero() {
         {/* Dummy UI Showcase */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 text-left">
           <div className="md:col-span-1 border-r border-border pr-4 hidden md:flex flex-col gap-3 text-xs text-muted-foreground">
-            <div className="p-2 rounded bg-primary/10 text-primary font-bold">
-              🎯 Follow-Up Board
+            <div className="p-2 rounded bg-[#eef8f0] text-[#17232b] font-bold dark:bg-[#0c1815] dark:text-[#dff8ee]">
+              Follow-Up Board
             </div>
             <div className="p-2 hover:bg-[#eef8f0]/50 dark:hover:bg-[#122118]/40 rounded transition-colors">
-              👥 Customers
+              Customers
             </div>
             <div className="p-2 hover:bg-[#eef8f0]/50 dark:hover:bg-[#122118]/40 rounded transition-colors">
-              💼 Jobs & Tickets
+              Jobs & Tickets
             </div>
             <div className="p-2 hover:bg-[#eef8f0]/50 dark:hover:bg-[#122118]/40 rounded transition-colors">
-              📝 Templates
+              Templates
             </div>
             <div className="p-2 hover:bg-[#eef8f0]/50 dark:hover:bg-[#122118]/40 rounded transition-colors">
-              ⚙️ Settings
+              Settings
             </div>
           </div>
 

@@ -44,3 +44,7 @@ The page has a solid SaaS visual foundation: clear typography, calm spacing, usa
 3. Replace metrics with early-stage trust/proof or remove the metrics band entirely.
 4. Replace the feature grid with a pain-to-workflow section plus four product pillars: customers, jobs, follow-ups, templates.
 5. Browser-test desktop and mobile first view, pricing section, signup CTA, and footer.
+
+## Implementation Update
+
+2026-06-04: Implemented the duplicate-shell fix for the website by making the root layout suppress its generic header/footer on landing-shell routes (`/` and `/pricing`). Updated the shared brand mark to use the actual afterservice icon geometry from the app icon and tuned the landing header, hero mock, and bottom CTA for a more intentional dark-mode version.
