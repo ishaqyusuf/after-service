@@ -400,3 +400,32 @@ Files changed:
 - `packages/events`
 - `.env.example`
 - `brain`
+
+### Midday-Style Dashboard Auth Guard
+
+Completed: 2026-06-04
+
+Summary:
+
+- Replaced the placeholder client `AuthGuard` with real server-side session and workspace membership checks in the dashboard `(sidebar)` layout.
+- Redirects unauthenticated users to `/sign-in`.
+- Redirects authenticated users without a workspace membership to `/onboarding`.
+- Renders the current workspace name in the dashboard header from the server-rendered layout.
+- Kept API `protectedProcedure` as the data-access source of truth.
+- Fixed manual follow-up send logging so `markSent` awaits notification/message-log persistence and returns the refreshed follow-up.
+- Preserved follow-up/customer IDs in email message-log payloads.
+- Synced the local database schema with Prisma before rerunning smoke.
+
+Verification:
+
+- Focused Biome check passed for changed auth/layout/API/notification files.
+- `bun run typecheck` passed.
+- `bun run smoke:mvp` passed.
+
+Files changed:
+
+- `apps/dashboard/src/app/(sidebar)/layout.tsx`
+- `apps/dashboard/src/components/auth-guard.tsx`
+- `apps/api/src/routers/_app.ts`
+- `packages/notifications/src/types/followup-message-sent.ts`
+- `brain`

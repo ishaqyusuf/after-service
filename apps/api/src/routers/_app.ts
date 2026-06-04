@@ -890,28 +890,26 @@ const followUpsRouter = t.router({
         workspaceId: ctx.workspace.id,
       });
 
-      notifications
-        .send(
-          "followup_message_sent",
-          ctx.workspace.id,
-          {
-            users: [
-              {
-                id: item.customer.id,
-                email: item.customer.email || "",
-                phone: item.customer.phone || undefined,
-                workspace_id: ctx.workspace.id,
-              },
-            ],
-            followUpId: item.id,
-            customerId: item.customerId,
-            body: input.body,
-            channel: followUp.channel,
-            recipient: input.recipient,
-          },
-          { channels: [followUp.channel] },
-        )
-        .catch(console.error);
+      await notifications.send(
+        "followup_message_sent",
+        ctx.workspace.id,
+        {
+          users: [
+            {
+              id: item.customer.id,
+              email: item.customer.email || "",
+              phone: item.customer.phone || undefined,
+              workspace_id: ctx.workspace.id,
+            },
+          ],
+          followUpId: item.id,
+          customerId: item.customerId,
+          body: input.body,
+          channel: followUp.channel,
+          recipient: input.recipient,
+        },
+        { channels: [followUp.channel] },
+      );
 
       analytics.track({
         event: LogEvents.FollowUpStatusUpdated.name,
@@ -920,7 +918,18 @@ const followUpsRouter = t.router({
         workspaceId: ctx.workspace.id,
       });
 
-      return { item: followUpDto(item) };
+      const updatedItem = await db.followUp.findFirstOrThrow({
+        include: {
+          customer: true,
+          events: true,
+          job: true,
+          messageLogs: true,
+          template: true,
+        },
+        where: { id: input.id, workspaceId: ctx.workspace.id },
+      });
+
+      return { item: followUpDto(updatedItem) };
     }),
   reschedule: protectedProcedure
     .input(z.object({ dueAt: z.coerce.date(), id: z.string().min(1) }))

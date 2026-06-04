@@ -18,6 +18,8 @@ export const followUpMessageSent: NotificationHandler<Data> = {
   createEmail: (data: Data, user: UserData, team: TeamContext) => ({
     user,
     data: {
+      customerId: data.customerId,
+      followUpId: data.followUpId,
       body: data.body,
     },
     subject: `Update from ${team.name}`,

@@ -12,6 +12,10 @@ As of 2026-06-03, the public website no longer uses an `IS_LAUNCHED` release fla
 
 As of 2026-06-04, the public launch posture is free beta / early access, not a paid free-trial launch. Public plan names are Free Beta, Starter, Shop, and Growth. Internal workspace plan enums remain `starter`, `growth`, and `pro` for now, mapped publicly as Free Beta/Starter, Shop, and Growth.
 
+As of 2026-06-04, the beta roadmap is captured in `brain/product/beta-roadmap.md`: MVP-ready, free beta now, habit validation before broad paid launch, and a private paid pilot before public pricing.
+
+As of 2026-06-04, dashboard route protection follows the Midday-style pattern: the dashboard proxy remains a fast unauthenticated redirect, the `(sidebar)` layout performs a real server-side session and workspace membership check, and API `protectedProcedure` remains the source of truth for workspace-scoped data access.
+
 ## Phase 1: Repo Bootstrap
 
 Status: complete.
