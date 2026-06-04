@@ -20,7 +20,7 @@ This file records core technology choices.
 - Auth: Better Auth-style package architecture planned for Phase 6
 
 ## Billing
-- Provider: Lemon Squeezy
+- Provider: Polar
 - Model: recurring subscriptions
 - Entitlements: persisted from webhook-confirmed subscription state
 

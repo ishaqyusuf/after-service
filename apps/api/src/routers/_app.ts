@@ -6,6 +6,7 @@ import { initTRPC, TRPCError } from "@trpc/server";
 import superjson from "superjson";
 import { z } from "zod";
 import type { ApiContext } from "../context";
+import { polarApi } from "../utils/polar";
 
 const t = initTRPC.context<ApiContext>().create({
   transformer: superjson,
@@ -1171,12 +1172,51 @@ const billingRouter = t.router({
       return { checkoutUrl: "/billing?checkout=beta" };
     }
 
-    const checkoutUrl =
-      process.env.LEMON_SQUEEZY_CHECKOUT_URL ??
-      process.env.LEMON_SQUEEZY_STARTER_CHECKOUT_URL ??
-      "/billing?checkout=not-configured";
+    try {
+      // Determine product ID based on plan
+      const workspace = await getWorkspaceForLimits(ctx.workspace.id);
+      const isGrowth = workspace.plan === "growth";
+      const isPro = workspace.plan === "pro";
+      
+      // Resolve or create Polar customer
+      let polarCustomer: { id: string };
+      try {
+        polarCustomer = await polarApi.customers.getExternal({
+          externalId: ctx.workspace.id,
+        });
+      } catch {
+        polarCustomer = await polarApi.customers.create({
+          externalId: ctx.workspace.id,
+          email: ctx.user!.email ?? "",
+          name: workspace.name ?? undefined,
+        });
+      }
 
-    return { checkoutUrl };
+      const productId = isPro 
+        ? process.env.POLAR_PRO_VARIANT_ID 
+        : isGrowth 
+          ? process.env.POLAR_GROWTH_VARIANT_ID 
+          : process.env.POLAR_STARTER_VARIANT_ID;
+          
+      if (!productId) {
+        return { checkoutUrl: "/billing?checkout=not-configured" };
+      }
+
+      const checkout = await polarApi.checkouts.create({
+        products: [productId],
+        allowDiscountCodes: false,
+        customerId: polarCustomer.id,
+        metadata: {
+          teamId: ctx.workspace.id,
+          companyName: workspace.name ?? "",
+        },
+      });
+
+      return { checkoutUrl: checkout.url };
+    } catch (e) {
+      console.error(e);
+      return { checkoutUrl: "/billing?checkout=error" };
+    }
   }),
   getCurrentPlan: protectedProcedure.query(async ({ ctx }) => {
     const workspace = await getWorkspaceForLimits(ctx.workspace.id);
@@ -1212,12 +1252,29 @@ const billingRouter = t.router({
       },
     };
   }),
-  getPortalUrl: protectedProcedure.query(({ ctx }) => {
+  getPortalUrl: protectedProcedure.query(async ({ ctx }) => {
     requireOwnerOrAdmin(ctx);
 
-    return {
-      portalUrl: process.env.LEMON_SQUEEZY_PORTAL_URL ?? null,
-    };
+    try {
+      let polarCustomer: { id: string };
+      try {
+        polarCustomer = await polarApi.customers.getExternal({
+          externalId: ctx.workspace.id,
+        });
+      } catch {
+        return { portalUrl: null };
+      }
+      
+      const result = await polarApi.customerSessions.create({
+        customerId: polarCustomer.id,
+      });
+
+      return {
+        portalUrl: result.customerPortalUrl ?? null,
+      };
+    } catch {
+      return { portalUrl: null };
+    }
   }),
 });
 
