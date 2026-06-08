@@ -11,9 +11,8 @@ This file captures the MVP observability baseline for afterservice production re
 - Manual outreach creates `MessageLog` records; automated outbound messaging remains disabled unless explicitly configured.
 
 ## Marketing Analytics
-- The public website emits `First Site Visit` once per browser/device when `AFTERSERVICE_FIRST_SITE_VISIT_ID` is first created.
-- First-site-visit attribution captures first-touch landing path, search string, referrer, and UTM parameters.
-- The first-visit ID and tracked marker use long-lived, host-only cookies with `SameSite=Lax`; localStorage is used as an additional tracked marker when available.
+- OpenPanel owns unique visitor and first-touch tracking for the public website.
+- afterservice should avoid custom first-visit cookies/localStorage unless OpenPanel cannot cover a required attribution use case.
 
 ## Error Monitoring
 - `SENTRY_DSN` is documented in `.env.example` as the default error-monitoring hook.
