@@ -42,6 +42,10 @@ Require active membership:
 - UI gates are helpful but not security boundaries.
 
 ## Auth Proxy Behavior
+- Browser OAuth:
+  - Google sign-up/sign-in starts from the dashboard origin and must use `BETTER_AUTH_URL=https://dashboard.afterservice.app` in production.
+  - The authorized Google redirect URI is `https://dashboard.afterservice.app/api/auth/callback/google`.
+  - Keep OAuth session cookies scoped to the dashboard origin; API routes may validate sessions but must not be the browser OAuth callback origin.
 - Dashboard proxy:
   - Public routes: `/sign-in`, `/sign-up`, `/onboarding`, `/api/`, `/_next/`, `/favicon`.
   - Uses cookie presence for redirect gating.

@@ -75,6 +75,7 @@ export function SignUpForm({ onSignUp, adapterRef }: Props) {
       const result = await signIn.social({
         provider: "google",
         callbackURL: "/onboarding",
+        disableRedirect: true,
         newUserCallbackURL: "/onboarding?signup_method=google",
       });
 

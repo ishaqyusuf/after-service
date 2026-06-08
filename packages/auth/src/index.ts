@@ -54,7 +54,7 @@ export function getAuthBaseUrl() {
   const isLocalRuntime =
     process.env.AFTERSERVICE_ENV_MODE === "local" ||
     process.env.NODE_ENV !== "production";
-  const devUrls = isLocalRuntime ? "http://localhost:4102" : undefined;
+  const devUrls = isLocalRuntime ? "http://localhost:4101" : undefined;
 
   if (devUrls) {
     return readNonEmptyEnv("BETTER_AUTH_LOCAL_URL") ?? devUrls;
@@ -62,7 +62,7 @@ export function getAuthBaseUrl() {
 
   return (
     readNonEmptyEnv("BETTER_AUTH_URL") ??
-    readNonEmptyEnv("NEXT_PUBLIC_API_URL") ??
+    readNonEmptyEnv("NEXT_PUBLIC_DASHBOARD_URL") ??
     undefined
   );
 }

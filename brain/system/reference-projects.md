@@ -6,6 +6,8 @@ This file records the local reference projects agents should use when implementi
 ## Primary References
 - `midday`: `/Users/M1PRO/Documents/code/_kitchen_sink/midday`
   - Primary standard for pages, tables, modals, sheets, sidebar, forms, onboarding, layouts, tRPC calls, loading states, error states, and caching patterns.
+- `caltext`: `/Users/M1PRO/Documents/code/_kitchen_sink/caltext`
+  - Reference for AI assistant workflows, Hono/Nitro API routes, webhook handling, messaging adapters, AI SDK tools, and durable Vercel Workflow patterns.
 - `gnd`: `/Users/M1PRO/Documents/code/_turbo/gnd`
   - Reference for the standard notification package system and mature operational dashboard patterns.
 - `plot-keys`: `/Users/M1PRO/Documents/code/plot-keys`

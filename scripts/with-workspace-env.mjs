@@ -97,11 +97,26 @@ if (command.length === 0) {
 
 const envFile = envFileForMode(mode);
 const fileEnv = parseEnvFile(resolve(workspaceRoot, envFile));
+const defaultEnv = parseEnvFile(resolve(workspaceRoot, ".env"));
+const processEnv = { ...process.env };
+
+if (envFile !== ".env") {
+  for (const [key, value] of Object.entries(defaultEnv)) {
+    if (
+      processEnv[key] === value &&
+      fileEnv[key] !== undefined &&
+      fileEnv[key] !== value
+    ) {
+      delete processEnv[key];
+    }
+  }
+}
+
 const child = spawn(command[0], command.slice(1), {
   cwd: process.cwd(),
   env: {
     ...fileEnv,
-    ...process.env,
+    ...processEnv,
     AFTERSERVICE_ENV_MODE: mode === "production" ? "production" : "local",
     AFTERSERVICE_WORKSPACE_ROOT: workspaceRoot,
   },

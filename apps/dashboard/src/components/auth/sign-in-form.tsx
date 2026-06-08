@@ -70,6 +70,7 @@ export function SignInForm({ onSignIn, returnTo, adapterRef }: Props) {
       const result = await signIn.social({
         provider: "google",
         callbackURL: returnTo || "/",
+        disableRedirect: true,
       });
 
       if (result.error) {

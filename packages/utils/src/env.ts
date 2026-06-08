@@ -20,10 +20,15 @@ const appUrlKeys = [
   "NEXT_PUBLIC_API_URL",
 ] as const;
 
+const authUrlKeys = ["BETTER_AUTH_URL"] as const;
+
 const productionRequiredKeys = [
   "AUTH_SECRET",
+  "BETTER_AUTH_URL",
   "DATABASE_URL",
   "EMAIL_FROM_ADDRESS",
+  "GOOGLE_CLIENT_ID",
+  "GOOGLE_CLIENT_SECRET",
   "POLAR_ACCESS_TOKEN",
   "POLAR_ORGANIZATION_ID",
   "POLAR_WEBHOOK_SECRET",
@@ -102,7 +107,7 @@ export function validateWorkspaceEnv(
     }
   }
 
-  for (const key of appUrlKeys) {
+  for (const key of [...appUrlKeys, ...authUrlKeys]) {
     const value = readEnv(env, key);
 
     if (!value) {
@@ -116,11 +121,32 @@ export function validateWorkspaceEnv(
     }
   }
 
+  if (mode === "production") {
+    const authUrl = normalizeUrl(readEnv(env, "BETTER_AUTH_URL"));
+    const dashboardUrl = normalizeUrl(readEnv(env, "NEXT_PUBLIC_DASHBOARD_URL"));
+
+    if (authUrl && dashboardUrl && authUrl !== dashboardUrl) {
+      invalid.push("BETTER_AUTH_URL");
+    }
+  }
+
   return {
     invalid,
     missing,
     ok: missing.length === 0 && invalid.length === 0,
   };
+}
+
+function normalizeUrl(value: string | undefined) {
+  if (!value) {
+    return undefined;
+  }
+
+  try {
+    return new URL(value).toString().replace(/\/$/, "");
+  } catch {
+    return undefined;
+  }
 }
 
 export function assertWorkspaceEnv(
