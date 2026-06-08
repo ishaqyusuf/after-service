@@ -72,11 +72,22 @@ export function SignUpForm({ onSignUp, adapterRef }: Props) {
       method: "google",
     });
     try {
-      await signIn.social({
+      const result = await signIn.social({
         provider: "google",
         callbackURL: "/onboarding",
         newUserCallbackURL: "/onboarding?signup_method=google",
       });
+
+      if (result.error) {
+        throw new Error(result.error.message ?? "Google sign-up failed.");
+      }
+
+      if (result.data?.url) {
+        window.location.href = result.data.url;
+        return;
+      }
+
+      setIsGooglePending(false);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Google sign-up failed.");
       setIsGooglePending(false);

@@ -67,10 +67,21 @@ export function SignInForm({ onSignIn, returnTo, adapterRef }: Props) {
     setIsGooglePending(true);
     setError(null);
     try {
-      await signIn.social({
+      const result = await signIn.social({
         provider: "google",
         callbackURL: returnTo || "/",
       });
+
+      if (result.error) {
+        throw new Error(result.error.message ?? "Google sign-in failed.");
+      }
+
+      if (result.data?.url) {
+        window.location.href = result.data.url;
+        return;
+      }
+
+      setIsGooglePending(false);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Google sign-in failed.");
       setIsGooglePending(false);
