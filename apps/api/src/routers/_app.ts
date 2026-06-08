@@ -1193,9 +1193,9 @@ const billingRouter = t.router({
       }
 
       const productId = isPro 
-        ? process.env.POLAR_PRO_VARIANT_ID 
+        ? process.env.POLAR_GROWTH_VARIANT_ID 
         : isGrowth 
-          ? process.env.POLAR_GROWTH_VARIANT_ID 
+          ? process.env.POLAR_SHOP_VARIANT_ID 
           : process.env.POLAR_STARTER_VARIANT_ID;
           
       if (!productId) {

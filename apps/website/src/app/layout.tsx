@@ -7,6 +7,7 @@ import { Geist } from "next/font/google";
 import { headers } from "next/headers";
 import Link from "next/link";
 import type { ReactNode } from "react";
+import { FirstSiteVisitTracker } from "../components/analytics/first-site-visit-tracker";
 import { PwaServiceWorkerRegister } from "../components/pwa-service-worker-register";
 import "./globals.css";
 
@@ -34,6 +35,7 @@ export default async function RootLayout({
     >
       <body className="min-h-screen flex flex-col bg-background text-foreground">
         <AnalyticsProvider />
+        <FirstSiteVisitTracker />
         <PwaServiceWorkerRegister />
         {!hasLandingShell && (
           <header className="sticky top-0 z-50 w-full border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">

@@ -89,6 +89,32 @@ export const auth = betterAuth({
   }),
   emailAndPassword: {
     enabled: true,
+    sendResetPassword: async ({ user, url }) => {
+      const resendApiKey = readNonEmptyEnv("RESEND_API_KEY");
+      if (resendApiKey) {
+        await fetch("https://api.resend.com/emails", {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${resendApiKey}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            from: readNonEmptyEnv("EMAIL_FROM_ADDRESS") ?? "noreply@afterservice.app",
+            to: user.email,
+            subject: "Reset your password",
+            html: `<p>Click <a href="${url}">here</a> to reset your password.</p>`,
+          }),
+        });
+      } else {
+        console.log(`[PASSWORD RESET] Send this link to ${user.email}: ${url}`);
+      }
+    },
+  },
+  socialProviders: {
+    google: {
+      clientId: readNonEmptyEnv("GOOGLE_CLIENT_ID") ?? "",
+      clientSecret: readNonEmptyEnv("GOOGLE_CLIENT_SECRET") ?? "",
+    },
   },
   secret: getAuthSecret(),
   trustedOrigins: getTrustedOrigins(),
