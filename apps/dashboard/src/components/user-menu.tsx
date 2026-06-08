@@ -1,5 +1,7 @@
 "use client";
 
+import { LogEvents } from "@afterservice/events";
+import { useClearIdentity, useTrack } from "@afterservice/events/client";
 import {
   Avatar,
   AvatarFallback,
@@ -13,17 +15,20 @@ import {
 } from "@afterservice/ui";
 import { LogOut, Settings, User } from "lucide-react";
 import { useState } from "react";
-import { useTrack } from "@afterservice/events/client";
-import { LogEvents } from "@afterservice/events";
 
 export function UserMenu({ isExpanded }: { isExpanded: boolean }) {
   const [isPending, setIsPending] = useState(false);
+  const clearIdentity = useClearIdentity();
   const track = useTrack();
 
   const handleSignOut = async () => {
     setIsPending(true);
     try {
-      track({ event: LogEvents.SignOut.name, channel: LogEvents.SignOut.channel });
+      track({
+        event: LogEvents.SignOut.name,
+        channel: LogEvents.SignOut.channel,
+      });
+      clearIdentity();
       await fetch("/api/auth/sign-out", { method: "POST" });
       window.location.href = "/sign-in";
     } catch (error) {

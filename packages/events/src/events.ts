@@ -39,6 +39,14 @@ export const LogEvents = {
     name: "User Signed Out",
     channel: "login",
   },
+  SignUpStarted: {
+    name: "Sign Up Started",
+    channel: "signup",
+  },
+  SignUpCompleted: {
+    name: "Sign Up Completed",
+    channel: "signup",
+  },
   WorkspaceCreated: {
     name: "Workspace Created",
     channel: "workspace",

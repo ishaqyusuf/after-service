@@ -5,6 +5,7 @@ import {
   type TrackProperties,
   useOpenPanel,
 } from "@openpanel/nextjs";
+import { useEffect } from "react";
 
 const isProd = process.env.NODE_ENV === "production";
 
@@ -18,6 +19,20 @@ const Provider = () => (
 );
 
 type TrackOptions = { event: string } & TrackProperties;
+type IdentifyUserOptions = {
+  userId: string;
+  workspaceId: string;
+  workspaceSlug: string;
+};
+type OpenPanelWithGroups = ReturnType<typeof useOpenPanel> & {
+  setGroup?: (id: string) => void;
+  upsertGroup?: (group: {
+    id: string;
+    type: string;
+    name?: string;
+    properties?: Record<string, unknown>;
+  }) => void;
+};
 
 const useTrack = () => {
   const { track: openTrack } = useOpenPanel();
@@ -34,4 +49,66 @@ const useTrack = () => {
   };
 };
 
-export { Provider, useTrack };
+const useClearIdentity = () => {
+  const { clear } = useOpenPanel();
+
+  return () => {
+    if (!isProd) {
+      console.log("Clear identity");
+      return;
+    }
+
+    clear();
+  };
+};
+
+function IdentifyUser({
+  userId,
+  workspaceId,
+  workspaceSlug,
+}: IdentifyUserOptions) {
+  const {
+    identify,
+    setGlobalProperties,
+    setGroup,
+    upsertGroup,
+  } = useOpenPanel() as OpenPanelWithGroups;
+
+  useEffect(() => {
+    const group = {
+      id: workspaceId,
+      type: "workspace",
+      name: workspaceSlug,
+      properties: {
+        workspaceId,
+        workspaceSlug,
+      },
+    };
+
+    if (!isProd) {
+      console.log("Identify", { profileId: userId });
+      console.log("Workspace group", group);
+      return;
+    }
+
+    identify({ profileId: userId });
+    upsertGroup?.(group);
+    setGroup?.(workspaceId);
+    setGlobalProperties({
+      workspaceId,
+      workspaceSlug,
+    });
+  }, [
+    identify,
+    setGlobalProperties,
+    setGroup,
+    upsertGroup,
+    userId,
+    workspaceId,
+    workspaceSlug,
+  ]);
+
+  return null;
+}
+
+export { IdentifyUser, Provider, useClearIdentity, useTrack };

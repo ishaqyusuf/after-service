@@ -1,6 +1,8 @@
 "use client";
 
-import { Button, Input, Label, Icons } from "@afterservice/ui";
+import { LogEvents } from "@afterservice/events";
+import { useTrack } from "@afterservice/events/client";
+import { Button, Icons, Input, Label } from "@afterservice/ui";
 import { Loader2 } from "lucide-react";
 import { type FormEvent, useCallback, useRef, useState } from "react";
 import type { QuickFillFormAdapter } from "@/components/dev/quick-fill";
@@ -21,6 +23,7 @@ export function SignUpForm({ onSignUp, adapterRef }: Props) {
   const [error, setError] = useState<string | null>(null);
   const [isPending, setIsPending] = useState(false);
   const [isGooglePending, setIsGooglePending] = useState(false);
+  const track = useTrack();
   const [values, setValues] = useState<FieldValues>({
     name: "",
     email: "",
@@ -44,6 +47,12 @@ export function SignUpForm({ onSignUp, adapterRef }: Props) {
     e.preventDefault();
     setError(null);
     setIsPending(true);
+    track({
+      event: LogEvents.SignUpStarted.name,
+      channel: LogEvents.SignUpStarted.channel,
+      location: "dashboard_sign_up",
+      method: "email",
+    });
 
     try {
       await onSignUp(values);
@@ -56,10 +65,17 @@ export function SignUpForm({ onSignUp, adapterRef }: Props) {
   async function handleGoogleSignUp() {
     setIsGooglePending(true);
     setError(null);
+    track({
+      event: LogEvents.SignUpStarted.name,
+      channel: LogEvents.SignUpStarted.channel,
+      location: "dashboard_sign_up",
+      method: "google",
+    });
     try {
       await signIn.social({
         provider: "google",
         callbackURL: "/onboarding",
+        newUserCallbackURL: "/onboarding?signup_method=google",
       });
     } catch (err) {
       setError(err instanceof Error ? err.message : "Google sign-up failed.");
@@ -70,9 +86,9 @@ export function SignUpForm({ onSignUp, adapterRef }: Props) {
   return (
     <div className="space-y-6">
       <div className="flex flex-col space-y-4">
-        <Button 
-          type="button" 
-          variant="outline" 
+        <Button
+          type="button"
+          variant="outline"
           onClick={handleGoogleSignUp}
           disabled={isGooglePending || isPending}
           className="w-full h-11 relative"
@@ -140,7 +156,11 @@ export function SignUpForm({ onSignUp, adapterRef }: Props) {
           />
         </div>
         {error ? <p className="text-sm text-destructive">{error}</p> : null}
-        <Button disabled={isPending || isGooglePending} type="submit" className="w-full h-11">
+        <Button
+          disabled={isPending || isGooglePending}
+          type="submit"
+          className="w-full h-11"
+        >
           {isPending ? "Creating account..." : "Create account"}
         </Button>
       </form>

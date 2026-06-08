@@ -13,6 +13,10 @@ This file captures the MVP observability baseline for afterservice production re
 ## Marketing Analytics
 - OpenPanel owns unique visitor and first-touch tracking for the public website.
 - afterservice should avoid custom first-visit cookies/localStorage unless OpenPanel cannot cover a required attribution use case.
+- Dashboard signup intent and completion events are tracked through OpenPanel.
+- Signup analytics record method as `email` or `google` and must not include name, email, or other PII.
+- Authenticated dashboard users are identified in OpenPanel by internal user ID only.
+- Dashboard analytics attach the current workspace by internal ID/slug only; user PII must not be sent in identify payloads.
 
 ## Error Monitoring
 - `SENTRY_DSN` is documented in `.env.example` as the default error-monitoring hook.

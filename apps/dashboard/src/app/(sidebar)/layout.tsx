@@ -1,5 +1,6 @@
 import { auth } from "@afterservice/auth";
 import { getDbClient } from "@afterservice/db";
+import { IdentifyUser } from "@afterservice/events/client";
 import { Badge } from "@afterservice/ui";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
@@ -45,6 +46,11 @@ export default async function SidebarLayout({
 
   return (
     <div className="relative">
+      <IdentifyUser
+        userId={session.user.id}
+        workspaceId={membership.workspace.id}
+        workspaceSlug={membership.workspace.slug}
+      />
       <Sidebar />
       <div className="md:ml-[70px] pb-4 min-h-screen flex flex-col">
         <header className="h-[70px] flex items-center justify-between px-4 md:px-8 border-b border-border bg-background sticky top-0 z-40">

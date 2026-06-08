@@ -1,5 +1,7 @@
 "use client";
 
+import { LogEvents } from "@afterservice/events";
+import { useTrack } from "@afterservice/events/client";
 import { BrandLogo } from "@afterservice/ui";
 import { appMetadata } from "@afterservice/utils";
 import dynamic from "next/dynamic";
@@ -19,6 +21,7 @@ type SignUpValues = { name: string; email: string; password: string };
 
 export default function SignUpPage() {
   const adapterRef = useRef<QuickFillFormAdapter<SignUpValues> | null>(null);
+  const track = useTrack();
 
   async function handleSignUp(values: SignUpValues) {
     const response = await fetch("/api/auth/sign-up/email", {
@@ -39,6 +42,13 @@ export default function SignUpPage() {
       } | null;
       throw new Error(payload?.message ?? "Sign-up failed.");
     }
+
+    track({
+      event: LogEvents.SignUpCompleted.name,
+      channel: LogEvents.SignUpCompleted.channel,
+      location: "dashboard_sign_up",
+      method: "email",
+    });
 
     if (process.env.NODE_ENV !== "production") {
       try {
@@ -99,7 +109,9 @@ function AuthLayout({
             <BrandLogo name={appMetadata.name} />
           </div>
           <div className="mb-8">
-            <h1 className="text-3xl font-bold tracking-tight text-foreground">{title}</h1>
+            <h1 className="text-3xl font-bold tracking-tight text-foreground">
+              {title}
+            </h1>
             <p className="text-sm text-muted-foreground mt-2">{description}</p>
           </div>
           {children}
@@ -113,8 +125,13 @@ function AuthLayout({
         <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/20 via-purple-500/20 to-pink-500/20 mix-blend-multiply" />
         <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 mix-blend-overlay"></div>
         <div className="z-10 text-center max-w-lg px-8 backdrop-blur-sm bg-background/30 p-8 rounded-2xl border border-white/10 shadow-2xl">
-          <h2 className="text-4xl font-bold tracking-tight text-foreground mb-4">Join After Service today</h2>
-          <p className="text-lg text-foreground/80">Get started in seconds and take control of your service operations like never before.</p>
+          <h2 className="text-4xl font-bold tracking-tight text-foreground mb-4">
+            Join After Service today
+          </h2>
+          <p className="text-lg text-foreground/80">
+            Get started in seconds and take control of your service operations
+            like never before.
+          </p>
         </div>
       </div>
     </div>
@@ -122,5 +139,7 @@ function AuthLayout({
 }
 
 function AuthFooter({ children }: { children: React.ReactNode }) {
-  return <div className="text-sm text-center text-muted-foreground">{children}</div>;
+  return (
+    <div className="text-sm text-center text-muted-foreground">{children}</div>
+  );
 }
