@@ -23,12 +23,12 @@ This file captures the MVP observability baseline for afterservice production re
 - A production deploy should configure source maps, release identifiers, and alerts for API/dashboard exceptions before live customer data is collected.
 
 ## Alerts
-- Alert on repeated 5xx responses from `api.afterservice.app`.
+- Alert on repeated 5xx responses from `dashboard.afterservice.app/api`.
 - Alert on Lemon Squeezy webhook verification or processing failures.
 - Alert on failed cron/job endpoint runs.
 - Alert on database connection saturation or migration failures.
 
 ## Health Checks
-- API health: `GET https://api.afterservice.app/health`.
-- Cron dry-run: `POST https://api.afterservice.app/api/jobs/follow-ups/dry-run` with `CRON_SECRET`.
-- Lemon webhook target: `POST https://api.afterservice.app/webhooks/lemon-squeezy`.
+- API health: `GET https://dashboard.afterservice.app/api/health`.
+- Cron dry-run: `POST https://dashboard.afterservice.app/api/jobs/follow-ups/dry-run` with `CRON_SECRET`.
+- Lemon webhook target: `POST https://dashboard.afterservice.app/api/webhooks/lemon-squeezy`.

@@ -3,6 +3,8 @@
 ## Purpose
 This file tracks implemented HTTP and tRPC endpoints.
 
+Production public API base: `https://dashboard.afterservice.app/api`.
+
 ## HTTP
 - `GET /health`: API service health.
 - `POST /webhooks/lemon-squeezy`: Lemon Squeezy webhook receiver. Requires a valid `x-signature` HMAC signature and stores idempotent `BillingEvent` records.

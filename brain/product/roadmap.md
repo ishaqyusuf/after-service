@@ -490,7 +490,7 @@ Domains:
 
 - `afterservice.app`: website.
 - `dashboard.afterservice.app`: dashboard.
-- `api.afterservice.app`: API.
+- `dashboard.afterservice.app/api`: public API.
 
 Acceptance:
 

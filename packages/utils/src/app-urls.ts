@@ -6,7 +6,8 @@ import {
 
 export const siteRootDomain = "afterservice.app";
 export const dashboardRootDomain = "dashboard.afterservice.app";
-export const apiRootDomain = "api.afterservice.app";
+export const apiRootDomain = dashboardRootDomain;
+const apiProductionBasePath = "/api";
 
 export const sitePortlessRootDomain = "afterservice.localhost";
 export const dashboardPortlessRootDomain = "app-afterservice.localhost";
@@ -92,6 +93,36 @@ export type BuildAppUrlOptions = {
 function normalizePath(path?: string) {
   if (!path) return "";
   return path.startsWith("/") ? path : `/${path}`;
+}
+
+function normalizeBaseUrl(value?: string | null) {
+  if (!value) return null;
+
+  try {
+    return new URL(value).toString().replace(/\/$/, "");
+  } catch {
+    return null;
+  }
+}
+
+function appendPath(baseUrl: string, path?: string) {
+  const normalizedPath = normalizePath(path);
+
+  if (
+    baseUrl.endsWith(apiProductionBasePath) &&
+    normalizedPath.startsWith(`${apiProductionBasePath}/`)
+  ) {
+    return `${baseUrl}${normalizedPath.slice(apiProductionBasePath.length)}`;
+  }
+
+  return `${baseUrl}${normalizedPath}`;
+}
+
+function isProductionMode() {
+  return (
+    process.env.NODE_ENV === "production" ||
+    process.env.AFTERSERVICE_ENV_MODE === "production"
+  );
 }
 
 function normalizeProtocol(value?: string | null) {
@@ -185,13 +216,32 @@ function buildSiblingAppUrl(kind: AppUrlKind, options: BuildAppUrlOptions) {
       hostMatches(current.host, root),
     )
   ) {
-    return `${current.protocol}://${resolveAppProductionRootDomain(kind)}${normalizePath(options.path)}`;
+    const basePath = kind === "api" ? apiProductionBasePath : "";
+
+    return appendPath(
+      `${current.protocol}://${resolveAppProductionRootDomain(kind)}${basePath}`,
+      options.path,
+    );
   }
 
   return null;
 }
 
 function buildAppUrl(kind: AppUrlKind, options: BuildAppUrlOptions = {}) {
+  const current = getCurrentParts(options);
+  const publicUrl = normalizeBaseUrl(resolveAppPublicUrl(kind));
+
+  if (
+    publicUrl &&
+    isProductionMode() &&
+    (!current.host ||
+      getAllProductionRootDomains().some((root) =>
+        hostMatches(current.host, root),
+      ))
+  ) {
+    return appendPath(publicUrl, options.path);
+  }
+
   const siblingUrl = buildSiblingAppUrl(kind, options);
 
   if (siblingUrl) return siblingUrl;

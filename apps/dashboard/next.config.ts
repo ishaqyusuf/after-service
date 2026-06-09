@@ -8,16 +8,14 @@ const apiBaseUrl =
 
 const nextConfig: NextConfig = {
   async rewrites() {
-    return [
-      {
-        destination: `${apiBaseUrl}/api/:path*`,
-        source: "/api/:path*",
-      },
-      {
-        destination: `${apiBaseUrl}/trpc/:path*`,
-        source: "/trpc/:path*",
-      },
-    ];
+    return {
+      afterFiles: [
+        {
+          destination: `${apiBaseUrl}/trpc/:path*`,
+          source: "/trpc/:path*",
+        },
+      ],
+    };
   },
 };
 

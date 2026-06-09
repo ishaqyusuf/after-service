@@ -16,7 +16,7 @@ This is the durable project memory for afterservice. It gives humans and AI agen
 - Apps:
   - `apps/website`: marketing site for `afterservice.app`.
   - `apps/dashboard`: operator dashboard for `dashboard.afterservice.app`.
-  - `apps/api`: Hono/tRPC API for `api.afterservice.app`.
+  - `apps/api`: Hono/tRPC API exposed publicly under `dashboard.afterservice.app/api`.
 - Shared packages exist as placeholders under `packages/*`.
 
 ## Product Summary

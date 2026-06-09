@@ -14,7 +14,12 @@ import { headers } from "next/headers";
 
 export const getQueryClient = cache(makeQueryClient);
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000";
+const API_BASE_URL =
+  process.env.NEXT_PUBLIC_API_URL ||
+  (process.env.NODE_ENV === "development"
+    ? "http://localhost:4102"
+    : "https://dashboard.afterservice.app/api");
+const TRPC_URL = `${API_BASE_URL.replace(/\/$/, "")}/trpc`;
 
 const SSR_FETCH_TIMEOUT_MS = 8_000;
 
@@ -37,7 +42,7 @@ export const trpc = createTRPCOptionsProxy<AppRouter>({
   client: createTRPCClient({
     links: [
       httpLink({
-        url: `${API_BASE_URL}/api/trpc`,
+        url: TRPC_URL,
         transformer: superjson,
         fetch: fetchWithTimeout,
         async headers() {

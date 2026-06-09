@@ -3,7 +3,7 @@
 import { BrandLogo } from "@afterservice/ui";
 import { appMetadata } from "@afterservice/utils";
 import dynamic from "next/dynamic";
-import { useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   type SignInFieldValues,
   SignInForm,
@@ -26,8 +26,11 @@ type SignInAdapter = React.MutableRefObject<{
 
 export default function SignInPage() {
   const adapterRef = useRef<SignInAdapter["current"]>(null);
+  const [returnTo, setReturnTo] = useState("/");
 
-  const returnTo = getReturnTo();
+  useEffect(() => {
+    setReturnTo(getReturnTo());
+  }, []);
 
   async function handleSignIn(values: SignInValues) {
     const response = await fetch("/api/auth/sign-in/email", {
@@ -75,7 +78,15 @@ export default function SignInPage() {
             });
           }}
           onSignIn={(account: { email: string; password: string }) => {
-            handleSignIn({ email: account.email, password: account.password });
+            handleSignIn({
+              email: account.email,
+              password: account.password,
+            }).catch(() => {
+              adapterRef.current?.reset({
+                email: account.email,
+                password: account.password,
+              });
+            });
           }}
         />
       )}
