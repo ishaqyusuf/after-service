@@ -80,6 +80,10 @@ export function SignUpForm({ onSignUp, adapterRef }: Props) {
       });
 
       if (result.error) {
+        console.error("[afterservice-auth-debug] Google sign-up failed", {
+          error: result.error,
+          location: window.location.href,
+        });
         throw new Error(result.error.message ?? "Google sign-up failed.");
       }
 
@@ -90,6 +94,10 @@ export function SignUpForm({ onSignUp, adapterRef }: Props) {
 
       setIsGooglePending(false);
     } catch (err) {
+      console.error("[afterservice-auth-debug] Google sign-up exception", {
+        error: err instanceof Error ? err.message : String(err),
+        location: window.location.href,
+      });
       setError(err instanceof Error ? err.message : "Google sign-up failed.");
       setIsGooglePending(false);
     }

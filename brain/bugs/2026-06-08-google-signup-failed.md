@@ -25,6 +25,7 @@ Clicking "Sign up with Google" on the dashboard sign-up page stays on the page a
 - Sign-in reads `return_to` after mount to avoid server/client markup drift, and dev quick sign-in catches invalid stored credentials instead of surfacing an unhandled rejection.
 - Dashboard rewrites no longer proxy broad `/api/*` traffic to the API service. The dashboard must own `/api/auth/*` so Better Auth can initiate Google OAuth from `dashboard.afterservice.app` without looping through `api.afterservice.app`.
 - Shared API URL helpers and production env now treat `https://dashboard.afterservice.app/api` as the public API base, while local development can still use the API service on `localhost:4102`.
+- Temporary production diagnostics can be enabled with `AFTERSERVICE_AUTH_DEBUG=true`. The dashboard auth route logs method, path, response status, and a truncated response body for non-2xx `/api/auth/*` responses; thrown errors include stack traces only when the flag is enabled. Google sign-in/sign-up also logs Better Auth client errors to the browser console with the prefix `[afterservice-auth-debug]`.
 
 ## Verification
 - 2026-06-09 local repro: clicking "Continue with Google" on `http://localhost:4101/sign-in` stays on the page and shows `Google sign-in failed.`

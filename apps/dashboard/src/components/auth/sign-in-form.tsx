@@ -74,6 +74,10 @@ export function SignInForm({ onSignIn, returnTo, adapterRef }: Props) {
       });
 
       if (result.error) {
+        console.error("[afterservice-auth-debug] Google sign-in failed", {
+          error: result.error,
+          location: window.location.href,
+        });
         throw new Error(result.error.message ?? "Google sign-in failed.");
       }
 
@@ -84,6 +88,10 @@ export function SignInForm({ onSignIn, returnTo, adapterRef }: Props) {
 
       setIsGooglePending(false);
     } catch (err) {
+      console.error("[afterservice-auth-debug] Google sign-in exception", {
+        error: err instanceof Error ? err.message : String(err),
+        location: window.location.href,
+      });
       setError(err instanceof Error ? err.message : "Google sign-in failed.");
       setIsGooglePending(false);
     }

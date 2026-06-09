@@ -11,6 +11,7 @@ This directory stores feature-level specifications.
 - Lemon Squeezy billing
 - Entitlements
 - Notifications and message logging
+- Signed-in user marketing and notification system
 - Jobs and automation
 
 ## How To Use
