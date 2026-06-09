@@ -21,6 +21,7 @@ export type ComboboxItem = {
 };
 
 type Props<T> = {
+  id?: string;
   placeholder?: React.ReactNode;
   searchPlaceholder?: string;
   items: T[];
@@ -44,6 +45,7 @@ type Props<T> = {
 };
 
 export function ComboboxDropdown<T extends ComboboxItem>({
+  id,
   headless,
   placeholder,
   searchPlaceholder,
@@ -70,11 +72,16 @@ export function ComboboxDropdown<T extends ComboboxItem>({
 
   const selectedItem = incomingSelectedItem ?? internalSelectedItem;
 
+  const normalizedInputValue = inputValue.trim().toLowerCase();
   const filteredItems = items.filter((item) =>
-    item.label.toLowerCase().includes(inputValue.toLowerCase()),
+    item.label.toLowerCase().includes(normalizedInputValue),
+  );
+  const hasExactMatch = items.some(
+    (item) => item.label.toLowerCase() === normalizedInputValue,
   );
 
-  const showCreate = onCreate && Boolean(inputValue) && !filteredItems.length;
+  const showCreate =
+    onCreate && Boolean(normalizedInputValue) && !hasExactMatch;
 
   const Component = (
     <Command loop shouldFilter={false}>
@@ -159,6 +166,8 @@ export function ComboboxDropdown<T extends ComboboxItem>({
     <Popover open={open} onOpenChange={setOpen} modal={modal}>
       <PopoverTrigger asChild disabled={disabled} className="w-full">
         <Button
+          id={id}
+          type="button"
           variant="outline"
           aria-expanded={open}
           className={cn(

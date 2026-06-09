@@ -18,6 +18,8 @@ As of 2026-06-04, dashboard route protection follows the Midday-style pattern: t
 
 As of 2026-06-09, organic search strategy is captured in `brain/marketing/seo-roadmap.md`: focus on the narrow wedge of post-job follow-up software for local service operators, build technical SEO foundation first, then publish segment and workflow pages grounded in beta learnings.
 
+As of 2026-06-09, onboarding business type and service category fields use creatable autocomplete suggestions. Business type defaults are curated system suggestions, and service category defaults now change based on the selected business type while still allowing custom operator input.
+
 ## Phase 1: Repo Bootstrap
 
 Status: complete.

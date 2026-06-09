@@ -12,7 +12,7 @@ Implemented manual-send foundation on 2026-05-30.
 - Reference standard: GND notification package architecture.
 - Package owner: `packages/notifications/src/index.ts`.
 - Board integration owner: `apps/api/src/routers/_app.ts`.
+- Jobs runner: `packages/jobs` follows the GND Trigger.dev package pattern for `dev` and `deploy` scripts while preserving manual-send-only messaging.
 
 ## Safety Rule
 No real customer outbound messaging is sent in MVP unless a future provider is explicitly configured and wired.
-

@@ -6,6 +6,34 @@ This file records completed work.
 
 ## Completed
 
+### Dashboard Overview Upgrade
+
+Completed: 2026-06-09
+
+Summary:
+
+- Rebuilt the signed-in dashboard overview with Midday-style metric widgets, action buttons, workload bars, follow-up health, channel mix, priority follow-ups, and recent jobs.
+- Extended `dashboard.overview` with live aggregates for overdue, due today, upcoming, resolved, sent-this-week, status, channel, and recent job data.
+- Documented the feature in `brain/features/dashboard-overview.md`.
+
+Verification:
+
+- Pending validation after implementation.
+
+### Onboarding Business Taxonomy Suggestions
+
+Completed: 2026-06-09
+
+Summary:
+
+- Replaced onboarding business type and service category text inputs with creatable autocomplete dropdowns.
+- Added 18 default business type suggestions and business-specific service category suggestions.
+- Kept custom typed values supported for both fields, with a generic service category fallback for custom business types.
+
+Verification:
+
+- `bun run --filter @afterservice/dashboard typecheck`
+
 ### Fix Landing CTA Server Event Handler Error
 
 Completed: 2026-06-03

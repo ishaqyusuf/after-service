@@ -1208,7 +1208,7 @@ const billingRouter = t.router({
       const workspace = await getWorkspaceForLimits(ctx.workspace.id);
       const isGrowth = workspace.plan === "growth";
       const isPro = workspace.plan === "pro";
-      
+
       // Resolve or create Polar customer
       let polarCustomer: { id: string };
       try {
@@ -1223,12 +1223,12 @@ const billingRouter = t.router({
         });
       }
 
-      const productId = isPro 
-        ? process.env.POLAR_GROWTH_VARIANT_ID 
-        : isGrowth 
-          ? process.env.POLAR_SHOP_VARIANT_ID 
+      const productId = isPro
+        ? process.env.POLAR_GROWTH_VARIANT_ID
+        : isGrowth
+          ? process.env.POLAR_SHOP_VARIANT_ID
           : process.env.POLAR_STARTER_VARIANT_ID;
-          
+
       if (!productId) {
         return { checkoutUrl: "/billing?checkout=not-configured" };
       }
@@ -1295,7 +1295,7 @@ const billingRouter = t.router({
       } catch {
         return { portalUrl: null };
       }
-      
+
       const result = await polarApi.customerSessions.create({
         customerId: polarCustomer.id,
       });
@@ -1312,6 +1312,16 @@ const billingRouter = t.router({
 const dashboardRouter = t.router({
   overview: protectedProcedure.query(async ({ ctx }) => {
     const workspace = await db.workspace.findUniqueOrThrow({
+      select: {
+        businessType: true,
+        defaultFollowUpDelayDays: true,
+        id: true,
+        name: true,
+        plan: true,
+        planStatus: true,
+        serviceCategory: true,
+        slug: true,
+      },
       where: { id: ctx.workspace.id },
     });
 
@@ -1323,19 +1333,34 @@ const dashboardRouter = t.router({
       where: { workspaceId: ctx.workspace.id },
     });
 
+    const recentJobs = await db.serviceJob.findMany({
+      include: { customer: true },
+      orderBy: { completedAt: "desc" },
+      take: 5,
+      where: { workspaceId: ctx.workspace.id },
+    });
+
     const followUps = await db.followUp.findMany({
       include: { customer: true, job: true },
       where: { workspaceId: ctx.workspace.id },
       orderBy: { dueAt: "asc" },
     });
 
+    const now = new Date();
+    const todayStart = new Date(now);
+    todayStart.setHours(0, 0, 0, 0);
     const todayEnd = new Date();
     todayEnd.setHours(23, 59, 59, 999);
+    const nextWeekEnd = new Date(todayEnd);
+    nextWeekEnd.setDate(nextWeekEnd.getDate() + 7);
+    const sevenDaysAgo = new Date(todayStart);
+    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 6);
 
     const dueToday = followUps.filter(
       (item) =>
         item.status !== "closed" &&
         item.status !== "replied" &&
+        item.dueAt >= todayStart &&
         item.dueAt <= todayEnd,
     ).length;
 
@@ -1343,19 +1368,66 @@ const dashboardRouter = t.router({
       (item) => item.status !== "closed",
     ).length;
 
+    const activeFollowUps = followUps.filter(
+      (item) => item.status !== "closed" && item.status !== "replied",
+    );
+    const overdueFollowUps = activeFollowUps.filter(
+      (item) => item.dueAt < todayStart,
+    ).length;
+    const upcomingFollowUps = activeFollowUps.filter(
+      (item) => item.dueAt > todayEnd && item.dueAt <= nextWeekEnd,
+    ).length;
+    const completedThisWeek = await db.serviceJob.count({
+      where: {
+        completedAt: { gte: sevenDaysAgo },
+        workspaceId: ctx.workspace.id,
+      },
+    });
+    const sentThisWeek = followUps.filter(
+      (item) => item.sentAt && item.sentAt >= sevenDaysAgo,
+    ).length;
+    const resolvedFollowUps = followUps.filter(
+      (item) => item.status === "closed" || item.status === "replied",
+    ).length;
+
     const recentFollowUps = followUps
       .filter((item) => item.status !== "closed")
       .slice(0, 8)
       .map((item) => followUpDto(item));
 
+    const followUpStatuses = followUpStatusSchema.options.map((status) => ({
+      count: followUps.filter((item) => item.status === status).length,
+      status,
+    }));
+    const followUpChannels = channelSchema.options.map((channel) => ({
+      channel,
+      count: followUps.filter((item) => item.channel === channel).length,
+    }));
+
     return {
       counts: {
         customers: customersCount,
+        completedThisWeek,
         dueToday,
         jobs: jobsCount,
         openFollowUps,
+        overdueFollowUps,
+        resolvedFollowUps,
+        sentThisWeek,
+        upcomingFollowUps,
       },
+      followUpChannels,
+      followUpStatuses,
       recentFollowUps,
+      recentJobs: recentJobs.map((job) => ({
+        amountCents: job.amountCents,
+        completedAt: job.completedAt.toISOString(),
+        customerName: job.customer.name,
+        id: job.id,
+        serviceCategory: job.serviceCategory,
+        status: job.status,
+        title: job.title,
+      })),
       workspace,
     };
   }),
