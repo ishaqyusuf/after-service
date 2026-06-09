@@ -3,15 +3,34 @@
 import { createJobSchema } from "@afterservice/api/schemas";
 import {
   Button,
+  Calendar,
+  Icons,
   Input,
-  Label,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
   Sheet,
   SheetContent,
   SheetHeader,
   SheetTitle,
   Textarea,
 } from "@afterservice/ui";
-import { Form } from "@afterservice/ui/form";
+import { cn } from "@afterservice/ui/cn";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@afterservice/ui/form";
+import { format } from "date-fns";
 import type { z } from "zod";
 import { trpc } from "@/components/providers/trpc-provider";
 import { QuickFill } from "@/components/quick-fill";
@@ -67,82 +86,192 @@ export function JobCreateSheet() {
         </SheetHeader>
         <div className="py-6">
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+            <form
+              onSubmit={form.handleSubmit(onSubmit)}
+              className="flex flex-col gap-6"
+            >
               <div className="flex justify-end">
                 <QuickFill name="job" args={{ customers }} />
               </div>
-              <div className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="job-customer">Customer</Label>
-                  <select
-                    id="job-customer"
-                    className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                    {...form.register("customerId")}
-                    disabled={isLoadingCustomers}
-                  >
-                    <option value="">
-                      {isLoadingCustomers
-                        ? "Loading customers..."
-                        : "Select customer"}
-                    </option>
-                    {customers.map((customer) => (
-                      <option key={customer.id} value={customer.id}>
-                        {customer.name}
-                      </option>
-                    ))}
-                  </select>
-                  {form.formState.errors.customerId && (
-                    <p className="text-sm text-destructive">
-                      {form.formState.errors.customerId.message}
-                    </p>
+              <div className="flex flex-col gap-4">
+                <FormField
+                  control={form.control}
+                  name="customerId"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Customer</FormLabel>
+                      <Select
+                        onValueChange={field.onChange}
+                        defaultValue={field.value}
+                        disabled={isLoadingCustomers}
+                      >
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue
+                              placeholder={
+                                isLoadingCustomers
+                                  ? "Loading customers..."
+                                  : "Select customer"
+                              }
+                            />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectGroup>
+                            {customers.map((customer) => (
+                              <SelectItem key={customer.id} value={customer.id}>
+                                {customer.name}
+                              </SelectItem>
+                            ))}
+                          </SelectGroup>
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
                   )}
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="job-title">Service title</Label>
-                  <Input id="job-title" {...form.register("title")} />
-                  {form.formState.errors.title && (
-                    <p className="text-sm text-destructive">
-                      {form.formState.errors.title.message}
-                    </p>
+                />
+                <FormField
+                  control={form.control}
+                  name="title"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Service title</FormLabel>
+                      <FormControl>
+                        <Input {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
                   )}
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="job-category">Category</Label>
-                  <Input
-                    id="job-category"
-                    placeholder="HVAC maintenance"
-                    {...form.register("serviceCategory")}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="job-completed-at">Completed date</Label>
-                  <Input
-                    id="job-completed-at"
-                    type="date"
-                    {...form.register("completedAt", { valueAsDate: true })}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="job-amount">Amount</Label>
-                  <Input
-                    id="job-amount"
-                    placeholder="250"
-                    type="number"
-                    {...form.register("amountDollars", { valueAsNumber: true })}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="job-next-follow-up">Next follow-up</Label>
-                  <Input
-                    id="job-next-follow-up"
-                    type="date"
-                    {...form.register("nextFollowUpAt", { valueAsDate: true })}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="job-notes">Notes</Label>
-                  <Textarea id="job-notes" {...form.register("notes")} />
-                </div>
+                />
+                <FormField
+                  control={form.control}
+                  name="serviceCategory"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Category</FormLabel>
+                      <FormControl>
+                        <Input placeholder="HVAC maintenance" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="completedAt"
+                  render={({ field }) => (
+                    <FormItem className="flex flex-col">
+                      <FormLabel>Completed date</FormLabel>
+                      <Popover>
+                        <PopoverTrigger asChild>
+                          <FormControl>
+                            <Button
+                              variant="outline"
+                              className={cn(
+                                "justify-start text-left font-normal",
+                                !field.value && "text-muted-foreground",
+                              )}
+                            >
+                              {field.value instanceof Date
+                                ? format(field.value, "PPP")
+                                : "Pick a date"}
+                              <Icons.CalendarMonth className="ml-auto size-4 opacity-50" />
+                            </Button>
+                          </FormControl>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-auto p-0" align="start">
+                          <Calendar
+                            mode="single"
+                            selected={
+                              field.value instanceof Date
+                                ? field.value
+                                : undefined
+                            }
+                            onSelect={field.onChange}
+                            initialFocus
+                          />
+                        </PopoverContent>
+                      </Popover>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="amountDollars"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Amount</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="number"
+                          placeholder="250"
+                          value={field.value ?? ""}
+                          onChange={(e) => {
+                            const val = e.target.value;
+                            field.onChange(
+                              val === "" ? undefined : Number(val),
+                            );
+                          }}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="nextFollowUpAt"
+                  render={({ field }) => (
+                    <FormItem className="flex flex-col">
+                      <FormLabel>Next follow-up</FormLabel>
+                      <Popover>
+                        <PopoverTrigger asChild>
+                          <FormControl>
+                            <Button
+                              variant="outline"
+                              className={cn(
+                                "justify-start text-left font-normal",
+                                !field.value && "text-muted-foreground",
+                              )}
+                            >
+                              {field.value instanceof Date
+                                ? format(field.value, "PPP")
+                                : "Pick a date"}
+                              <Icons.CalendarMonth className="ml-auto size-4 opacity-50" />
+                            </Button>
+                          </FormControl>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-auto p-0" align="start">
+                          <Calendar
+                            mode="single"
+                            selected={
+                              field.value instanceof Date
+                                ? field.value
+                                : undefined
+                            }
+                            onSelect={field.onChange}
+                            initialFocus
+                          />
+                        </PopoverContent>
+                      </Popover>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="notes"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Notes</FormLabel>
+                      <FormControl>
+                        <Textarea {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
               </div>
               <Button
                 disabled={customers.length === 0 || createJobMutation.isPending}

@@ -27,7 +27,11 @@ export default async function JobsPage(props: Props) {
 
   batchPrefetch([
     trpc.serviceJobs.list.queryOptions({
-      search: filter.q ?? undefined,
+      q: filter.q ?? undefined,
+      customers: filter.customers ?? undefined,
+      status: filter.status ?? undefined,
+      start: filter.start ?? undefined,
+      end: filter.end ?? undefined,
     }),
   ]);
 

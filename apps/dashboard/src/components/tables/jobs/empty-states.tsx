@@ -1,10 +1,10 @@
 "use client";
 
 import { Button } from "@afterservice/ui";
-import { useCustomerParams } from "@/hooks/use-customer-params";
+import { useJobParams } from "@/hooks/use-job-params";
 
 export function EmptyState() {
-  const { setParams } = useCustomerParams();
+  const { setParams } = useJobParams();
 
   return (
     <div className="flex items-center justify-center ">
@@ -21,11 +21,11 @@ export function EmptyState() {
           variant="outline"
           onClick={() =>
             setParams({
-              createCustomer: true,
+              createJob: true,
             })
           }
         >
-          Create customer
+          Create job
         </Button>
       </div>
     </div>
@@ -33,7 +33,7 @@ export function EmptyState() {
 }
 
 export function NoResults() {
-  const { setParams } = useCustomerParams();
+  const { setParams } = useJobParams();
 
   return (
     <div className="flex items-center justify-center ">

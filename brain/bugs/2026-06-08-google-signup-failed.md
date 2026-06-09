@@ -1,7 +1,7 @@
 # Bug: Google Sign-Up Failed Inline
 
 ## Status
-Code fix implemented on 2026-06-08. Production retry still depends on deployment and TLS health.
+Code fix implemented on 2026-06-08. Local OAuth initiation is working as of 2026-06-09 after adding Google OAuth env values and running both dashboard and API dev servers. Production auth initiation still depends on Cloudflare/Vercel TLS/origin health.
 
 ## Symptom
 Clicking "Sign up with Google" on the dashboard sign-up page stays on the page and shows the generic Google sign-up failure message instead of redirecting to Google.
@@ -9,7 +9,9 @@ Clicking "Sign up with Google" on the dashboard sign-up page stays on the page a
 ## Diagnosis
 - The failure occurs before the browser leaves the sign-up page, so the failing path is OAuth initiation at `/api/auth/sign-in/social`.
 - Production browser OAuth must use the dashboard origin for both initiation and callback: `https://dashboard.afterservice.app/api/auth/callback/google`.
+- Production Google OAuth authorized origins are `https://www.afterservice.app` and `https://dashboard.afterservice.app`; the authorized redirect URI is `https://dashboard.afterservice.app/api/auth/callback/google`.
 - Live HTTP probing from the debugging environment returned Cloudflare `525 SSL handshake failed` for dashboard/API auth checks. If the same occurs for users, this is an infrastructure TLS/origin issue rather than a React form issue.
+- Local dashboard probing from `http://localhost:4101/sign-in` returned `500` from `/api/auth/sign-in/social` when local mode lacked `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET`, and also when the API server on `localhost:4102` was not running.
 - The workspace env wrapper was vulnerable to Bun's automatic `.env` loading: `bun scripts/with-workspace-env.mjs --mode production` could let `.env` values override `.env.production` values before spawning the real command.
 
 ## Fix Notes
@@ -17,8 +19,21 @@ Clicking "Sign up with Google" on the dashboard sign-up page stays on the page a
 - Google sign-up/sign-in requests now ask for a non-auto-redirect response and redirect manually after receiving the provider URL.
 - Production env validation now requires Google OAuth credentials and an explicit `BETTER_AUTH_URL` matching `NEXT_PUBLIC_DASHBOARD_URL`.
 - The env wrapper now drops auto-loaded `.env` values when another mode file provides a different value for the same key, while preserving external deployment secrets.
+- `.env.example` now includes `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET` placeholders so local OAuth setup is visible.
+- `.env.production` now uses `NEXT_PUBLIC_SITE_URL=https://www.afterservice.app` and explicitly sets both auth trusted-origin env vars to `https://www.afterservice.app,https://dashboard.afterservice.app`.
 
 ## Verification
+- 2026-06-09 local repro: clicking "Continue with Google" on `http://localhost:4101/sign-in` stays on the page and shows `Google sign-in failed.`
+- 2026-06-09 local HTTP repro: `POST http://localhost:4101/api/auth/sign-in/social` returns `500` when Google OAuth credentials are absent from local env.
+- 2026-06-09 local fix check: after adding local Google OAuth credentials and starting `@afterservice/api` on `4102`, `POST http://localhost:4101/api/auth/sign-in/social` returns `200` with a Google Accounts URL and `redirect_uri=http://localhost:4101/api/auth/callback/google`.
+- 2026-06-09 browser check: clicking "Continue with Google" in the in-app browser redirects from `http://localhost:4101/sign-in` to Google Accounts.
+- 2026-06-09 local DB check: the configured local Postgres URL responds to a Prisma `select 1`, so the OAuth callback has a reachable database for user/session writes.
+- 2026-06-09 production env check: `NEXT_PUBLIC_SITE_URL`, `NEXT_PUBLIC_DASHBOARD_URL`, `BETTER_AUTH_URL`, `AUTH_TRUSTED_ORIGINS`, and `BETTER_AUTH_TRUSTED_ORIGINS` match the configured Google OAuth origins/redirect. Validator reports no URL invalids, but unrelated production secrets remain missing in the local `.env.production` copy.
+- 2026-06-09 live repro: `POST https://dashboard.afterservice.app/api/auth/sign-in/social` returns Cloudflare `525 SSL handshake failed`, so the browser receives an auth initiation failure before Google redirect.
+- 2026-06-09 live retry after local/env fixes: production still returns Cloudflare `525` for dynamic auth initiation while the cached sign-up page returns `200`.
+- 2026-06-09 live check: `GET https://dashboard.afterservice.app/sign-up` returns `200` from cached Vercel/Cloudflare content, while dynamic dashboard auth and API auth routes return `525`.
+- 2026-06-09 live check: `app.afterservice.app` also returns `525`, so the issue is not limited to the canonical dashboard hostname used by Better Auth.
+- 2026-06-09 DNS check: `dashboard.afterservice.app`, `app.afterservice.app`, and `afterservice.app` resolve through the same Cloudflare proxy IPs. Fix should focus on Cloudflare SSL/origin routing for dashboard/API origins, then re-run the auth initiation probe.
 - `bun --filter @afterservice/dashboard typecheck` passed.
 - `bun --filter @afterservice/auth typecheck` passed.
 - `bun --filter @afterservice/utils typecheck` passed.

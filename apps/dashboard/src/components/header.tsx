@@ -1,6 +1,8 @@
 import { Skeleton } from "@afterservice/ui/skeleton";
 import { Suspense } from "react";
+import { MobileMenu } from "@/components/mobile-menu";
 import { OpenSearchButton } from "@/components/search/open-search-button";
+import { UserMenu } from "@/components/user-menu";
 
 function UserMenuSkeleton() {
   return <Skeleton className="w-8 h-8 rounded-full" />;
@@ -16,13 +18,13 @@ export function Header() {
         willChange: "transform",
       }}
     >
-      <div className="w-8 h-8 bg-muted rounded-md" /> {/* Mobile Menu Placeholder */}
+      <MobileMenu />
 
       <OpenSearchButton />
 
       <div className="flex space-x-2 ml-auto">
         <Suspense fallback={<UserMenuSkeleton />}>
-          <div className="w-8 h-8 bg-muted rounded-full" /> {/* User Menu Placeholder */}
+          <UserMenu isExpanded={false} />
         </Suspense>
       </div>
     </header>

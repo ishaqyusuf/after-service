@@ -505,21 +505,52 @@ const serviceJobsRouter = t.router({
     .input(
       z
         .object({
+          q: z.string().trim().optional(),
           search: z.string().trim().optional(),
+          customers: z.array(z.string()).optional(),
+          status: z.string().optional(),
+          start: z.string().optional(),
+          end: z.string().optional(),
           cursor: z.string().nullish(),
           limit: z.number().min(1).max(100).default(50),
         })
         .default({ limit: 50 }),
     )
     .query(async ({ ctx, input }) => {
+      const searchTerm = input.q ?? input.search;
+
+      const completedAtFilter: Record<string, Date> = {};
+      if (input.start) completedAtFilter.gte = new Date(input.start);
+      if (input.end) {
+        const endDate = new Date(input.end);
+        endDate.setHours(23, 59, 59, 999);
+        completedAtFilter.lte = endDate;
+      }
+
       const items = await db.serviceJob.findMany({
         include: { customer: true, followUps: true },
         orderBy: { completedAt: "desc" },
         where: {
           workspaceId: ctx.workspace.id,
-          title: input.search
-            ? { contains: input.search, mode: "insensitive" }
-            : undefined,
+          ...(searchTerm
+            ? {
+                OR: [
+                  { title: { contains: searchTerm, mode: "insensitive" } },
+                  {
+                    customer: {
+                      name: { contains: searchTerm, mode: "insensitive" },
+                    },
+                  },
+                ],
+              }
+            : {}),
+          ...(input.customers?.length
+            ? { customerId: { in: input.customers } }
+            : {}),
+          ...(input.status ? { status: input.status as any } : {}),
+          ...(Object.keys(completedAtFilter).length
+            ? { completedAt: completedAtFilter }
+            : {}),
         },
       });
 

@@ -16,7 +16,13 @@ import {
 import { LogOut, Settings, User } from "lucide-react";
 import { useState } from "react";
 
-export function UserMenu({ isExpanded }: { isExpanded: boolean }) {
+export function UserMenu({
+  isExpanded,
+  onOpenChange,
+}: {
+  isExpanded: boolean;
+  onOpenChange?: (open: boolean) => void;
+}) {
   const [isPending, setIsPending] = useState(false);
   const clearIdentity = useClearIdentity();
   const track = useTrack();
@@ -39,7 +45,7 @@ export function UserMenu({ isExpanded }: { isExpanded: boolean }) {
   };
 
   return (
-    <DropdownMenu>
+    <DropdownMenu onOpenChange={onOpenChange}>
       <DropdownMenuTrigger asChild>
         <button
           type="button"

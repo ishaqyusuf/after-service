@@ -1,11 +1,11 @@
 import { JobsColumnVisibility } from "./jobs-column-visibility";
+import { JobsSearchFilter } from "./jobs-search-filter";
 import { OpenJobSheet } from "./open-job-sheet";
-import { SearchField } from "./search-field";
 
 export async function JobsHeader() {
   return (
     <div className="flex items-center justify-between mb-4">
-      <SearchField placeholder="Search jobs..." />
+      <JobsSearchFilter />
 
       <div className="flex items-center gap-2">
         <JobsColumnVisibility />
