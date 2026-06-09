@@ -13,6 +13,7 @@ This file records core technology choices.
 - Website: Next.js App Router
 - Dashboard: Next.js App Router
 - API: Hono with tRPC
+- Dashboard theme management: `next-themes` with class-based light/dark/system mode.
 
 ## Data And Auth
 - Database: Postgres

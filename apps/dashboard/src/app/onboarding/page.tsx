@@ -3,7 +3,10 @@ import type { Metadata } from "next";
 import { Suspense } from "react";
 import { SignupCompletionTracker } from "@/components/analytics/signup-completion-tracker";
 import { ErrorBoundary } from "@/components/error-boundary";
-import { OnboardingForm } from "@/components/forms/onboarding-form";
+import {
+  OnboardingForm,
+  OnboardingFormSkeleton,
+} from "@/components/forms/onboarding-form";
 
 export async function generateMetadata(): Promise<Metadata> {
   return {
@@ -35,9 +38,7 @@ export default async function OnboardingPage() {
           </p>
         </header>
 
-        <Suspense
-          fallback={<div className="animate-pulse h-64 bg-muted rounded-xl" />}
-        >
+        <Suspense fallback={<OnboardingFormSkeleton />}>
           <OnboardingForm />
         </Suspense>
       </div>

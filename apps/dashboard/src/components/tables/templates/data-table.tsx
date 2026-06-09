@@ -2,7 +2,6 @@
 
 import { closestCenter, DndContext } from "@dnd-kit/core";
 import { Table, TableBody, TableCell, TableRow } from "@afterservice/ui/table";
-import { useMutation, useSuspenseInfiniteQuery } from "@tanstack/react-query";
 import { getCoreRowModel, useReactTable } from "@tanstack/react-table";
 import { useVirtualizer, type VirtualItem } from "@tanstack/react-virtual";
 import {
@@ -13,7 +12,10 @@ import {
   useRef,
 } from "react";
 import { VirtualRow } from "@/components/tables/core";
-import { useTemplateFilterParams } from "@/hooks/use-template-filter-params";
+import {
+  toTemplateChannel,
+  useTemplateFilterParams,
+} from "@/hooks/use-template-filter-params";
 import { useTemplateParams } from "@/hooks/use-template-params";
 import { useInfiniteScroll } from "@/hooks/use-infinite-scroll";
 import { useScrollHeader } from "@/hooks/use-scroll-header";
@@ -68,9 +70,9 @@ export function DataTable({ initialSettings }: Props) {
 
   const [data, { fetchNextPage, hasNextPage, isFetchingNextPage, refetch }] = trpc.templates.list.useSuspenseInfiniteQuery(
     {
-      ...filter,
-      sort: params.sort,
-      q: deferredSearch,
+      channel: toTemplateChannel(filter.channel),
+      search: deferredSearch ?? undefined,
+      sort: params.sort ?? undefined,
     }, {
       getNextPageParam: (lastPage: any) => lastPage.nextCursor,
     });

@@ -4,19 +4,16 @@ import { createJobSchema } from "@afterservice/api/schemas";
 import {
   Button,
   Calendar,
+  ComboboxDropdown,
+  type ComboboxItem,
   Icons,
   Input,
   Popover,
   PopoverContent,
   PopoverTrigger,
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
   Sheet,
   SheetContent,
+  SheetDescription,
   SheetHeader,
   SheetTitle,
   Textarea,
@@ -31,6 +28,7 @@ import {
   FormMessage,
 } from "@afterservice/ui/form";
 import { format } from "date-fns";
+import { useMemo } from "react";
 import type { z } from "zod";
 import { trpc } from "@/components/providers/trpc-provider";
 import { QuickFill } from "@/components/quick-fill";
@@ -43,6 +41,25 @@ export function JobCreateSheet() {
   const { data: customersData, isLoading: isLoadingCustomers } =
     trpc.customers.list.useQuery({ includeArchived: false });
   const customers = customersData?.items ?? [];
+  const { data: jobsData } = trpc.serviceJobs.list.useQuery({ limit: 100 });
+  const jobs = jobsData?.items ?? [];
+
+  const customerItems = useMemo(
+    () =>
+      customers.map((customer) => ({
+        id: customer.id,
+        label: customer.name,
+      })),
+    [customers],
+  );
+  const serviceTitleItems = useMemo(
+    () => toUniqueComboboxItems(jobs.map((job) => job.title)),
+    [jobs],
+  );
+  const serviceCategoryItems = useMemo(
+    () => toUniqueComboboxItems(jobs.map((job) => job.serviceCategory)),
+    [jobs],
+  );
 
   const form = useZodForm({
     schema: createJobSchema,
@@ -56,8 +73,18 @@ export function JobCreateSheet() {
       notes: "",
     },
   });
+  const selectedCustomerId = form.watch("customerId");
 
   const utils = trpc.useUtils();
+  const createCustomerMutation = trpc.customers.create.useMutation({
+    onSuccess: ({ item }) => {
+      utils.customers.list.invalidate();
+      form.setValue("customerId", item.id, {
+        shouldDirty: true,
+        shouldValidate: true,
+      });
+    },
+  });
   const createJobMutation = trpc.serviceJobs.create.useMutation({
     onSuccess: () => {
       utils.serviceJobs.list.invalidate();
@@ -83,6 +110,9 @@ export function JobCreateSheet() {
       <SheetContent>
         <SheetHeader>
           <SheetTitle>Log completed job</SheetTitle>
+          <SheetDescription>
+            Record completed service work and queue the next follow-up.
+          </SheetDescription>
         </SheetHeader>
         <div className="py-6">
           <Form {...form}>
@@ -100,32 +130,30 @@ export function JobCreateSheet() {
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Customer</FormLabel>
-                      <Select
-                        onValueChange={field.onChange}
-                        defaultValue={field.value}
+                      <ComboboxDropdown
+                        items={customerItems}
+                        selectedItem={customerItems.find(
+                          (item) => item.id === field.value,
+                        )}
+                        onSelect={(item) => field.onChange(item.id)}
+                        onCreate={(value) => {
+                          const name = value.trim();
+
+                          if (name) {
+                            createCustomerMutation.mutate({ name });
+                          }
+                        }}
+                        createPosition="first"
                         disabled={isLoadingCustomers}
-                      >
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue
-                              placeholder={
-                                isLoadingCustomers
-                                  ? "Loading customers..."
-                                  : "Select customer"
-                              }
-                            />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          <SelectGroup>
-                            {customers.map((customer) => (
-                              <SelectItem key={customer.id} value={customer.id}>
-                                {customer.name}
-                              </SelectItem>
-                            ))}
-                          </SelectGroup>
-                        </SelectContent>
-                      </Select>
+                        placeholder={
+                          isLoadingCustomers
+                            ? "Loading customers..."
+                            : "Select or create customer"
+                        }
+                        searchPlaceholder="Search customers..."
+                        renderOnCreate={(value) => `Create "${value}"`}
+                        triggerClassName="h-9 bg-transparent"
+                      />
                       <FormMessage />
                     </FormItem>
                   )}
@@ -136,9 +164,17 @@ export function JobCreateSheet() {
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Service title</FormLabel>
-                      <FormControl>
-                        <Input {...field} />
-                      </FormControl>
+                      <ComboboxDropdown
+                        items={serviceTitleItems}
+                        selectedItem={toSelectedComboboxItem(field.value)}
+                        onSelect={(item) => field.onChange(item.label)}
+                        onCreate={(value) => field.onChange(value.trim())}
+                        createPosition="first"
+                        placeholder="Select or create service title"
+                        searchPlaceholder="Maintenance, repair, installation..."
+                        renderOnCreate={(value) => `Create "${value}"`}
+                        triggerClassName="h-9 bg-transparent"
+                      />
                       <FormMessage />
                     </FormItem>
                   )}
@@ -149,9 +185,17 @@ export function JobCreateSheet() {
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Category</FormLabel>
-                      <FormControl>
-                        <Input placeholder="HVAC maintenance" {...field} />
-                      </FormControl>
+                      <ComboboxDropdown
+                        items={serviceCategoryItems}
+                        selectedItem={toSelectedComboboxItem(field.value)}
+                        onSelect={(item) => field.onChange(item.label)}
+                        onCreate={(value) => field.onChange(value.trim())}
+                        createPosition="first"
+                        placeholder="Select or create category"
+                        searchPlaceholder="HVAC maintenance, detailing..."
+                        renderOnCreate={(value) => `Create "${value}"`}
+                        triggerClassName="h-9 bg-transparent"
+                      />
                       <FormMessage />
                     </FormItem>
                   )}
@@ -274,7 +318,7 @@ export function JobCreateSheet() {
                 />
               </div>
               <Button
-                disabled={customers.length === 0 || createJobMutation.isPending}
+                disabled={!selectedCustomerId || createJobMutation.isPending}
                 type="submit"
                 className="w-full"
               >
@@ -286,4 +330,32 @@ export function JobCreateSheet() {
       </SheetContent>
     </Sheet>
   );
+}
+
+function toUniqueComboboxItems(values: Array<string | null | undefined>) {
+  return Array.from(
+    new Set(
+      values.flatMap((value) => {
+        const label = value?.trim();
+
+        return label ? [label] : [];
+      }),
+    ),
+  )
+    .sort((a, b) => a.localeCompare(b))
+    .map((value) => ({
+      id: value,
+      label: value,
+    })) satisfies ComboboxItem[];
+}
+
+function toSelectedComboboxItem(value: string | null | undefined) {
+  const label = value?.trim();
+
+  if (!label) return undefined;
+
+  return {
+    id: label,
+    label,
+  };
 }

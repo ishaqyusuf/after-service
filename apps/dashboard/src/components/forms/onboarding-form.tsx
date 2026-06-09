@@ -8,7 +8,21 @@ import {
   ComboboxDropdown,
   type ComboboxItem,
   Input,
+  Select,
+  SelectContent,
+  SelectItem,
+  Skeleton,
+  SelectTrigger,
+  SelectValue,
 } from "@afterservice/ui";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@afterservice/ui/form";
 import { useMemo, useState } from "react";
 import type { z } from "zod";
 import { useZodForm } from "@/hooks/use-zod-form";
@@ -20,6 +34,13 @@ import {
   SERVICE_CATEGORY_SUGGESTIONS_BY_BUSINESS_TYPE,
   toCustomSuggestion,
 } from "@/lib/onboarding-suggestions";
+
+const followUpDelayOptions = [
+  { label: "3 days", value: "3" },
+  { label: "7 days", value: "7" },
+  { label: "14 days", value: "14" },
+  { label: "30 days", value: "30" },
+] as const;
 
 export function OnboardingForm() {
   const [error, setError] = useState<string | null>(null);
@@ -120,90 +141,113 @@ export function OnboardingForm() {
   }
 
   return (
-    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+        <div className="space-y-4">
+          <FormField
+            control={form.control}
+            name="businessName"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Business name</FormLabel>
+                <FormControl>
+                  <Input {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="businessType"
+            render={() => (
+              <FormItem>
+                <FormLabel>Business type</FormLabel>
+                <ComboboxDropdown
+                  items={[...BUSINESS_TYPE_SUGGESTIONS]}
+                  selectedItem={selectedBusinessType}
+                  onSelect={setBusinessType}
+                  onCreate={createBusinessType}
+                  placeholder="Select or create a business type"
+                  searchPlaceholder="Repair shop, clinic, salon..."
+                  renderOnCreate={(value) => `Use "${value}"`}
+                  triggerClassName="h-9 bg-transparent"
+                />
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="serviceCategory"
+            render={() => (
+              <FormItem>
+                <FormLabel>Service category</FormLabel>
+                <ComboboxDropdown
+                  items={serviceCategorySuggestions}
+                  selectedItem={selectedServiceCategory}
+                  onSelect={setServiceCategory}
+                  onCreate={createServiceCategory}
+                  placeholder="Select or create a service category"
+                  searchPlaceholder="Appliance repair, maintenance..."
+                  renderOnCreate={(value) => `Use "${value}"`}
+                  triggerClassName="h-9 bg-transparent"
+                />
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="defaultFollowUpDelayDays"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Default follow-up delay</FormLabel>
+                <Select
+                  onValueChange={(value) => field.onChange(Number(value))}
+                  value={String(field.value)}
+                >
+                  <FormControl>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select delay" />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    {followUpDelayOptions.map((option) => (
+                      <SelectItem key={option.value} value={option.value}>
+                        {option.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
+        {error ? (
+          <p className="text-[0.8rem] font-medium text-destructive">{error}</p>
+        ) : null}
+        <Button disabled={isPending} type="submit" className="w-full">
+          {isPending ? "Creating workspace..." : "Create workspace"}
+        </Button>
+      </form>
+    </Form>
+  );
+}
+
+export function OnboardingFormSkeleton() {
+  return (
+    <div className="space-y-6">
       <div className="space-y-4">
-        <div className="space-y-2">
-          <label
-            htmlFor="onboarding-business-name"
-            className="text-sm font-medium leading-none"
-          >
-            Business name
-          </label>
-          <Input
-            id="onboarding-business-name"
-            {...form.register("businessName")}
-          />
-          {form.formState.errors.businessName && (
-            <p className="text-sm text-destructive">
-              {form.formState.errors.businessName.message}
-            </p>
-          )}
-        </div>
-        <div className="space-y-2">
-          <label
-            htmlFor="onboarding-business-type"
-            className="text-sm font-medium leading-none"
-          >
-            Business type
-          </label>
-          <ComboboxDropdown
-            id="onboarding-business-type"
-            items={[...BUSINESS_TYPE_SUGGESTIONS]}
-            selectedItem={selectedBusinessType}
-            onSelect={setBusinessType}
-            onCreate={createBusinessType}
-            placeholder="Select or create a business type"
-            searchPlaceholder="Repair shop, clinic, salon..."
-            renderOnCreate={(value) => `Use "${value}"`}
-            triggerClassName="h-9 bg-transparent"
-          />
-        </div>
-        <div className="space-y-2">
-          <label
-            htmlFor="onboarding-service-category"
-            className="text-sm font-medium leading-none"
-          >
-            Service category
-          </label>
-          <ComboboxDropdown
-            id="onboarding-service-category"
-            items={serviceCategorySuggestions}
-            selectedItem={selectedServiceCategory}
-            onSelect={setServiceCategory}
-            onCreate={createServiceCategory}
-            placeholder="Select or create a service category"
-            searchPlaceholder="Appliance repair, maintenance..."
-            renderOnCreate={(value) => `Use "${value}"`}
-            triggerClassName="h-9 bg-transparent"
-          />
-        </div>
-        <div className="space-y-2">
-          <label
-            htmlFor="onboarding-follow-up-delay"
-            className="text-sm font-medium leading-none"
-          >
-            Default follow-up delay
-          </label>
-          <select
-            id="onboarding-follow-up-delay"
-            className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-base shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 md:text-sm"
-            {...form.register("defaultFollowUpDelayDays", {
-              valueAsNumber: true,
-            })}
-          >
-            <option value="3">3 days</option>
-            <option value="7">7 days</option>
-            <option value="14">14 days</option>
-            <option value="30">30 days</option>
-          </select>
-        </div>
+        {Array.from({ length: 4 }).map((_, index) => (
+          <div key={index} className="space-y-2">
+            <Skeleton className="h-4 w-36" />
+            <Skeleton className="h-9 w-full" />
+          </div>
+        ))}
       </div>
-      {error ? (
-        <p className="text-[0.8rem] font-medium text-destructive">{error}</p>
-      ) : null}
-      <Button disabled={isPending} type="submit" className="w-full">
-        {isPending ? "Creating workspace..." : "Create workspace"}
-      </Button>
-    </form>
+      <Skeleton className="h-9 w-full" />
+    </div>
   );
 }

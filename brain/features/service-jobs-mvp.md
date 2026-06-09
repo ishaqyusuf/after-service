@@ -3,16 +3,20 @@
 ## Status
 Implemented for MVP on 2026-05-30.
 
+Updated on 2026-06-09 to align the create-job sheet with Midday-style creatable autocomplete fields.
+
 ## Scope
 - Workspace-scoped job list and create/update APIs.
 - Completed job logging with customer, title, category, completion date, value, and notes.
 - One-click follow-up creation from a job.
 - Job data appears in dashboard workflows and follow-up/template context.
+- Create-job sheet uses creatable autocomplete for customer, service title, and service category. Customer creation appears as the first search result and creates/selects the customer inline.
 
 ## Architecture
 - API owner: `apps/api/src/routers/_app.ts` `serviceJobs` router.
 - UI owner: `apps/dashboard/src/app/jobs/page.tsx`.
 - Dashboard server actions call tRPC procedures through `apps/dashboard/src/lib/trpc-server.ts`.
+- Create sheet owner: `apps/dashboard/src/components/sheets/job-create-sheet.tsx`.
 
 ## Rules
 - Jobs always belong to the active workspace.
@@ -22,4 +26,3 @@ Implemented for MVP on 2026-05-30.
 - `bun run typecheck`
 - `bun run lint`
 - `bun run build`
-

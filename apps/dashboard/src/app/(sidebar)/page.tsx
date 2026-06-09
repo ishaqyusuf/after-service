@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Suspense } from "react";
 import { ErrorBoundary } from "@/components/error-boundary";
 import { OverviewView } from "@/components/widgets";
+import { OverviewSkeleton } from "@/components/widgets/overview-skeleton";
 
 export async function generateMetadata(): Promise<Metadata> {
   return {
@@ -16,9 +17,7 @@ export default async function DashboardPage() {
 
   return (
     <ErrorBoundary>
-      <Suspense
-        fallback={<div className="animate-pulse h-64 bg-muted rounded-xl" />}
-      >
+      <Suspense fallback={<OverviewSkeleton />}>
         <OverviewView />
       </Suspense>
     </ErrorBoundary>

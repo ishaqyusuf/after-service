@@ -5,7 +5,7 @@ export const STICKY_COLUMNS: Record<TableId, StickyColumnConfig[]> = {
   customers: [{ id: "name", width: 250 }],
   jobs: [{ id: "title", width: 250 }],
   templates: [{ id: "name", width: 250 }],
-  "follow-ups": [{ id: "customerName", width: 200 }],
+  "follow-ups": [{ id: "customer", width: 250 }],
 };
 
 export const SORT_FIELD_MAPS: Record<TableId, Record<string, string>> = {
@@ -38,7 +38,7 @@ export const NON_REORDERABLE_COLUMNS: Record<TableId, Set<string>> = {
   customers: new Set(["name", "actions"]),
   jobs: new Set(["title", "actions"]),
   templates: new Set(["name", "actions"]),
-  "follow-ups": new Set(["customerName", "actions"]),
+  "follow-ups": new Set(["customer", "actions"]),
 };
 
 export const ROW_HEIGHTS: Record<TableId, number> = {

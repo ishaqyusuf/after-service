@@ -20,6 +20,8 @@ As of 2026-06-09, organic search strategy is captured in `brain/marketing/seo-ro
 
 As of 2026-06-09, onboarding business type and service category fields use creatable autocomplete suggestions. Business type defaults are curated system suggestions, and service category defaults now change based on the selected business type while still allowing custom operator input.
 
+As of 2026-06-09, a post-MVP customer self-onboarding job flow is planned in `brain/features/customer-self-onboarding-job-flow.md`: operators can start a job from only phone/email, then invite the customer to complete profile and service details through a tokenized afterservice link.
+
 ## Phase 1: Repo Bootstrap
 
 Status: complete.

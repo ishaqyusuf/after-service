@@ -37,6 +37,7 @@ type Props<T> = {
   popoverProps?: React.ComponentProps<typeof PopoverContent>;
   disabled?: boolean;
   onCreate?: (value: string) => void;
+  createPosition?: "first" | "last";
   headless?: boolean;
   className?: string;
   triggerClassName?: string;
@@ -59,6 +60,7 @@ export function ComboboxDropdown<T extends ComboboxItem>({
   popoverProps,
   disabled,
   onCreate,
+  createPosition = "last",
   className,
   triggerClassName,
   listClassName,
@@ -82,6 +84,23 @@ export function ComboboxDropdown<T extends ComboboxItem>({
 
   const showCreate =
     onCreate && Boolean(normalizedInputValue) && !hasExactMatch;
+  const createItem = showCreate ? (
+    <CommandItem
+      key={inputValue}
+      value={inputValue}
+      onSelect={() => {
+        onCreate(inputValue);
+        setOpen(false);
+        setInputValue("");
+      }}
+      onMouseDown={(event) => {
+        event.preventDefault();
+        event.stopPropagation();
+      }}
+    >
+      {renderOnCreate ? renderOnCreate(inputValue) : null}
+    </CommandItem>
+  ) : null;
 
   const Component = (
     <Command loop shouldFilter={false}>
@@ -96,6 +115,8 @@ export function ComboboxDropdown<T extends ComboboxItem>({
         <CommandList
           className={cn("max-h-[225px] overflow-auto", listClassName)}
         >
+          {createPosition === "first" ? createItem : null}
+
           {filteredItems.map((item) => {
             const isChecked = selectedItem?.id === item.id;
 
@@ -136,23 +157,7 @@ export function ComboboxDropdown<T extends ComboboxItem>({
 
           <CommandEmpty>{emptyResults ?? "No item found"}</CommandEmpty>
 
-          {showCreate && (
-            <CommandItem
-              key={inputValue}
-              value={inputValue}
-              onSelect={() => {
-                onCreate(inputValue);
-                setOpen(false);
-                setInputValue("");
-              }}
-              onMouseDown={(event) => {
-                event.preventDefault();
-                event.stopPropagation();
-              }}
-            >
-              {renderOnCreate ? renderOnCreate(inputValue) : null}
-            </CommandItem>
-          )}
+          {createPosition === "last" ? createItem : null}
         </CommandList>
       </CommandGroup>
     </Command>

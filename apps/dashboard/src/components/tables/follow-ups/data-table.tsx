@@ -2,7 +2,6 @@
 
 import { closestCenter, DndContext } from "@dnd-kit/core";
 import { Table, TableBody, TableCell, TableRow } from "@afterservice/ui/table";
-import { useMutation, useSuspenseInfiniteQuery } from "@tanstack/react-query";
 import { getCoreRowModel, useReactTable } from "@tanstack/react-table";
 import { useVirtualizer, type VirtualItem } from "@tanstack/react-virtual";
 import {
@@ -13,7 +12,11 @@ import {
   useRef,
 } from "react";
 import { VirtualRow } from "@/components/tables/core";
-import { useFollowUpFilterParams } from "@/hooks/use-follow-up-filter-params";
+import {
+  toFollowUpChannel,
+  toFollowUpStatus,
+  useFollowUpFilterParams,
+} from "@/hooks/use-follow-up-filter-params";
 import { useFollowUpParams } from "@/hooks/use-follow-up-params";
 import { useInfiniteScroll } from "@/hooks/use-infinite-scroll";
 import { useScrollHeader } from "@/hooks/use-scroll-header";
@@ -68,9 +71,12 @@ export function DataTable({ initialSettings }: Props) {
 
   const [data, { fetchNextPage, hasNextPage, isFetchingNextPage, refetch }] = trpc.followUps.listTable.useSuspenseInfiniteQuery(
     {
-      ...filter,
-      sort: params.sort,
-      q: deferredSearch,
+      channel: toFollowUpChannel(filter.channel),
+      end: filter.end ?? undefined,
+      search: deferredSearch ?? undefined,
+      sort: params.sort ?? undefined,
+      start: filter.start ?? undefined,
+      status: toFollowUpStatus(filter.status),
     }, {
       getNextPageParam: (lastPage: any) => lastPage.nextCursor,
     });

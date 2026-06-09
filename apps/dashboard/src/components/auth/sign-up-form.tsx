@@ -2,11 +2,27 @@
 
 import { LogEvents } from "@afterservice/events";
 import { useTrack } from "@afterservice/events/client";
-import { Button, Icons, Input, Label } from "@afterservice/ui";
+import { Button, Icons, Input } from "@afterservice/ui";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@afterservice/ui/form";
 import { Loader2 } from "lucide-react";
-import { type FormEvent, useCallback, useRef, useState } from "react";
+import { useState } from "react";
+import { z } from "zod";
 import type { QuickFillFormAdapter } from "@/components/dev/quick-fill";
+import { useZodForm } from "@/hooks/use-zod-form";
 import { signIn } from "@/lib/auth-client";
+
+const signUpSchema = z.object({
+  name: z.string().trim().min(1, "Enter your name."),
+  email: z.string().email("Enter a valid email address."),
+  password: z.string().min(8, "Password must be at least 8 characters."),
+});
 
 type FieldValues = {
   name: string;
@@ -21,32 +37,36 @@ type Props = {
 
 export function SignUpForm({ onSignUp, adapterRef }: Props) {
   const [error, setError] = useState<string | null>(null);
-  const [isPending, setIsPending] = useState(false);
   const [isGooglePending, setIsGooglePending] = useState(false);
   const track = useTrack();
-  const [values, setValues] = useState<FieldValues>({
-    name: "",
-    email: "",
-    password: "",
+  const form = useZodForm({
+    schema: signUpSchema,
+    defaultValues: {
+      name: "",
+      email: "",
+      password: "",
+    },
   });
-  const formRef = useRef<HTMLFormElement>(null);
 
-  const setValue = useCallback((name: string, value: unknown) => {
-    setValues((prev) => ({ ...prev, [name]: value as string }));
-  }, []);
+  const isPending = form.formState.isSubmitting;
 
   if (adapterRef) {
     adapterRef.current = {
-      getValues: () => values,
-      reset: (v) => setValues(v as FieldValues),
-      setValue,
+      getValues: () => form.getValues(),
+      reset: (values) => form.reset(values as FieldValues),
+      setValue: (name, value) => {
+        if (name === "name" || name === "email" || name === "password") {
+          form.setValue(name, String(value), {
+            shouldDirty: true,
+            shouldValidate: true,
+          });
+        }
+      },
     };
   }
 
-  async function handleSubmit(e: FormEvent<HTMLFormElement>) {
-    e.preventDefault();
+  async function handleSubmit(values: FieldValues) {
     setError(null);
-    setIsPending(true);
     track({
       event: LogEvents.SignUpStarted.name,
       channel: LogEvents.SignUpStarted.channel,
@@ -58,7 +78,6 @@ export function SignUpForm({ onSignUp, adapterRef }: Props) {
       await onSignUp(values);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Sign-up failed.");
-      setIsPending(false);
     }
   }
 
@@ -133,57 +152,73 @@ export function SignUpForm({ onSignUp, adapterRef }: Props) {
         </div>
       </div>
 
-      <form ref={formRef} onSubmit={handleSubmit} className="space-y-4">
-        <div className="space-y-2">
-          <Label htmlFor="sign-up-name">Name</Label>
-          <Input
-            id="sign-up-name"
+      <Form {...form}>
+        <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
+          <FormField
+            control={form.control}
             name="name"
-            required
-            value={values.name}
-            onChange={(e) => setValue("name", e.target.value)}
-            disabled={isPending || isGooglePending}
-            className="h-11"
-            placeholder="John Doe"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Name</FormLabel>
+                <FormControl>
+                  <Input
+                    {...field}
+                    disabled={isPending || isGooglePending}
+                    className="h-11"
+                    placeholder="John Doe"
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
           />
-        </div>
-        <div className="space-y-2">
-          <Label htmlFor="sign-up-email">Email</Label>
-          <Input
-            id="sign-up-email"
+          <FormField
+            control={form.control}
             name="email"
-            required
-            type="email"
-            value={values.email}
-            onChange={(e) => setValue("email", e.target.value)}
-            disabled={isPending || isGooglePending}
-            className="h-11"
-            placeholder="name@example.com"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Email</FormLabel>
+                <FormControl>
+                  <Input
+                    {...field}
+                    type="email"
+                    disabled={isPending || isGooglePending}
+                    className="h-11"
+                    placeholder="name@example.com"
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
           />
-        </div>
-        <div className="space-y-2">
-          <Label htmlFor="sign-up-password">Password</Label>
-          <Input
-            id="sign-up-password"
-            minLength={8}
+          <FormField
+            control={form.control}
             name="password"
-            required
-            type="password"
-            value={values.password}
-            onChange={(e) => setValue("password", e.target.value)}
-            disabled={isPending || isGooglePending}
-            className="h-11"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Password</FormLabel>
+                <FormControl>
+                  <Input
+                    {...field}
+                    type="password"
+                    disabled={isPending || isGooglePending}
+                    className="h-11"
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
           />
-        </div>
-        {error ? <p className="text-sm text-destructive">{error}</p> : null}
-        <Button
-          disabled={isPending || isGooglePending}
-          type="submit"
-          className="w-full h-11"
-        >
-          {isPending ? "Creating account..." : "Create account"}
-        </Button>
-      </form>
+          {error ? <p className="text-sm text-destructive">{error}</p> : null}
+          <Button
+            disabled={isPending || isGooglePending}
+            type="submit"
+            className="h-11 w-full"
+          >
+            {isPending ? "Creating account..." : "Create account"}
+          </Button>
+        </form>
+      </Form>
     </div>
   );
 }

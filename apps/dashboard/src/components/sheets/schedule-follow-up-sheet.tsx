@@ -3,7 +3,11 @@
 import {
   Button,
   Input,
-  Label,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
   Sheet,
   SheetContent,
   SheetDescription,
@@ -11,11 +15,20 @@ import {
   SheetTitle,
   Textarea,
 } from "@afterservice/ui";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@afterservice/ui/form";
 import { trpc } from "@/components/providers/trpc-provider";
 import { useQueryState } from "nuqs";
 import { useZodForm } from "@/hooks/use-zod-form";
 import { z } from "zod";
 import { useEffect } from "react";
+import { SheetFormSkeleton } from "./sheet-form-skeleton";
 
 const scheduleFollowUpSchema = z.object({
   jobId: z.string().min(1),
@@ -24,6 +37,15 @@ const scheduleFollowUpSchema = z.object({
   notes: z.string().trim().optional(),
   templateId: z.string().optional(),
 });
+
+const channelOptions = [
+  { label: "Email", value: "email" },
+  { label: "SMS", value: "sms" },
+  { label: "Phone", value: "phone" },
+  { label: "WhatsApp", value: "whatsapp" },
+] as const;
+
+const EMPTY_OPTION_VALUE = "__empty__";
 
 export function ScheduleFollowUpSheet() {
   const [jobId, setJobId] = useQueryState("schedule_follow_up");
@@ -86,59 +108,143 @@ export function ScheduleFollowUpSheet() {
         <SheetHeader>
           <SheetTitle>Schedule Follow-up</SheetTitle>
           <SheetDescription>
-            {jobData?.item ? `Create a follow up action for ${jobData.item.title}.` : "Loading job details..."}
+            {jobData?.item
+              ? `Create a follow up action for ${jobData.item.title}.`
+              : "Create a follow up action for this service job."}
           </SheetDescription>
         </SheetHeader>
-        
+
         {isLoadingJob || isLoadingTemplates ? (
-          <div className="mt-6 flex justify-center py-8">Loading...</div>
+          <SheetFormSkeleton fields={4} />
         ) : (
-          <form onSubmit={form.handleSubmit((data) => createFollowUp.mutate(data))} className="mt-6 space-y-4">
-            <div className="space-y-2">
-              <Label>Due Date</Label>
-              <Input
-                type="date"
-                {...form.register("dueAt", { valueAsDate: true })}
+          <Form {...form}>
+            <form
+              onSubmit={form.handleSubmit((data) =>
+                createFollowUp.mutate({
+                  ...data,
+                  templateId: data.templateId || undefined,
+                }),
+              )}
+              className="mt-6 space-y-4"
+            >
+              <FormField
+                control={form.control}
+                name="dueAt"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Due date</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="date"
+                        value={toDateInputValue(field.value)}
+                        onChange={(event) =>
+                          field.onChange(
+                            event.target.value
+                              ? new Date(`${event.target.value}T00:00:00`)
+                              : undefined,
+                          )
+                        }
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
               />
-            </div>
-            <div className="space-y-2">
-              <Label>Channel</Label>
-              <select 
-                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                {...form.register("channel")}
-              >
-                <option value="email">Email</option>
-                <option value="sms">SMS</option>
-                <option value="phone">Phone</option>
-                <option value="whatsapp">WhatsApp</option>
-              </select>
-            </div>
-            <div className="space-y-2">
-              <Label>Template</Label>
-              <select 
-                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                {...form.register("templateId")}
-              >
-                <option value="">No template</option>
-                {templates.map((template) => (
-                  <option key={template.id} value={template.id}>
-                    {template.name}
-                  </option>
-                ))}
-              </select>
-            </div>
-            <div className="space-y-2">
-              <Label>Notes</Label>
-              <Textarea
-                {...form.register("notes")}
+              <FormField
+                control={form.control}
+                name="channel"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Channel</FormLabel>
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                    >
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select channel" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {channelOptions.map((option) => (
+                          <SelectItem key={option.value} value={option.value}>
+                            {option.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
               />
-            </div>
-            <Button type="submit" disabled={createFollowUp.isPending} className="w-full mt-4">
-              {createFollowUp.isPending ? "Creating..." : "Create follow-up"}
-            </Button>
-          </form>
+              <FormField
+                control={form.control}
+                name="templateId"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Template</FormLabel>
+                    <Select
+                      onValueChange={(value) =>
+                        field.onChange(
+                          value === EMPTY_OPTION_VALUE ? "" : value,
+                        )
+                      }
+                      value={field.value || EMPTY_OPTION_VALUE}
+                    >
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="No template" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value={EMPTY_OPTION_VALUE}>
+                          No template
+                        </SelectItem>
+                        {templates.map((template) => (
+                          <SelectItem key={template.id} value={template.id}>
+                            {template.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="notes"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Notes</FormLabel>
+                    <FormControl>
+                      <Textarea {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <Button
+                type="submit"
+                disabled={createFollowUp.isPending}
+                className="mt-4 w-full"
+              >
+                {createFollowUp.isPending ? "Creating..." : "Create follow-up"}
+              </Button>
+            </form>
+          </Form>
         )}
       </SheetContent>
     </Sheet>
   );
+}
+
+function toDateInputValue(value: Date | string | null | undefined) {
+  if (!value) return "";
+
+  const date = value instanceof Date ? value : new Date(value);
+
+  if (Number.isNaN(date.getTime())) return "";
+
+  return date.toISOString().slice(0, 10);
 }

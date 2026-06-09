@@ -1,13 +1,13 @@
 import { TemplatesColumnVisibility } from "./templates-column-visibility";
 import { OpenTemplateSheet } from "./open-template-sheet";
-import { SearchField } from "./search-field";
+import { TemplatesSearchFilter } from "./templates-search-filter";
 
 export async function TemplatesHeader() {
   return (
-    <div className="flex items-center justify-between mb-4">
-      <SearchField placeholder="Search templates..." />
+    <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+      <TemplatesSearchFilter />
 
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-2 self-end sm:self-auto">
         <TemplatesColumnVisibility />
         <div className="hidden sm:block">
           <OpenTemplateSheet />

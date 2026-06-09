@@ -2,7 +2,6 @@
 
 import { closestCenter, DndContext } from "@dnd-kit/core";
 import { Table, TableBody, TableCell, TableRow } from "@afterservice/ui/table";
-import { useMutation, useSuspenseInfiniteQuery } from "@tanstack/react-query";
 import { getCoreRowModel, useReactTable } from "@tanstack/react-table";
 import { useVirtualizer, type VirtualItem } from "@tanstack/react-virtual";
 import {
@@ -68,9 +67,10 @@ export function DataTable({ initialSettings }: Props) {
 
   const [data, { fetchNextPage, hasNextPage, isFetchingNextPage, refetch }] = trpc.customers.list.useSuspenseInfiniteQuery(
     {
-      ...filter,
-      sort: params.sort,
-      q: deferredSearch,
+      includeArchived: false,
+      search: deferredSearch ?? undefined,
+      sort: params.sort ?? undefined,
+      tags: filter.tags ?? undefined,
     }, {
       getNextPageParam: (lastPage: any) => lastPage.nextCursor,
     });

@@ -15,6 +15,7 @@ import {
 } from "@afterservice/ui";
 import { LogOut, Settings, User } from "lucide-react";
 import { useState } from "react";
+import { ThemeSwitch } from "./theme-switch";
 
 export function UserMenu({
   isExpanded,
@@ -85,6 +86,11 @@ export function UserMenu({
           <Settings className="mr-2 h-4 w-4" />
           <span>Settings</span>
         </DropdownMenuItem>
+        <DropdownMenuSeparator />
+        <div className="flex flex-row items-center justify-between px-2 py-1.5">
+          <p className="text-xs">Theme</p>
+          <ThemeSwitch />
+        </div>
         <DropdownMenuSeparator />
         <DropdownMenuItem
           onClick={handleSignOut}

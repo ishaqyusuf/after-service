@@ -2,15 +2,12 @@ import { useQueryStates } from "nuqs";
 import {
   createLoader,
   parseAsArrayOf,
-  parseAsBoolean,
   parseAsString,
 } from "nuqs/server";
 
 const customerFilterParamsSchema = {
   q: parseAsString,
-  statuses: parseAsArrayOf(parseAsString),
-  start: parseAsString,
-  end: parseAsString,
+  tags: parseAsArrayOf(parseAsString),
 };
 
 export function useCustomerFilterParams() {

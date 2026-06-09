@@ -1,9 +1,9 @@
 "use client";
 
+import { updateCustomerSchema } from "@afterservice/api/schemas";
 import {
   Button,
   Input,
-  Label,
   Sheet,
   SheetContent,
   SheetDescription,
@@ -11,21 +11,19 @@ import {
   SheetTitle,
   Textarea,
 } from "@afterservice/ui";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@afterservice/ui/form";
 import { trpc } from "@/components/providers/trpc-provider";
 import { useQueryState } from "nuqs";
 import { useZodForm } from "@/hooks/use-zod-form";
-import { z } from "zod";
 import { useEffect } from "react";
-
-const updateCustomerSchema = z.object({
-  id: z.string().min(1),
-  companyName: z.string().trim().optional(),
-  email: z.string().trim().email().optional().or(z.literal("")),
-  name: z.string().trim().min(1, "Name is required"),
-  notes: z.string().trim().optional(),
-  phone: z.string().trim().optional(),
-  tags: z.string().trim().optional(),
-});
+import { SheetFormSkeleton } from "./sheet-form-skeleton";
 
 export function EditCustomerSheet() {
   const [customerId, setCustomerId] = useQueryState("edit_customer");
@@ -91,38 +89,103 @@ export function EditCustomerSheet() {
         </SheetHeader>
         
         {isLoading ? (
-          <div className="mt-6 flex justify-center py-8">Loading...</div>
+          <SheetFormSkeleton fields={6} />
         ) : (
           <div className="mt-6 space-y-6">
-            <form onSubmit={form.handleSubmit((data) => updateCustomer.mutate(data))} className="space-y-4">
-              <div className="space-y-2">
-                <Label>Name</Label>
-                <Input {...form.register("name")} />
-              </div>
-              <div className="space-y-2">
-                <Label>Email</Label>
-                <Input type="email" {...form.register("email")} />
-              </div>
-              <div className="space-y-2">
-                <Label>Phone</Label>
-                <Input {...form.register("phone")} />
-              </div>
-              <div className="space-y-2">
-                <Label>Company</Label>
-                <Input {...form.register("companyName")} />
-              </div>
-              <div className="space-y-2">
-                <Label>Tags</Label>
-                <Input {...form.register("tags")} />
-              </div>
-              <div className="space-y-2">
-                <Label>Notes</Label>
-                <Textarea className="h-32" {...form.register("notes")} />
-              </div>
-              <Button type="submit" disabled={updateCustomer.isPending} className="w-full">
-                {updateCustomer.isPending ? "Saving..." : "Save changes"}
-              </Button>
-            </form>
+            <Form {...form}>
+              <form
+                onSubmit={form.handleSubmit((data) =>
+                  updateCustomer.mutate(data),
+                )}
+                className="space-y-4"
+              >
+                <FormField
+                  control={form.control}
+                  name="name"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Name</FormLabel>
+                      <FormControl>
+                        <Input {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="email"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Email</FormLabel>
+                      <FormControl>
+                        <Input type="email" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="phone"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Phone</FormLabel>
+                      <FormControl>
+                        <Input {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="companyName"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Company</FormLabel>
+                      <FormControl>
+                        <Input {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="tags"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Tags</FormLabel>
+                      <FormControl>
+                        <Input {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="notes"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Notes</FormLabel>
+                      <FormControl>
+                        <Textarea className="h-32" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <Button
+                  type="submit"
+                  disabled={updateCustomer.isPending}
+                  className="w-full"
+                >
+                  {updateCustomer.isPending ? "Saving..." : "Save changes"}
+                </Button>
+              </form>
+            </Form>
 
             <div className="pt-4 border-t border-border">
               <Button 

@@ -78,6 +78,50 @@ function iso(date: Date | null | undefined) {
   return date?.toISOString() ?? null;
 }
 
+type SortDirection = "asc" | "desc";
+type SortFactory = (direction: SortDirection) => any;
+
+function resolveSort(
+  sort: string[] | null | undefined,
+  factories: Record<string, SortFactory>,
+  fallback: any,
+) {
+  const [field, direction] = sort ?? [];
+
+  if (direction !== "asc" && direction !== "desc") {
+    return fallback;
+  }
+
+  return field ? (factories[field]?.(direction) ?? fallback) : fallback;
+}
+
+const customerSorts: Record<string, SortFactory> = {
+  companyName: (direction) => ({ companyName: direction }),
+  createdAt: (direction) => ({ createdAt: direction }),
+  email: (direction) => ({ email: direction }),
+  name: (direction) => ({ name: direction }),
+  phone: (direction) => ({ phone: direction }),
+};
+
+const serviceJobSorts: Record<string, SortFactory> = {
+  amountCents: (direction) => ({ amountCents: direction }),
+  completedAt: (direction) => ({ completedAt: direction }),
+  status: (direction) => ({ status: direction }),
+  title: (direction) => ({ title: direction }),
+};
+
+const followUpSorts: Record<string, SortFactory> = {
+  channel: (direction) => ({ channel: direction }),
+  dueAt: (direction) => ({ dueAt: direction }),
+  status: (direction) => ({ status: direction }),
+};
+
+const templateSorts: Record<string, SortFactory> = {
+  channel: (direction) => ({ channel: direction }),
+  name: (direction) => ({ name: direction }),
+  subject: (direction) => ({ subject: direction }),
+};
+
 function requireOwnerOrAdmin(ctx: ApiContext) {
   if (ctx.workspace?.role !== "owner" && ctx.workspace?.role !== "admin") {
     throw new TRPCError({
@@ -335,6 +379,8 @@ const customersRouter = t.router({
         .object({
           includeArchived: z.boolean().default(false),
           search: z.string().trim().optional(),
+          sort: z.array(z.string()).optional(),
+          tags: z.array(z.string()).optional(),
           cursor: z.string().nullish(),
           limit: z.number().min(1).max(100).default(50),
         })
@@ -347,12 +393,26 @@ const customersRouter = t.router({
             select: { status: true },
           },
         },
-        orderBy: { updatedAt: "desc" },
+        orderBy: resolveSort(input.sort, customerSorts, { updatedAt: "desc" }),
         where: {
           archivedAt: input.includeArchived ? undefined : null,
-          name: input.search
-            ? { contains: input.search, mode: "insensitive" }
-            : undefined,
+          ...(input.search
+            ? {
+                OR: [
+                  { name: { contains: input.search, mode: "insensitive" } },
+                  {
+                    companyName: {
+                      contains: input.search,
+                      mode: "insensitive",
+                    },
+                  },
+                  { email: { contains: input.search, mode: "insensitive" } },
+                  { phone: { contains: input.search, mode: "insensitive" } },
+                  { tags: { has: input.search } },
+                ],
+              }
+            : {}),
+          ...(input.tags?.length ? { tags: { hasSome: input.tags } } : {}),
           workspaceId: ctx.workspace.id,
         },
       });
@@ -515,6 +575,7 @@ const serviceJobsRouter = t.router({
           status: z.string().optional(),
           start: z.string().optional(),
           end: z.string().optional(),
+          sort: z.array(z.string()).optional(),
           cursor: z.string().nullish(),
           limit: z.number().min(1).max(100).default(50),
         })
@@ -533,7 +594,9 @@ const serviceJobsRouter = t.router({
 
       const items = await db.serviceJob.findMany({
         include: { customer: true, followUps: true },
-        orderBy: { completedAt: "desc" },
+        orderBy: resolveSort(input.sort, serviceJobSorts, {
+          completedAt: "desc",
+        }),
         where: {
           workspaceId: ctx.workspace.id,
           ...(searchTerm
@@ -826,14 +889,26 @@ const followUpsRouter = t.router({
     .input(
       z
         .object({
+          channel: channelSchema.optional(),
+          end: z.string().optional(),
           status: followUpStatusSchema.optional(),
           search: z.string().trim().optional(),
+          sort: z.array(z.string()).optional(),
+          start: z.string().optional(),
           cursor: z.string().nullish(),
           limit: z.number().min(1).max(100).default(50),
         })
         .default({ limit: 50 }),
     )
     .query(async ({ ctx, input }) => {
+      const dueAtFilter: Record<string, Date> = {};
+      if (input.start) dueAtFilter.gte = new Date(input.start);
+      if (input.end) {
+        const endDate = new Date(input.end);
+        endDate.setHours(23, 59, 59, 999);
+        dueAtFilter.lte = endDate;
+      }
+
       const items = await db.followUp.findMany({
         include: {
           customer: true,
@@ -842,8 +917,12 @@ const followUpsRouter = t.router({
           messageLogs: { orderBy: { createdAt: "desc" }, take: 3 },
           template: true,
         },
-        orderBy: { dueAt: "asc" },
+        orderBy: resolveSort(input.sort, followUpSorts, { dueAt: "asc" }),
         where: {
+          channel: input.channel,
+          ...(Object.keys(dueAtFilter).length
+            ? { dueAt: dueAtFilter }
+            : {}),
           status: input.status,
           workspaceId: ctx.workspace.id,
           customer: input.search
@@ -1067,7 +1146,9 @@ const templatesRouter = t.router({
     .input(
       z
         .object({
+          channel: channelSchema.optional(),
           search: z.string().trim().optional(),
+          sort: z.array(z.string()).optional(),
           cursor: z.string().nullish(),
           limit: z.number().min(1).max(100).default(50),
         })
@@ -1075,8 +1156,12 @@ const templatesRouter = t.router({
     )
     .query(async ({ ctx, input }) => {
       const items = await db.followUpTemplate.findMany({
-        orderBy: [{ sortOrder: "asc" }, { name: "asc" }],
+        orderBy: resolveSort(input.sort, templateSorts, [
+          { sortOrder: "asc" },
+          { name: "asc" },
+        ]),
         where: {
+          channel: input.channel,
           workspaceId: ctx.workspace.id,
           name: input.search
             ? { contains: input.search, mode: "insensitive" }

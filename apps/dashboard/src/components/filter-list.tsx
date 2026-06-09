@@ -2,11 +2,19 @@ import { Button } from "@afterservice/ui/button";
 import { Icons } from "@afterservice/ui/icons";
 import { format, parseISO } from "date-fns";
 
-type FilterKey = "status" | "customers" | "start" | "end";
+type FilterKey =
+  | "status"
+  | "customers"
+  | "tags"
+  | "channel"
+  | "start"
+  | "end";
 
 type FilterValue = {
   status: string;
   customers: string[];
+  tags: string[];
+  channel: string;
   start: string;
   end: string;
 };
@@ -20,6 +28,7 @@ interface Props {
   filters: Partial<FilterValue>;
   onRemove: (filters: { [key: string]: null }) => void;
   statusFilters?: { id: string; name: string }[];
+  channelFilters?: { id: string; name: string }[];
   customers?: { id: string; name: string }[];
 }
 
@@ -27,6 +36,7 @@ export function FilterList({
   filters,
   onRemove,
   statusFilters,
+  channelFilters,
   customers,
 }: Props) {
   const renderFilter = ({ key, value }: FilterValueProps) => {
@@ -43,6 +53,15 @@ export function FilterList({
         if (names.length === 0) return null;
         if (names.length === 1) return names[0];
         return `${names[0]} +${names.length - 1} more`;
+      }
+      case "tags": {
+        if (!Array.isArray(value) || value.length === 0) return null;
+        if (value.length === 1) return value[0];
+        return `${value[0]} +${value.length - 1} more`;
+      }
+      case "channel": {
+        if (!value) return null;
+        return channelFilters?.find((filter) => filter.id === value)?.name;
       }
       case "start":
       case "end": {

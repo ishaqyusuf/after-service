@@ -1,7 +1,10 @@
-import { BillingOverview } from "@/components/billing-overview";
-import { Suspense } from "react";
-import { ErrorBoundary } from "@/components/error-boundary";
 import type { Metadata } from "next";
+import { Suspense } from "react";
+import {
+  BillingOverview,
+  BillingOverviewSkeleton,
+} from "@/components/billing-overview";
+import { ErrorBoundary } from "@/components/error-boundary";
 
 export async function generateMetadata(): Promise<Metadata> {
   return {
@@ -16,7 +19,7 @@ export default async function BillingPage() {
 
   return (
     <ErrorBoundary>
-      <Suspense fallback={<div className="animate-pulse h-64 bg-muted rounded-xl" />}>
+      <Suspense fallback={<BillingOverviewSkeleton />}>
         <BillingOverview />
       </Suspense>
     </ErrorBoundary>

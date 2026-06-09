@@ -17,7 +17,9 @@ export function useSortQuery() {
    */
   const createSortQuery = useCallback(
     (name: string) => {
-      if (sortValue === "asc") {
+      if (sortColumn !== name) {
+        setParams({ sort: [name, "asc"] });
+      } else if (sortValue === "asc") {
         setParams({ sort: [name, "desc"] });
       } else if (sortValue === "desc") {
         setParams({ sort: null });
@@ -25,7 +27,7 @@ export function useSortQuery() {
         setParams({ sort: [name, "asc"] });
       }
     },
-    [sortValue, setParams],
+    [sortColumn, sortValue, setParams],
   );
 
   return {

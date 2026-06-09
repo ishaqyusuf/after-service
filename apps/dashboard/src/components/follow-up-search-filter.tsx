@@ -14,19 +14,22 @@ import {
 } from "@afterservice/ui/dropdown-menu";
 import { Icons } from "@afterservice/ui/icons";
 import { Input } from "@afterservice/ui/input";
+import { Label } from "@afterservice/ui/label";
 import { useRef, useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
-import { useFollowUpFilterParams } from "@/hooks/use-follow-up-filter-params";
+import {
+  followUpChannels,
+  followUpStatuses,
+  useFollowUpFilterParams,
+} from "@/hooks/use-follow-up-filter-params";
 import { FilterList } from "./filter-list";
 
-const allowedStatuses = [
-  "open",
-  "scheduled",
-  "sent",
-  "replied",
-  "closed",
-  "missed",
-];
+const channelLabels = {
+  email: "Email",
+  phone: "Phone",
+  sms: "SMS",
+  whatsapp: "WhatsApp",
+} as const;
 
 export function FollowUpSearchFilter() {
   const { filter, setFilter } = useFollowUpFilterParams();
@@ -34,9 +37,13 @@ export function FollowUpSearchFilter() {
   const inputRef = useRef<HTMLInputElement>(null);
   const [isOpen, setIsOpen] = useState(false);
 
-  const statusFilters = allowedStatuses.map((status) => ({
+  const statusFilters = followUpStatuses.map((status) => ({
     id: status,
     name: status.charAt(0).toUpperCase() + status.slice(1),
+  }));
+  const channelFilters = followUpChannels.map((channel) => ({
+    id: channel,
+    name: channelLabels[channel],
   }));
 
   useHotkeys(
@@ -63,7 +70,7 @@ export function FollowUpSearchFilter() {
     if (value) {
       setInput(value);
     } else {
-      setFilter(null);
+      setFilter({ q: null });
       setInput("");
     }
   };
@@ -123,6 +130,7 @@ export function FollowUpSearchFilter() {
           filters={validFilters}
           onRemove={setFilter}
           statusFilters={statusFilters}
+          channelFilters={channelFilters}
         />
       </div>
 
@@ -159,6 +167,87 @@ export function FollowUpSearchFilter() {
                     {status.name}
                   </DropdownMenuCheckboxItem>
                 ))}
+              </DropdownMenuSubContent>
+            </DropdownMenuPortal>
+          </DropdownMenuSub>
+
+          <DropdownMenuSub>
+            <DropdownMenuSubTrigger>
+              <Icons.OutgoingMail className="mr-2 h-4 w-4" />
+              <span>Channel</span>
+            </DropdownMenuSubTrigger>
+            <DropdownMenuPortal>
+              <DropdownMenuSubContent
+                sideOffset={14}
+                alignOffset={-4}
+                className="p-0"
+              >
+                {channelFilters.map((channel) => (
+                  <DropdownMenuCheckboxItem
+                    key={channel.id}
+                    checked={filter.channel === channel.id}
+                    onSelect={(e) => e.preventDefault()}
+                    onCheckedChange={(checked) => {
+                      setFilter({
+                        channel: checked ? channel.id : null,
+                      });
+                    }}
+                  >
+                    {channel.name}
+                  </DropdownMenuCheckboxItem>
+                ))}
+              </DropdownMenuSubContent>
+            </DropdownMenuPortal>
+          </DropdownMenuSub>
+
+          <DropdownMenuSub>
+            <DropdownMenuSubTrigger>
+              <Icons.CalendarMonth className="mr-2 h-4 w-4" />
+              <span>Due date</span>
+            </DropdownMenuSubTrigger>
+            <DropdownMenuPortal>
+              <DropdownMenuSubContent
+                sideOffset={14}
+                alignOffset={-4}
+                className="p-3"
+              >
+                <div className="flex flex-col gap-3">
+                  <div className="flex flex-col gap-1.5">
+                    <Label className="text-xs">From</Label>
+                    <Input
+                      type="date"
+                      value={filter.start ?? ""}
+                      onChange={(e) => {
+                        setFilter({
+                          start: e.target.value || null,
+                        });
+                      }}
+                    />
+                  </div>
+                  <div className="flex flex-col gap-1.5">
+                    <Label className="text-xs">To</Label>
+                    <Input
+                      type="date"
+                      value={filter.end ?? ""}
+                      onChange={(e) => {
+                        setFilter({
+                          end: e.target.value || null,
+                        });
+                      }}
+                    />
+                  </div>
+                  {(filter.start || filter.end) && (
+                    <button
+                      type="button"
+                      className="text-left text-xs text-muted-foreground hover:text-foreground"
+                      onClick={() => {
+                        setFilter({ start: null, end: null });
+                      }}
+                    >
+                      Clear date range
+                    </button>
+                  )}
+                </div>
               </DropdownMenuSubContent>
             </DropdownMenuPortal>
           </DropdownMenuSub>

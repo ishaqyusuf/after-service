@@ -4,14 +4,21 @@ import { createCustomerSchema } from "@afterservice/api/schemas";
 import {
   Button,
   Input,
-  Label,
   Sheet,
   SheetContent,
+  SheetDescription,
   SheetHeader,
   SheetTitle,
   Textarea,
 } from "@afterservice/ui";
-import { Form } from "@afterservice/ui/form";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@afterservice/ui/form";
 import { trpc } from "@/components/providers/trpc-provider";
 import { QuickFill } from "@/components/quick-fill";
 import { useCustomerParams } from "@/hooks/use-customer-params";
@@ -43,6 +50,9 @@ export function CustomerCreateSheet() {
       <SheetContent>
         <SheetHeader>
           <SheetTitle>Add customer</SheetTitle>
+          <SheetDescription>
+            Create a customer profile for service history and follow-ups.
+          </SheetDescription>
         </SheetHeader>
         <div className="py-6">
           <Form {...form}>
@@ -56,50 +66,84 @@ export function CustomerCreateSheet() {
                 <QuickFill name="customer" />
               </div>
               <div className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="customer-name">Name</Label>
-                  <Input id="customer-name" {...form.register("name")} />
-                  {form.formState.errors.name && (
-                    <p className="text-sm text-destructive">
-                      {form.formState.errors.name.message}
-                    </p>
+                <FormField
+                  control={form.control}
+                  name="name"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Name</FormLabel>
+                      <FormControl>
+                        <Input {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
                   )}
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="customer-phone">Phone</Label>
-                  <Input id="customer-phone" {...form.register("phone")} />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="customer-email">Email</Label>
-                  <Input
-                    id="customer-email"
-                    type="email"
-                    {...form.register("email")}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="customer-company">Company</Label>
-                  <Input
-                    id="customer-company"
-                    {...form.register("companyName")}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="customer-tags">Tags</Label>
-                  <Input
-                    id="customer-tags"
-                    placeholder="warranty, vip"
-                    {...form.register("tags")}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="customer-notes">Notes</Label>
-                  <Textarea
-                    id="customer-notes"
-                    className="resize-y"
-                    {...form.register("notes")}
-                  />
-                </div>
+                />
+                <FormField
+                  control={form.control}
+                  name="phone"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Phone</FormLabel>
+                      <FormControl>
+                        <Input {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="email"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Email</FormLabel>
+                      <FormControl>
+                        <Input type="email" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="companyName"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Company</FormLabel>
+                      <FormControl>
+                        <Input {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="tags"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Tags</FormLabel>
+                      <FormControl>
+                        <Input placeholder="warranty, vip" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="notes"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Notes</FormLabel>
+                      <FormControl>
+                        <Textarea className="resize-y" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
               </div>
               <Button
                 type="submit"

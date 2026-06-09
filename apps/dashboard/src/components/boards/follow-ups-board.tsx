@@ -1,5 +1,6 @@
 "use client";
 
+import { Skeleton } from "@afterservice/ui";
 import { trpc } from "@/components/providers/trpc-provider";
 import Link from "next/link";
 import { resolveTemplate } from "@/lib/dashboard-format";
@@ -18,6 +19,40 @@ export function FollowUpsBoard() {
       <BoardColumn title="Waiting" items={columns.waiting} />
       <BoardColumn title="Replied" items={columns.replied} />
       <BoardColumn title="Closed" items={columns.closed} />
+    </div>
+  );
+}
+
+export function FollowUpsBoardSkeleton() {
+  return (
+    <div className="flex gap-4 overflow-x-auto pb-4 snap-x">
+      {["due", "upcoming", "waiting", "replied", "closed"].map((column) => (
+        <div
+          key={column}
+          className="flex w-[300px] shrink-0 snap-start flex-col rounded-lg bg-muted/50 p-3"
+        >
+          <div className="mb-3 flex items-center justify-between px-1">
+            <Skeleton className="h-4 w-24" />
+            <Skeleton className="h-5 w-8 rounded-full" />
+          </div>
+          <div className="space-y-3">
+            {Array.from({ length: 3 }).map((_, index) => (
+              <div
+                key={`${column}-${index}`}
+                className="rounded-md border border-border bg-card p-3"
+              >
+                <div className="mb-2 flex items-center justify-between gap-2">
+                  <Skeleton className="h-4 w-28" />
+                  <Skeleton className="h-3 w-12" />
+                </div>
+                <Skeleton className="mb-3 h-3 w-36" />
+                <Skeleton className="h-3 w-full" />
+                <Skeleton className="mt-2 h-3 w-3/4" />
+              </div>
+            ))}
+          </div>
+        </div>
+      ))}
     </div>
   );
 }

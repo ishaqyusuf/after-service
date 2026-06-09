@@ -1,44 +1,62 @@
 "use client";
 
-import { Button, Input, Label } from "@afterservice/ui";
-import { type FormEvent, useState, useEffect } from "react";
+import { Button, Input } from "@afterservice/ui";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@afterservice/ui/form";
+import { useState } from "react";
+import { z } from "zod";
+import { useZodForm } from "@/hooks/use-zod-form";
+
+const resetPasswordSchema = z
+  .object({
+    password: z.string().min(8, "Password must be at least 8 characters."),
+    confirmPassword: z.string().min(8, "Confirm your new password."),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: "Passwords do not match.",
+    path: ["confirmPassword"],
+  });
 
 export function ResetPasswordForm() {
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
-  const [isPending, setIsPending] = useState(false);
-  const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
+  const form = useZodForm({
+    schema: resetPasswordSchema,
+    defaultValues: {
+      password: "",
+      confirmPassword: "",
+    },
+  });
 
-  async function handleSubmit(e: FormEvent<HTMLFormElement>) {
-    e.preventDefault();
+  async function handleSubmit(data: z.infer<typeof resetPasswordSchema>) {
     setError(null);
-    setIsPending(true);
     setSuccess(false);
-
-    if (password !== confirmPassword) {
-      setError("Passwords do not match.");
-      setIsPending(false);
-      return;
-    }
 
     try {
       const res = await fetch("/api/auth/reset-password", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ newPassword: password }),
+        body: JSON.stringify({ newPassword: data.password }),
       });
 
       if (!res.ok) {
-        const payload = (await res.json().catch(() => null)) as { message?: string } | null;
+        const payload = (await res.json().catch(() => null)) as {
+          message?: string;
+        } | null;
         throw new Error(payload?.message || "Failed to reset password.");
       }
 
       setSuccess(true);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to reset password.");
-    } finally {
-      setIsPending(false);
+      setError(
+        err instanceof Error ? err.message : "Failed to reset password.",
+      );
     }
   }
 
@@ -50,7 +68,13 @@ export function ResetPasswordForm() {
             Your password has been successfully reset.
           </p>
         </div>
-        <Button variant="outline" className="w-full" onClick={() => window.location.href = "/sign-in"}>
+        <Button
+          variant="outline"
+          className="w-full"
+          onClick={() => {
+            window.location.href = "/sign-in";
+          }}
+        >
           Return to log in
         </Button>
       </div>
@@ -58,39 +82,53 @@ export function ResetPasswordForm() {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
-      <div className="space-y-2">
-        <Label htmlFor="reset-password-new">New Password</Label>
-        <Input
-          id="reset-password-new"
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
+        <FormField
+          control={form.control}
           name="password"
-          required
-          type="password"
-          minLength={8}
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          disabled={isPending}
-          className="h-11"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>New password</FormLabel>
+              <FormControl>
+                <Input
+                  {...field}
+                  type="password"
+                  disabled={form.formState.isSubmitting}
+                  className="h-11"
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
         />
-      </div>
-      <div className="space-y-2">
-        <Label htmlFor="reset-password-confirm">Confirm New Password</Label>
-        <Input
-          id="reset-password-confirm"
+        <FormField
+          control={form.control}
           name="confirmPassword"
-          required
-          type="password"
-          minLength={8}
-          value={confirmPassword}
-          onChange={(e) => setConfirmPassword(e.target.value)}
-          disabled={isPending}
-          className="h-11"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Confirm new password</FormLabel>
+              <FormControl>
+                <Input
+                  {...field}
+                  type="password"
+                  disabled={form.formState.isSubmitting}
+                  className="h-11"
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
         />
-      </div>
-      {error ? <p className="text-sm text-destructive">{error}</p> : null}
-      <Button disabled={isPending} type="submit" className="w-full h-11">
-        {isPending ? "Resetting..." : "Reset password"}
-      </Button>
-    </form>
+        {error ? <p className="text-sm text-destructive">{error}</p> : null}
+        <Button
+          disabled={form.formState.isSubmitting}
+          type="submit"
+          className="h-11 w-full"
+        >
+          {form.formState.isSubmitting ? "Resetting..." : "Reset password"}
+        </Button>
+      </form>
+    </Form>
   );
 }

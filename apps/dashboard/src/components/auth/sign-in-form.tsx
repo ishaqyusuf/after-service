@@ -3,17 +3,28 @@
 import {
   Button,
   Input,
-  Label,
   Icons
 } from "@afterservice/ui";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@afterservice/ui/form";
 import { Loader2 } from "lucide-react";
-import { type FormEvent, useCallback, useRef, useState } from "react";
+import { useState } from "react";
+import { z } from "zod";
+import { useZodForm } from "@/hooks/use-zod-form";
 import { signIn } from "@/lib/auth-client";
 
-type FieldValues = {
-  email: string;
-  password: string;
-};
+const signInSchema = z.object({
+  email: z.string().email("Enter a valid email address."),
+  password: z.string().min(8, "Password must be at least 8 characters."),
+});
+
+type FieldValues = z.infer<typeof signInSchema>;
 
 type Props = {
   onSignIn: (values: FieldValues) => Promise<void>;
@@ -30,36 +41,39 @@ type QuickFillFormAdapter<TValues extends Record<string, unknown>> = {
 
 export function SignInForm({ onSignIn, returnTo, adapterRef }: Props) {
   const [error, setError] = useState<string | null>(null);
-  const [isPending, setIsPending] = useState(false);
   const [isGooglePending, setIsGooglePending] = useState(false);
-  const [values, setValues] = useState<FieldValues>({
-    email: "",
-    password: "",
+  const form = useZodForm({
+    schema: signInSchema,
+    defaultValues: {
+      email: "",
+      password: "",
+    },
   });
-  const formRef = useRef<HTMLFormElement>(null);
 
-  const setValue = useCallback((name: string, value: unknown) => {
-    setValues((prev) => ({ ...prev, [name]: value as string }));
-  }, []);
+  const isPending = form.formState.isSubmitting;
 
   if (adapterRef) {
     adapterRef.current = {
-      getValues: () => values,
-      reset: (v) => setValues(v as FieldValues),
-      setValue,
+      getValues: () => form.getValues(),
+      reset: (values) => form.reset(values as FieldValues),
+      setValue: (name, value) => {
+        if (name === "email" || name === "password") {
+          form.setValue(name, String(value), {
+            shouldDirty: true,
+            shouldValidate: true,
+          });
+        }
+      },
     };
   }
 
-  async function handleSubmit(e: FormEvent<HTMLFormElement>) {
-    e.preventDefault();
+  async function handleSubmit(values: FieldValues) {
     setError(null);
-    setIsPending(true);
 
     try {
       await onSignIn(values);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Sign-in failed.");
-      setIsPending(false);
     }
   }
 
@@ -127,55 +141,73 @@ export function SignInForm({ onSignIn, returnTo, adapterRef }: Props) {
         </div>
       </div>
 
-      <form ref={formRef} onSubmit={handleSubmit} className="space-y-4">
-        {returnTo && returnTo !== "/" ? (
-          <p className="text-sm text-muted-foreground text-center">
-            You&apos;ll be redirected to <strong>{returnTo}</strong> after
-            sign-in.
-          </p>
-        ) : null}
-        
-        <div className="space-y-2">
-          <Label htmlFor="sign-in-email">Email</Label>
-          <Input
-            id="sign-in-email"
-            name="email"
-            required
-            type="email"
-            value={values.email}
-            onChange={(e) => setValue("email", e.target.value)}
-            disabled={isPending || isGooglePending}
-            className="h-11"
-            placeholder="name@example.com"
-          />
-        </div>
-        
-        <div className="space-y-2">
-          <div className="flex items-center justify-between">
-            <Label htmlFor="sign-in-password">Password</Label>
-            <a href="/forgot-password" className="text-sm font-medium text-primary hover:underline underline-offset-4">
-              Forgot password?
-            </a>
-          </div>
-          <Input
-            id="sign-in-password"
-            minLength={8}
-            name="password"
-            required
-            type="password"
-            value={values.password}
-            onChange={(e) => setValue("password", e.target.value)}
-            disabled={isPending || isGooglePending}
-            className="h-11"
-          />
-        </div>
+      <Form {...form}>
+        <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
+          {returnTo && returnTo !== "/" ? (
+            <p className="text-center text-sm text-muted-foreground">
+              You&apos;ll be redirected to <strong>{returnTo}</strong> after
+              sign-in.
+            </p>
+          ) : null}
 
-        {error ? <p className="text-sm text-destructive">{error}</p> : null}
-        
-        <Button disabled={isPending || isGooglePending} type="submit" className="w-full h-11">
-          {isPending ? "Signing in..." : "Sign in"}
-        </Button>
-      </form>
+          <FormField
+            control={form.control}
+            name="email"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Email</FormLabel>
+                <FormControl>
+                  <Input
+                    {...field}
+                    type="email"
+                    disabled={isPending || isGooglePending}
+                    className="h-11"
+                    placeholder="name@example.com"
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="password"
+            render={({ field }) => (
+              <FormItem>
+                <div className="flex items-center justify-between">
+                  <FormLabel>Password</FormLabel>
+                  <a
+                    href="/forgot-password"
+                    className="text-sm font-medium text-primary underline-offset-4 hover:underline"
+                  >
+                    Forgot password?
+                  </a>
+                </div>
+                <FormControl>
+                  <Input
+                    {...field}
+                    type="password"
+                    disabled={isPending || isGooglePending}
+                    className="h-11"
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          {error ? <p className="text-sm text-destructive">{error}</p> : null}
+
+          <Button
+            disabled={isPending || isGooglePending}
+            type="submit"
+            className="h-11 w-full"
+          >
+            {isPending ? "Signing in..." : "Sign in"}
+          </Button>
+        </form>
+      </Form>
     </div>
   );
 }
