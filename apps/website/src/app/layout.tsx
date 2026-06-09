@@ -8,13 +8,20 @@ import { headers } from "next/headers";
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { PwaServiceWorkerRegister } from "../components/pwa-service-worker-register";
+import { createPageMetadata, siteUrl } from "../lib/seo";
 import "./globals.css";
 
 const geist = Geist({ subsets: ["latin"], variable: "--font-sans" });
 
 export const metadata: Metadata = {
-  description: appMetadata.description,
-  title: appMetadata.title,
+  ...createPageMetadata({
+    description:
+      "Free beta for local service operators who need one board for post-job customer follow-up.",
+    path: "/",
+    title: "afterservice | Post-job follow-up board for service shops",
+  }),
+  applicationName: appMetadata.name,
+  metadataBase: new URL(siteUrl),
 };
 
 export default async function RootLayout({

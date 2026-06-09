@@ -1,11 +1,14 @@
 import { appMetadata } from "@afterservice/utils";
 import type { Metadata } from "next";
+import { createPageMetadata } from "../../lib/seo";
 
 export async function generateMetadata(): Promise<Metadata> {
-  return {
-    title: "Terms of Service | After Service",
-    description: "Our terms of service.",
-  };
+  return createPageMetadata({
+    title: "Terms of Service | afterservice",
+    description:
+      "Terms of service for afterservice, the post-job follow-up board for local service operators.",
+    path: "/terms",
+  });
 }
 
 export default async function TermsPage() {

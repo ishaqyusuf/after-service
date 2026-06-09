@@ -1,11 +1,14 @@
 import { appMetadata } from "@afterservice/utils";
 import type { Metadata } from "next";
+import { createPageMetadata } from "../../lib/seo";
 
 export async function generateMetadata(): Promise<Metadata> {
-  return {
-    title: "Privacy Policy | After Service",
-    description: "Our privacy policy.",
-  };
+  return createPageMetadata({
+    title: "Privacy Policy | afterservice",
+    description:
+      "Privacy policy for afterservice, the post-job follow-up board for local service operators.",
+    path: "/privacy",
+  });
 }
 
 export default async function PrivacyPage() {

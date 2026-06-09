@@ -87,6 +87,12 @@ Local operators often lose revenue and trust after work is complete because foll
 - Repeated language that improves positioning or product scope.
 - Operators agreeing to deeper conversations or beta feedback.
 
+## SEO Strategy
+
+- The canonical organic search roadmap lives in `brain/marketing/seo-roadmap.md`.
+- SEO should target the narrow wedge "post-job follow-up software for local service operators" before broader CRM or field-service keywords.
+- Search content should be based on real operator workflows, beta feedback, and the priority segments in this strategy.
+
 ## Review Rhythm
 
 - After 3 daily runs, review whether questions are producing useful replies.

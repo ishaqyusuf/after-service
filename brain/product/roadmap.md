@@ -16,6 +16,8 @@ As of 2026-06-04, the beta roadmap is captured in `brain/product/beta-roadmap.md
 
 As of 2026-06-04, dashboard route protection follows the Midday-style pattern: the dashboard proxy remains a fast unauthenticated redirect, the `(sidebar)` layout performs a real server-side session and workspace membership check, and API `protectedProcedure` remains the source of truth for workspace-scoped data access.
 
+As of 2026-06-09, organic search strategy is captured in `brain/marketing/seo-roadmap.md`: focus on the narrow wedge of post-job follow-up software for local service operators, build technical SEO foundation first, then publish segment and workflow pages grounded in beta learnings.
+
 ## Phase 1: Repo Bootstrap
 
 Status: complete.
@@ -450,6 +452,13 @@ Acceptance:
 - Pricing makes Free Beta the current action and marks paid plans as planned.
 - No dashboard-only explanation leaks into marketing.
 - No unsupported review-gating, fake traction, or paid free-trial claims appear in active public copy.
+
+SEO additions:
+
+- Add sitemap, robots, canonical metadata, social metadata, and relevant structured data.
+- Publish high-intent solution pages for priority service-operator segments.
+- Publish practical guides around post-job follow-up, review-safe requests, issue recovery, and repeat-service reminders.
+- Keep SEO content aligned to free beta until Brain changes launch posture.
 
 ## Phase 16: QA, Verification, And Hardening
 

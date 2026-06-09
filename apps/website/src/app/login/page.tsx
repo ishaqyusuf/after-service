@@ -1,12 +1,15 @@
 import { buildDashboardUrl } from "@afterservice/utils";
 import type { Metadata } from "next";
 import { headers } from "next/headers";
+import { createPageMetadata } from "../../lib/seo";
 
 export async function generateMetadata(): Promise<Metadata> {
-  return {
-    title: "Log in | After Service",
-    description: "Log in to your workspace.",
-  };
+  return createPageMetadata({
+    title: "Log in | afterservice",
+    description: "Log in to your afterservice workspace.",
+    noIndex: true,
+    path: "/login",
+  });
 }
 
 export default async function LoginPage() {

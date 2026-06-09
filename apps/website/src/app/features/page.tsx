@@ -1,10 +1,13 @@
 import type { Metadata } from "next";
+import { createPageMetadata } from "../../lib/seo";
 
 export async function generateMetadata(): Promise<Metadata> {
-  return {
-    title: "Features | After Service",
-    description: "Follow-up workflows for the work that already happened.",
-  };
+  return createPageMetadata({
+    title: "Features | afterservice",
+    description:
+      "Follow-up workflows for completed jobs, customer check-ins, templates, and manual outreach logs.",
+    path: "/features",
+  });
 }
 
 export default async function FeaturesPage() {

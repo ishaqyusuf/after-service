@@ -1,10 +1,13 @@
 import type { Metadata } from "next";
+import { createPageMetadata } from "../../lib/seo";
 
 export async function generateMetadata(): Promise<Metadata> {
-  return {
-    title: "Customers | After Service",
-    description: "Keep every service customer ready for the next follow-up.",
-  };
+  return createPageMetadata({
+    title: "Customer history | afterservice",
+    description:
+      "Keep service customers, completed jobs, follow-up history, notes, and manual outreach logs in one workspace.",
+    path: "/customers",
+  });
 }
 
 export default async function CustomersPage() {

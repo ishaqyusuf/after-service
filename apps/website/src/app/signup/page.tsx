@@ -1,12 +1,15 @@
 import { buildDashboardUrl } from "@afterservice/utils";
 import type { Metadata } from "next";
 import { headers } from "next/headers";
+import { createPageMetadata } from "../../lib/seo";
 
 export async function generateMetadata(): Promise<Metadata> {
-  return {
-    title: "Sign up | After Service",
-    description: "Create your After Service workspace.",
-  };
+  return createPageMetadata({
+    title: "Join Free Beta | afterservice",
+    description:
+      "Create a free beta afterservice workspace for post-job customer follow-up. No credit card required.",
+    path: "/signup",
+  });
 }
 
 export default async function SignupPage() {

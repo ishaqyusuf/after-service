@@ -12,6 +12,8 @@ export const websiteNavItems = [
   { href: "/", label: "Home" },
   { href: "/features", label: "Features" },
   { href: "/customers", label: "Customers" },
+  { href: "/solutions/repair-shops", label: "Repair shops" },
+  { href: "/guides/post-job-follow-up", label: "Guide" },
   { href: "/pricing", label: "Pricing" },
   { href: "/login", label: "Log in" },
   { href: "/signup", label: "Sign up" },
