@@ -12,13 +12,13 @@ Completed: 2026-06-09
 
 Summary:
 
-- Rebuilt the signed-in dashboard overview with Midday-style metric widgets, action buttons, workload bars, follow-up health, channel mix, priority follow-ups, and recent jobs.
-- Extended `dashboard.overview` with live aggregates for overdue, due today, upcoming, resolved, sent-this-week, status, channel, and recent job data.
+- Rebuilt the signed-in dashboard overview with Midday-style `components/widgets/*` files for metric widgets, action buttons, workload bars, follow-up health, channel mix, priority follow-ups, and recent jobs.
+- Extended `dashboard.overview` with live aggregates for overdue, due today, upcoming, resolved, sent-this-week, status, channel, and recent job data through `packages/db/src/queries/dashboard-overview.ts`.
 - Documented the feature in `brain/features/dashboard-overview.md`.
 
 Verification:
 
-- Pending validation after implementation.
+- Recommended after the Midday file-architecture extraction: `bun run --filter @afterservice/dashboard typecheck` and `bun run --filter @afterservice/api typecheck`.
 
 ### Onboarding Business Taxonomy Suggestions
 

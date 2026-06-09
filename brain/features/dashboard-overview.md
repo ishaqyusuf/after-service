@@ -15,8 +15,9 @@ Give operators a dense, scannable home dashboard that summarizes today's after-s
 
 ## Architecture
 - Page owner: `apps/dashboard/src/app/(sidebar)/page.tsx`.
-- UI owner: `apps/dashboard/src/components/dashboard-overview.tsx`.
-- Data owner: `apps/api/src/routers/_app.ts` under `dashboard.overview`.
+- UI owner: `apps/dashboard/src/components/widgets/*`, following the Midday overview widget folder pattern.
+- Data query owner: `packages/db/src/queries/dashboard-overview.ts`.
+- API owner: `apps/api/src/routers/_app.ts` under `dashboard.overview`; the route stays thin and delegates to the DB query module.
 - The dashboard remains a client component backed by tRPC server state.
 
 ## Product Rule

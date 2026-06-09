@@ -1,4 +1,8 @@
-import { getDbClient, type WorkspacePlan } from "@afterservice/db";
+import {
+  getDashboardOverview,
+  getDbClient,
+  type WorkspacePlan,
+} from "@afterservice/db";
 import { LogEvents } from "@afterservice/events";
 import { setupAnalytics } from "@afterservice/events/server";
 import { Notifications } from "@afterservice/notifications";
@@ -1311,125 +1315,7 @@ const billingRouter = t.router({
 
 const dashboardRouter = t.router({
   overview: protectedProcedure.query(async ({ ctx }) => {
-    const workspace = await db.workspace.findUniqueOrThrow({
-      select: {
-        businessType: true,
-        defaultFollowUpDelayDays: true,
-        id: true,
-        name: true,
-        plan: true,
-        planStatus: true,
-        serviceCategory: true,
-        slug: true,
-      },
-      where: { id: ctx.workspace.id },
-    });
-
-    const customersCount = await db.customer.count({
-      where: { archivedAt: null, workspaceId: ctx.workspace.id },
-    });
-
-    const jobsCount = await db.serviceJob.count({
-      where: { workspaceId: ctx.workspace.id },
-    });
-
-    const recentJobs = await db.serviceJob.findMany({
-      include: { customer: true },
-      orderBy: { completedAt: "desc" },
-      take: 5,
-      where: { workspaceId: ctx.workspace.id },
-    });
-
-    const followUps = await db.followUp.findMany({
-      include: { customer: true, job: true },
-      where: { workspaceId: ctx.workspace.id },
-      orderBy: { dueAt: "asc" },
-    });
-
-    const now = new Date();
-    const todayStart = new Date(now);
-    todayStart.setHours(0, 0, 0, 0);
-    const todayEnd = new Date();
-    todayEnd.setHours(23, 59, 59, 999);
-    const nextWeekEnd = new Date(todayEnd);
-    nextWeekEnd.setDate(nextWeekEnd.getDate() + 7);
-    const sevenDaysAgo = new Date(todayStart);
-    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 6);
-
-    const dueToday = followUps.filter(
-      (item) =>
-        item.status !== "closed" &&
-        item.status !== "replied" &&
-        item.dueAt >= todayStart &&
-        item.dueAt <= todayEnd,
-    ).length;
-
-    const openFollowUps = followUps.filter(
-      (item) => item.status !== "closed",
-    ).length;
-
-    const activeFollowUps = followUps.filter(
-      (item) => item.status !== "closed" && item.status !== "replied",
-    );
-    const overdueFollowUps = activeFollowUps.filter(
-      (item) => item.dueAt < todayStart,
-    ).length;
-    const upcomingFollowUps = activeFollowUps.filter(
-      (item) => item.dueAt > todayEnd && item.dueAt <= nextWeekEnd,
-    ).length;
-    const completedThisWeek = await db.serviceJob.count({
-      where: {
-        completedAt: { gte: sevenDaysAgo },
-        workspaceId: ctx.workspace.id,
-      },
-    });
-    const sentThisWeek = followUps.filter(
-      (item) => item.sentAt && item.sentAt >= sevenDaysAgo,
-    ).length;
-    const resolvedFollowUps = followUps.filter(
-      (item) => item.status === "closed" || item.status === "replied",
-    ).length;
-
-    const recentFollowUps = followUps
-      .filter((item) => item.status !== "closed")
-      .slice(0, 8)
-      .map((item) => followUpDto(item));
-
-    const followUpStatuses = followUpStatusSchema.options.map((status) => ({
-      count: followUps.filter((item) => item.status === status).length,
-      status,
-    }));
-    const followUpChannels = channelSchema.options.map((channel) => ({
-      channel,
-      count: followUps.filter((item) => item.channel === channel).length,
-    }));
-
-    return {
-      counts: {
-        customers: customersCount,
-        completedThisWeek,
-        dueToday,
-        jobs: jobsCount,
-        openFollowUps,
-        overdueFollowUps,
-        resolvedFollowUps,
-        sentThisWeek,
-        upcomingFollowUps,
-      },
-      followUpChannels,
-      followUpStatuses,
-      recentFollowUps,
-      recentJobs: recentJobs.map((job) => ({
-        amountCents: job.amountCents,
-        completedAt: job.completedAt.toISOString(),
-        customerName: job.customer.name,
-        id: job.id,
-        serviceCategory: job.serviceCategory,
-        status: job.status,
-        title: job.title,
-      })),
-      workspace,
-    };
+    return getDashboardOverview(db, ctx.workspace.id);
   }),
 });
 

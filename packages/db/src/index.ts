@@ -16,6 +16,7 @@ export {
   type StarterTemplate,
   starterFollowUpTemplates,
 } from "./seed";
+export * from "./queries";
 export { PrismaClient };
 
 const globalForDb = globalThis as typeof globalThis & {
