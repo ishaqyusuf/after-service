@@ -571,6 +571,7 @@ const serviceJobsRouter = t.router({
         .object({
           q: z.string().trim().optional(),
           search: z.string().trim().optional(),
+          categories: z.array(z.string()).optional(),
           customers: z.array(z.string()).optional(),
           status: z.string().optional(),
           start: z.string().optional(),
@@ -613,6 +614,9 @@ const serviceJobsRouter = t.router({
             : {}),
           ...(input.customers?.length
             ? { customerId: { in: input.customers } }
+            : {}),
+          ...(input.categories?.length
+            ? { serviceCategory: { in: input.categories } }
             : {}),
           ...(input.status ? { status: input.status as any } : {}),
           ...(Object.keys(completedAtFilter).length

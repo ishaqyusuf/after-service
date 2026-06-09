@@ -67,6 +67,7 @@ export function DataTable({ initialSettings }: Props) {
 
   const [data, { fetchNextPage, hasNextPage, isFetchingNextPage, refetch }] = trpc.serviceJobs.list.useSuspenseInfiniteQuery(
     {
+      categories: filter.categories ?? undefined,
       customers: filter.customers ?? undefined,
       end: filter.end ?? undefined,
       q: deferredSearch ?? undefined,

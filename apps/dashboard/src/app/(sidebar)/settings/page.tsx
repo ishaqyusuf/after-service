@@ -1,6 +1,7 @@
 import { Badge } from "@afterservice/ui";
 import type { Metadata } from "next";
 import { ErrorBoundary } from "@/components/error-boundary";
+import { ErrorFallback } from "@/components/error-fallback";
 import { UpdateWorkspaceForm } from "@/components/forms/update-workspace-form";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -15,7 +16,7 @@ export default async function SettingsPage() {
   // await trpc.workspace.get.prefetch();
 
   return (
-    <ErrorBoundary>
+    <ErrorBoundary fallback={<ErrorFallback />}>
       <div className="max-w-[800px] py-6">
         <header className="mb-8 flex flex-col gap-4">
           <div className="space-y-1">

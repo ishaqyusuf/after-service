@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
 import { ErrorBoundary } from "@/components/error-boundary";
+import { ErrorFallback } from "@/components/error-fallback";
 import { OverviewView } from "@/components/widgets";
 import { OverviewSkeleton } from "@/components/widgets/overview-skeleton";
 
@@ -16,7 +17,7 @@ export default async function DashboardPage() {
   // await trpc.dashboard.getOverview.prefetch();
 
   return (
-    <ErrorBoundary>
+    <ErrorBoundary fallback={<ErrorFallback />}>
       <Suspense fallback={<OverviewSkeleton />}>
         <OverviewView />
       </Suspense>

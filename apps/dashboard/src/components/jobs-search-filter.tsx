@@ -15,7 +15,7 @@ import {
 import { Icons } from "@afterservice/ui/icons";
 import { Input } from "@afterservice/ui/input";
 import { Label } from "@afterservice/ui/label";
-import { useRef, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
 import { useJobFilterParams } from "@/hooks/use-job-filter-params";
 import { trpc } from "@/components/providers/trpc-provider";
@@ -37,6 +37,20 @@ export function JobsSearchFilter() {
     includeArchived: false,
   });
   const customers = customersData?.items ?? [];
+  const { data: jobsData } = trpc.serviceJobs.list.useQuery({});
+  const categoryFilters = useMemo(() => {
+    const categories = new Set<string>();
+
+    for (const job of jobsData?.items ?? []) {
+      if (job.serviceCategory) {
+        categories.add(job.serviceCategory);
+      }
+    }
+
+    return Array.from(categories)
+      .sort((a, b) => a.localeCompare(b))
+      .map((category) => ({ id: category, name: category }));
+  }, [jobsData]);
 
   useHotkeys(
     "esc",
@@ -121,6 +135,7 @@ export function JobsSearchFilter() {
           filters={validFilters}
           onRemove={setFilter}
           statusFilters={allowedStatuses}
+          categoryFilters={categoryFilters}
           customers={customers}
         />
       </div>
@@ -158,6 +173,52 @@ export function JobsSearchFilter() {
                     {status.name}
                   </DropdownMenuCheckboxItem>
                 ))}
+              </DropdownMenuSubContent>
+            </DropdownMenuPortal>
+          </DropdownMenuSub>
+
+          <DropdownMenuSub>
+            <DropdownMenuSubTrigger>
+              <Icons.Category className="mr-2 h-4 w-4" />
+              <span>Category</span>
+            </DropdownMenuSubTrigger>
+            <DropdownMenuPortal>
+              <DropdownMenuSubContent
+                sideOffset={14}
+                alignOffset={-4}
+                className="p-0 max-h-[300px] overflow-y-auto"
+              >
+                {categoryFilters.length > 0 ? (
+                  categoryFilters.map((category) => {
+                    const current = Array.isArray(filter.categories)
+                      ? filter.categories
+                      : [];
+                    const isChecked = current.includes(category.id);
+
+                    return (
+                      <DropdownMenuCheckboxItem
+                        key={category.id}
+                        checked={isChecked}
+                        onSelect={(e) => e.preventDefault()}
+                        onCheckedChange={() => {
+                          const next = isChecked
+                            ? current.filter((id) => id !== category.id)
+                            : [...current, category.id];
+
+                          setFilter({
+                            categories: next.length > 0 ? next : null,
+                          });
+                        }}
+                      >
+                        {category.name}
+                      </DropdownMenuCheckboxItem>
+                    );
+                  })
+                ) : (
+                  <div className="px-2 py-1.5 text-xs text-muted-foreground">
+                    No categories yet
+                  </div>
+                )}
               </DropdownMenuSubContent>
             </DropdownMenuPortal>
           </DropdownMenuSub>

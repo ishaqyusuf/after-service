@@ -15,6 +15,7 @@ In progress. Page shell, form consistency, and page skeleton fallbacks updated o
 
 ## Current State
 - Customers, jobs, follow-ups, and templates pages use the local app `ErrorBoundary` with `ErrorFallback`.
+- Dashboard overview, billing, settings, and onboarding pages use the same local `ErrorBoundary` with `ErrorFallback`.
 - Customers, jobs, follow-ups, and templates pages use domain skeleton fallbacks for table loading.
 - Follow-ups page uses a board skeleton fallback for board loading.
 - Dashboard overview page uses the feature `OverviewSkeleton` instead of a raw placeholder block.

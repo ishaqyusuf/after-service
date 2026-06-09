@@ -1,7 +1,7 @@
 # Feature: Dashboard Table Standardization
 
 ## Status
-In progress. Empty-state alignment, filter payload cleanup, customer tag filters, template channel filters, table settings hydration, and infinite prefetch alignment updated on 2026-06-09.
+In progress. Empty-state alignment, filter payload cleanup, customer tag filters, job category filters, template channel filters, table settings hydration, and infinite prefetch alignment updated on 2026-06-09.
 
 ## Scope
 - Customers, jobs, follow-ups, and templates tables should use a shared Midday-style empty/no-results pattern.
@@ -38,6 +38,7 @@ In progress. Empty-state alignment, filter payload cleanup, customer tag filters
 - Template filters now support channel filtering with matching URL params, table query input, and API router predicates.
 - Customer search now matches name, company, email, phone, and exact tag values instead of name only.
 - Customer filters now support tag filtering with matching URL params, table query input, route prefetch, filter chips, and API router predicates.
+- Job filters now support service category filtering with matching URL params, table query input, route prefetch, filter chips, and API router predicates.
 - Customers, jobs, follow-ups, and templates route pages now load persisted table settings from the table-settings cookie and pass them into the table components.
 - Customers, jobs, follow-up history, and templates route pages now prefetch table data with `infiniteQueryOptions` to match their `useSuspenseInfiniteQuery` table consumers.
 

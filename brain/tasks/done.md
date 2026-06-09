@@ -892,3 +892,50 @@ Files changed:
 - `apps/dashboard/src/components/auth/forgot-password-form.tsx`
 - `apps/dashboard/src/components/auth/reset-password-form.tsx`
 - `brain`
+
+### Dashboard Page Error Fallback Alignment
+
+Completed: 2026-06-09
+
+Summary:
+
+- Added the shared `ErrorFallback` to dashboard overview, billing, settings, and onboarding page error boundaries.
+- Aligned non-table dashboard pages with the table pages' retry fallback pattern.
+- Updated Brain page standardization notes.
+
+Verification:
+
+- Focused whitespace and error-boundary fallback scans only, per fast Bun monorepo command discipline.
+
+Files changed:
+
+- `apps/dashboard/src/app/(sidebar)/page.tsx`
+- `apps/dashboard/src/app/(sidebar)/billing/page.tsx`
+- `apps/dashboard/src/app/(sidebar)/settings/page.tsx`
+- `apps/dashboard/src/app/onboarding/page.tsx`
+- `brain`
+
+### Dashboard Job Category Filters
+
+Completed: 2026-06-09
+
+Summary:
+
+- Added URL-backed service category filters for the jobs page.
+- Wired category filters through route prefetch, the jobs table query, and the service jobs API predicate.
+- Added category filter chips and a category submenu to the jobs filter control.
+- Updated Brain dashboard table standardization notes.
+
+Verification:
+
+- Focused whitespace and exact job category filter wiring scans only, per fast Bun monorepo command discipline.
+
+Files changed:
+
+- `apps/dashboard/src/hooks/use-job-filter-params.ts`
+- `apps/dashboard/src/components/jobs-search-filter.tsx`
+- `apps/dashboard/src/components/filter-list.tsx`
+- `apps/dashboard/src/app/(sidebar)/jobs/page.tsx`
+- `apps/dashboard/src/components/tables/jobs/data-table.tsx`
+- `apps/api/src/routers/_app.ts`
+- `brain`

@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { Suspense } from "react";
 import { SignupCompletionTracker } from "@/components/analytics/signup-completion-tracker";
 import { ErrorBoundary } from "@/components/error-boundary";
+import { ErrorFallback } from "@/components/error-fallback";
 import {
   OnboardingForm,
   OnboardingFormSkeleton,
@@ -19,7 +20,7 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function OnboardingPage() {
   // TODO: trpc prefetch here
   return (
-    <ErrorBoundary>
+    <ErrorBoundary fallback={<ErrorFallback />}>
       <Suspense fallback={null}>
         <SignupCompletionTracker />
       </Suspense>

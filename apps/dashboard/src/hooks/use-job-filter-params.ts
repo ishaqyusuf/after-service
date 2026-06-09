@@ -7,6 +7,7 @@ import {
 
 const jobFilterParamsSchema = {
   q: parseAsString,
+  categories: parseAsArrayOf(parseAsString),
   customers: parseAsArrayOf(parseAsString),
   status: parseAsString,
   start: parseAsString,

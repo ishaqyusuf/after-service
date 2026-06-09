@@ -4,6 +4,7 @@ import { format, parseISO } from "date-fns";
 
 type FilterKey =
   | "status"
+  | "categories"
   | "customers"
   | "tags"
   | "channel"
@@ -12,6 +13,7 @@ type FilterKey =
 
 type FilterValue = {
   status: string;
+  categories: string[];
   customers: string[];
   tags: string[];
   channel: string;
@@ -28,6 +30,7 @@ interface Props {
   filters: Partial<FilterValue>;
   onRemove: (filters: { [key: string]: null }) => void;
   statusFilters?: { id: string; name: string }[];
+  categoryFilters?: { id: string; name: string }[];
   channelFilters?: { id: string; name: string }[];
   customers?: { id: string; name: string }[];
 }
@@ -36,6 +39,7 @@ export function FilterList({
   filters,
   onRemove,
   statusFilters,
+  categoryFilters,
   channelFilters,
   customers,
 }: Props) {
@@ -49,6 +53,15 @@ export function FilterList({
         if (!Array.isArray(value) || value.length === 0) return null;
         const names = value
           .map((id) => customers?.find((c) => c.id === id)?.name)
+          .filter(Boolean);
+        if (names.length === 0) return null;
+        if (names.length === 1) return names[0];
+        return `${names[0]} +${names.length - 1} more`;
+      }
+      case "categories": {
+        if (!Array.isArray(value) || value.length === 0) return null;
+        const names = value
+          .map((id) => categoryFilters?.find((filter) => filter.id === id)?.name)
           .filter(Boolean);
         if (names.length === 0) return null;
         if (names.length === 1) return names[0];

@@ -32,6 +32,7 @@ export default async function JobsPage(props: Props) {
     trpc.serviceJobs.list.infiniteQueryOptions(
       {
         q: filter.q ?? undefined,
+        categories: filter.categories ?? undefined,
         customers: filter.customers ?? undefined,
         status: filter.status ?? undefined,
         start: filter.start ?? undefined,
