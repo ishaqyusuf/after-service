@@ -12,6 +12,12 @@ import {
   DropdownMenuLabel,
   DropdownMenuTrigger,
 } from "@afterservice/ui";
+import {
+  followUpChannelLabels,
+  followUpStatusLabels,
+  toFollowUpChannel,
+  toFollowUpStatus,
+} from "@/hooks/use-follow-up-filter-params";
 
 export type FollowUp = {
   id: string;
@@ -56,11 +62,21 @@ export const columns: ColumnDef<FollowUp>[] = [
       headerLabel: "Status",
       className: "w-[150px] min-w-[120px]",
     },
-    cell: ({ row }) => (
-      <Badge variant={row.original.status === "closed" || row.original.status === "replied" ? "secondary" : "default"}>
-        {row.original.status}
-      </Badge>
-    ),
+    cell: ({ row }) => {
+      const status = toFollowUpStatus(row.original.status);
+
+      return (
+        <Badge
+          variant={
+            status === "closed" || status === "replied"
+              ? "secondary"
+              : "default"
+          }
+        >
+          {status ? followUpStatusLabels[status] : row.original.status}
+        </Badge>
+      );
+    },
   },
   {
     id: "channel",
@@ -75,11 +91,15 @@ export const columns: ColumnDef<FollowUp>[] = [
       headerLabel: "Channel",
       className: "w-[150px] min-w-[120px]",
     },
-    cell: ({ row }) => (
-      <Badge variant="outline" className="capitalize">
-        {row.original.channel}
-      </Badge>
-    ),
+    cell: ({ row }) => {
+      const channel = toFollowUpChannel(row.original.channel);
+
+      return (
+        <Badge variant="outline">
+          {channel ? followUpChannelLabels[channel] : row.original.channel}
+        </Badge>
+      );
+    },
   },
   {
     id: "dueAt",

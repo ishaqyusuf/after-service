@@ -9,7 +9,10 @@ import {
   cn,
 } from "@afterservice/ui";
 import Link from "next/link";
-import { channelLabels } from "./constants";
+import {
+  followUpChannelLabels,
+  toFollowUpChannel,
+} from "@/hooks/use-follow-up-filter-params";
 import type { DashboardOverviewData } from "./overview-types";
 
 function SummaryStat({ label, value }: { label: string; value: string }) {
@@ -66,6 +69,7 @@ export function WorkloadCard({ data }: { data: DashboardOverviewData }) {
   const busiestChannel = [...followUpChannels].sort(
     (a, b) => b.count - a.count,
   )[0];
+  const topChannel = toFollowUpChannel(busiestChannel?.channel);
   const workload = [
     {
       color: "bg-red-500",
@@ -129,8 +133,9 @@ export function WorkloadCard({ data }: { data: DashboardOverviewData }) {
             label="Top channel"
             value={
               busiestChannel?.count
-                ? (channelLabels[busiestChannel.channel] ??
-                  busiestChannel.channel)
+                ? topChannel
+                  ? followUpChannelLabels[topChannel]
+                  : busiestChannel.channel
                 : "None"
             }
           />

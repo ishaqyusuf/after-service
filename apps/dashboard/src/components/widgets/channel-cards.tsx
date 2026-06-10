@@ -1,7 +1,10 @@
 "use client";
 
 import { Card, CardContent } from "@afterservice/ui";
-import { channelLabels } from "./constants";
+import {
+  followUpChannelLabels,
+  toFollowUpChannel,
+} from "@/hooks/use-follow-up-filter-params";
 import type { DashboardOverviewData } from "./overview-types";
 
 function ChannelCard({
@@ -44,14 +47,20 @@ export function ChannelCards({ data }: { data: DashboardOverviewData }) {
 
   return (
     <section className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-      {data.followUpChannels.map((item) => (
-        <ChannelCard
-          key={item.channel}
-          label={channelLabels[item.channel] ?? item.channel}
-          value={item.count}
-          total={totalFollowUps}
-        />
-      ))}
+      {data.followUpChannels.map((item) => {
+        const channel = toFollowUpChannel(item.channel);
+
+        return (
+          <ChannelCard
+            key={item.channel}
+            label={
+              channel ? followUpChannelLabels[channel] : item.channel
+            }
+            value={item.count}
+            total={totalFollowUps}
+          />
+        );
+      })}
     </section>
   );
 }

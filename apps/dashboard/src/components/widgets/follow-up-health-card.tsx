@@ -1,7 +1,11 @@
 "use client";
 
 import { Card, CardContent, CardHeader, CardTitle, cn } from "@afterservice/ui";
-import { statusLabels, statusTone } from "./constants";
+import {
+  followUpStatusLabels,
+  toFollowUpStatus,
+} from "@/hooks/use-follow-up-filter-params";
+import { statusTone } from "./constants";
 import type { DashboardOverviewData } from "./overview-types";
 
 function BreakdownRow({
@@ -50,15 +54,19 @@ export function FollowUpHealthCard({ data }: { data: DashboardOverviewData }) {
         </p>
       </CardHeader>
       <CardContent className="space-y-4 pt-6">
-        {data.followUpStatuses.map((item) => (
-          <BreakdownRow
-            color={statusTone[item.status] ?? "bg-muted-foreground"}
-            key={item.status}
-            label={statusLabels[item.status] ?? item.status}
-            total={totalFollowUps}
-            value={item.count}
-          />
-        ))}
+        {data.followUpStatuses.map((item) => {
+          const status = toFollowUpStatus(item.status);
+
+          return (
+            <BreakdownRow
+              color={statusTone[item.status] ?? "bg-muted-foreground"}
+              key={item.status}
+              label={status ? followUpStatusLabels[status] : item.status}
+              total={totalFollowUps}
+              value={item.count}
+            />
+          );
+        })}
       </CardContent>
     </Card>
   );

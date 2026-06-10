@@ -1,4 +1,4 @@
-import { Button } from "@afterservice/ui";
+import { Button, Card, CardContent } from "@afterservice/ui";
 
 type SheetMissingStateProps = {
   description: string;
@@ -12,19 +12,16 @@ export function SheetMissingState({
   title,
 }: SheetMissingStateProps) {
   return (
-    <div className="mt-6 border border-border p-6">
-      <div className="space-y-1">
-        <p className="text-sm font-medium">{title}</p>
-        <p className="text-sm text-muted-foreground">{description}</p>
-      </div>
-      <Button
-        type="button"
-        variant="outline"
-        className="mt-4"
-        onClick={onClose}
-      >
-        Close
-      </Button>
-    </div>
+    <Card className="mt-6">
+      <CardContent className="flex flex-col items-start gap-4 p-6">
+        <div className="space-y-1">
+          <p className="text-sm font-medium">{title}</p>
+          <p className="text-sm text-muted-foreground">{description}</p>
+        </div>
+        <Button type="button" variant="outline" onClick={onClose}>
+          Close
+        </Button>
+      </CardContent>
+    </Card>
   );
 }

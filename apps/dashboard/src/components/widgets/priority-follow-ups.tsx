@@ -16,11 +16,15 @@ import {
 } from "@afterservice/ui";
 import { ArrowUpRight, Clock3 } from "lucide-react";
 import Link from "next/link";
+import {
+  followUpStatusLabels,
+  toFollowUpStatus,
+} from "@/hooks/use-follow-up-filter-params";
 import { formatDate } from "@/lib/dashboard-format";
-import { statusLabels } from "./constants";
 import type { DashboardOverviewData } from "./overview-types";
 
 function StatusBadge({ status }: { status: string }) {
+  const normalizedStatus = toFollowUpStatus(status);
   const className =
     status === "missed"
       ? "border-red-200 bg-red-50 text-red-700 hover:bg-red-50"
@@ -30,7 +34,11 @@ function StatusBadge({ status }: { status: string }) {
           ? "border-amber-200 bg-amber-50 text-amber-700 hover:bg-amber-50"
           : "border-sky-200 bg-sky-50 text-sky-700 hover:bg-sky-50";
 
-  return <Badge className={className}>{statusLabels[status] ?? status}</Badge>;
+  return (
+    <Badge className={className}>
+      {normalizedStatus ? followUpStatusLabels[normalizedStatus] : status}
+    </Badge>
+  );
 }
 
 export function PriorityFollowUps({ data }: { data: DashboardOverviewData }) {

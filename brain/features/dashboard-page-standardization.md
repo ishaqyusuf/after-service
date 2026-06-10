@@ -35,6 +35,7 @@ In progress. Page shell, form consistency, page skeleton fallbacks, and stale TO
 - Dashboard overview and billing client views render structured empty states instead of blank content when their primary query payload is missing.
 - Dashboard overview priority follow-ups now use a structured card empty state with an action instead of an empty table row.
 - Dashboard overview recent job badges now reuse shared service job status labels instead of formatting raw enum values inline.
+- Dashboard overview follow-up widgets now reuse shared follow-up status and channel labels instead of local duplicate maps.
 - The shared dashboard `ErrorFallback` now renders a structured card-style retry state instead of a bare centered message.
 - Settings page content now follows the quieter Midday settings rhythm with a constrained section stack instead of a duplicate page-level header.
 - Dashboard shell search results and navigation icon maps avoid dashboard-local `any` types.

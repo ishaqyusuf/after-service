@@ -12,6 +12,10 @@ import {
   DropdownMenuLabel,
   DropdownMenuTrigger,
 } from "@afterservice/ui";
+import {
+  templateChannelLabels,
+  toTemplateChannel,
+} from "@/hooks/use-template-filter-params";
 
 export type Template = {
   id: string;
@@ -54,11 +58,15 @@ export const columns: ColumnDef<Template>[] = [
       headerLabel: "Channel",
       className: "w-[150px] min-w-[120px]",
     },
-    cell: ({ row }) => (
-      <Badge variant="outline" className="capitalize">
-        {row.original.channel}
-      </Badge>
-    ),
+    cell: ({ row }) => {
+      const channel = toTemplateChannel(row.original.channel);
+
+      return (
+        <Badge variant="outline">
+          {channel ? templateChannelLabels[channel] : row.original.channel}
+        </Badge>
+      );
+    },
   },
   {
     id: "subject",

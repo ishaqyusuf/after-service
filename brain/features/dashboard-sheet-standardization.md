@@ -20,7 +20,7 @@ In progress. Primary dashboard sheet forms aligned on 2026-06-09.
 - Template creation now follows the Midday sheet composition pattern: the URL-backed sheet stays thin and renders a dedicated form component from `components/forms`.
 - Template editing now follows the same composition pattern, and the edit sheet reads the same `templateId` URL param written by the templates table.
 - Template create/edit sheets already use shared shadcn-style form primitives.
-- Record-backed customer, follow-up work, schedule follow-up, and template edit sheets render the shared missing-record state with a close action when URL params point at archived or removed records.
+- Record-backed customer, follow-up work, schedule follow-up, and template edit sheets render the shared card-style missing-record state with a close action when URL params point at archived or removed records.
 - Customer creation and editing now follow the same composition pattern, and the edit sheet reads the same `customerId` URL param written by the customers table.
 - Customer create/edit sheets now use `FormField`, `FormItem`, `FormLabel`, `FormControl`, and `FormMessage`.
 - Job creation now follows the same composition pattern while preserving create-first customer, service-title, and category autocomplete behavior.

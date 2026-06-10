@@ -1,19 +1,3 @@
-export const statusLabels: Record<string, string> = {
-  closed: "Closed",
-  missed: "Missed",
-  open: "Open",
-  replied: "Replied",
-  scheduled: "Scheduled",
-  sent: "Sent",
-};
-
-export const channelLabels: Record<string, string> = {
-  email: "Email",
-  phone: "Phone",
-  sms: "SMS",
-  whatsapp: "WhatsApp",
-};
-
 export const statusTone: Record<string, string> = {
   closed: "bg-emerald-500",
   missed: "bg-red-500",

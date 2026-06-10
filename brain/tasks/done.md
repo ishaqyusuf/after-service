@@ -1910,6 +1910,72 @@ Files changed:
 - `apps/dashboard/src/components/forms/job-create-form.tsx`
 - `brain`
 
+### Overview Follow-Up Label Map Alignment
+
+Completed: 2026-06-10
+
+Summary:
+
+- Removed duplicate follow-up status and channel label maps from overview widget constants.
+- Reused shared follow-up status labels in priority follow-ups and follow-up health widgets.
+- Reused shared follow-up channel labels in channel cards and workload summary widgets.
+- Preserved widget-local status tone styling and unknown-value fallbacks.
+- Updated Brain page standardization notes.
+
+Verification:
+
+- Focused whitespace and exact overview follow-up label scans only, per fast Bun monorepo command discipline.
+
+Files changed:
+
+- `apps/dashboard/src/components/widgets/constants.ts`
+- `apps/dashboard/src/components/widgets/channel-cards.tsx`
+- `apps/dashboard/src/components/widgets/workload-card.tsx`
+- `apps/dashboard/src/components/widgets/priority-follow-ups.tsx`
+- `apps/dashboard/src/components/widgets/follow-up-health-card.tsx`
+- `brain`
+
+### Table Badge Display Label Alignment
+
+Completed: 2026-06-10
+
+Summary:
+
+- Replaced raw follow-up status badge text with the shared follow-up status label map.
+- Replaced raw follow-up channel badge text with the shared follow-up channel label map.
+- Replaced raw template channel badge text with the shared template channel label map.
+- Preserved fallback rendering for unknown values.
+- Updated Brain table/filter standardization notes.
+
+Verification:
+
+- Focused whitespace and exact table badge label scans only, per fast Bun monorepo command discipline.
+
+Files changed:
+
+- `apps/dashboard/src/components/tables/follow-ups/columns.tsx`
+- `apps/dashboard/src/components/tables/templates/columns.tsx`
+- `brain`
+
+### Sheet Missing State Card Alignment
+
+Completed: 2026-06-10
+
+Summary:
+
+- Converted the shared sheet missing-record state from a hand-rolled bordered block to shared `Card` and `CardContent` primitives.
+- Preserved the close action, titles, descriptions, and all sheet callers.
+- Updated Brain sheet standardization notes.
+
+Verification:
+
+- Focused whitespace and exact sheet missing-state card scans only, per fast Bun monorepo command discipline.
+
+Files changed:
+
+- `apps/dashboard/src/components/sheets/sheet-missing-state.tsx`
+- `brain`
+
 ### Dashboard Date Filter Control Alignment
 
 Completed: 2026-06-10

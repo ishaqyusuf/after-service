@@ -39,6 +39,7 @@ In progress. Empty-state alignment, filter payload cleanup, customer tag filters
 - Sort toggling now starts new columns at ascending, then cycles ascending, descending, and cleared.
 - Follow-up history filters now support status, channel, and due-date range with matching API predicates.
 - Follow-up status and channel filters now use shared display-label maps instead of inline label construction.
+- Follow-up status/channel and template channel table badges now reuse the same shared display-label maps as their filters.
 - Template filters now support channel filtering with matching URL params, table query input, and API router predicates.
 - Template channel filters now use a shared display-label map instead of a local label object.
 - Customer search now matches name, company, email, phone, and exact tag values instead of name only.
