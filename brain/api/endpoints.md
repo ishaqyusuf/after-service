@@ -13,6 +13,9 @@ Production public API base: `https://dashboard.afterservice.app/api`.
 - `POST /api/onboarding`: dashboard same-origin onboarding adapter. Requires a valid Better Auth session, creates a workspace, owner membership, starter subscription state, and starter templates.
 
 ## tRPC Routers
+Canonical production tRPC base: `https://dashboard.afterservice.app/api/trpc`.
+The API service also keeps `/trpc/*` as a legacy/local compatibility mount, but browser and dashboard-facing code should use `/api/trpc`.
+
 `health`
 - `health`: returns service status.
 

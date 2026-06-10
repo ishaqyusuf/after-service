@@ -4,7 +4,7 @@ import { buildWorkspaceTemplateSeed, getDbClient } from "@afterservice/db";
 import { markMissedFollowUps, runDueFollowUpsDryRun } from "@afterservice/jobs";
 import { getDevAppUrlStrings } from "@afterservice/utils";
 import { fetchRequestHandler } from "@trpc/server/adapters/fetch";
-import { Hono } from "hono";
+import { Hono, type Context } from "hono";
 import { cors } from "hono/cors";
 import { z } from "zod";
 import { createContext } from "./context";
@@ -58,14 +58,17 @@ app.get("/health", (c) => {
   });
 });
 
-app.all("/trpc/*", (c) => {
+function handleTrpcRequest(c: Context) {
   return fetchRequestHandler({
     createContext: () => createContext(c.req.raw),
-    endpoint: "/trpc",
+    endpoint: c.req.path.startsWith("/api/trpc") ? "/api/trpc" : "/trpc",
     req: c.req.raw,
     router: appRouter,
   });
-});
+}
+
+app.all("/api/trpc/*", handleTrpcRequest);
+app.all("/trpc/*", handleTrpcRequest);
 
 app.on(["GET", "POST"], "/api/auth/*", (c) => {
   return auth.handler(c.req.raw);
