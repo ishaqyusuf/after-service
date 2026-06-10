@@ -4,7 +4,7 @@ import { buildWorkspaceTemplateSeed, getDbClient } from "@afterservice/db";
 import { markMissedFollowUps, runDueFollowUpsDryRun } from "@afterservice/jobs";
 import { getDevAppUrlStrings } from "@afterservice/utils";
 import { fetchRequestHandler } from "@trpc/server/adapters/fetch";
-import { Hono, type Context } from "hono";
+import { type Context, Hono } from "hono";
 import { cors } from "hono/cors";
 import { z } from "zod";
 import { createContext } from "./context";
@@ -105,9 +105,25 @@ app.post("/api/onboarding", async (c) => {
   });
 
   if (existingMembership) {
+    const workspace = await db.workspace.update({
+      data: {
+        businessType: parsed.data.businessType || null,
+        defaultFollowUpDelayDays: parsed.data.defaultFollowUpDelayDays,
+        name: parsed.data.businessName,
+        serviceCategory: parsed.data.serviceCategory || null,
+      },
+      select: {
+        id: true,
+        slug: true,
+      },
+      where: {
+        id: existingMembership.workspace.id,
+      },
+    });
+
     return c.json({
       ok: true,
-      workspace: existingMembership.workspace,
+      workspace,
     });
   }
 

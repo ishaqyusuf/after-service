@@ -37,6 +37,7 @@ Dashboard SSR tRPC prefetching depended on an HTTP client URL derived from `NEXT
 - 2026-06-10: Added overview payload normalization before rendering widgets so missing `counts`, `followUpChannels`, `followUpStatuses`, `recentFollowUps`, or `recentJobs` fall back to empty/zero values instead of crashing.
 - 2026-06-10: Fixed dashboard hydration mismatch by making `prefetch(...)` return its query promise and awaiting `dashboard.overview` prefetch before rendering the dashboard page. This prevents the server from rendering the overview skeleton while the client hydrates with overview data.
 - 2026-06-10: Updated customers, jobs, follow-ups, and templates tables to use the Midday-style TanStack `useSuspenseInfiniteQuery(trpc.*.infiniteQueryOptions(...))` pattern instead of direct tRPC suspense-infinite hooks, fixing query option shape crashes such as undefined `length` reads.
+- 2026-06-10: Fixed onboarding resubmits for users who already have a workspace. Both onboarding endpoints now update the existing workspace profile fields instead of returning the existing workspace unchanged, and settings awaits the workspace prefetch so saved onboarding details are available immediately.
 - Pending: reproduce locally with `.env.production` via `bun run terminal prod:dashboard`.
 - Pending: deploy and open authenticated dashboard routes.
 - Pending: run a production smoke check against `https://dashboard.afterservice.app/api/trpc`.

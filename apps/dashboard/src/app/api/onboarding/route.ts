@@ -53,9 +53,25 @@ export async function POST(request: Request) {
   });
 
   if (existingMembership) {
+    const workspace = await db.workspace.update({
+      data: {
+        businessType: parsed.data.businessType || null,
+        defaultFollowUpDelayDays: parsed.data.defaultFollowUpDelayDays,
+        name: parsed.data.businessName,
+        serviceCategory: parsed.data.serviceCategory || null,
+      },
+      select: {
+        id: true,
+        slug: true,
+      },
+      where: {
+        id: existingMembership.workspace.id,
+      },
+    });
+
     return Response.json({
       ok: true,
-      workspace: existingMembership.workspace,
+      workspace,
     });
   }
 

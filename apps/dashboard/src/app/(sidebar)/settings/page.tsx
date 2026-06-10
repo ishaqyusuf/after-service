@@ -12,7 +12,7 @@ export const metadata: Metadata = {
 };
 
 export default async function SettingsPage() {
-  prefetch(trpc.workspace.getCurrent.queryOptions());
+  await prefetch(trpc.workspace.getCurrent.queryOptions());
 
   return (
     <HydrateClient>
