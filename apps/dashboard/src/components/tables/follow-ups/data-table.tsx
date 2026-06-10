@@ -1,11 +1,12 @@
 "use client";
 
 import type { AppRouter } from "@afterservice/api/router";
-import { closestCenter, DndContext } from "@dnd-kit/core";
 import { Table, TableBody, TableCell, TableRow } from "@afterservice/ui/table";
+import { closestCenter, DndContext } from "@dnd-kit/core";
+import { useSuspenseInfiniteQuery } from "@tanstack/react-query";
 import { getCoreRowModel, useReactTable } from "@tanstack/react-table";
-import type { inferRouterOutputs } from "@trpc/server";
 import { useVirtualizer, type VirtualItem } from "@tanstack/react-virtual";
+import type { inferRouterOutputs } from "@trpc/server";
 import {
   useCallback,
   useDeferredValue,
@@ -13,6 +14,7 @@ import {
   useMemo,
   useRef,
 } from "react";
+import { trpc } from "@/components/providers/trpc-provider";
 import { VirtualRow } from "@/components/tables/core";
 import {
   toFollowUpChannel,
@@ -28,7 +30,6 @@ import { useTableDnd } from "@/hooks/use-table-dnd";
 import { useTableScroll } from "@/hooks/use-table-scroll";
 import { useTableSettings } from "@/hooks/use-table-settings";
 import { useFollowUpsStore } from "@/store/follow-ups";
-import { trpc } from "@/components/providers/trpc-provider";
 import { STICKY_COLUMNS, SUMMARY_GRID_HEIGHTS } from "@/utils/table-configs";
 import { getColumnIds, type TableSettings } from "@/utils/table-settings";
 import { columns } from "./columns";
@@ -49,7 +50,6 @@ type FollowUpsListPage =
 type FollowUpRow = FollowUpsListPage["items"][number];
 
 export function DataTable({ initialSettings }: Props) {
-
   const { setParams } = useFollowUpParams();
   const { filter, hasFilters } = useFollowUpFilterParams();
   const { params } = useSortParams();
@@ -59,7 +59,9 @@ export function DataTable({ initialSettings }: Props) {
   const deferredSearch = useDeferredValue(filter.q);
 
   // Hide header and summary grid on scroll
-  useScrollHeader(parentRef, { extraOffset: SUMMARY_GRID_HEIGHTS["follow-ups"] });
+  useScrollHeader(parentRef, {
+    extraOffset: SUMMARY_GRID_HEIGHTS["follow-ups"],
+  });
 
   // Use unified table settings hook for column state management
   const {
@@ -75,7 +77,7 @@ export function DataTable({ initialSettings }: Props) {
     columnIds: COLUMN_IDS,
   });
 
-  const [data, { fetchNextPage, hasNextPage, isFetchingNextPage, refetch }] = trpc.followUps.listTable.useSuspenseInfiniteQuery(
+  const infiniteQueryOptions = trpc.followUps.listTable.infiniteQueryOptions(
     {
       channel: toFollowUpChannel(filter.channel),
       end: filter.end ?? undefined,
@@ -83,9 +85,14 @@ export function DataTable({ initialSettings }: Props) {
       sort: params.sort ?? undefined,
       start: filter.start ?? undefined,
       status: toFollowUpStatus(filter.status),
-    }, {
+    },
+    {
       getNextPageParam: (lastPage: FollowUpsListPage) => lastPage.nextCursor,
-    });
+    },
+  );
+
+  const { data, fetchNextPage, hasNextPage, isFetchingNextPage, refetch } =
+    useSuspenseInfiniteQuery(infiniteQueryOptions);
 
   const closeFollowUpMutation = trpc.followUps.close.useMutation({
     onSuccess: () => {
@@ -146,7 +153,7 @@ export function DataTable({ initialSettings }: Props) {
   // Sync columns to store for column visibility toggle
   useEffect(() => {
     setColumns(table.getAllLeafColumns());
-  }, [table, setColumns, columnVisibility]);
+  }, [table, setColumns]);
 
   // Use the reusable sticky columns hook
   const { getStickyStyle, getStickyClassName } = useStickyColumns({
@@ -181,8 +188,6 @@ export function DataTable({ initialSettings }: Props) {
     fetchNextPage,
     threshold: 50,
   });
-
-
 
   if (!tableData.length && hasFilters) {
     return <NoResults />;

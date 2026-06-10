@@ -3,7 +3,7 @@ import { websiteNavItems } from "@afterservice/site-nav";
 import { BrandLogo, cn } from "@afterservice/ui";
 import { appMetadata } from "@afterservice/utils";
 import type { Metadata } from "next";
-import { Geist } from "next/font/google";
+import { Hedvig_Letters_Sans, Hedvig_Letters_Serif } from "next/font/google";
 import { headers } from "next/headers";
 import Link from "next/link";
 import type { ReactNode } from "react";
@@ -11,7 +11,25 @@ import { PwaServiceWorkerRegister } from "../components/pwa-service-worker-regis
 import { createPageMetadata, siteUrl } from "../lib/seo";
 import "./globals.css";
 
-const geist = Geist({ subsets: ["latin"], variable: "--font-sans" });
+const hedvigSans = Hedvig_Letters_Sans({
+  adjustFontFallback: true,
+  display: "optional",
+  fallback: ["system-ui", "arial"],
+  preload: true,
+  subsets: ["latin"],
+  variable: "--font-hedvig-sans",
+  weight: "400",
+});
+
+const hedvigSerif = Hedvig_Letters_Serif({
+  adjustFontFallback: true,
+  display: "optional",
+  fallback: ["Georgia", "Times New Roman", "serif"],
+  preload: true,
+  subsets: ["latin"],
+  variable: "--font-hedvig-serif",
+  weight: "400",
+});
 
 export const metadata: Metadata = {
   ...createPageMetadata({
@@ -36,7 +54,11 @@ export default async function RootLayout({
   return (
     <html
       lang="en"
-      className={cn("font-sans antialiased", geist.variable)}
+      className={cn(
+        "font-sans antialiased",
+        hedvigSans.variable,
+        hedvigSerif.variable,
+      )}
       suppressHydrationWarning
     >
       <body className="min-h-screen flex flex-col bg-background text-foreground">

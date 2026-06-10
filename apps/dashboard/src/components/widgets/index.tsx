@@ -7,10 +7,37 @@ import { ChannelCards } from "./channel-cards";
 import { FollowUpHealthCard } from "./follow-up-health-card";
 import { OverviewHeader } from "./overview-header";
 import { OverviewSkeleton } from "./overview-skeleton";
+import type { DashboardOverviewData } from "./overview-types";
 import { PriorityFollowUps } from "./priority-follow-ups";
 import { RecentJobs } from "./recent-jobs";
 import { WidgetCards } from "./widget-cards";
 import { WorkloadCard } from "./workload-card";
+
+const emptyCounts: DashboardOverviewData["counts"] = {
+  completedThisWeek: 0,
+  customers: 0,
+  dueToday: 0,
+  jobs: 0,
+  openFollowUps: 0,
+  overdueFollowUps: 0,
+  resolvedFollowUps: 0,
+  sentThisWeek: 0,
+  upcomingFollowUps: 0,
+};
+
+function normalizeOverviewData(data: DashboardOverviewData) {
+  return {
+    ...data,
+    counts: {
+      ...emptyCounts,
+      ...data.counts,
+    },
+    followUpChannels: data.followUpChannels ?? [],
+    followUpStatuses: data.followUpStatuses ?? [],
+    recentFollowUps: data.recentFollowUps ?? [],
+    recentJobs: data.recentJobs ?? [],
+  };
+}
 
 export function OverviewView() {
   const { data, isLoading } = trpc.dashboard.overview.useQuery();
@@ -22,19 +49,21 @@ export function OverviewView() {
 
   if (!data) return <OverviewEmptyState onRetry={() => router.refresh()} />;
 
+  const overviewData = normalizeOverviewData(data);
+
   return (
     <div className="space-y-6">
-      <OverviewHeader data={data} />
-      <WidgetCards data={data} />
+      <OverviewHeader data={overviewData} />
+      <WidgetCards data={overviewData} />
       <section className="grid gap-4 lg:grid-cols-[1.1fr_0.9fr]">
-        <WorkloadCard data={data} />
-        <FollowUpHealthCard data={data} />
+        <WorkloadCard data={overviewData} />
+        <FollowUpHealthCard data={overviewData} />
       </section>
       <section className="grid gap-4 lg:grid-cols-[1.2fr_0.8fr]">
-        <PriorityFollowUps data={data} />
-        <RecentJobs data={data} />
+        <PriorityFollowUps data={overviewData} />
+        <RecentJobs data={overviewData} />
       </section>
-      <ChannelCards data={data} />
+      <ChannelCards data={overviewData} />
     </div>
   );
 }

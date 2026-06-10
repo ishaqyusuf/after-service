@@ -4,7 +4,7 @@
 Authenticated dashboard pages failed to load in production with a Vercel server-render error showing `Error: redacted`.
 
 ## Status
-Fixed in code on 2026-06-10. Production verification is pending deployment.
+Reopened on 2026-06-10 after production pages were still reported not loading. The earlier code fix remains in place, but root cause needs fresh production-env reproduction.
 
 ## Impact
 Signed-in users could not load dashboard pages such as overview, jobs, customers, follow-ups, templates, billing, and settings.
@@ -30,5 +30,16 @@ Dashboard SSR tRPC prefetching depended on an HTTP client URL derived from `NEXT
 - The API service accepts both `/api/trpc/*` and legacy `/trpc/*`.
 
 ## Verification
+- 2026-06-10: Linked local checkout to Vercel project `after-service-dashboard` (`prj_YBTsQyreE9GcIeEX7jFFkMmHaQ1w`) and pulled production envs into ignored root `.env.production`. Safe key check confirmed 34 keys are present, including `DATABASE_URL`, `BETTER_AUTH_SECRET`, `NEXT_PUBLIC_SITE_URL`, `GOOGLE_CLIENT_ID`, and `GOOGLE_CLIENT_SECRET`.
+- 2026-06-10: Added a temporary `AFTERSERVICE_AUTH_DEBUG=true` sign-in page FAB that opens recent Better Auth DB account identifiers from the `Account` table and shows safe query errors without printing secrets.
+- 2026-06-10: Added a dashboard proxy logout escape hatch. `/logout`, `/sign-out`, and `/sign-in?logout=true` expire known auth cookies and redirect to `/sign-in`, which helps recover from stale cookies that make the proxy think the user is authenticated.
+- 2026-06-10: Hardened overview widgets against partial overview payloads where `workspace` is missing. The header now falls back to `Dashboard` / `Local service`, and workload default delay falls back to `Not set` instead of crashing.
+- 2026-06-10: Added overview payload normalization before rendering widgets so missing `counts`, `followUpChannels`, `followUpStatuses`, `recentFollowUps`, or `recentJobs` fall back to empty/zero values instead of crashing.
+- 2026-06-10: Fixed dashboard hydration mismatch by making `prefetch(...)` return its query promise and awaiting `dashboard.overview` prefetch before rendering the dashboard page. This prevents the server from rendering the overview skeleton while the client hydrates with overview data.
+- 2026-06-10: Updated customers, jobs, follow-ups, and templates tables to use the Midday-style TanStack `useSuspenseInfiniteQuery(trpc.*.infiniteQueryOptions(...))` pattern instead of direct tRPC suspense-infinite hooks, fixing query option shape crashes such as undefined `length` reads.
+- Pending: reproduce locally with `.env.production` via `bun run terminal prod:dashboard`.
 - Pending: deploy and open authenticated dashboard routes.
 - Pending: run a production smoke check against `https://dashboard.afterservice.app/api/trpc`.
+
+## Follow-Up Prompt
+- For any future production page-load bug, run the relevant production-env terminal prompt before concluding the issue is fixed: `bun run terminal prod:dashboard` for dashboard pages or `bun run terminal prod:website` for marketing pages.

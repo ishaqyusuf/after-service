@@ -17,6 +17,7 @@ This file records core technology choices.
 
 ## Dependency Notes
 - 2026-06-10: Aligned the monorepo Next.js packages on `next@^16.2.9` and React packages on 19.2.x. This keeps the website, dashboard, and shared UI package on one Next/React line.
+- 2026-06-10: Website and dashboard typography should match the Midday reference project by using `Hedvig_Letters_Sans` and `Hedvig_Letters_Serif` through Next font variables `--font-hedvig-sans` and `--font-hedvig-serif`.
 
 ## Data And Auth
 - Database: Postgres

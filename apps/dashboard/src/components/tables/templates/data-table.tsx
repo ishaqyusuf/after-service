@@ -1,11 +1,12 @@
 "use client";
 
 import type { AppRouter } from "@afterservice/api/router";
-import { closestCenter, DndContext } from "@dnd-kit/core";
 import { Table, TableBody, TableCell, TableRow } from "@afterservice/ui/table";
+import { closestCenter, DndContext } from "@dnd-kit/core";
+import { useSuspenseInfiniteQuery } from "@tanstack/react-query";
 import { getCoreRowModel, useReactTable } from "@tanstack/react-table";
-import type { inferRouterOutputs } from "@trpc/server";
 import { useVirtualizer, type VirtualItem } from "@tanstack/react-virtual";
+import type { inferRouterOutputs } from "@trpc/server";
 import {
   useCallback,
   useDeferredValue,
@@ -13,12 +14,8 @@ import {
   useMemo,
   useRef,
 } from "react";
+import { trpc } from "@/components/providers/trpc-provider";
 import { VirtualRow } from "@/components/tables/core";
-import {
-  toTemplateChannel,
-  useTemplateFilterParams,
-} from "@/hooks/use-template-filter-params";
-import { useTemplateParams } from "@/hooks/use-template-params";
 import { useInfiniteScroll } from "@/hooks/use-infinite-scroll";
 import { useScrollHeader } from "@/hooks/use-scroll-header";
 import { useSortParams } from "@/hooks/use-sort-params";
@@ -26,8 +23,12 @@ import { useStickyColumns } from "@/hooks/use-sticky-columns";
 import { useTableDnd } from "@/hooks/use-table-dnd";
 import { useTableScroll } from "@/hooks/use-table-scroll";
 import { useTableSettings } from "@/hooks/use-table-settings";
+import {
+  toTemplateChannel,
+  useTemplateFilterParams,
+} from "@/hooks/use-template-filter-params";
+import { useTemplateParams } from "@/hooks/use-template-params";
 import { useTemplatesStore } from "@/store/templates";
-import { trpc } from "@/components/providers/trpc-provider";
 import { STICKY_COLUMNS, SUMMARY_GRID_HEIGHTS } from "@/utils/table-configs";
 import { getColumnIds, type TableSettings } from "@/utils/table-settings";
 import { columns } from "./columns";
@@ -47,7 +48,6 @@ type TemplatesListPage = inferRouterOutputs<AppRouter>["templates"]["list"];
 type TemplateRow = TemplatesListPage["items"][number];
 
 export function DataTable({ initialSettings }: Props) {
-
   const { setParams } = useTemplateParams();
   const { filter, hasFilters } = useTemplateFilterParams();
   const { params } = useSortParams();
@@ -73,14 +73,19 @@ export function DataTable({ initialSettings }: Props) {
     columnIds: COLUMN_IDS,
   });
 
-  const [data, { fetchNextPage, hasNextPage, isFetchingNextPage, refetch }] = trpc.templates.list.useSuspenseInfiniteQuery(
+  const infiniteQueryOptions = trpc.templates.list.infiniteQueryOptions(
     {
       channel: toTemplateChannel(filter.channel),
       search: deferredSearch ?? undefined,
       sort: params.sort ?? undefined,
-    }, {
+    },
+    {
       getNextPageParam: (lastPage: TemplatesListPage) => lastPage.nextCursor,
-    });
+    },
+  );
+
+  const { data, fetchNextPage, hasNextPage, isFetchingNextPage, refetch } =
+    useSuspenseInfiniteQuery(infiniteQueryOptions);
 
   const archiveTemplateMutation = trpc.templates.archive.useMutation({
     onSuccess: () => {
@@ -141,7 +146,7 @@ export function DataTable({ initialSettings }: Props) {
   // Sync columns to store for column visibility toggle
   useEffect(() => {
     setColumns(table.getAllLeafColumns());
-  }, [table, setColumns, columnVisibility]);
+  }, [table, setColumns]);
 
   // Use the reusable sticky columns hook
   const { getStickyStyle, getStickyClassName } = useStickyColumns({
@@ -176,8 +181,6 @@ export function DataTable({ initialSettings }: Props) {
     fetchNextPage,
     threshold: 50,
   });
-
-
 
   if (!tableData.length && hasFilters) {
     return <NoResults />;

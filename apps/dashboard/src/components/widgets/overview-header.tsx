@@ -7,6 +7,9 @@ import type { DashboardOverviewData } from "./overview-types";
 
 export function OverviewHeader({ data }: { data: DashboardOverviewData }) {
   const { workspace } = data;
+  const serviceLabel =
+    workspace?.serviceCategory ?? workspace?.businessType ?? "Local service";
+  const workspaceName = workspace?.name ?? "Dashboard";
 
   return (
     <header className="flex flex-col gap-4 border-b border-border pb-6 lg:flex-row lg:items-end lg:justify-between">
@@ -15,15 +18,11 @@ export function OverviewHeader({ data }: { data: DashboardOverviewData }) {
           <Badge className="border-emerald-200 bg-emerald-50 text-emerald-700 hover:bg-emerald-50">
             Workspace live
           </Badge>
-          <Badge variant="outline">
-            {workspace.serviceCategory ??
-              workspace.businessType ??
-              "Local service"}
-          </Badge>
+          <Badge variant="outline">{serviceLabel}</Badge>
         </div>
         <div className="space-y-2">
           <h1 className="text-3xl font-semibold tracking-tight text-foreground">
-            {workspace.name}
+            {workspaceName}
           </h1>
           <p className="text-sm leading-6 text-muted-foreground">
             A focused operating view for completed jobs, customer check-ins,

@@ -102,5 +102,30 @@ bun run terminal
 bun run terminal check
 bun run terminal dashboard
 bun run terminal db:validate
+bun run terminal prod:dashboard
+bun run terminal prod:website
 bun run terminal smoke:mvp
 ```
+
+Use `prod:dashboard` or `prod:website` when reproducing production-only page
+load failures. They build the selected app and start it locally with root
+`.env.production`.
+
+## Production Env Sync
+
+Root `.env.production` is ignored and can be synced with the linked Vercel
+project:
+
+```bash
+# Import Vercel production envs to .env.production
+bun run env:prod:import
+
+# Preview which .env.production keys would be exported back to Vercel
+bun run env:prod:export
+
+# Export .env.production keys to Vercel production
+bun run env:prod:export:apply
+```
+
+The export helper skips Vercel/system-generated keys by default and does not
+print secret values.

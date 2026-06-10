@@ -58,6 +58,27 @@ const terminalScripts = {
     description: "Run the local MVP auth/API/billing smoke verifier.",
     steps: [{ command: "bun", args: ["run", "smoke:mvp"] }],
   },
+  "prod:dashboard": {
+    description:
+      "Build and start the dashboard locally with the production env.",
+    steps: [
+      {
+        command: "bun",
+        args: ["run", "--filter", "@afterservice/dashboard", "build"],
+      },
+      { command: "bun", args: ["run", "start:dashboard:prod"] },
+    ],
+  },
+  "prod:website": {
+    description: "Build and start the website locally with the production env.",
+    steps: [
+      {
+        command: "bun",
+        args: ["run", "--filter", "@afterservice/website", "build"],
+      },
+      { command: "bun", args: ["run", "start:website:prod"] },
+    ],
+  },
   typecheck: {
     description: "Run typecheck across the workspace.",
     steps: [{ command: "bun", args: ["run", "typecheck"] }],

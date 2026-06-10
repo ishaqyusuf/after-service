@@ -1,11 +1,12 @@
 "use client";
 
 import type { AppRouter } from "@afterservice/api/router";
-import { closestCenter, DndContext } from "@dnd-kit/core";
 import { Table, TableBody, TableCell, TableRow } from "@afterservice/ui/table";
+import { closestCenter, DndContext } from "@dnd-kit/core";
+import { useSuspenseInfiniteQuery } from "@tanstack/react-query";
 import { getCoreRowModel, useReactTable } from "@tanstack/react-table";
-import type { inferRouterOutputs } from "@trpc/server";
 import { useVirtualizer, type VirtualItem } from "@tanstack/react-virtual";
+import type { inferRouterOutputs } from "@trpc/server";
 import { useQueryState } from "nuqs";
 import {
   useCallback,
@@ -14,12 +15,13 @@ import {
   useMemo,
   useRef,
 } from "react";
+import { trpc } from "@/components/providers/trpc-provider";
 import { VirtualRow } from "@/components/tables/core";
+import { useInfiniteScroll } from "@/hooks/use-infinite-scroll";
 import {
   toServiceJobStatus,
   useJobFilterParams,
 } from "@/hooks/use-job-filter-params";
-import { useInfiniteScroll } from "@/hooks/use-infinite-scroll";
 import { useScrollHeader } from "@/hooks/use-scroll-header";
 import { useSortParams } from "@/hooks/use-sort-params";
 import { useStickyColumns } from "@/hooks/use-sticky-columns";
@@ -27,7 +29,6 @@ import { useTableDnd } from "@/hooks/use-table-dnd";
 import { useTableScroll } from "@/hooks/use-table-scroll";
 import { useTableSettings } from "@/hooks/use-table-settings";
 import { useJobsStore } from "@/store/jobs";
-import { trpc } from "@/components/providers/trpc-provider";
 import { STICKY_COLUMNS, SUMMARY_GRID_HEIGHTS } from "@/utils/table-configs";
 import { getColumnIds, type TableSettings } from "@/utils/table-settings";
 import { columns } from "./columns";
@@ -72,21 +73,23 @@ export function DataTable({ initialSettings }: Props) {
     columnIds: COLUMN_IDS,
   });
 
-  const [data, { fetchNextPage, hasNextPage, isFetchingNextPage, refetch }] =
-    trpc.serviceJobs.list.useSuspenseInfiniteQuery(
-      {
-        categories: filter.categories ?? undefined,
-        customers: filter.customers ?? undefined,
-        end: filter.end ?? undefined,
-        q: deferredSearch ?? undefined,
-        sort: params.sort ?? undefined,
-        start: filter.start ?? undefined,
-        status: toServiceJobStatus(filter.status),
-      },
-      {
-        getNextPageParam: (lastPage: JobsListPage) => lastPage.nextCursor,
-      },
-    );
+  const infiniteQueryOptions = trpc.serviceJobs.list.infiniteQueryOptions(
+    {
+      categories: filter.categories ?? undefined,
+      customers: filter.customers ?? undefined,
+      end: filter.end ?? undefined,
+      q: deferredSearch ?? undefined,
+      sort: params.sort ?? undefined,
+      start: filter.start ?? undefined,
+      status: toServiceJobStatus(filter.status),
+    },
+    {
+      getNextPageParam: (lastPage: JobsListPage) => lastPage.nextCursor,
+    },
+  );
+
+  const { data, fetchNextPage, hasNextPage, isFetchingNextPage } =
+    useSuspenseInfiniteQuery(infiniteQueryOptions);
 
   const tableData = useMemo<JobRow[]>(() => {
     return data?.pages.flatMap((page) => page.items) ?? [];
@@ -134,7 +137,7 @@ export function DataTable({ initialSettings }: Props) {
   // Sync columns to store for column visibility toggle
   useEffect(() => {
     setColumns(table.getAllLeafColumns());
-  }, [table, setColumns, columnVisibility]);
+  }, [table, setColumns]);
 
   // Use the reusable sticky columns hook
   const { getStickyStyle, getStickyClassName } = useStickyColumns({
@@ -169,8 +172,6 @@ export function DataTable({ initialSettings }: Props) {
     fetchNextPage,
     threshold: 50,
   });
-
-
 
   if (!tableData.length && hasFilters) {
     return <NoResults />;

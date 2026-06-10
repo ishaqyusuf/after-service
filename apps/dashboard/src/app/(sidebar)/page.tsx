@@ -13,7 +13,7 @@ export const metadata: Metadata = {
 };
 
 export default async function DashboardPage() {
-  prefetch(trpc.dashboard.overview.queryOptions());
+  await prefetch(trpc.dashboard.overview.queryOptions());
 
   return (
     <HydrateClient>

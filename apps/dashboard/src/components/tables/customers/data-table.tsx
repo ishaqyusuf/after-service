@@ -1,11 +1,12 @@
 "use client";
 
 import type { AppRouter } from "@afterservice/api/router";
-import { closestCenter, DndContext } from "@dnd-kit/core";
 import { Table, TableBody, TableCell, TableRow } from "@afterservice/ui/table";
+import { closestCenter, DndContext } from "@dnd-kit/core";
+import { useSuspenseInfiniteQuery } from "@tanstack/react-query";
 import { getCoreRowModel, useReactTable } from "@tanstack/react-table";
-import type { inferRouterOutputs } from "@trpc/server";
 import { useVirtualizer, type VirtualItem } from "@tanstack/react-virtual";
+import type { inferRouterOutputs } from "@trpc/server";
 import {
   useCallback,
   useDeferredValue,
@@ -13,6 +14,7 @@ import {
   useMemo,
   useRef,
 } from "react";
+import { trpc } from "@/components/providers/trpc-provider";
 import { VirtualRow } from "@/components/tables/core";
 import { useCustomerFilterParams } from "@/hooks/use-customer-filter-params";
 import { useCustomerParams } from "@/hooks/use-customer-params";
@@ -24,7 +26,6 @@ import { useTableDnd } from "@/hooks/use-table-dnd";
 import { useTableScroll } from "@/hooks/use-table-scroll";
 import { useTableSettings } from "@/hooks/use-table-settings";
 import { useCustomersStore } from "@/store/customers";
-import { trpc } from "@/components/providers/trpc-provider";
 import { STICKY_COLUMNS, SUMMARY_GRID_HEIGHTS } from "@/utils/table-configs";
 import { getColumnIds, type TableSettings } from "@/utils/table-settings";
 import { columns } from "./columns";
@@ -44,7 +45,6 @@ type CustomersListPage = inferRouterOutputs<AppRouter>["customers"]["list"];
 type CustomerRow = CustomersListPage["items"][number];
 
 export function DataTable({ initialSettings }: Props) {
-
   const { setParams } = useCustomerParams();
   const { filter, hasFilters } = useCustomerFilterParams();
   const { params } = useSortParams();
@@ -70,15 +70,20 @@ export function DataTable({ initialSettings }: Props) {
     columnIds: COLUMN_IDS,
   });
 
-  const [data, { fetchNextPage, hasNextPage, isFetchingNextPage, refetch }] = trpc.customers.list.useSuspenseInfiniteQuery(
+  const infiniteQueryOptions = trpc.customers.list.infiniteQueryOptions(
     {
       includeArchived: false,
       search: deferredSearch ?? undefined,
       sort: params.sort ?? undefined,
       tags: filter.tags ?? undefined,
-    }, {
+    },
+    {
       getNextPageParam: (lastPage: CustomersListPage) => lastPage.nextCursor,
-    });
+    },
+  );
+
+  const { data, fetchNextPage, hasNextPage, isFetchingNextPage, refetch } =
+    useSuspenseInfiniteQuery(infiniteQueryOptions);
 
   const archiveCustomerMutation = trpc.customers.archive.useMutation({
     onSuccess: () => {
@@ -139,7 +144,7 @@ export function DataTable({ initialSettings }: Props) {
   // Sync columns to store for column visibility toggle
   useEffect(() => {
     setColumns(table.getAllLeafColumns());
-  }, [table, setColumns, columnVisibility]);
+  }, [table, setColumns]);
 
   // Use the reusable sticky columns hook
   const { getStickyStyle, getStickyClassName } = useStickyColumns({
@@ -174,8 +179,6 @@ export function DataTable({ initialSettings }: Props) {
     fetchNextPage,
     threshold: 50,
   });
-
-
 
   if (!tableData.length && hasFilters) {
     return <NoResults />;

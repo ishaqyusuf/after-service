@@ -1,13 +1,10 @@
 import "server-only";
 
 import { createContext } from "@afterservice/api/context";
-import { appRouter } from "@afterservice/api/router";
 import type { AppRouter } from "@afterservice/api/router";
+import { appRouter } from "@afterservice/api/router";
 import { dehydrate, HydrationBoundary } from "@tanstack/react-query";
-import {
-  createTRPCOptionsProxy,
-  type TRPCQueryOptions,
-} from "@trpc/tanstack-react-query";
+import { createTRPCOptionsProxy } from "@trpc/tanstack-react-query";
 import { headers } from "next/headers";
 import { cache } from "react";
 import { makeQueryClient } from "./query-client";
@@ -39,18 +36,16 @@ export function HydrateClient(props: { children: React.ReactNode }) {
   );
 }
 
-
-
-export function prefetch<T extends { queryKey: any }>(
-  queryOptions: T,
-) {
+export function prefetch<T extends { queryKey: any }>(queryOptions: T) {
   const queryClient = getQueryClient();
 
   if (queryOptions.queryKey[1]?.type === "infinite") {
-    void queryClient.prefetchInfiniteQuery(queryOptions as any).catch(() => {});
-  } else {
-    void queryClient.prefetchQuery(queryOptions as any).catch(() => {});
+    return queryClient
+      .prefetchInfiniteQuery(queryOptions as any)
+      .catch(() => {});
   }
+
+  return queryClient.prefetchQuery(queryOptions as any).catch(() => {});
 }
 
 export function batchPrefetch<T extends { queryKey: any }>(
@@ -60,7 +55,9 @@ export function batchPrefetch<T extends { queryKey: any }>(
 
   for (const queryOptions of queryOptionsArray) {
     if (queryOptions.queryKey[1]?.type === "infinite") {
-      void queryClient.prefetchInfiniteQuery(queryOptions as any).catch(() => {});
+      void queryClient
+        .prefetchInfiniteQuery(queryOptions as any)
+        .catch(() => {});
     } else {
       void queryClient.prefetchQuery(queryOptions as any).catch(() => {});
     }

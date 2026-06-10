@@ -70,6 +70,10 @@ export function WorkloadCard({ data }: { data: DashboardOverviewData }) {
     (a, b) => b.count - a.count,
   )[0];
   const topChannel = toFollowUpChannel(busiestChannel?.channel);
+  const defaultDelay =
+    workspace?.defaultFollowUpDelayDays == null
+      ? "Not set"
+      : `${workspace.defaultFollowUpDelayDays}d`;
   const workload = [
     {
       color: "bg-red-500",
@@ -125,10 +129,7 @@ export function WorkloadCard({ data }: { data: DashboardOverviewData }) {
         ))}
         <div className="grid gap-3 border-t pt-5 sm:grid-cols-3">
           <SummaryStat label="Resolved" value={`${resolvedRate}%`} />
-          <SummaryStat
-            label="Default delay"
-            value={`${workspace.defaultFollowUpDelayDays}d`}
-          />
+          <SummaryStat label="Default delay" value={defaultDelay} />
           <SummaryStat
             label="Top channel"
             value={

@@ -1,5 +1,8 @@
 import { type NextRequest, NextResponse } from "next/server";
-import { hasAcceptedSessionCookie } from "@/lib/session-cookies";
+import {
+  appendAuthCookieExpiryFallbacks,
+  hasAcceptedSessionCookie,
+} from "@/lib/session-cookies";
 
 const PUBLIC_PREFIXES = [
   "/sign-in",
@@ -18,10 +21,27 @@ function isAuthPath(pathname: string): boolean {
   return pathname === "/sign-in" || pathname === "/sign-up";
 }
 
+function isLogoutPath(pathname: string): boolean {
+  return pathname === "/logout" || pathname === "/sign-out";
+}
+
+function isLogoutRequest(request: NextRequest): boolean {
+  return (
+    isLogoutPath(request.nextUrl.pathname) ||
+    request.nextUrl.searchParams.get("logout") === "true"
+  );
+}
+
 function getSafeReturnTo(request: NextRequest): string | null {
   const returnTo = request.nextUrl.searchParams.get("return_to");
   if (!returnTo?.startsWith("/")) return null;
   return returnTo;
+}
+
+function redirectToSignInAfterLogout(request: NextRequest): NextResponse {
+  return appendAuthCookieExpiryFallbacks(
+    NextResponse.redirect(new URL("/sign-in", request.url)),
+  );
 }
 
 export const config = {
@@ -36,6 +56,10 @@ export default async function proxy(request: NextRequest) {
   requestHeaders.set("x-pathname", pathname);
 
   if (authenticated) {
+    if (isLogoutRequest(request)) {
+      return redirectToSignInAfterLogout(request);
+    }
+
     if (isAuthPath(pathname)) {
       const returnTo = getSafeReturnTo(request);
       return NextResponse.redirect(new URL(returnTo ?? "/", request.url));
@@ -46,6 +70,10 @@ export default async function proxy(request: NextRequest) {
 
   if (isPublicPath(pathname)) {
     return NextResponse.next({ request: { headers: requestHeaders } });
+  }
+
+  if (isLogoutRequest(request)) {
+    return redirectToSignInAfterLogout(request);
   }
 
   const signInUrl = new URL("/sign-in", request.url);

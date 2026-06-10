@@ -29,6 +29,8 @@ This file captures persistent instructions for AI agents working on afterservice
 - Keep DB migrations deterministic and reviewed.
 - Billing entitlement state must come from persisted Lemon Squeezy webhook data, not checkout redirects.
 - Do not send customer messages in local/dev unless explicitly configured.
+- When debugging production page-load failures, first reproduce with the production env locally using `bun run terminal prod:dashboard` for dashboard pages or `bun run terminal prod:website` for marketing pages. These commands load root `.env.production`; do not rely only on `bun run dev` or root `.env` for production-only failures.
+- Use `bun run env:prod:import` to pull Vercel production envs into ignored root `.env.production`; use `bun run env:prod:export` to dry-run exports and `bun run env:prod:export:apply` only when intentionally pushing local `.env.production` keys back to Vercel production.
 
 ## Documentation Rules
 - Update brain docs with meaningful changes.
