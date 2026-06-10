@@ -1,15 +1,10 @@
 "use client";
 
-import {
-  Sheet,
-  SheetContent,
-  SheetDescription,
-  SheetHeader,
-  SheetTitle,
-} from "@afterservice/ui";
+import { Sheet } from "@afterservice/ui";
 import { CustomerEditForm } from "@/components/forms/customer-edit-form";
 import { trpc } from "@/components/providers/trpc-provider";
 import { useCustomerParams } from "@/hooks/use-customer-params";
+import { DashboardSheetContent } from "./dashboard-sheet-content";
 import { SheetFormSkeleton } from "./sheet-form-skeleton";
 import { SheetMissingState } from "./sheet-missing-state";
 
@@ -27,14 +22,11 @@ export function EditCustomerSheet() {
 
   return (
     <Sheet open={!!customerId} onOpenChange={handleOpenChange}>
-      <SheetContent className="overflow-y-auto">
-        <SheetHeader>
-          <SheetTitle>Edit customer</SheetTitle>
-          <SheetDescription>
-            Update customer details or archive this record.
-          </SheetDescription>
-        </SheetHeader>
-
+      <DashboardSheetContent
+        bodyClassName=""
+        title="Edit customer"
+        description="Update customer details or archive this record."
+      >
         {isLoading ? (
           <SheetFormSkeleton fields={6} />
         ) : customerData?.item ? (
@@ -46,7 +38,7 @@ export function EditCustomerSheet() {
             onClose={() => setParams(null)}
           />
         )}
-      </SheetContent>
+      </DashboardSheetContent>
     </Sheet>
   );
 }

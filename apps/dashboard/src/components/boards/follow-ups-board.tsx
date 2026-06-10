@@ -1,10 +1,15 @@
 "use client";
 
 import type { AppRouter } from "@afterservice/api/router";
-import { Button, Skeleton } from "@afterservice/ui";
+import { Badge, Button, Card, CardContent, Skeleton } from "@afterservice/ui";
 import type { inferRouterOutputs } from "@trpc/server";
+import { ClipboardList } from "lucide-react";
 import Link from "next/link";
 import { trpc } from "@/components/providers/trpc-provider";
+import {
+  followUpChannelLabels,
+  toFollowUpChannel,
+} from "@/hooks/use-follow-up-filter-params";
 import { useFollowUpParams } from "@/hooks/use-follow-up-params";
 import { resolveTemplate } from "@/lib/dashboard-format";
 
@@ -78,8 +83,11 @@ function FollowUpsBoardEmptyState() {
   const { setParams } = useFollowUpParams();
 
   return (
-    <div className="flex min-h-[360px] items-center justify-center rounded-lg border border-dashed border-border bg-muted/30 px-6 text-center">
-      <div className="flex max-w-sm flex-col items-center gap-4">
+    <Card>
+      <CardContent className="flex min-h-[360px] flex-col items-center justify-center gap-4 p-6 text-center">
+        <div className="flex size-10 items-center justify-center rounded-full border border-border bg-muted text-muted-foreground">
+          <ClipboardList className="size-5" />
+        </div>
         <div className="space-y-2">
           <h2 className="text-lg font-medium">No follow-ups</h2>
           <p className="text-sm text-muted-foreground">
@@ -92,8 +100,8 @@ function FollowUpsBoardEmptyState() {
         >
           Create follow-up
         </Button>
-      </div>
-    </div>
+      </CardContent>
+    </Card>
   );
 }
 
@@ -121,6 +129,7 @@ function BoardColumn({ items, title }: { items: BoardItem[]; title: string }) {
 }
 
 function FollowUpCard({ item }: { item: BoardItem }) {
+  const channel = toFollowUpChannel(item.channel);
   const body = resolveTemplate(
     item.notes ?? "Checking in after your service.",
     {
@@ -138,7 +147,9 @@ function FollowUpCard({ item }: { item: BoardItem }) {
     >
       <div className="flex items-center justify-between gap-2 mb-1">
         <span className="text-sm font-medium truncate">{item.customerName}</span>
-        <span className="text-xs text-muted-foreground uppercase tracking-wider">{item.channel}</span>
+        <Badge variant="outline" className="shrink-0">
+          {channel ? followUpChannelLabels[channel] : item.channel}
+        </Badge>
       </div>
       <div className="text-xs text-muted-foreground mb-2 truncate">
         {item.serviceTitle}

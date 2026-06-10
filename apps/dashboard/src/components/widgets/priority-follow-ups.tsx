@@ -26,11 +26,11 @@ import type { DashboardOverviewData } from "./overview-types";
 function StatusBadge({ status }: { status: string }) {
   const normalizedStatus = toFollowUpStatus(status);
   const className =
-    status === "missed"
+    normalizedStatus === "missed"
       ? "border-red-200 bg-red-50 text-red-700 hover:bg-red-50"
-      : status === "replied" || status === "closed"
+      : normalizedStatus === "replied" || normalizedStatus === "closed"
         ? "border-emerald-200 bg-emerald-50 text-emerald-700 hover:bg-emerald-50"
-        : status === "sent"
+        : normalizedStatus === "sent"
           ? "border-amber-200 bg-amber-50 text-amber-700 hover:bg-amber-50"
           : "border-sky-200 bg-sky-50 text-sky-700 hover:bg-sky-50";
 

@@ -59,7 +59,9 @@ export function FollowUpHealthCard({ data }: { data: DashboardOverviewData }) {
 
           return (
             <BreakdownRow
-              color={statusTone[item.status] ?? "bg-muted-foreground"}
+              color={
+                status ? statusTone[status] : "bg-muted-foreground"
+              }
               key={item.status}
               label={status ? followUpStatusLabels[status] : item.status}
               total={totalFollowUps}

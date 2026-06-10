@@ -1,14 +1,9 @@
 "use client";
 
-import {
-  Sheet,
-  SheetContent,
-  SheetDescription,
-  SheetHeader,
-  SheetTitle,
-} from "@afterservice/ui";
+import { Sheet } from "@afterservice/ui";
 import { TemplateCreateForm } from "@/components/forms/template-create-form";
 import { useTemplateParams } from "@/hooks/use-template-params";
+import { DashboardSheetContent } from "./dashboard-sheet-content";
 
 export function TemplateCreateSheet() {
   const { createTemplate, setParams } = useTemplateParams();
@@ -20,17 +15,12 @@ export function TemplateCreateSheet() {
         setParams({ createTemplate: isOpen ? true : null })
       }
     >
-      <SheetContent className="overflow-y-auto">
-        <SheetHeader>
-          <SheetTitle>Create template</SheetTitle>
-          <SheetDescription>
-            Add a reusable follow-up message for completed service work.
-          </SheetDescription>
-        </SheetHeader>
-        <div className="py-6">
-          <TemplateCreateForm />
-        </div>
-      </SheetContent>
+      <DashboardSheetContent
+        title="Create template"
+        description="Add a reusable follow-up message for completed service work."
+      >
+        <TemplateCreateForm />
+      </DashboardSheetContent>
     </Sheet>
   );
 }

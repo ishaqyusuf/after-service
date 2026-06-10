@@ -12,6 +12,7 @@ In progress. Primary dashboard sheet forms aligned on 2026-06-09.
 ## Architecture
 - Sheets remain in `apps/dashboard/src/components/sheets`.
 - Sheet open state remains URL-backed through existing domain hooks or nearby `nuqs` query state.
+- Primary dashboard sheets share `apps/dashboard/src/components/sheets/dashboard-sheet-content.tsx` for scrollable content, visible header copy, accessible sheet titles, and body spacing.
 - Forms use the typed `useZodForm` helper with API schemas where available.
 - Fields use `@afterservice/ui/form` primitives and shared UI controls instead of raw labels, native selects, or direct `form.register` markup.
 - Loading states use `apps/dashboard/src/components/sheets/sheet-form-skeleton.tsx` instead of centered text placeholders.
@@ -40,6 +41,7 @@ In progress. Primary dashboard sheet forms aligned on 2026-06-09.
 - Edit/work sheets now use shared skeleton loading states while fetching records.
 - Edit/work sheets no longer use loading skeletons as the final fallback for missing records.
 - Customer, job, follow-up, schedule, and template form sheets use scrollable `SheetContent` so long forms remain usable on shorter viewports.
+- Customer, job, follow-up, schedule, and template form sheets now consume the shared dashboard sheet content wrapper instead of repeating `SheetContent`, `SheetHeader`, title, and description wiring locally.
 - Schedule follow-up sheet descriptions avoid loading prose because fetch loading is represented by the sheet skeleton.
 - Create sheets use stable select/autocomplete placeholders while option queries load; disabled state communicates loading instead of field text changing to loading prose.
 - Sheet titles now use sentence-case copy consistently across customer, follow-up, job, and template sheets.

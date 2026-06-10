@@ -36,6 +36,9 @@ In progress. Page shell, form consistency, page skeleton fallbacks, and stale TO
 - Dashboard overview priority follow-ups now use a structured card empty state with an action instead of an empty table row.
 - Dashboard overview recent job badges now reuse shared service job status labels instead of formatting raw enum values inline.
 - Dashboard overview follow-up widgets now reuse shared follow-up status and channel labels instead of local duplicate maps.
+- Dashboard overview follow-up status tones now use normalized follow-up status values and a typed tone map before choosing badge/progress colors.
+- Dashboard overview widget types no longer export local follow-up status/channel aliases now that shared domain helpers own those concepts.
+- Follow-ups board cards now reuse shared follow-up channel labels, and the board-level empty state follows the card-style dashboard empty-state pattern.
 - The shared dashboard `ErrorFallback` now renders a structured card-style retry state instead of a bare centered message.
 - Settings page content now follows the quieter Midday settings rhythm with a constrained section stack instead of a duplicate page-level header.
 - Dashboard shell search results and navigation icon maps avoid dashboard-local `any` types.

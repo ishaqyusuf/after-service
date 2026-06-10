@@ -1910,6 +1910,66 @@ Files changed:
 - `apps/dashboard/src/components/forms/job-create-form.tsx`
 - `brain`
 
+### Overview Local Follow-Up Type Cleanup
+
+Completed: 2026-06-10
+
+Summary:
+
+- Removed unused overview-local follow-up status and channel type aliases.
+- Kept `DashboardOverviewData` as the only overview-specific exported data type.
+- Left shared follow-up status/channel concepts owned by the filter/domain hook.
+- Updated Brain page standardization notes.
+
+Verification:
+
+- Focused whitespace and exact overview type-alias scans only, per fast Bun monorepo command discipline.
+
+Files changed:
+
+- `apps/dashboard/src/components/widgets/overview-types.ts`
+- `brain`
+
+### Overview Status Tone Type Alignment
+
+Completed: 2026-06-10
+
+Summary:
+
+- Typed the overview status tone map with the shared `FollowUpStatus` union.
+- Kept tone values and runtime rendering unchanged.
+- Updated Brain page standardization notes.
+
+Verification:
+
+- Focused whitespace and exact overview tone-map type scans only, per fast Bun monorepo command discipline.
+
+Files changed:
+
+- `apps/dashboard/src/components/widgets/constants.ts`
+- `brain`
+
+### Overview Follow-Up Status Tone Alignment
+
+Completed: 2026-06-10
+
+Summary:
+
+- Updated priority follow-up badge tone selection to use normalized follow-up statuses.
+- Updated follow-up health status tone lookup to use normalized follow-up statuses.
+- Preserved unknown-status fallbacks and all shared label rendering.
+- Updated Brain page standardization notes.
+
+Verification:
+
+- Focused whitespace and exact overview status-tone scans only, per fast Bun monorepo command discipline.
+
+Files changed:
+
+- `apps/dashboard/src/components/widgets/priority-follow-ups.tsx`
+- `apps/dashboard/src/components/widgets/follow-up-health-card.tsx`
+- `brain`
+
 ### Overview Follow-Up Label Map Alignment
 
 Completed: 2026-06-10
@@ -2354,4 +2414,52 @@ Verification:
 Files changed:
 
 - `apps/dashboard/src/components/forms/job-create-form.tsx`
+- `brain`
+
+### Follow-Up Board Empty-State And Channel Label Alignment
+
+Completed: 2026-06-10
+
+Summary:
+
+- Replaced the board-level dashed empty block with a structured card empty state.
+- Added an icon, explanatory copy, and the existing create follow-up action.
+- Replaced raw follow-up channel rendering on board cards with shared channel labels.
+- Updated Brain page standardization notes.
+
+Verification:
+
+- Focused whitespace and exact follow-up board label/empty-state scans only, per fast Bun monorepo command discipline.
+
+Files changed:
+
+- `apps/dashboard/src/components/boards/follow-ups-board.tsx`
+- `brain`
+
+### Dashboard Sheet Shell Standardization
+
+Completed: 2026-06-10
+
+Summary:
+
+- Added a shared `DashboardSheetContent` helper for primary dashboard sheet shells.
+- Migrated customer, job, follow-up, schedule, and template sheets to the shared helper.
+- Preserved each sheet's URL-backed open state, query loading branches, forms, and missing-record states.
+- Updated Brain sheet standardization notes.
+
+Verification:
+
+- Focused whitespace and exact dashboard sheet-shell scans only, per fast Bun monorepo command discipline.
+
+Files changed:
+
+- `apps/dashboard/src/components/sheets/dashboard-sheet-content.tsx`
+- `apps/dashboard/src/components/sheets/customer-create-sheet.tsx`
+- `apps/dashboard/src/components/sheets/edit-customer-sheet.tsx`
+- `apps/dashboard/src/components/sheets/follow-up-card-sheet.tsx`
+- `apps/dashboard/src/components/sheets/follow-up-create-sheet.tsx`
+- `apps/dashboard/src/components/sheets/job-create-sheet.tsx`
+- `apps/dashboard/src/components/sheets/schedule-follow-up-sheet.tsx`
+- `apps/dashboard/src/components/sheets/template-create-sheet.tsx`
+- `apps/dashboard/src/components/sheets/template-sheet.tsx`
 - `brain`

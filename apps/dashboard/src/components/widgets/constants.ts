@@ -1,4 +1,6 @@
-export const statusTone: Record<string, string> = {
+import type { FollowUpStatus } from "@/hooks/use-follow-up-filter-params";
+
+export const statusTone: Record<FollowUpStatus, string> = {
   closed: "bg-emerald-500",
   missed: "bg-red-500",
   open: "bg-sky-500",

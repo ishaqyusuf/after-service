@@ -1,15 +1,10 @@
 "use client";
 
-import {
-  Sheet,
-  SheetContent,
-  SheetDescription,
-  SheetHeader,
-  SheetTitle,
-} from "@afterservice/ui";
+import { Sheet } from "@afterservice/ui";
 import { FollowUpWorkForm } from "@/components/forms/follow-up-work-form";
 import { trpc } from "@/components/providers/trpc-provider";
 import { useFollowUpParams } from "@/hooks/use-follow-up-params";
+import { DashboardSheetContent } from "./dashboard-sheet-content";
 import { SheetFormSkeleton } from "./sheet-form-skeleton";
 import { SheetMissingState } from "./sheet-missing-state";
 
@@ -27,14 +22,11 @@ export function FollowUpCardSheet() {
 
   return (
     <Sheet open={!!followUpId} onOpenChange={handleOpenChange}>
-      <SheetContent className="overflow-y-auto">
-        <SheetHeader>
-          <SheetTitle>Work follow-up</SheetTitle>
-          <SheetDescription>
-            Update the state of this follow-up.
-          </SheetDescription>
-        </SheetHeader>
-
+      <DashboardSheetContent
+        bodyClassName=""
+        title="Work follow-up"
+        description="Update the state of this follow-up."
+      >
         {isLoading ? (
           <SheetFormSkeleton fields={6} />
         ) : followUpData?.item ? (
@@ -46,7 +38,7 @@ export function FollowUpCardSheet() {
             onClose={() => setParams(null)}
           />
         )}
-      </SheetContent>
+      </DashboardSheetContent>
     </Sheet>
   );
 }

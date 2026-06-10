@@ -1,15 +1,10 @@
 "use client";
 
-import {
-  Sheet,
-  SheetContent,
-  SheetDescription,
-  SheetHeader,
-  SheetTitle,
-} from "@afterservice/ui";
+import { Sheet } from "@afterservice/ui";
 import { ScheduleFollowUpForm } from "@/components/forms/schedule-follow-up-form";
 import { trpc } from "@/components/providers/trpc-provider";
 import { useQueryState } from "nuqs";
+import { DashboardSheetContent } from "./dashboard-sheet-content";
 import { SheetFormSkeleton } from "./sheet-form-skeleton";
 import { SheetMissingState } from "./sheet-missing-state";
 
@@ -36,16 +31,15 @@ export function ScheduleFollowUpSheet() {
 
   return (
     <Sheet open={!!jobId} onOpenChange={handleOpenChange}>
-      <SheetContent className="overflow-y-auto">
-        <SheetHeader>
-          <SheetTitle>Schedule follow-up</SheetTitle>
-          <SheetDescription>
-            {jobData?.item
-              ? `Create a follow-up action for ${jobData.item.title}.`
-              : "Create a follow-up action for this service job."}
-          </SheetDescription>
-        </SheetHeader>
-
+      <DashboardSheetContent
+        bodyClassName=""
+        title="Schedule follow-up"
+        description={
+          jobData?.item
+            ? `Create a follow-up action for ${jobData.item.title}.`
+            : "Create a follow-up action for this service job."
+        }
+      >
         {isLoadingJob || isLoadingTemplates ? (
           <SheetFormSkeleton fields={4} />
         ) : jobData?.item ? (
@@ -61,7 +55,7 @@ export function ScheduleFollowUpSheet() {
             onClose={() => setJobId(null)}
           />
         )}
-      </SheetContent>
+      </DashboardSheetContent>
     </Sheet>
   );
 }

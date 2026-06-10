@@ -1,15 +1,10 @@
 "use client";
 
-import {
-  Sheet,
-  SheetContent,
-  SheetDescription,
-  SheetHeader,
-  SheetTitle,
-} from "@afterservice/ui";
+import { Sheet } from "@afterservice/ui";
 import { TemplateEditForm } from "@/components/forms/template-edit-form";
 import { trpc } from "@/components/providers/trpc-provider";
 import { useTemplateParams } from "@/hooks/use-template-params";
+import { DashboardSheetContent } from "./dashboard-sheet-content";
 import { SheetFormSkeleton } from "./sheet-form-skeleton";
 import { SheetMissingState } from "./sheet-missing-state";
 
@@ -27,12 +22,11 @@ export function TemplateSheet() {
 
   return (
     <Sheet open={!!templateId} onOpenChange={handleOpenChange}>
-      <SheetContent className="overflow-y-auto">
-        <SheetHeader>
-          <SheetTitle>Edit template</SheetTitle>
-          <SheetDescription>Update this follow-up template.</SheetDescription>
-        </SheetHeader>
-
+      <DashboardSheetContent
+        bodyClassName=""
+        title="Edit template"
+        description="Update this follow-up template."
+      >
         {isLoading ? (
           <SheetFormSkeleton fields={5} />
         ) : templateData?.item ? (
@@ -44,7 +38,7 @@ export function TemplateSheet() {
             onClose={() => setParams(null)}
           />
         )}
-      </SheetContent>
+      </DashboardSheetContent>
     </Sheet>
   );
 }
