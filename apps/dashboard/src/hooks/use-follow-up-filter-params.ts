@@ -15,6 +15,22 @@ export const followUpChannels = ["email", "sms", "phone", "whatsapp"] as const;
 export type FollowUpStatus = (typeof followUpStatuses)[number];
 export type FollowUpChannel = (typeof followUpChannels)[number];
 
+export const followUpStatusLabels: Record<FollowUpStatus, string> = {
+  closed: "Closed",
+  missed: "Missed",
+  open: "Open",
+  replied: "Replied",
+  scheduled: "Scheduled",
+  sent: "Sent",
+};
+
+export const followUpChannelLabels: Record<FollowUpChannel, string> = {
+  email: "Email",
+  phone: "Phone",
+  sms: "SMS",
+  whatsapp: "WhatsApp",
+};
+
 const followUpFilterParamsSchema = {
   q: parseAsString,
   channel: parseAsString,
@@ -41,7 +57,12 @@ export function useFollowUpFilterParams() {
   return {
     filter,
     setFilter,
-    hasFilters: Object.values(filter).some((value) => value !== null),
+    hasFilters:
+      Boolean(filter.q) ||
+      Boolean(toFollowUpChannel(filter.channel)) ||
+      Boolean(toFollowUpStatus(filter.status)) ||
+      Boolean(filter.start) ||
+      Boolean(filter.end),
   };
 }
 

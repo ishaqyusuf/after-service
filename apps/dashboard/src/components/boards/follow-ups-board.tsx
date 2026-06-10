@@ -1,16 +1,33 @@
 "use client";
 
-import { Skeleton } from "@afterservice/ui";
-import { trpc } from "@/components/providers/trpc-provider";
+import type { AppRouter } from "@afterservice/api/router";
+import { Button, Skeleton } from "@afterservice/ui";
+import type { inferRouterOutputs } from "@trpc/server";
 import Link from "next/link";
+import { trpc } from "@/components/providers/trpc-provider";
+import { useFollowUpParams } from "@/hooks/use-follow-up-params";
 import { resolveTemplate } from "@/lib/dashboard-format";
 
-type BoardItem = any; // Type comes from tRPC router ideally
+type FollowUpsBoardData =
+  inferRouterOutputs<AppRouter>["followUps"]["listBoard"];
+type FollowUpsBoardColumns = FollowUpsBoardData["columns"];
+type BoardItem = FollowUpsBoardColumns[keyof FollowUpsBoardColumns][number];
 
 export function FollowUpsBoard() {
   const [{ columns }] = trpc.followUps.listBoard.useSuspenseQuery();
 
   if (!columns) return null;
+
+  const totalItems =
+    columns.dueToday.length +
+    columns.upcoming.length +
+    columns.waiting.length +
+    columns.replied.length +
+    columns.closed.length;
+
+  if (totalItems === 0) {
+    return <FollowUpsBoardEmptyState />;
+  }
 
   return (
     <div className="flex gap-4 overflow-x-auto pb-4 snap-x">
@@ -57,11 +74,34 @@ export function FollowUpsBoardSkeleton() {
   );
 }
 
+function FollowUpsBoardEmptyState() {
+  const { setParams } = useFollowUpParams();
+
+  return (
+    <div className="flex min-h-[360px] items-center justify-center rounded-lg border border-dashed border-border bg-muted/30 px-6 text-center">
+      <div className="flex max-w-sm flex-col items-center gap-4">
+        <div className="space-y-2">
+          <h2 className="text-lg font-medium">No follow-ups</h2>
+          <p className="text-sm text-muted-foreground">
+            Create a follow-up to keep the next customer check-in visible.
+          </p>
+        </div>
+        <Button
+          variant="outline"
+          onClick={() => setParams({ createFollowUp: true })}
+        >
+          Create follow-up
+        </Button>
+      </div>
+    </div>
+  );
+}
+
 function BoardColumn({ items, title }: { items: BoardItem[]; title: string }) {
   return (
     <div className="flex flex-col w-[300px] shrink-0 snap-start bg-muted/50 rounded-lg p-3">
       <h2 className="text-sm font-semibold mb-3 flex items-center justify-between px-1">
-        {title} 
+        {title}
         <span className="bg-background text-muted-foreground px-2 py-0.5 rounded-full text-xs">
           {items.length}
         </span>
@@ -71,7 +111,9 @@ function BoardColumn({ items, title }: { items: BoardItem[]; title: string }) {
           <FollowUpCard item={item} key={item.id} />
         ))}
         {items.length === 0 ? (
-          <p className="text-sm text-muted-foreground text-center py-8">No cards.</p>
+          <p className="py-8 text-center text-sm text-muted-foreground">
+            No follow-ups in this stage.
+          </p>
         ) : null}
       </div>
     </div>
@@ -79,7 +121,6 @@ function BoardColumn({ items, title }: { items: BoardItem[]; title: string }) {
 }
 
 function FollowUpCard({ item }: { item: BoardItem }) {
-  const recipient = item.channel === "email" ? "customer@example.com" : "manual";
   const body = resolveTemplate(
     item.notes ?? "Checking in after your service.",
     {
@@ -90,8 +131,8 @@ function FollowUpCard({ item }: { item: BoardItem }) {
   );
 
   return (
-    <Link 
-      href={`?follow_up_id=${item.id}`} 
+    <Link
+      href={`?followUpId=${item.id}`}
       scroll={false}
       className="block bg-card rounded-md border border-border p-3 shadow-sm hover:border-primary/50 transition-colors text-left"
     >

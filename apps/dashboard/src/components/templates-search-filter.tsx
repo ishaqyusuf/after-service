@@ -17,17 +17,12 @@ import { Input } from "@afterservice/ui/input";
 import { useRef, useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
 import {
+  templateChannelLabels,
   templateChannels,
+  toTemplateChannel,
   useTemplateFilterParams,
 } from "@/hooks/use-template-filter-params";
 import { FilterList } from "./filter-list";
-
-const channelLabels = {
-  email: "Email",
-  phone: "Phone",
-  sms: "SMS",
-  whatsapp: "WhatsApp",
-} as const;
 
 export function TemplatesSearchFilter() {
   const { filter, setFilter } = useTemplateFilterParams();
@@ -37,7 +32,7 @@ export function TemplatesSearchFilter() {
 
   const channelFilters = templateChannels.map((channel) => ({
     id: channel,
-    name: channelLabels[channel],
+    name: templateChannelLabels[channel],
   }));
 
   useHotkeys(
@@ -78,9 +73,7 @@ export function TemplatesSearchFilter() {
     Object.entries(filter).filter(([key]) => key !== "q"),
   );
 
-  const hasValidFilters = Object.values(validFilters).some(
-    (value) => value !== null,
-  );
+  const hasValidFilters = Boolean(toTemplateChannel(filter.channel));
 
   return (
     <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>

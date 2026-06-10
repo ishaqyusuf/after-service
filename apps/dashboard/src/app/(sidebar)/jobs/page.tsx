@@ -7,13 +7,16 @@ import { ScrollableContent } from "@/components/scrollable-content";
 import { JobsHeader } from "@/components/jobs-header";
 import { DataTable } from "@/components/tables/jobs/data-table";
 import { JobsTableSkeleton } from "@/components/tables/jobs/skeleton";
-import { loadJobFilterParams } from "@/hooks/use-job-filter-params";
+import {
+  loadJobFilterParams,
+  toServiceJobStatus,
+} from "@/hooks/use-job-filter-params";
 import { loadSortParams } from "@/hooks/use-sort-params";
 import { batchPrefetch, HydrateClient, trpc } from "@/trpc/server";
 import { getInitialTableSettings } from "@/utils/table-settings-server";
 
 export const metadata: Metadata = {
-  title: "Jobs | After Service",
+  title: "Jobs | afterservice",
   description: "Record completed services.",
 };
 
@@ -34,7 +37,7 @@ export default async function JobsPage(props: Props) {
         q: filter.q ?? undefined,
         categories: filter.categories ?? undefined,
         customers: filter.customers ?? undefined,
-        status: filter.status ?? undefined,
+        status: toServiceJobStatus(filter.status),
         start: filter.start ?? undefined,
         end: filter.end ?? undefined,
         sort: sort ?? undefined,

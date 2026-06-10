@@ -10,6 +10,10 @@ import {
 } from "@afterservice/ui";
 import { Send } from "lucide-react";
 import Link from "next/link";
+import {
+  serviceJobStatusLabels,
+  toServiceJobStatus,
+} from "@/hooks/use-job-filter-params";
 import { formatDate } from "@/lib/dashboard-format";
 import type { DashboardOverviewData } from "./overview-types";
 
@@ -26,21 +30,7 @@ export function RecentJobs({ data }: { data: DashboardOverviewData }) {
         {data.recentJobs.length > 0 ? (
           <div className="divide-y">
             {data.recentJobs.map((job) => (
-              <Link
-                className="flex items-start justify-between gap-4 p-4 transition-colors hover:bg-muted/40"
-                href="/jobs"
-                key={job.id}
-              >
-                <div className="min-w-0 space-y-1">
-                  <p className="truncate text-sm font-medium">{job.title}</p>
-                  <p className="truncate text-xs text-muted-foreground">
-                    {job.customerName} · {formatDate(job.completedAt)}
-                  </p>
-                </div>
-                <Badge variant="outline">
-                  {job.status.replaceAll("_", " ")}
-                </Badge>
-              </Link>
+              <RecentJobLink key={job.id} job={job} />
             ))}
           </div>
         ) : (
@@ -59,5 +49,28 @@ export function RecentJobs({ data }: { data: DashboardOverviewData }) {
         )}
       </CardContent>
     </Card>
+  );
+}
+
+type RecentJob = DashboardOverviewData["recentJobs"][number];
+
+function RecentJobLink({ job }: { job: RecentJob }) {
+  const status = toServiceJobStatus(job.status);
+
+  return (
+    <Link
+      className="flex items-start justify-between gap-4 p-4 transition-colors hover:bg-muted/40"
+      href="/jobs"
+    >
+      <div className="min-w-0 space-y-1">
+        <p className="truncate text-sm font-medium">{job.title}</p>
+        <p className="truncate text-xs text-muted-foreground">
+          {job.customerName} · {formatDate(job.completedAt)}
+        </p>
+      </div>
+      <Badge variant="outline">
+        {status ? serviceJobStatusLabels[status] : job.status}
+      </Badge>
+    </Link>
   );
 }

@@ -14,6 +14,7 @@ Updated on 2026-06-09 with a fuller Midday-style billing page and structured loa
 - Starter/Growth/Pro limits for customers, follow-ups, templates, and team members.
 - Billing page now includes plan summary cards, usage meters, subscription details, checkout action, and provider portal action when available.
 - Billing page suspense and client loading states use the same structured skeleton.
+- Billing plan and status badges use display labels instead of raw workspace enum values.
 
 ## Architecture
 - API owner: `apps/api/src/routers/_app.ts` `billing` router.
@@ -25,6 +26,7 @@ Updated on 2026-06-09 with a fuller Midday-style billing page and structured loa
 - Entitlement truth comes from verified Lemon Squeezy webhooks.
 - Checkout redirects are not trusted as entitlement state.
 - Owner/admin access is required for checkout and portal actions.
+- Keep raw billing plan/status values in API responses, and map them to user-facing labels in the dashboard UI.
 
 ## Limits
 - Starter: 100 customers, 200 follow-ups, 5 templates, 1 team member.

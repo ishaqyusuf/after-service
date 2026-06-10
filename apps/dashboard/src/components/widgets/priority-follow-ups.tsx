@@ -4,6 +4,7 @@ import {
   Badge,
   Button,
   Card,
+  CardContent,
   CardHeader,
   CardTitle,
   Table,
@@ -13,7 +14,7 @@ import {
   TableHeader,
   TableRow,
 } from "@afterservice/ui";
-import { ArrowUpRight } from "lucide-react";
+import { ArrowUpRight, Clock3 } from "lucide-react";
 import Link from "next/link";
 import { formatDate } from "@/lib/dashboard-format";
 import { statusLabels } from "./constants";
@@ -49,50 +50,58 @@ export function PriorityFollowUps({ data }: { data: DashboardOverviewData }) {
           </Link>
         </Button>
       </CardHeader>
-      <div className="overflow-x-auto">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Customer</TableHead>
-              <TableHead>Service</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead>Due</TableHead>
-              <TableHead className="w-[90px]">Action</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {data.recentFollowUps.map((followUp) => (
-              <TableRow key={followUp.id}>
-                <TableCell className="font-medium">
-                  {followUp.customerName}
-                </TableCell>
-                <TableCell className="max-w-[240px] truncate text-muted-foreground">
-                  {followUp.serviceTitle ?? "General check-in"}
-                </TableCell>
-                <TableCell>
-                  <StatusBadge status={followUp.status} />
-                </TableCell>
-                <TableCell>{formatDate(followUp.dueAt)}</TableCell>
-                <TableCell>
-                  <Link
-                    href={`/follow-ups?follow_up_id=${followUp.id}`}
-                    className="text-sm font-medium text-muted-foreground hover:text-foreground"
-                  >
-                    View
-                  </Link>
-                </TableCell>
-              </TableRow>
-            ))}
-            {data.recentFollowUps.length === 0 ? (
+      {data.recentFollowUps.length > 0 ? (
+        <div className="overflow-x-auto">
+          <Table>
+            <TableHeader>
               <TableRow>
-                <TableCell colSpan={5} className="h-24 text-center">
-                  No open follow-ups yet.
-                </TableCell>
+                <TableHead>Customer</TableHead>
+                <TableHead>Service</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead>Due</TableHead>
+                <TableHead className="w-[90px]">Action</TableHead>
               </TableRow>
-            ) : null}
-          </TableBody>
-        </Table>
-      </div>
+            </TableHeader>
+            <TableBody>
+              {data.recentFollowUps.map((followUp) => (
+                <TableRow key={followUp.id}>
+                  <TableCell className="font-medium">
+                    {followUp.customerName}
+                  </TableCell>
+                  <TableCell className="max-w-[240px] truncate text-muted-foreground">
+                    {followUp.serviceTitle ?? "General check-in"}
+                  </TableCell>
+                  <TableCell>
+                    <StatusBadge status={followUp.status} />
+                  </TableCell>
+                  <TableCell>{formatDate(followUp.dueAt)}</TableCell>
+                  <TableCell>
+                    <Link
+                      href={`/follow-ups?followUpId=${followUp.id}`}
+                      className="text-sm font-medium text-muted-foreground hover:text-foreground"
+                    >
+                      View
+                    </Link>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </div>
+      ) : (
+        <CardContent className="flex min-h-[220px] flex-col items-center justify-center gap-3 p-6 text-center">
+          <Clock3 className="size-6 text-muted-foreground" />
+          <div>
+            <p className="text-sm font-medium">No open follow-ups yet</p>
+            <p className="mt-1 text-sm text-muted-foreground">
+              Schedule a follow-up to keep the next customer check-in visible.
+            </p>
+          </div>
+          <Button asChild size="sm" variant="outline">
+            <Link href="/follow-ups">Open follow-ups</Link>
+          </Button>
+        </CardContent>
+      )}
     </Card>
   );
 }

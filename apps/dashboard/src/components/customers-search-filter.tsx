@@ -18,7 +18,7 @@ import { useMemo, useRef, useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
 import { trpc } from "@/components/providers/trpc-provider";
 import { useCustomerFilterParams } from "@/hooks/use-customer-filter-params";
-import { FilterList } from "./filter-list";
+import { FilterList, FilterMenuEmptyState } from "./filter-list";
 
 export function CustomersSearchFilter() {
   const { filter, setFilter } = useCustomerFilterParams();
@@ -28,6 +28,7 @@ export function CustomersSearchFilter() {
 
   const { data } = trpc.customers.list.useQuery({
     includeArchived: false,
+    limit: 100,
   });
   const tagOptions = useMemo(() => {
     const tags = new Set<string>();
@@ -79,8 +80,9 @@ export function CustomersSearchFilter() {
     Object.entries(filter).filter(([key]) => key !== "q"),
   );
 
-  const hasValidFilters = Object.values(validFilters).some(
-    (value) => value !== null,
+  const selectedTags = Array.isArray(filter.tags) ? filter.tags : [];
+  const hasValidFilters = selectedTags.some((tag) =>
+    tagOptions.includes(tag),
   );
 
   return (
@@ -170,9 +172,7 @@ export function CustomersSearchFilter() {
                     );
                   })
                 ) : (
-                  <div className="px-2 py-1.5 text-xs text-muted-foreground">
-                    No tags yet
-                  </div>
+                  <FilterMenuEmptyState>No tags yet</FilterMenuEmptyState>
                 )}
               </DropdownMenuSubContent>
             </DropdownMenuPortal>

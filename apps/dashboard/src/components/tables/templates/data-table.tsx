@@ -1,8 +1,10 @@
 "use client";
 
+import type { AppRouter } from "@afterservice/api/router";
 import { closestCenter, DndContext } from "@dnd-kit/core";
 import { Table, TableBody, TableCell, TableRow } from "@afterservice/ui/table";
 import { getCoreRowModel, useReactTable } from "@tanstack/react-table";
+import type { inferRouterOutputs } from "@trpc/server";
 import { useVirtualizer, type VirtualItem } from "@tanstack/react-virtual";
 import {
   useCallback,
@@ -41,6 +43,9 @@ type Props = {
   initialSettings?: Partial<TableSettings>;
 };
 
+type TemplatesListPage = inferRouterOutputs<AppRouter>["templates"]["list"];
+type TemplateRow = TemplatesListPage["items"][number];
+
 export function DataTable({ initialSettings }: Props) {
 
   const { setParams } = useTemplateParams();
@@ -74,32 +79,30 @@ export function DataTable({ initialSettings }: Props) {
       search: deferredSearch ?? undefined,
       sort: params.sort ?? undefined,
     }, {
-      getNextPageParam: (lastPage: any) => lastPage.nextCursor,
+      getNextPageParam: (lastPage: TemplatesListPage) => lastPage.nextCursor,
     });
 
-  const deleteTemplateMutation = trpc.templates.archive.useMutation({
+  const archiveTemplateMutation = trpc.templates.archive.useMutation({
     onSuccess: () => {
       refetch();
     },
   });
 
-  const handleDeleteTemplate = useCallback(
+  const handleArchiveTemplate = useCallback(
     (id: string) => {
-      deleteTemplateMutation.mutate({ id });
+      archiveTemplateMutation.mutate({ id });
     },
-    [deleteTemplateMutation],
+    [archiveTemplateMutation],
   );
 
-  
-
-  const tableData = useMemo(() => {
-    return data?.pages.flatMap((page: any) => page.items) ?? [];
+  const tableData = useMemo<TemplateRow[]>(() => {
+    return data?.pages.flatMap((page) => page.items) ?? [];
   }, [data]);
 
   const setOpen = useCallback(
     (id?: string) => {
       if (id) {
-        setParams({ templateId: id, /* details: true */ });
+        setParams({ templateId: id });
       } else {
         setParams(null);
       }
@@ -109,10 +112,9 @@ export function DataTable({ initialSettings }: Props) {
 
   const tableMeta = useMemo(
     () => ({
-      deleteTemplate: handleDeleteTemplate,
-      
+      archiveTemplate: handleArchiveTemplate,
     }),
-    [handleDeleteTemplate],
+    [handleArchiveTemplate],
   );
 
   const table = useReactTable({
@@ -209,7 +211,7 @@ export function DataTable({ initialSettings }: Props) {
           }}
         >
           <DndContext
-            id="customers-table-dnd"
+            id="templates-table-dnd"
             sensors={sensors}
             collisionDetection={closestCenter}
             onDragEnd={handleDragEnd}
@@ -251,7 +253,7 @@ export function DataTable({ initialSettings }: Props) {
                       colSpan={columns.length}
                       className="h-24 text-center"
                     >
-                      No results.
+                      Preparing rows...
                     </TableCell>
                   </TableRow>
                 )}

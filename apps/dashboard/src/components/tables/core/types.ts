@@ -114,10 +114,9 @@ export const ACTIONS_FULL_WIDTH_CELL_CLASS =
 
 declare module '@tanstack/react-table' {
   interface TableMeta<TData extends import('@tanstack/react-table').RowData> {
-    deleteCustomer?: (id: string) => void;
-    deleteTemplate?: (id: string) => void;
-    deleteJob?: (id: string) => void;
-    deleteFollowUp?: (id: string) => void;
-    enrichCustomer?: (id: string) => void;
+    archiveCustomer?: (id: string) => void;
+    archiveTemplate?: (id: string) => void;
+    closeFollowUp?: (id: string) => void;
+    scheduleFollowUp?: (id: string) => void;
   }
 }

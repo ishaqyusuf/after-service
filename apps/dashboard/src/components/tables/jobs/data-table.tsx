@@ -1,9 +1,12 @@
 "use client";
 
+import type { AppRouter } from "@afterservice/api/router";
 import { closestCenter, DndContext } from "@dnd-kit/core";
 import { Table, TableBody, TableCell, TableRow } from "@afterservice/ui/table";
 import { getCoreRowModel, useReactTable } from "@tanstack/react-table";
+import type { inferRouterOutputs } from "@trpc/server";
 import { useVirtualizer, type VirtualItem } from "@tanstack/react-virtual";
+import { useQueryState } from "nuqs";
 import {
   useCallback,
   useDeferredValue,
@@ -12,8 +15,10 @@ import {
   useRef,
 } from "react";
 import { VirtualRow } from "@/components/tables/core";
-import { useJobFilterParams } from "@/hooks/use-job-filter-params";
-import { useJobParams } from "@/hooks/use-job-params";
+import {
+  toServiceJobStatus,
+  useJobFilterParams,
+} from "@/hooks/use-job-filter-params";
 import { useInfiniteScroll } from "@/hooks/use-infinite-scroll";
 import { useScrollHeader } from "@/hooks/use-scroll-header";
 import { useSortParams } from "@/hooks/use-sort-params";
@@ -38,9 +43,11 @@ type Props = {
   initialSettings?: Partial<TableSettings>;
 };
 
-export function DataTable({ initialSettings }: Props) {
+type JobsListPage = inferRouterOutputs<AppRouter>["serviceJobs"]["list"];
+type JobRow = JobsListPage["items"][number];
 
-  const { setParams } = useJobParams();
+export function DataTable({ initialSettings }: Props) {
+  const [, setScheduleFollowUpId] = useQueryState("schedule_follow_up");
   const { filter, hasFilters } = useJobFilterParams();
   const { params } = useSortParams();
   const parentRef = useRef<HTMLDivElement>(null);
@@ -65,44 +72,42 @@ export function DataTable({ initialSettings }: Props) {
     columnIds: COLUMN_IDS,
   });
 
-  const [data, { fetchNextPage, hasNextPage, isFetchingNextPage, refetch }] = trpc.serviceJobs.list.useSuspenseInfiniteQuery(
-    {
-      categories: filter.categories ?? undefined,
-      customers: filter.customers ?? undefined,
-      end: filter.end ?? undefined,
-      q: deferredSearch ?? undefined,
-      sort: params.sort ?? undefined,
-      start: filter.start ?? undefined,
-      status: filter.status ?? undefined,
-    }, {
-      getNextPageParam: (lastPage: any) => lastPage.nextCursor,
-    });
+  const [data, { fetchNextPage, hasNextPage, isFetchingNextPage, refetch }] =
+    trpc.serviceJobs.list.useSuspenseInfiniteQuery(
+      {
+        categories: filter.categories ?? undefined,
+        customers: filter.customers ?? undefined,
+        end: filter.end ?? undefined,
+        q: deferredSearch ?? undefined,
+        sort: params.sort ?? undefined,
+        start: filter.start ?? undefined,
+        status: toServiceJobStatus(filter.status),
+      },
+      {
+        getNextPageParam: (lastPage: JobsListPage) => lastPage.nextCursor,
+      },
+    );
 
-  
-
-  
-
-  
-
-  const tableData = useMemo(() => {
-    return data?.pages.flatMap((page: any) => page.items) ?? [];
+  const tableData = useMemo<JobRow[]>(() => {
+    return data?.pages.flatMap((page) => page.items) ?? [];
   }, [data]);
 
   const setOpen = useCallback(
     (id?: string) => {
       if (id) {
-        setParams({ jobId: id, /* details: true */ });
+        setScheduleFollowUpId(id);
       } else {
-        setParams(null);
+        setScheduleFollowUpId(null);
       }
     },
-    [setParams],
+    [setScheduleFollowUpId],
   );
 
   const tableMeta = useMemo(
     () => ({
+      scheduleFollowUp: setOpen,
     }),
-    [],
+    [setOpen],
   );
 
   const table = useReactTable({
@@ -199,7 +204,7 @@ export function DataTable({ initialSettings }: Props) {
           }}
         >
           <DndContext
-            id="customers-table-dnd"
+            id="jobs-table-dnd"
             sensors={sensors}
             collisionDetection={closestCenter}
             onDragEnd={handleDragEnd}
@@ -241,7 +246,7 @@ export function DataTable({ initialSettings }: Props) {
                       colSpan={columns.length}
                       className="h-24 text-center"
                     >
-                      No results.
+                      Preparing rows...
                     </TableCell>
                   </TableRow>
                 )}

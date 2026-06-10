@@ -6,7 +6,9 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import type { ComponentType } from "react";
 
-const navIcons: Record<string, ComponentType<any>> = {
+type NavIcon = ComponentType<{ className?: string }>;
+
+const navIcons: Record<string, NavIcon> = {
   "/": Icons.Overview,
   "/customers": Icons.Customers,
   "/jobs": Icons.Transactions,

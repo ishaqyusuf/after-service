@@ -42,7 +42,7 @@ function VirtualRowInner<TData>({
   const cells = row.getVisibleCells();
   const lastCellId = cells[cells.length - 1]?.column.id ?? "";
 
-  // Check if there are any non-sticky columns visible before actions
+  // Check whether non-sticky columns are visible before actions.
   const hasNonStickyBeforeActions = cells.some((cell) => {
     if (cell.column.id === "actions") return false;
     const meta = cell.column.columnDef.meta as TableColumnMeta | undefined;

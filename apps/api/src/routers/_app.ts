@@ -1,6 +1,7 @@
 import {
   getDashboardOverview,
   getDbClient,
+  type Prisma,
   type WorkspacePlan,
 } from "@afterservice/db";
 import { LogEvents } from "@afterservice/events";
@@ -79,12 +80,19 @@ function iso(date: Date | null | undefined) {
 }
 
 type SortDirection = "asc" | "desc";
-type SortFactory = (direction: SortDirection) => any;
+type SortOrderInput =
+  | Prisma.CustomerOrderByWithRelationInput
+  | Prisma.FollowUpOrderByWithRelationInput
+  | Prisma.FollowUpTemplateOrderByWithRelationInput
+  | Prisma.ServiceJobOrderByWithRelationInput;
+type SortFactory<TOrderBy extends SortOrderInput> = (
+  direction: SortDirection,
+) => TOrderBy;
 
-function resolveSort(
+function resolveSort<TOrderBy extends SortOrderInput>(
   sort: string[] | null | undefined,
-  factories: Record<string, SortFactory>,
-  fallback: any,
+  factories: Record<string, SortFactory<TOrderBy>>,
+  fallback: TOrderBy | TOrderBy[],
 ) {
   const [field, direction] = sort ?? [];
 
@@ -95,7 +103,10 @@ function resolveSort(
   return field ? (factories[field]?.(direction) ?? fallback) : fallback;
 }
 
-const customerSorts: Record<string, SortFactory> = {
+const customerSorts: Record<
+  string,
+  SortFactory<Prisma.CustomerOrderByWithRelationInput>
+> = {
   companyName: (direction) => ({ companyName: direction }),
   createdAt: (direction) => ({ createdAt: direction }),
   email: (direction) => ({ email: direction }),
@@ -103,20 +114,29 @@ const customerSorts: Record<string, SortFactory> = {
   phone: (direction) => ({ phone: direction }),
 };
 
-const serviceJobSorts: Record<string, SortFactory> = {
+const serviceJobSorts: Record<
+  string,
+  SortFactory<Prisma.ServiceJobOrderByWithRelationInput>
+> = {
   amountCents: (direction) => ({ amountCents: direction }),
   completedAt: (direction) => ({ completedAt: direction }),
   status: (direction) => ({ status: direction }),
   title: (direction) => ({ title: direction }),
 };
 
-const followUpSorts: Record<string, SortFactory> = {
+const followUpSorts: Record<
+  string,
+  SortFactory<Prisma.FollowUpOrderByWithRelationInput>
+> = {
   channel: (direction) => ({ channel: direction }),
   dueAt: (direction) => ({ dueAt: direction }),
   status: (direction) => ({ status: direction }),
 };
 
-const templateSorts: Record<string, SortFactory> = {
+const templateSorts: Record<
+  string,
+  SortFactory<Prisma.FollowUpTemplateOrderByWithRelationInput>
+> = {
   channel: (direction) => ({ channel: direction }),
   name: (direction) => ({ name: direction }),
   subject: (direction) => ({ subject: direction }),
@@ -573,7 +593,7 @@ const serviceJobsRouter = t.router({
           search: z.string().trim().optional(),
           categories: z.array(z.string()).optional(),
           customers: z.array(z.string()).optional(),
-          status: z.string().optional(),
+          status: serviceJobStatusSchema.optional(),
           start: z.string().optional(),
           end: z.string().optional(),
           sort: z.array(z.string()).optional(),
@@ -618,7 +638,7 @@ const serviceJobsRouter = t.router({
           ...(input.categories?.length
             ? { serviceCategory: { in: input.categories } }
             : {}),
-          ...(input.status ? { status: input.status as any } : {}),
+          ...(input.status ? { status: input.status } : {}),
           ...(Object.keys(completedAtFilter).length
             ? { completedAt: completedAtFilter }
             : {}),

@@ -1,5 +1,6 @@
 "use client";
 
+import { dashboardNavItems } from "@afterservice/site-nav";
 import {
   Command,
   CommandEmpty,
@@ -10,20 +11,25 @@ import {
 } from "@afterservice/ui/command";
 import { Icons } from "@afterservice/ui/icons";
 import { Spinner } from "@afterservice/ui/spinner";
-import { useQuery } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import type { ReactNode } from "react";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
 import { useDebounceValue } from "usehooks-ts";
 import { useSearchStore } from "@/store/search";
-import { trpc } from "@/components/providers/trpc-provider";
+
+type SearchItemType = "shortcut" | "customer" | "job" | "follow_up" | "template";
+
+type SearchResultData = {
+  name?: string;
+  title?: string;
+};
 
 interface SearchItem {
   id: string;
-  type: string;
+  type: SearchItemType;
   title: string;
-  data?: any;
+  data?: SearchResultData;
   action?: () => void;
 }
 
@@ -57,7 +63,7 @@ const SearchResultItemDisplay = ({ item }: { item: SearchItem }) => {
         resultDisplay = (
           <div className="flex items-center w-full">
             <div className="flex-grow truncate flex gap-2 items-center">
-              <span>{item.data.name as string}</span>
+              <span>{item.data.name ?? item.title}</span>
             </div>
           </div>
         );
@@ -67,7 +73,7 @@ const SearchResultItemDisplay = ({ item }: { item: SearchItem }) => {
         resultDisplay = (
           <div className="flex items-center w-full">
             <div className="flex-grow truncate flex gap-2 items-center">
-              <span>{item.data.title as string}</span>
+              <span>{item.data.title ?? item.title}</span>
             </div>
           </div>
         );
@@ -118,42 +124,26 @@ export function Search() {
     debounceDelay,
   );
 
-  const sectionActions: SearchItem[] = [
-    {
-      id: "sc-view-customers",
-      type: "customer",
-      title: "View customers",
-      action: () => { setOpen(); router.push("/sales-book/customers"); },
-    },
-    {
-      id: "sc-view-jobs",
-      type: "job",
-      title: "View jobs",
-      action: () => { setOpen(); router.push("/sales-book/jobs"); },
-    },
-    {
-      id: "sc-view-followups",
-      type: "follow_up",
-      title: "View follow-ups",
-      action: () => { setOpen(); router.push("/sales-book/follow-ups"); },
-    },
-  ];
+  const sectionActions = useMemo<SearchItem[]>(
+    () =>
+      dashboardNavItems.map((item) => ({
+        id: `sc-view-${item.href === "/" ? "overview" : item.href.slice(1)}`,
+        type: "shortcut",
+        title: `Go to ${item.label}`,
+        action: () => {
+          setOpen();
+          router.push(item.href);
+        },
+      })),
+    [router, setOpen],
+  );
 
-  // Fetch data using useQuery
-  // We'll stub this out for now until the global search endpoint is built in the backend
+  // Stubbed until the global search endpoint is built in the backend.
   const isLoading = false;
   const isFetching = false;
   const searchResults: SearchItem[] = [];
 
-  const combinedData = useMemo(() => {
-    const mappedSearchResults = searchResults.map((res) => ({
-      ...res,
-      action: () => {
-        // Implement navigation based on result
-      },
-    }));
-    return [...mappedSearchResults];
-  }, [searchResults]);
+  const combinedData = useMemo(() => [...searchResults], [searchResults]);
 
   const groupedData = useMemo(() => {
     const groups: Record<string, SearchItem[]> = {};
@@ -198,7 +188,7 @@ export function Search() {
           </div>
           <CommandInput
             ref={searchInputRef}
-            placeholder="Search customers, jobs, or templates..."
+            placeholder="Search or jump to a page..."
             onValueChange={(val) => {
               setDebouncedSearch(val);
             }}

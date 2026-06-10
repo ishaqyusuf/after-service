@@ -1,6 +1,7 @@
 import { Button } from "@afterservice/ui/button";
 import { Icons } from "@afterservice/ui/icons";
 import { format, parseISO } from "date-fns";
+import type { ReactNode } from "react";
 
 type FilterKey =
   | "status"
@@ -77,13 +78,29 @@ export function FilterList({
         return channelFilters?.find((filter) => filter.id === value)?.name;
       }
       case "start":
+        if (!value || typeof value !== "string") return null;
+        if (filters.end) {
+          try {
+            return `${format(parseISO(value), "MMM d, yyyy")} - ${format(
+              parseISO(filters.end),
+              "MMM d, yyyy",
+            )}`;
+          } catch {
+            return `${value} - ${filters.end}`;
+          }
+        }
+
+        try {
+          return `From ${format(parseISO(value), "MMM d, yyyy")}`;
+        } catch {
+          return `From ${value}`;
+        }
       case "end": {
         if (!value || typeof value !== "string") return null;
-        const label = key === "start" ? "From" : "To";
         try {
-          return `${label} ${format(parseISO(value), "MMM d, yyyy")}`;
+          return `To ${format(parseISO(value), "MMM d, yyyy")}`;
         } catch {
-          return `${label} ${value}`;
+          return `To ${value}`;
         }
       }
       default:
@@ -92,13 +109,23 @@ export function FilterList({
   };
 
   const handleOnRemove = (key: FilterKey) => {
+    if (key === "start" || key === "end") {
+      onRemove({ start: null, end: null });
+      return;
+    }
+
     onRemove({ [key]: null });
   };
 
   return (
     <ul className="flex flex-wrap gap-2">
       {Object.entries(filters)
-        .filter(([key, value]) => value !== null && value !== undefined)
+        .filter(
+          ([key, value]) =>
+            value !== null &&
+            value !== undefined &&
+            !(key === "end" && filters.start),
+        )
         .map(([key, value]) => {
           const filterKey = key as FilterKey;
           const displayValue = renderFilter({
@@ -119,5 +146,13 @@ export function FilterList({
           );
         })}
     </ul>
+  );
+}
+
+export function FilterMenuEmptyState({ children }: { children: ReactNode }) {
+  return (
+    <div className="px-2 py-1.5 text-xs text-muted-foreground">
+      {children}
+    </div>
   );
 }

@@ -1,0 +1,176 @@
+"use client";
+
+import type { AppRouter } from "@afterservice/api/router";
+import { updateCustomerSchema } from "@afterservice/api/schemas";
+import { Button, Input, Textarea } from "@afterservice/ui";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@afterservice/ui/form";
+import type { inferRouterOutputs } from "@trpc/server";
+import { useEffect } from "react";
+import { trpc } from "@/components/providers/trpc-provider";
+import { useCustomerParams } from "@/hooks/use-customer-params";
+import { useZodForm } from "@/hooks/use-zod-form";
+
+type Customer = inferRouterOutputs<AppRouter>["customers"]["get"]["item"];
+
+type Props = {
+  customer: Customer;
+};
+
+export function CustomerEditForm({ customer }: Props) {
+  const { setParams } = useCustomerParams();
+  const utils = trpc.useUtils();
+
+  const handleSuccess = () => {
+    utils.customers.list.invalidate();
+    utils.customers.get.invalidate({ id: customer.id });
+    setParams(null);
+  };
+
+  const updateCustomer = trpc.customers.update.useMutation({
+    onSuccess: handleSuccess,
+  });
+
+  const archiveCustomer = trpc.customers.archive.useMutation({
+    onSuccess: handleSuccess,
+  });
+
+  const form = useZodForm({
+    schema: updateCustomerSchema,
+    defaultValues: {
+      id: customer.id,
+      name: customer.name,
+      email: customer.email ?? "",
+      phone: customer.phone ?? "",
+      companyName: customer.companyName ?? "",
+      tags: customer.tags.join(", "),
+      notes: customer.notes ?? "",
+    },
+  });
+
+  useEffect(() => {
+    form.reset({
+      id: customer.id,
+      name: customer.name,
+      email: customer.email ?? "",
+      phone: customer.phone ?? "",
+      companyName: customer.companyName ?? "",
+      tags: customer.tags.join(", "),
+      notes: customer.notes ?? "",
+    });
+  }, [customer, form]);
+
+  return (
+    <div className="mt-6 space-y-6">
+      <Form {...form}>
+        <form
+          onSubmit={form.handleSubmit((data) => updateCustomer.mutate(data))}
+          className="space-y-4"
+        >
+          <FormField
+            control={form.control}
+            name="name"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Name</FormLabel>
+                <FormControl>
+                  <Input {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="email"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Email</FormLabel>
+                <FormControl>
+                  <Input type="email" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="phone"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Phone</FormLabel>
+                <FormControl>
+                  <Input {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="companyName"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Company</FormLabel>
+                <FormControl>
+                  <Input {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="tags"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Tags</FormLabel>
+                <FormControl>
+                  <Input {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="notes"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Notes</FormLabel>
+                <FormControl>
+                  <Textarea className="h-32" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <Button
+            type="submit"
+            disabled={updateCustomer.isPending}
+            className="w-full"
+          >
+            {updateCustomer.isPending ? "Saving..." : "Save changes"}
+          </Button>
+        </form>
+      </Form>
+
+      <div className="border-t border-border pt-4">
+        <Button
+          variant="destructive"
+          className="w-full"
+          disabled={archiveCustomer.isPending}
+          onClick={() => archiveCustomer.mutate({ id: customer.id })}
+        >
+          {archiveCustomer.isPending ? "Archiving..." : "Archive customer"}
+        </Button>
+      </div>
+    </div>
+  );
+}

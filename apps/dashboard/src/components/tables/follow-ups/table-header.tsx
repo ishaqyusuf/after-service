@@ -277,7 +277,7 @@ function getHeaderLabel(columnId: string): string {
     customer: "Customer",
     status: "Status",
     channel: "Channel",
-    dueAt: "Due At",
+    dueAt: "Due at",
     job: "Job",
     notes: "Notes",
     actions: "Actions",

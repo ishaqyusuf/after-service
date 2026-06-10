@@ -278,7 +278,7 @@ function getHeaderLabel(columnId: string): string {
     companyName: "Company",
     email: "Email",
     phone: "Phone",
-    lastServiceAt: "Last Service",
+    lastServiceAt: "Last service",
     openFollowUpCount: "Follow-ups",
     tags: "Tags",
     actions: "Actions",

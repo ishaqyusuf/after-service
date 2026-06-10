@@ -16,6 +16,19 @@ import type { ReactNode } from "react";
 import { trpc } from "@/components/providers/trpc-provider";
 import { formatDate } from "@/lib/dashboard-format";
 
+const planLabels = {
+  growth: "Shop",
+  pro: "Growth",
+  starter: "Starter",
+} as const;
+
+const planStatusLabels = {
+  active: "Active",
+  canceled: "Canceled",
+  past_due: "Past due",
+  trialing: "Trialing",
+} as const;
+
 export function BillingOverview() {
   const { data, isLoading } = trpc.billing.getCurrentPlan.useQuery();
   const { data: portalData } = trpc.billing.getPortalUrl.useQuery();
@@ -31,7 +44,9 @@ export function BillingOverview() {
     return <BillingOverviewSkeleton />;
   }
 
-  if (!data?.item) return null;
+  if (!data?.item) {
+    return <BillingOverviewEmptyState onRetry={() => router.refresh()} />;
+  }
 
   const {
     isCheckoutEnabled,
@@ -42,6 +57,8 @@ export function BillingOverview() {
     subscription,
     usage,
   } = data.item;
+  const planLabel = planLabels[plan] ?? plan;
+  const planStatusLabel = planStatusLabels[planStatus] ?? planStatus;
   const usageItems = [
     {
       label: "Customers",
@@ -74,9 +91,9 @@ export function BillingOverview() {
               variant={planStatus === "active" ? "default" : "outline"}
               className="w-fit"
             >
-              {planStatus}
+              {planStatusLabel}
             </Badge>
-            <Badge variant="outline">{plan}</Badge>
+            <Badge variant="outline">{planLabel}</Badge>
           </div>
           <div className="space-y-1">
             <h1 className="text-3xl font-semibold tracking-tight">Billing</h1>
@@ -110,7 +127,11 @@ export function BillingOverview() {
       </header>
 
       <section className="grid gap-3 md:grid-cols-2 lg:grid-cols-4">
-        <PlanMetric label="Plan" value={planDisplayName} detail={planStatus} />
+        <PlanMetric
+          label="Plan"
+          value={planDisplayName}
+          detail={planStatusLabel}
+        />
         {usageItems.slice(0, 3).map((item) => (
           <PlanMetric
             key={item.label}
@@ -241,6 +262,36 @@ export function BillingOverviewSkeleton() {
           </CardContent>
         </Card>
       </section>
+    </div>
+  );
+}
+
+function BillingOverviewEmptyState({ onRetry }: { onRetry: () => void }) {
+  return (
+    <div className="max-w-[900px] space-y-8 py-6">
+      <header className="border-b border-border pb-8">
+        <div className="max-w-2xl space-y-2">
+          <h1 className="text-3xl font-semibold tracking-tight">Billing</h1>
+          <p className="text-muted-foreground">
+            Billing details are not available for this workspace yet.
+          </p>
+        </div>
+      </header>
+
+      <Card>
+        <CardContent className="flex flex-col items-start gap-4 p-6">
+          <div className="space-y-1">
+            <p className="text-sm font-medium">No billing profile found</p>
+            <p className="max-w-xl text-sm text-muted-foreground">
+              Refresh the workspace billing state to load plan, usage, and
+              subscription details.
+            </p>
+          </div>
+          <Button variant="outline" onClick={onRetry}>
+            Refresh billing
+          </Button>
+        </CardContent>
+      </Card>
     </div>
   );
 }

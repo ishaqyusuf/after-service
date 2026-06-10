@@ -1,8 +1,10 @@
 "use client";
 
+import type { AppRouter } from "@afterservice/api/router";
 import { closestCenter, DndContext } from "@dnd-kit/core";
 import { Table, TableBody, TableCell, TableRow } from "@afterservice/ui/table";
 import { getCoreRowModel, useReactTable } from "@tanstack/react-table";
+import type { inferRouterOutputs } from "@trpc/server";
 import { useVirtualizer, type VirtualItem } from "@tanstack/react-virtual";
 import {
   useCallback,
@@ -38,6 +40,9 @@ type Props = {
   initialSettings?: Partial<TableSettings>;
 };
 
+type CustomersListPage = inferRouterOutputs<AppRouter>["customers"]["list"];
+type CustomerRow = CustomersListPage["items"][number];
+
 export function DataTable({ initialSettings }: Props) {
 
   const { setParams } = useCustomerParams();
@@ -72,32 +77,30 @@ export function DataTable({ initialSettings }: Props) {
       sort: params.sort ?? undefined,
       tags: filter.tags ?? undefined,
     }, {
-      getNextPageParam: (lastPage: any) => lastPage.nextCursor,
+      getNextPageParam: (lastPage: CustomersListPage) => lastPage.nextCursor,
     });
 
-  const deleteCustomerMutation = trpc.customers.archive.useMutation({
+  const archiveCustomerMutation = trpc.customers.archive.useMutation({
     onSuccess: () => {
       refetch();
     },
   });
 
-  const handleDeleteCustomer = useCallback(
+  const handleArchiveCustomer = useCallback(
     (id: string) => {
-      deleteCustomerMutation.mutate({ id });
+      archiveCustomerMutation.mutate({ id });
     },
-    [deleteCustomerMutation],
+    [archiveCustomerMutation],
   );
 
-  
-
-  const tableData = useMemo(() => {
-    return data?.pages.flatMap((page: any) => page.items) ?? [];
+  const tableData = useMemo<CustomerRow[]>(() => {
+    return data?.pages.flatMap((page) => page.items) ?? [];
   }, [data]);
 
   const setOpen = useCallback(
     (id?: string) => {
       if (id) {
-        setParams({ customerId: id, /* details: true */ });
+        setParams({ customerId: id });
       } else {
         setParams(null);
       }
@@ -107,10 +110,9 @@ export function DataTable({ initialSettings }: Props) {
 
   const tableMeta = useMemo(
     () => ({
-      deleteCustomer: handleDeleteCustomer,
-      
+      archiveCustomer: handleArchiveCustomer,
     }),
-    [handleDeleteCustomer],
+    [handleArchiveCustomer],
   );
 
   const table = useReactTable({
@@ -249,7 +251,7 @@ export function DataTable({ initialSettings }: Props) {
                       colSpan={columns.length}
                       className="h-24 text-center"
                     >
-                      No results.
+                      Preparing rows...
                     </TableCell>
                   </TableRow>
                 )}

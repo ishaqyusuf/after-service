@@ -5,6 +5,11 @@ import { LogEvents } from "@afterservice/events";
 import { useTrack } from "@afterservice/events/client";
 import {
   Button,
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
   ComboboxDropdown,
   Input,
   Select,
@@ -121,166 +126,172 @@ export function UpdateWorkspaceForm() {
   }
 
   return (
-    <Form {...form}>
-      <form
-        onSubmit={form.handleSubmit((data) => updateMutation.mutate(data))}
-        className="space-y-8"
-      >
-        <section className="space-y-4 border-b border-border pb-8">
-          <div>
-            <h2 className="text-lg font-medium">Workspace profile</h2>
-            <p className="mt-1 text-sm text-muted-foreground">
-              These details shape default template suggestions and operator
-              context.
-            </p>
-          </div>
-          <div className="space-y-4">
-            <FormField
-              control={form.control}
-              name="name"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Workspace name</FormLabel>
-                  <FormControl>
-                    <Input {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="businessType"
-              render={() => (
-                <FormItem>
-                  <FormLabel>Business type</FormLabel>
-                  <ComboboxDropdown
-                    items={[...BUSINESS_TYPE_SUGGESTIONS]}
-                    selectedItem={selectedBusinessType}
-                    onSelect={setBusinessType}
-                    onCreate={(value) => {
-                      const item = toCustomSuggestion(value);
+    <Card>
+      <CardHeader>
+        <CardTitle>Workspace profile</CardTitle>
+        <CardDescription>
+          Manage workspace identity, service context, and default follow-up
+          cadence.
+        </CardDescription>
+      </CardHeader>
 
-                      if (item.label) {
-                        setBusinessType(item);
-                      }
-                    }}
-                    placeholder="Select or create a business type"
-                    searchPlaceholder="Repair shop, clinic, salon..."
-                    renderOnCreate={(value) => `Use "${value}"`}
-                    triggerClassName="h-9 bg-transparent"
-                  />
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="serviceCategory"
-              render={() => (
-                <FormItem>
-                  <FormLabel>Service category</FormLabel>
-                  <ComboboxDropdown
-                    items={serviceCategorySuggestions}
-                    selectedItem={selectedServiceCategory}
-                    onSelect={setServiceCategory}
-                    onCreate={(value) => {
-                      const item = toCustomSuggestion(value);
+      <CardContent>
+        <Form {...form}>
+          <form
+            onSubmit={form.handleSubmit((data) => updateMutation.mutate(data))}
+            className="space-y-8"
+          >
+            <section className="space-y-4 border-b border-border pb-8">
+              <div className="space-y-4">
+                <FormField
+                  control={form.control}
+                  name="name"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Workspace name</FormLabel>
+                      <FormControl>
+                        <Input {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="businessType"
+                  render={() => (
+                    <FormItem>
+                      <FormLabel>Business type</FormLabel>
+                      <ComboboxDropdown
+                        items={[...BUSINESS_TYPE_SUGGESTIONS]}
+                        selectedItem={selectedBusinessType}
+                        onSelect={setBusinessType}
+                        onCreate={(value) => {
+                          const item = toCustomSuggestion(value);
 
-                      if (item.label) {
-                        setServiceCategory(item);
-                      }
-                    }}
-                    placeholder="Select or create a service category"
-                    searchPlaceholder="Appliance repair, maintenance..."
-                    renderOnCreate={(value) => `Use "${value}"`}
-                    triggerClassName="h-9 bg-transparent"
-                  />
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </div>
-        </section>
+                          if (item.label) {
+                            setBusinessType(item);
+                          }
+                        }}
+                        placeholder="Select or create a business type"
+                        searchPlaceholder="Repair shop, clinic, salon..."
+                        renderOnCreate={(value) => `Use "${value}"`}
+                        triggerClassName="h-9 bg-transparent"
+                      />
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="serviceCategory"
+                  render={() => (
+                    <FormItem>
+                      <FormLabel>Service category</FormLabel>
+                      <ComboboxDropdown
+                        items={serviceCategorySuggestions}
+                        selectedItem={selectedServiceCategory}
+                        onSelect={setServiceCategory}
+                        onCreate={(value) => {
+                          const item = toCustomSuggestion(value);
 
-        <section className="space-y-4">
-          <div>
-            <h2 className="text-lg font-medium">Follow-up defaults</h2>
-            <p className="mt-1 text-sm text-muted-foreground">
-              Set the default cadence used when jobs create follow-up work.
-            </p>
-          </div>
-          <FormField
-            control={form.control}
-            name="defaultFollowUpDelayDays"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Default follow-up delay</FormLabel>
-                <Select
-                  onValueChange={(value) => field.onChange(Number(value))}
-                  value={String(field.value)}
-                >
-                  <FormControl>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select delay" />
-                    </SelectTrigger>
-                  </FormControl>
-                  <SelectContent>
-                    {followUpDelayOptions.map((option) => (
-                      <SelectItem key={option.value} value={option.value}>
-                        {option.label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                <FormDescription>
-                  Existing follow-ups keep their current due dates.
-                </FormDescription>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        </section>
+                          if (item.label) {
+                            setServiceCategory(item);
+                          }
+                        }}
+                        placeholder="Select or create a service category"
+                        searchPlaceholder="Appliance repair, maintenance..."
+                        renderOnCreate={(value) => `Use "${value}"`}
+                        triggerClassName="h-9 bg-transparent"
+                      />
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+            </section>
 
-        <Button type="submit" disabled={updateMutation.isPending}>
-          {updateMutation.isPending ? "Saving..." : "Save settings"}
-        </Button>
-      </form>
-    </Form>
+            <section className="space-y-4">
+              <div>
+                <h3 className="text-base font-medium">Follow-up defaults</h3>
+                <p className="mt-1 text-sm text-muted-foreground">
+                  Set the default cadence used when jobs create follow-up work.
+                </p>
+              </div>
+              <FormField
+                control={form.control}
+                name="defaultFollowUpDelayDays"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Default follow-up delay</FormLabel>
+                    <Select
+                      onValueChange={(value) => field.onChange(Number(value))}
+                      value={String(field.value)}
+                    >
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select delay" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {followUpDelayOptions.map((option) => (
+                          <SelectItem key={option.value} value={option.value}>
+                            {option.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <FormDescription>
+                      Existing follow-ups keep their current due dates.
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </section>
+
+            <Button type="submit" disabled={updateMutation.isPending}>
+              {updateMutation.isPending ? "Saving..." : "Save settings"}
+            </Button>
+          </form>
+        </Form>
+      </CardContent>
+    </Card>
   );
 }
 
 function WorkspaceSettingsSkeleton() {
   return (
-    <div className="space-y-8">
-      <section className="space-y-4 border-b border-border pb-8">
-        <div className="space-y-2">
-          <Skeleton className="h-6 w-40" />
-          <Skeleton className="h-4 w-full max-w-[520px]" />
-        </div>
-        <div className="space-y-4">
+    <Card>
+      <CardHeader>
+        <Skeleton className="h-6 w-40" />
+        <Skeleton className="h-4 w-full max-w-[520px]" />
+      </CardHeader>
+
+      <CardContent className="space-y-8">
+        <section className="space-y-4 border-b border-border pb-8">
           {Array.from({ length: 3 }).map((_, index) => (
             <div key={index} className="space-y-2">
               <Skeleton className="h-4 w-32" />
               <Skeleton className="h-9 w-full" />
             </div>
           ))}
-        </div>
-      </section>
+        </section>
 
-      <section className="space-y-4">
-        <div className="space-y-2">
-          <Skeleton className="h-6 w-44" />
-          <Skeleton className="h-4 w-full max-w-[500px]" />
-        </div>
-        <div className="space-y-2">
-          <Skeleton className="h-4 w-40" />
-          <Skeleton className="h-9 w-full" />
-          <Skeleton className="h-4 w-64" />
-        </div>
-      </section>
+        <section className="space-y-4">
+          <div className="space-y-2">
+            <Skeleton className="h-6 w-44" />
+            <Skeleton className="h-4 w-full max-w-[500px]" />
+          </div>
+          <div className="space-y-2">
+            <Skeleton className="h-4 w-40" />
+            <Skeleton className="h-9 w-full" />
+            <Skeleton className="h-4 w-64" />
+          </div>
+        </section>
 
-      <Skeleton className="h-9 w-32" />
-    </div>
+        <Skeleton className="h-9 w-32" />
+      </CardContent>
+    </Card>
   );
 }

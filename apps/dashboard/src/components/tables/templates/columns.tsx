@@ -110,14 +110,14 @@ export const columns: ColumnDef<Template>[] = [
   {
     id: "createdAt",
     accessorKey: "createdAt",
-    header: "Created At",
+    header: "Created at",
     size: 150,
     minSize: 120,
     maxSize: 200,
     enableResizing: true,
     meta: {
       skeleton: { type: "text", width: "w-24" },
-      headerLabel: "Created At",
+      headerLabel: "Created at",
       className: "w-[150px] min-w-[120px]",
     },
     cell: ({ row }) => {
@@ -156,10 +156,10 @@ export const columns: ColumnDef<Template>[] = [
             <DropdownMenuItem
               onClick={(e) => {
                 e.stopPropagation();
-                // table.options.meta?.deleteTemplate?.(row.original.id);
+                table.options.meta?.archiveTemplate?.(row.original.id);
               }}
             >
-              Delete template
+              Archive template
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

@@ -84,14 +84,14 @@ export const columns: ColumnDef<FollowUp>[] = [
   {
     id: "dueAt",
     accessorKey: "dueAt",
-    header: "Due At",
+    header: "Due at",
     size: 150,
     minSize: 120,
     maxSize: 200,
     enableResizing: true,
     meta: {
       skeleton: { type: "text", width: "w-24" },
-      headerLabel: "Due At",
+      headerLabel: "Due at",
       className: "w-[150px] min-w-[120px]",
     },
     cell: ({ row }) => {
@@ -160,7 +160,7 @@ export const columns: ColumnDef<FollowUp>[] = [
             <DropdownMenuItem
               onClick={(e) => {
                 e.stopPropagation();
-                table.options.meta?.deleteFollowUp?.(row.original.id);
+                table.options.meta?.closeFollowUp?.(row.original.id);
               }}
             >
               Close follow-up

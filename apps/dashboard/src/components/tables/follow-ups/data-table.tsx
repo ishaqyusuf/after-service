@@ -1,8 +1,10 @@
 "use client";
 
+import type { AppRouter } from "@afterservice/api/router";
 import { closestCenter, DndContext } from "@dnd-kit/core";
 import { Table, TableBody, TableCell, TableRow } from "@afterservice/ui/table";
 import { getCoreRowModel, useReactTable } from "@tanstack/react-table";
+import type { inferRouterOutputs } from "@trpc/server";
 import { useVirtualizer, type VirtualItem } from "@tanstack/react-virtual";
 import {
   useCallback,
@@ -42,6 +44,10 @@ type Props = {
   initialSettings?: Partial<TableSettings>;
 };
 
+type FollowUpsListPage =
+  inferRouterOutputs<AppRouter>["followUps"]["listTable"];
+type FollowUpRow = FollowUpsListPage["items"][number];
+
 export function DataTable({ initialSettings }: Props) {
 
   const { setParams } = useFollowUpParams();
@@ -78,26 +84,24 @@ export function DataTable({ initialSettings }: Props) {
       start: filter.start ?? undefined,
       status: toFollowUpStatus(filter.status),
     }, {
-      getNextPageParam: (lastPage: any) => lastPage.nextCursor,
+      getNextPageParam: (lastPage: FollowUpsListPage) => lastPage.nextCursor,
     });
 
-  const deleteFollowUpMutation = trpc.followUps.close.useMutation({
+  const closeFollowUpMutation = trpc.followUps.close.useMutation({
     onSuccess: () => {
       refetch();
     },
   });
 
-  const handleDeleteFollowUp = useCallback(
+  const handleCloseFollowUp = useCallback(
     (id: string) => {
-      deleteFollowUpMutation.mutate({ id });
+      closeFollowUpMutation.mutate({ id });
     },
-    [deleteFollowUpMutation],
+    [closeFollowUpMutation],
   );
 
-  
-
-  const tableData = useMemo(() => {
-    return data?.pages.flatMap((page: any) => page.items) ?? [];
+  const tableData = useMemo<FollowUpRow[]>(() => {
+    return data?.pages.flatMap((page) => page.items) ?? [];
   }, [data]);
 
   const setOpen = useCallback(
@@ -113,9 +117,9 @@ export function DataTable({ initialSettings }: Props) {
 
   const tableMeta = useMemo(
     () => ({
-      deleteFollowUp: handleDeleteFollowUp,
+      closeFollowUp: handleCloseFollowUp,
     }),
-    [handleDeleteFollowUp],
+    [handleCloseFollowUp],
   );
 
   const table = useReactTable({
@@ -254,7 +258,7 @@ export function DataTable({ initialSettings }: Props) {
                       colSpan={columns.length}
                       className="h-24 text-center"
                     >
-                      No results.
+                      Preparing rows...
                     </TableCell>
                   </TableRow>
                 )}

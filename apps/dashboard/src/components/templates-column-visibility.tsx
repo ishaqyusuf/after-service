@@ -3,6 +3,7 @@
 import { Button } from "@afterservice/ui/button";
 import { Checkbox } from "@afterservice/ui/checkbox";
 import { Icons } from "@afterservice/ui/icons";
+import { Label } from "@afterservice/ui/label";
 import { Popover, PopoverContent, PopoverTrigger } from "@afterservice/ui/popover";
 import { useTemplatesStore } from "@/store/templates";
 
@@ -43,12 +44,12 @@ export function TemplatesColumnVisibility() {
                       column.toggleVisibility(checked === true)
                     }
                   />
-                  <label
+                  <Label
                     htmlFor={column.id}
                     className="text-sm peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
                   >
                     {label}
-                  </label>
+                  </Label>
                 </div>
               );
             })}

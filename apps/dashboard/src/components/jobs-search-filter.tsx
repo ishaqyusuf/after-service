@@ -14,18 +14,17 @@ import {
 } from "@afterservice/ui/dropdown-menu";
 import { Icons } from "@afterservice/ui/icons";
 import { Input } from "@afterservice/ui/input";
-import { Label } from "@afterservice/ui/label";
 import { useMemo, useRef, useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
-import { useJobFilterParams } from "@/hooks/use-job-filter-params";
 import { trpc } from "@/components/providers/trpc-provider";
-import { FilterList } from "./filter-list";
-
-const allowedStatuses = [
-  { id: "completed", name: "Completed" },
-  { id: "needs_follow_up", name: "Needs follow-up" },
-  { id: "resolved", name: "Resolved" },
-];
+import {
+  serviceJobStatusLabels,
+  serviceJobStatuses,
+  toServiceJobStatus,
+  useJobFilterParams,
+} from "@/hooks/use-job-filter-params";
+import { DateRangeFilter } from "./date-range-filter";
+import { FilterList, FilterMenuEmptyState } from "./filter-list";
 
 export function JobsSearchFilter() {
   const { filter, setFilter } = useJobFilterParams();
@@ -35,9 +34,14 @@ export function JobsSearchFilter() {
 
   const { data: customersData } = trpc.customers.list.useQuery({
     includeArchived: false,
+    limit: 100,
   });
   const customers = customersData?.items ?? [];
-  const { data: jobsData } = trpc.serviceJobs.list.useQuery({});
+  const { data: jobsData } = trpc.serviceJobs.list.useQuery({ limit: 100 });
+  const allowedStatuses = serviceJobStatuses.map((status) => ({
+    id: status,
+    name: serviceJobStatusLabels[status],
+  }));
   const categoryFilters = useMemo(() => {
     const categories = new Set<string>();
 
@@ -89,9 +93,22 @@ export function JobsSearchFilter() {
     Object.entries(filter).filter(([key]) => key !== "q"),
   );
 
-  const hasValidFilters = Object.values(validFilters).some(
-    (value) => value !== null,
-  );
+  const selectedCategories = Array.isArray(filter.categories)
+    ? filter.categories
+    : [];
+  const selectedCustomers = Array.isArray(filter.customers)
+    ? filter.customers
+    : [];
+  const hasValidFilters =
+    Boolean(toServiceJobStatus(filter.status)) ||
+    selectedCategories.some((category) =>
+      categoryFilters.some((filter) => filter.id === category),
+    ) ||
+    selectedCustomers.some((customerId) =>
+      customers.some((customer) => customer.id === customerId),
+    ) ||
+    Boolean(filter.start) ||
+    Boolean(filter.end);
 
   return (
     <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
@@ -215,9 +232,7 @@ export function JobsSearchFilter() {
                     );
                   })
                 ) : (
-                  <div className="px-2 py-1.5 text-xs text-muted-foreground">
-                    No categories yet
-                  </div>
+                  <FilterMenuEmptyState>No categories yet</FilterMenuEmptyState>
                 )}
               </DropdownMenuSubContent>
             </DropdownMenuPortal>
@@ -234,31 +249,35 @@ export function JobsSearchFilter() {
                 alignOffset={-4}
                 className="p-0 max-h-[300px] overflow-y-auto"
               >
-                {customers.map((customer) => {
-                  const isChecked =
-                    Array.isArray(filter.customers) &&
-                    filter.customers.includes(customer.id);
-                  return (
-                    <DropdownMenuCheckboxItem
-                      key={customer.id}
-                      checked={isChecked}
-                      onSelect={(e) => e.preventDefault()}
-                      onCheckedChange={() => {
-                        const current = Array.isArray(filter.customers)
-                          ? filter.customers
-                          : [];
-                        const next = isChecked
-                          ? current.filter((id) => id !== customer.id)
-                          : [...current, customer.id];
-                        setFilter({
-                          customers: next.length > 0 ? next : null,
-                        });
-                      }}
-                    >
-                      {customer.name}
-                    </DropdownMenuCheckboxItem>
-                  );
-                })}
+                {customers.length > 0 ? (
+                  customers.map((customer) => {
+                    const isChecked =
+                      Array.isArray(filter.customers) &&
+                      filter.customers.includes(customer.id);
+                    return (
+                      <DropdownMenuCheckboxItem
+                        key={customer.id}
+                        checked={isChecked}
+                        onSelect={(e) => e.preventDefault()}
+                        onCheckedChange={() => {
+                          const current = Array.isArray(filter.customers)
+                            ? filter.customers
+                            : [];
+                          const next = isChecked
+                            ? current.filter((id) => id !== customer.id)
+                            : [...current, customer.id];
+                          setFilter({
+                            customers: next.length > 0 ? next : null,
+                          });
+                        }}
+                      >
+                        {customer.name}
+                      </DropdownMenuCheckboxItem>
+                    );
+                  })
+                ) : (
+                  <FilterMenuEmptyState>No customers yet</FilterMenuEmptyState>
+                )}
               </DropdownMenuSubContent>
             </DropdownMenuPortal>
           </DropdownMenuSub>
@@ -272,45 +291,13 @@ export function JobsSearchFilter() {
               <DropdownMenuSubContent
                 sideOffset={14}
                 alignOffset={-4}
-                className="p-3"
+                className="p-0"
               >
-                <div className="flex flex-col gap-3">
-                  <div className="flex flex-col gap-1.5">
-                    <Label className="text-xs">From</Label>
-                    <Input
-                      type="date"
-                      value={filter.start ?? ""}
-                      onChange={(e) => {
-                        setFilter({
-                          start: e.target.value || null,
-                        });
-                      }}
-                    />
-                  </div>
-                  <div className="flex flex-col gap-1.5">
-                    <Label className="text-xs">To</Label>
-                    <Input
-                      type="date"
-                      value={filter.end ?? ""}
-                      onChange={(e) => {
-                        setFilter({
-                          end: e.target.value || null,
-                        });
-                      }}
-                    />
-                  </div>
-                  {(filter.start || filter.end) && (
-                    <button
-                      type="button"
-                      className="text-xs text-muted-foreground hover:text-foreground text-left"
-                      onClick={() => {
-                        setFilter({ start: null, end: null });
-                      }}
-                    >
-                      Clear date range
-                    </button>
-                  )}
-                </div>
+                <DateRangeFilter
+                  start={filter.start}
+                  end={filter.end}
+                  onSelect={setFilter}
+                />
               </DropdownMenuSubContent>
             </DropdownMenuPortal>
           </DropdownMenuSub>

@@ -5,6 +5,13 @@ export const templateChannels = ["email", "sms", "phone", "whatsapp"] as const;
 
 export type TemplateChannel = (typeof templateChannels)[number];
 
+export const templateChannelLabels: Record<TemplateChannel, string> = {
+  email: "Email",
+  phone: "Phone",
+  sms: "SMS",
+  whatsapp: "WhatsApp",
+};
+
 export function toTemplateChannel(value: string | null) {
   return templateChannels.find((channel) => channel === value);
 }
@@ -20,7 +27,7 @@ export function useTemplateFilterParams() {
   return {
     filter,
     setFilter,
-    hasFilters: Object.values(filter).some((value) => value !== null),
+    hasFilters: Boolean(filter.q) || Boolean(toTemplateChannel(filter.channel)),
   };
 }
 

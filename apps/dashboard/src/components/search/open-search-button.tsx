@@ -15,7 +15,7 @@ export function OpenSearchButton() {
       onClick={() => setOpen()}
     >
       <Icons.Search size={18} className="mr-2" />
-      <span>Find anything...</span>
+      <span>Search pages...</span>
       <kbd className="pointer-events-none absolute opacity-0 hover:opacity-100 right-1.5 top-1.5 hidden h-5 select-none items-center gap-1 border bg-accent px-1.5 text-[10px] font-medium sm:flex">
         <span className="text-xs">⌘</span>K
       </kbd>

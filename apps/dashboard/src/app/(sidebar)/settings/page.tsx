@@ -1,38 +1,29 @@
-import { Badge } from "@afterservice/ui";
 import type { Metadata } from "next";
+import { ChangeTheme } from "@/components/change-theme";
 import { ErrorBoundary } from "@/components/error-boundary";
 import { ErrorFallback } from "@/components/error-fallback";
 import { UpdateWorkspaceForm } from "@/components/forms/update-workspace-form";
+import { ScrollableContent } from "@/components/scrollable-content";
+import { HydrateClient, prefetch, trpc } from "@/trpc/server";
 
-export async function generateMetadata(): Promise<Metadata> {
-  return {
-    title: "Settings | After Service",
-    description: "Manage workspace settings.",
-  };
-}
+export const metadata: Metadata = {
+  title: "Settings | afterservice",
+  description: "Manage workspace settings.",
+};
 
 export default async function SettingsPage() {
-  // TODO: Add trpc prefetch here when ready
-  // await trpc.workspace.get.prefetch();
+  prefetch(trpc.workspace.getCurrent.queryOptions());
 
   return (
-    <ErrorBoundary fallback={<ErrorFallback />}>
-      <div className="max-w-[800px] py-6">
-        <header className="mb-8 flex flex-col gap-4">
-          <div className="space-y-1">
-            <Badge variant="outline" className="mb-2 w-fit">
-              Workspace
-            </Badge>
-            <h1 className="text-3xl font-semibold tracking-tight">Settings</h1>
-            <p className="max-w-2xl text-muted-foreground">
-              Keep workspace identity and default follow-up cadence aligned with
-              the operator&apos;s service workflow.
-            </p>
+    <HydrateClient>
+      <ScrollableContent>
+        <ErrorBoundary fallback={<ErrorFallback />}>
+          <div className="max-w-[800px] space-y-12">
+            <UpdateWorkspaceForm />
+            <ChangeTheme />
           </div>
-        </header>
-
-        <UpdateWorkspaceForm />
-      </div>
-    </ErrorBoundary>
+        </ErrorBoundary>
+      </ScrollableContent>
+    </HydrateClient>
   );
 }

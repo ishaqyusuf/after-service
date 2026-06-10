@@ -1,10 +1,7 @@
 "use client";
 
-import { Badge } from "@afterservice/ui";
-import { format } from "date-fns";
-import type { ColumnDef } from "@tanstack/react-table";
-import { MoreHorizontal } from "lucide-react";
 import { Button } from "@afterservice/ui";
+import { Badge } from "@afterservice/ui";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -12,6 +9,13 @@ import {
   DropdownMenuLabel,
   DropdownMenuTrigger,
 } from "@afterservice/ui";
+import type { ColumnDef } from "@tanstack/react-table";
+import { format } from "date-fns";
+import { MoreHorizontal } from "lucide-react";
+import {
+  serviceJobStatusLabels,
+  toServiceJobStatus,
+} from "@/hooks/use-job-filter-params";
 
 export type ServiceJob = {
   id: string;
@@ -70,11 +74,15 @@ export const columns: ColumnDef<ServiceJob>[] = [
       headerLabel: "Status",
       className: "w-[150px] min-w-[120px]",
     },
-    cell: ({ row }) => (
-      <Badge variant={row.original.status === "completed" ? "default" : "secondary"}>
-        {row.original.status}
-      </Badge>
-    ),
+    cell: ({ row }) => {
+      const status = toServiceJobStatus(row.original.status);
+
+      return (
+        <Badge variant={status === "completed" ? "default" : "secondary"}>
+          {status ? serviceJobStatusLabels[status] : row.original.status}
+        </Badge>
+      );
+    },
   },
   {
     id: "serviceCategory",
@@ -113,14 +121,14 @@ export const columns: ColumnDef<ServiceJob>[] = [
   {
     id: "completedAt",
     accessorKey: "completedAt",
-    header: "Completed At",
+    header: "Completed at",
     size: 150,
     minSize: 120,
     maxSize: 200,
     enableResizing: true,
     meta: {
       skeleton: { type: "text", width: "w-24" },
-      headerLabel: "Completed At",
+      headerLabel: "Completed at",
       className: "w-[150px] min-w-[120px]",
     },
     cell: ({ row }) => {
@@ -176,10 +184,10 @@ export const columns: ColumnDef<ServiceJob>[] = [
             <DropdownMenuItem
               onClick={(e) => {
                 e.stopPropagation();
-                // table.options.meta?.deleteJob?.(row.original.id);
+                table.options.meta?.scheduleFollowUp?.(row.original.id);
               }}
             >
-              Delete job
+              Schedule follow-up
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

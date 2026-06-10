@@ -13,7 +13,7 @@ import { batchPrefetch, HydrateClient, trpc } from "@/trpc/server";
 import { getInitialTableSettings } from "@/utils/table-settings-server";
 
 export const metadata: Metadata = {
-  title: "Customers | After Service",
+  title: "Customers | afterservice",
   description: "Manage your customer base.",
 };
 

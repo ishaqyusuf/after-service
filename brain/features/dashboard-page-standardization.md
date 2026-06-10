@@ -1,7 +1,7 @@
 # Feature: Dashboard Page Standardization
 
 ## Status
-In progress. Page shell, form consistency, and page skeleton fallbacks updated on 2026-06-09.
+In progress. Page shell, form consistency, page skeleton fallbacks, and stale TODO cleanup updated on 2026-06-10.
 
 ## Scope
 - Authenticated dashboard table pages.
@@ -16,15 +16,30 @@ In progress. Page shell, form consistency, and page skeleton fallbacks updated o
 ## Current State
 - Customers, jobs, follow-ups, and templates pages use the local app `ErrorBoundary` with `ErrorFallback`.
 - Dashboard overview, billing, settings, and onboarding pages use the same local `ErrorBoundary` with `ErrorFallback`.
+- Dashboard overview, billing, and settings pages prefetch their primary tRPC queries at the route level and hydrate client consumers.
+- Dashboard overview, billing, settings, and onboarding pages use static `metadata` exports like the table routes because their metadata does not depend on request data.
+- Dashboard route metadata titles, including auth recovery routes, use the canonical `afterservice` product name.
+- Dashboard overview, billing, and settings pages now use the shared scroll-aware `ScrollableContent` wrapper like the table routes.
 - Customers, jobs, follow-ups, and templates pages use domain skeleton fallbacks for table loading.
 - Follow-ups page uses a board skeleton fallback for board loading.
 - Dashboard overview page uses the feature `OverviewSkeleton` instead of a raw placeholder block.
 - Customers, jobs, follow-ups, and templates header controls stack on small screens and align horizontally on wider screens.
 - Onboarding uses the shared form primitives and shared `Select`.
 - Onboarding uses a form-shaped skeleton fallback instead of a raw placeholder block.
+- Onboarding page no longer carries stale prefetch TODOs; it has no route-level tRPC data dependency.
 - Sign-in, sign-up, forgot-password, and reset-password pages use a shared centered auth shell instead of duplicated split-panel layouts.
 - Sign-in, sign-up, forgot-password, and reset-password forms use shared `@afterservice/ui/form` primitives with local Zod schemas.
+- Sign-in and sign-up routes are thin server pages with metadata; client auth behavior lives in `sign-in-view.tsx` and `sign-up-view.tsx`.
 - Settings and billing pages already use constrained Midday-style page layouts.
+- Settings now groups workspace and appearance configuration as matching card-style settings sections, with a card-shaped workspace loading skeleton.
+- Dashboard overview and billing client views render structured empty states instead of blank content when their primary query payload is missing.
+- Dashboard overview priority follow-ups now use a structured card empty state with an action instead of an empty table row.
+- Dashboard overview recent job badges now reuse shared service job status labels instead of formatting raw enum values inline.
+- The shared dashboard `ErrorFallback` now renders a structured card-style retry state instead of a bare centered message.
+- Settings page content now follows the quieter Midday settings rhythm with a constrained section stack instead of a duplicate page-level header.
+- Dashboard shell search results and navigation icon maps avoid dashboard-local `any` types.
+- Dashboard shell search shortcuts derive from shared `dashboardNavItems`, so page jump actions stay aligned with the actual dashboard routes.
+- Dashboard shell search copy reflects the current page-jump behavior while global record search remains stubbed.
 
 ## Remaining Work
 - Continue auditing newly added pages against the same route composition standard.

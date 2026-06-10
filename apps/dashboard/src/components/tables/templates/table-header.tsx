@@ -279,7 +279,7 @@ function getHeaderLabel(columnId: string): string {
     subject: "Subject",
     body: "Body",
     isDefault: "Default",
-    createdAt: "Created At",
+    createdAt: "Created at",
     actions: "Actions",
   };
   return labels[columnId] || columnId;

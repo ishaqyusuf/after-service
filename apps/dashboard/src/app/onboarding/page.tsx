@@ -9,16 +9,12 @@ import {
   OnboardingFormSkeleton,
 } from "@/components/forms/onboarding-form";
 
-export async function generateMetadata(): Promise<Metadata> {
-  return {
-    title: "Onboarding | After Service",
-    description:
-      "Create the workspace, owner membership, and starter templates.",
-  };
-}
+export const metadata: Metadata = {
+  title: "Onboarding | afterservice",
+  description: "Create the workspace, owner membership, and starter templates.",
+};
 
 export default async function OnboardingPage() {
-  // TODO: trpc prefetch here
   return (
     <ErrorBoundary fallback={<ErrorFallback />}>
       <Suspense fallback={null}>

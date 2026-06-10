@@ -3,8 +3,8 @@ import { AuthFooter, AuthShell } from "@/components/auth/auth-shell";
 import { ForgotPasswordForm } from "@/components/auth/forgot-password-form";
 
 export const metadata: Metadata = {
-  title: "Forgot Password",
-  description: "Reset your password",
+  title: "Forgot password | afterservice",
+  description: "Request an afterservice dashboard password reset link.",
 };
 
 export default function ForgotPasswordPage() {

@@ -279,7 +279,7 @@ function getHeaderLabel(columnId: string): string {
     status: "Status",
     serviceCategory: "Category",
     amountCents: "Amount",
-    completedAt: "Completed At",
+    completedAt: "Completed at",
     notes: "Notes",
     actions: "Actions",
   };

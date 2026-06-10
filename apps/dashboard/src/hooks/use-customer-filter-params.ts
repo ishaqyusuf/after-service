@@ -16,7 +16,7 @@ export function useCustomerFilterParams() {
   return {
     filter,
     setFilter,
-    hasFilters: Object.values(filter).some((value) => value !== null),
+    hasFilters: Boolean(filter.q) || Boolean(filter.tags?.length),
   };
 }
 

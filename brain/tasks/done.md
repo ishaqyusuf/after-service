@@ -81,6 +81,23 @@ Verification:
 - `git diff --check -- apps/dashboard/package.json apps/dashboard/src/app/layout.tsx apps/dashboard/src/components/theme-provider.tsx apps/dashboard/src/components/theme-switch.tsx apps/dashboard/src/components/user-menu.tsx`
 - Recommended: `bun run --filter @afterservice/dashboard typecheck`.
 
+### Dashboard Dark Mode Settings Surface
+
+Completed: 2026-06-10
+
+Summary:
+
+- Added a Midday-style Appearance card to dashboard Settings.
+- Reused the existing light/dark/system `ThemeSwitch` instead of adding a second theme control path.
+- Updated the dashboard root shell classes so the themed background covers the document and body.
+- Updated `brain/features/dashboard-dark-mode.md`.
+
+Verification:
+
+- `git diff --check -- apps/dashboard/src/app/layout.tsx apps/dashboard/src/app/(sidebar)/settings/page.tsx apps/dashboard/src/components/change-theme.tsx brain/features/dashboard-dark-mode.md brain/tasks/done.md`
+- Targeted symbol scan confirmed the Settings page imports and renders `ChangeTheme`.
+- Recommended: `bun run --filter @afterservice/dashboard typecheck`.
+
 ### Dashboard Table Empty States
 
 Completed: 2026-06-09
@@ -772,6 +789,72 @@ Files changed:
 - `apps/dashboard/src/components/sheets/schedule-follow-up-sheet.tsx`
 - `brain`
 
+### Follow-Up Board Sheet URL Alignment
+
+Completed: 2026-06-10
+
+Summary:
+
+- Updated follow-up board cards to open the work sheet with the standardized `followUpId` URL param.
+- Kept board rendering and card copy unchanged.
+- Updated Brain sheet standardization notes.
+
+Verification:
+
+- Focused whitespace and exact follow-up URL-param scans only, per fast Bun monorepo command discipline.
+
+Files changed:
+
+- `apps/dashboard/src/components/boards/follow-ups-board.tsx`
+- `brain`
+
+### Dashboard Table Date Label Sentence Case
+
+Completed: 2026-06-10
+
+Summary:
+
+- Normalized customer, job, follow-up, and template date column labels to sentence case.
+- Kept column IDs and sort/filter behavior unchanged.
+- Updated Brain table standardization notes.
+
+Verification:
+
+- Focused whitespace and exact date-label scans only, per fast Bun monorepo command discipline.
+
+Files changed:
+
+- `apps/dashboard/src/components/tables/customers/columns.tsx`
+- `apps/dashboard/src/components/tables/customers/table-header.tsx`
+- `apps/dashboard/src/components/tables/jobs/columns.tsx`
+- `apps/dashboard/src/components/tables/jobs/table-header.tsx`
+- `apps/dashboard/src/components/tables/follow-ups/columns.tsx`
+- `apps/dashboard/src/components/tables/follow-ups/table-header.tsx`
+- `apps/dashboard/src/components/tables/templates/columns.tsx`
+- `apps/dashboard/src/components/tables/templates/table-header.tsx`
+- `brain`
+
+### Dashboard Table Row Open Handler Cleanup
+
+Completed: 2026-06-10
+
+Summary:
+
+- Removed stale `details: true` comments from customer, job, and template table row-open handlers.
+- Preserved the existing URL-backed detail sheet behavior.
+- Updated Brain table standardization notes.
+
+Verification:
+
+- Focused whitespace and exact stale details-comment scans only, per fast Bun monorepo command discipline.
+
+Files changed:
+
+- `apps/dashboard/src/components/tables/customers/data-table.tsx`
+- `apps/dashboard/src/components/tables/jobs/data-table.tsx`
+- `apps/dashboard/src/components/tables/templates/data-table.tsx`
+- `brain`
+
 ### Dashboard Auth Page Shell Standardization
 
 Completed: 2026-06-09
@@ -938,4 +1021,1271 @@ Files changed:
 - `apps/dashboard/src/app/(sidebar)/jobs/page.tsx`
 - `apps/dashboard/src/components/tables/jobs/data-table.tsx`
 - `apps/api/src/routers/_app.ts`
+- `brain`
+
+### Dashboard Non-Table Route Prefetch Alignment
+
+Completed: 2026-06-10
+
+Summary:
+
+- Added route-level tRPC prefetch and hydration to dashboard overview, billing, and settings pages.
+- Removed stale prefetch TODO comments from those pages.
+- Matched route prefetches to the client queries consumed by overview widgets, billing overview, and workspace settings form.
+- Updated Brain page standardization notes.
+
+Verification:
+
+- Focused whitespace and exact prefetch/hydration scans only, per fast Bun monorepo command discipline.
+
+Files changed:
+
+- `apps/dashboard/src/app/(sidebar)/page.tsx`
+- `apps/dashboard/src/app/(sidebar)/billing/page.tsx`
+- `apps/dashboard/src/app/(sidebar)/settings/page.tsx`
+- `brain`
+
+### Dashboard Stale Loading Text Cleanup
+
+Completed: 2026-06-10
+
+Summary:
+
+- Removed the stale onboarding route prefetch TODO.
+- Replaced create-sheet dropdown loading prose with stable field placeholders while disabled loading states remain in place.
+- Updated Brain page and sheet standardization notes.
+
+Verification:
+
+- Focused whitespace and stale TODO/loading-text scans only, per fast Bun monorepo command discipline.
+
+Files changed:
+
+- `apps/dashboard/src/app/onboarding/page.tsx`
+- `apps/dashboard/src/components/sheets/follow-up-create-sheet.tsx`
+- `apps/dashboard/src/components/sheets/job-create-sheet.tsx`
+- `brain`
+
+### Dashboard Auth Route Thin Pages
+
+Completed: 2026-06-10
+
+Summary:
+
+- Moved sign-in and sign-up client behavior into dedicated auth view components.
+- Converted `/sign-in` and `/sign-up` route files into thin server pages with route metadata.
+- Preserved dev quick-fill controls and auth submission behavior.
+- Updated Brain page standardization notes.
+
+Verification:
+
+- Focused whitespace and route/client-boundary scans only, per fast Bun monorepo command discipline.
+
+Files changed:
+
+- `apps/dashboard/src/app/sign-in/page.tsx`
+- `apps/dashboard/src/app/sign-up/page.tsx`
+- `apps/dashboard/src/components/auth/sign-in-view.tsx`
+- `apps/dashboard/src/components/auth/sign-up-view.tsx`
+- `brain`
+
+### Dashboard Follow-Up Create Customer Autocomplete
+
+Completed: 2026-06-10
+
+Summary:
+
+- Replaced the follow-up create sheet customer select with the shared combobox autocomplete.
+- Added create-first customer creation so the first result can create the typed customer and select it.
+- Updated the submit disabled state to key off the selected customer field rather than requiring preloaded customer options.
+- Updated Brain sheet standardization notes.
+
+Verification:
+
+- Focused whitespace and exact combobox wiring scans only, per fast Bun monorepo command discipline.
+
+Files changed:
+
+- `apps/dashboard/src/components/sheets/follow-up-create-sheet.tsx`
+- `brain`
+
+### Dashboard Jobs Filter Option Empty State
+
+Completed: 2026-06-10
+
+Summary:
+
+- Added a compact empty-state row to the jobs customer filter submenu when no customers exist.
+- Matched the category and customer-tag filter menu behavior so filter-option menus do not render blank.
+- Updated Brain table/filter standardization notes.
+
+Verification:
+
+- Focused whitespace and exact jobs filter empty-state scans only, per fast Bun monorepo command discipline.
+
+Files changed:
+
+- `apps/dashboard/src/components/jobs-search-filter.tsx`
+- `brain`
+
+### Dashboard Follow-Up Board Empty State
+
+Completed: 2026-06-10
+
+Summary:
+
+- Added a board-level empty state for the follow-up board when every column is empty.
+- Wired the empty-state action to open the create follow-up sheet.
+- Removed an unused card recipient variable while touching the board component.
+- Updated Brain follow-up board and dashboard table standardization notes.
+
+Verification:
+
+- Focused whitespace and exact board empty-state/action scans only, per fast Bun monorepo command discipline.
+
+Files changed:
+
+- `apps/dashboard/src/components/boards/follow-ups-board.tsx`
+- `brain`
+
+### Dashboard Follow-Up Board Typed Items
+
+Completed: 2026-06-10
+
+Summary:
+
+- Replaced the follow-up board card `any` type with the inferred `followUps.listBoard` router output type.
+- Changed per-column empty copy from generic card language to follow-up-specific language.
+- Tidied JSX whitespace in the board card links and column title.
+- Updated Brain follow-up board and dashboard table standardization notes.
+
+Verification:
+
+- Focused whitespace and exact board type/empty-copy scans only, per fast Bun monorepo command discipline.
+
+Files changed:
+
+- `apps/dashboard/src/components/boards/follow-ups-board.tsx`
+- `brain`
+
+### Dashboard Non-Table Static Metadata
+
+Completed: 2026-06-10
+
+Summary:
+
+- Converted dashboard overview, billing, and settings pages from async `generateMetadata` functions to static `metadata` exports.
+- Aligned those non-table server routes with the existing customers, jobs, follow-ups, and templates route metadata pattern.
+- Updated Brain page standardization notes.
+
+Verification:
+
+- Focused whitespace and exact metadata export scans only, per fast Bun monorepo command discipline.
+
+Files changed:
+
+- `apps/dashboard/src/app/(sidebar)/page.tsx`
+- `apps/dashboard/src/app/(sidebar)/billing/page.tsx`
+- `apps/dashboard/src/app/(sidebar)/settings/page.tsx`
+- `brain`
+
+### Dashboard Table Router Output Typing
+
+Completed: 2026-06-10
+
+Summary:
+
+- Typed customers, jobs, follow-up history, and templates table pagination from inferred tRPC router outputs.
+- Removed `any` from table `getNextPageParam` and page-flattening code.
+- Replaced the virtualizer-only fallback copy from misleading `No results.` to `Preparing rows...`; real empty and no-results states still use the shared domain empty-state components.
+- Updated Brain table standardization notes.
+
+Verification:
+
+- Focused whitespace and exact table typing/fallback scans only, per fast Bun monorepo command discipline.
+
+Files changed:
+
+- `apps/dashboard/src/components/tables/customers/data-table.tsx`
+- `apps/dashboard/src/components/tables/jobs/data-table.tsx`
+- `apps/dashboard/src/components/tables/follow-ups/data-table.tsx`
+- `apps/dashboard/src/components/tables/templates/data-table.tsx`
+- `brain`
+
+### Dashboard Table And Sheet Copy-Paste Cleanup
+
+Completed: 2026-06-10
+
+Summary:
+
+- Fixed jobs and templates table drag-and-drop context IDs so they no longer reuse the customers table id.
+- Standardized remaining follow-up/customer sheet titles to sentence case.
+- Updated Brain table and sheet standardization notes.
+
+Verification:
+
+- Focused whitespace and exact DnD id/title scans only, per fast Bun monorepo command discipline.
+
+Files changed:
+
+- `apps/dashboard/src/components/tables/jobs/data-table.tsx`
+- `apps/dashboard/src/components/tables/templates/data-table.tsx`
+- `apps/dashboard/src/components/sheets/edit-customer-sheet.tsx`
+- `apps/dashboard/src/components/sheets/follow-up-card-sheet.tsx`
+- `apps/dashboard/src/components/sheets/schedule-follow-up-sheet.tsx`
+- `brain`
+
+### Dashboard Column Visibility Label Primitives
+
+Completed: 2026-06-10
+
+Summary:
+
+- Replaced raw checkbox labels in customer, job, follow-up, and template column visibility popovers with the shared `@afterservice/ui/label` primitive.
+- Preserved the existing checkbox `htmlFor` associations and visibility behavior.
+- Updated Brain table standardization notes.
+
+Verification:
+
+- Focused whitespace and exact raw-label/shared-label scans only, per fast Bun monorepo command discipline.
+
+Files changed:
+
+- `apps/dashboard/src/components/customers-column-visibility.tsx`
+- `apps/dashboard/src/components/jobs-column-visibility.tsx`
+- `apps/dashboard/src/components/follow-ups-column-visibility.tsx`
+- `apps/dashboard/src/components/templates-column-visibility.tsx`
+- `brain`
+
+### Dashboard Shell Search Typing
+
+Completed: 2026-06-10
+
+Summary:
+
+- Replaced the dashboard search item payload `any` with a small typed result data shape.
+- Removed stale unused search imports while keeping the current stubbed search behavior.
+- Typed the main navigation icon map without `ComponentType<any>`.
+- Cleaned stale search/table comments that mentioned removed implementation details.
+- Updated Brain page standardization notes.
+
+Verification:
+
+- Focused whitespace and exact dashboard-local `any` scans only, per fast Bun monorepo command discipline.
+
+Files changed:
+
+- `apps/dashboard/src/components/search/search.tsx`
+- `apps/dashboard/src/components/main-menu.tsx`
+- `apps/dashboard/src/components/tables/core/virtual-row.tsx`
+- `brain`
+
+### Dashboard Search Route Shortcuts
+
+Completed: 2026-06-10
+
+Summary:
+
+- Replaced stale `/sales-book/*` search shortcuts with actions derived from shared `dashboardNavItems`.
+- Expanded search page-jump shortcuts to cover all primary dashboard nav pages.
+- Updated the search placeholder to match the current page-jump behavior while global record search remains stubbed.
+- Updated Brain page standardization notes.
+
+Verification:
+
+- Focused whitespace and exact stale-route/shared-nav scans only, per fast Bun monorepo command discipline.
+
+Files changed:
+
+- `apps/dashboard/src/components/search/search.tsx`
+- `brain`
+
+### Dashboard Sheet Action Consistency
+
+Completed: 2026-06-10
+
+Summary:
+
+- Changed the edit customer archive action copy to sentence case.
+- Matched the job create sheet customer combobox pending disabled state to the follow-up create sheet.
+- Updated Brain sheet standardization notes.
+
+Verification:
+
+- Focused whitespace and exact sheet action/disabled-state scans only, per fast Bun monorepo command discipline.
+
+Files changed:
+
+- `apps/dashboard/src/components/sheets/edit-customer-sheet.tsx`
+- `apps/dashboard/src/components/sheets/job-create-sheet.tsx`
+- `brain`
+
+### Dashboard Search And Follow-Up Copy Alignment
+
+Completed: 2026-06-10
+
+Summary:
+
+- Updated the dashboard search trigger copy to match the current page-jump behavior.
+- Removed stale placeholder navigation mapping from the stubbed search result path.
+- Hyphenated follow-up copy in the schedule follow-up sheet description.
+- Updated Brain page and sheet standardization notes.
+
+Verification:
+
+- Focused whitespace and exact search/follow-up copy scans only, per fast Bun monorepo command discipline.
+
+Files changed:
+
+- `apps/dashboard/src/components/search/open-search-button.tsx`
+- `apps/dashboard/src/components/search/search.tsx`
+- `apps/dashboard/src/components/sheets/schedule-follow-up-sheet.tsx`
+- `brain`
+
+### Template Create Sheet Form Extraction
+
+Completed: 2026-06-10
+
+Summary:
+
+- Moved the create-template form from the sheet into `components/forms/template-create-form.tsx`, matching the Midday sheet composition pattern.
+- Kept the template create sheet focused on URL-backed open state and sheet layout.
+- Normalized the template delete action copy to sentence case.
+- Updated Brain sheet standardization notes.
+
+Verification:
+
+- Focused whitespace and exact template form/sheet scans only, per fast Bun monorepo command discipline.
+
+Files changed:
+
+- `apps/dashboard/src/components/forms/template-create-form.tsx`
+- `apps/dashboard/src/components/sheets/template-create-sheet.tsx`
+- `apps/dashboard/src/components/sheets/template-sheet.tsx`
+- `brain`
+
+### Template Edit Sheet Form Extraction
+
+Completed: 2026-06-10
+
+Summary:
+
+- Moved template update and archive form behavior into `components/forms/template-edit-form.tsx`.
+- Kept the template edit sheet focused on URL-backed open state, record fetching, and skeleton display.
+- Fixed the template edit sheet to read the same `templateId` URL param written by the templates table.
+- Updated Brain sheet standardization notes.
+
+Verification:
+
+- Focused whitespace, URL-param, and exact template sheet ownership scans only, per fast Bun monorepo command discipline.
+
+Files changed:
+
+- `apps/dashboard/src/components/forms/template-edit-form.tsx`
+- `apps/dashboard/src/components/sheets/template-sheet.tsx`
+- `brain`
+
+### Customer Sheet Form Extraction
+
+Completed: 2026-06-10
+
+Summary:
+
+- Moved customer create, update, and archive form behavior into dedicated files under `components/forms`.
+- Kept customer create/edit sheets focused on URL-backed open state, sheet layout, record fetching, and skeleton display.
+- Fixed the customer edit sheet to read the same `customerId` URL param written by the customers table.
+- Updated Brain sheet standardization notes.
+
+Verification:
+
+- Focused whitespace, URL-param, and exact customer sheet ownership scans only, per fast Bun monorepo command discipline.
+
+Files changed:
+
+- `apps/dashboard/src/components/forms/customer-create-form.tsx`
+- `apps/dashboard/src/components/forms/customer-edit-form.tsx`
+- `apps/dashboard/src/components/sheets/customer-create-sheet.tsx`
+- `apps/dashboard/src/components/sheets/edit-customer-sheet.tsx`
+- `brain`
+
+### Job Create Sheet Form Extraction
+
+Completed: 2026-06-10
+
+Summary:
+
+- Moved completed-job creation behavior into `components/forms/job-create-form.tsx`.
+- Kept the job create sheet focused on URL-backed open state and sheet layout.
+- Preserved create-first autocomplete for customer, service title, and service category.
+- Updated Brain sheet and service job notes.
+
+Verification:
+
+- Focused whitespace and exact job autocomplete/sheet ownership scans only, per fast Bun monorepo command discipline.
+
+Files changed:
+
+- `apps/dashboard/src/components/forms/job-create-form.tsx`
+- `apps/dashboard/src/components/sheets/job-create-sheet.tsx`
+- `brain`
+
+### Follow-Up Create Sheet Form Extraction
+
+Completed: 2026-06-10
+
+Summary:
+
+- Moved follow-up creation behavior into `components/forms/follow-up-create-form.tsx`.
+- Kept the follow-up create sheet focused on URL-backed open state and sheet layout.
+- Preserved create-first customer autocomplete behavior.
+- Updated Brain sheet standardization notes.
+
+Verification:
+
+- Focused whitespace and exact follow-up autocomplete/sheet ownership scans only, per fast Bun monorepo command discipline.
+
+Files changed:
+
+- `apps/dashboard/src/components/forms/follow-up-create-form.tsx`
+- `apps/dashboard/src/components/sheets/follow-up-create-sheet.tsx`
+- `brain`
+
+### Schedule Follow-Up Sheet Form Extraction
+
+Completed: 2026-06-10
+
+Summary:
+
+- Moved schedule follow-up validation and mutation behavior into `components/forms/schedule-follow-up-form.tsx`.
+- Kept the schedule follow-up sheet focused on URL-backed open state, job/template fetching, and skeleton display.
+- Preserved the existing `schedule_follow_up` query key.
+- Updated Brain sheet standardization notes.
+
+Verification:
+
+- Focused whitespace and exact schedule follow-up sheet ownership scans only, per fast Bun monorepo command discipline.
+
+Files changed:
+
+- `apps/dashboard/src/components/forms/schedule-follow-up-form.tsx`
+- `apps/dashboard/src/components/sheets/schedule-follow-up-sheet.tsx`
+- `brain`
+
+### Follow-Up Work Sheet Form Extraction
+
+Completed: 2026-06-10
+
+Summary:
+
+- Moved follow-up work actions into `components/forms/follow-up-work-form.tsx`.
+- Kept the follow-up work sheet focused on URL-backed open state, record fetching, and skeleton display.
+- Fixed the follow-up work sheet and priority widget link to use the same `followUpId` URL param written by the follow-ups table.
+- Updated Brain sheet standardization notes.
+
+Verification:
+
+- Focused whitespace, URL-param, and exact follow-up work sheet ownership scans only, per fast Bun monorepo command discipline.
+
+Files changed:
+
+- `apps/dashboard/src/components/forms/follow-up-work-form.tsx`
+- `apps/dashboard/src/components/sheets/follow-up-card-sheet.tsx`
+- `apps/dashboard/src/components/widgets/priority-follow-ups.tsx`
+- `brain`
+
+### Dashboard Overview And Billing Missing Data States
+
+Completed: 2026-06-10
+
+Summary:
+
+- Replaced blank missing-data branches in the dashboard overview and billing client views with structured empty states.
+- Added retry actions that refresh the current route.
+- Updated Brain page standardization notes.
+
+Verification:
+
+- Focused whitespace and exact missing-data return scans only, per fast Bun monorepo command discipline.
+
+Files changed:
+
+- `apps/dashboard/src/components/widgets/index.tsx`
+- `apps/dashboard/src/components/billing-overview.tsx`
+- `brain`
+
+### Dashboard Filter Option Query Limit Alignment
+
+Completed: 2026-06-10
+
+Summary:
+
+- Updated customer tag, job customer, and job category filter option queries to request the max supported list page size.
+- Matched create/schedule form dropdown source queries for customers, jobs, and templates to the same limit.
+- Updated Brain table/filter standardization notes.
+
+Verification:
+
+- Focused whitespace and exact option-query limit scans only, per fast Bun monorepo command discipline.
+
+Files changed:
+
+- `apps/dashboard/src/components/customers-search-filter.tsx`
+- `apps/dashboard/src/components/jobs-search-filter.tsx`
+- `apps/dashboard/src/components/forms/follow-up-create-form.tsx`
+- `apps/dashboard/src/components/forms/job-create-form.tsx`
+- `apps/dashboard/src/components/sheets/schedule-follow-up-sheet.tsx`
+- `brain`
+
+### Dashboard Filter Active-State Alignment
+
+Completed: 2026-06-10
+
+Summary:
+
+- Updated customer, job, follow-up, and template filter bars so the filter button active state is based on visible, valid filter chips.
+- Preserved URL params, filter chip rendering, and API query behavior.
+- Updated Brain table standardization notes.
+
+Verification:
+
+- Focused whitespace and exact active-filter scans only, per fast Bun monorepo command discipline.
+
+Files changed:
+
+- `apps/dashboard/src/components/customers-search-filter.tsx`
+- `apps/dashboard/src/components/jobs-search-filter.tsx`
+- `apps/dashboard/src/components/follow-up-search-filter.tsx`
+- `apps/dashboard/src/components/templates-search-filter.tsx`
+- `brain`
+
+### Dashboard Non-Table Page Scroll Wrapper Alignment
+
+Completed: 2026-06-10
+
+Summary:
+
+- Wrapped the dashboard overview, billing, and settings routes in the shared `ScrollableContent` page wrapper.
+- Kept the existing main layout padding owned by the sidebar layout.
+- Updated Brain page standardization notes.
+
+Verification:
+
+- Focused whitespace and exact `ScrollableContent` route scans only, per fast Bun monorepo command discipline.
+
+Files changed:
+
+- `apps/dashboard/src/app/(sidebar)/page.tsx`
+- `apps/dashboard/src/app/(sidebar)/billing/page.tsx`
+- `apps/dashboard/src/app/(sidebar)/settings/page.tsx`
+- `brain`
+
+### Dashboard Jobs Status Filter Contract Alignment
+
+Completed: 2026-06-10
+
+Summary:
+
+- Added a shared service-job status helper for jobs filter URL state.
+- Sanitized jobs status filters before route prefetch and client table queries.
+- Tightened the service jobs API list input from plain string to the service job status enum.
+- Updated Brain table standardization notes.
+
+Verification:
+
+- Focused whitespace and exact jobs status-filter scans only, per fast Bun monorepo command discipline.
+
+Files changed:
+
+- `apps/dashboard/src/hooks/use-job-filter-params.ts`
+- `apps/dashboard/src/app/(sidebar)/jobs/page.tsx`
+- `apps/dashboard/src/components/jobs-search-filter.tsx`
+- `apps/dashboard/src/components/tables/jobs/data-table.tsx`
+- `apps/api/src/routers/_app.ts`
+- `brain`
+
+### Dashboard Sheet Content Scroll Alignment
+
+Completed: 2026-06-10
+
+Summary:
+
+- Added scrollable `SheetContent` to customer, job, follow-up, schedule, and template form sheets.
+- Preserved sheet headers, URL-backed open state, and form components.
+- Updated Brain sheet standardization notes.
+
+Verification:
+
+- Focused whitespace and exact `SheetContent` scroll-class scans only, per fast Bun monorepo command discipline.
+
+Files changed:
+
+- `apps/dashboard/src/components/sheets/customer-create-sheet.tsx`
+- `apps/dashboard/src/components/sheets/edit-customer-sheet.tsx`
+- `apps/dashboard/src/components/sheets/job-create-sheet.tsx`
+- `apps/dashboard/src/components/sheets/follow-up-create-sheet.tsx`
+- `apps/dashboard/src/components/sheets/schedule-follow-up-sheet.tsx`
+- `apps/dashboard/src/components/sheets/template-create-sheet.tsx`
+- `apps/dashboard/src/components/sheets/template-sheet.tsx`
+- `brain`
+
+### Dashboard Metadata Brand Alignment
+
+Completed: 2026-06-10
+
+Summary:
+
+- Updated dashboard route metadata titles to use the canonical `afterservice` product name.
+- Kept existing metadata descriptions and route structure unchanged.
+- Updated Brain page standardization notes.
+
+Verification:
+
+- Focused whitespace and exact dashboard metadata brand scans only, per fast Bun monorepo command discipline.
+
+Files changed:
+
+- `apps/dashboard/src/app/sign-in/page.tsx`
+- `apps/dashboard/src/app/sign-up/page.tsx`
+- `apps/dashboard/src/app/onboarding/page.tsx`
+- `apps/dashboard/src/app/(sidebar)/page.tsx`
+- `apps/dashboard/src/app/(sidebar)/customers/page.tsx`
+- `apps/dashboard/src/app/(sidebar)/jobs/page.tsx`
+- `apps/dashboard/src/app/(sidebar)/follow-ups/page.tsx`
+- `apps/dashboard/src/app/(sidebar)/templates/page.tsx`
+- `apps/dashboard/src/app/(sidebar)/billing/page.tsx`
+- `apps/dashboard/src/app/(sidebar)/settings/page.tsx`
+- `brain`
+
+### Dashboard Auth Recovery Metadata Alignment
+
+Completed: 2026-06-10
+
+Summary:
+
+- Updated forgot-password and reset-password route metadata to use the canonical `afterservice` product name.
+- Expanded their descriptions to match the dashboard account context.
+- Updated Brain page standardization notes.
+
+Verification:
+
+- Focused whitespace and exact auth recovery metadata scans only, per fast Bun monorepo command discipline.
+
+Files changed:
+
+- `apps/dashboard/src/app/forgot-password/page.tsx`
+- `apps/dashboard/src/app/reset-password/page.tsx`
+- `brain`
+
+### Dashboard Jobs Schedule Sheet Wiring
+
+Completed: 2026-06-10
+
+Summary:
+
+- Wired jobs table row clicks and the jobs action menu to the mounted schedule follow-up sheet.
+- Removed unused `jobId` and `editJob` URL params from the jobs sheet params hook.
+- Replaced the jobs action menu no-op delete item with a working schedule follow-up action.
+- Updated Brain table and sheet standardization notes.
+
+Verification:
+
+- Focused whitespace and exact jobs schedule-sheet URL wiring scans only, per fast Bun monorepo command discipline.
+
+Files changed:
+
+- `apps/dashboard/src/components/tables/jobs/data-table.tsx`
+- `apps/dashboard/src/components/tables/jobs/columns.tsx`
+- `apps/dashboard/src/components/tables/core/types.ts`
+- `apps/dashboard/src/hooks/use-job-params.ts`
+- `brain`
+
+### Dashboard Table Action Menu Wiring
+
+Completed: 2026-06-10
+
+Summary:
+
+- Wired the templates table delete action to the existing `deleteTemplate` table meta callback.
+- Removed stale customer action-menu comments while preserving the existing archive behavior.
+- Renamed follow-up close table meta wiring from delete-oriented names to close-oriented names.
+- Updated Brain table standardization notes.
+
+Verification:
+
+- Focused whitespace and exact table action-menu wiring scans only, per fast Bun monorepo command discipline.
+
+Files changed:
+
+- `apps/dashboard/src/components/tables/templates/columns.tsx`
+- `apps/dashboard/src/components/tables/templates/data-table.tsx`
+- `apps/dashboard/src/components/tables/customers/columns.tsx`
+- `apps/dashboard/src/components/tables/customers/data-table.tsx`
+- `apps/dashboard/src/components/tables/follow-ups/columns.tsx`
+- `apps/dashboard/src/components/tables/follow-ups/data-table.tsx`
+- `apps/dashboard/src/components/tables/core/types.ts`
+- `brain`
+
+### Dashboard Archive Action Copy Alignment
+
+Completed: 2026-06-10
+
+Summary:
+
+- Renamed customer and template table archive callbacks from delete-oriented names to archive-oriented names.
+- Updated customer and template table action labels to say archive instead of delete.
+- Updated the template edit sheet archive button copy to match the archive mutation.
+- Updated Brain table and sheet standardization notes.
+
+Verification:
+
+- Focused whitespace and exact archive/delete action-copy scans only, per fast Bun monorepo command discipline.
+
+Files changed:
+
+- `apps/dashboard/src/components/tables/customers/columns.tsx`
+- `apps/dashboard/src/components/tables/customers/data-table.tsx`
+- `apps/dashboard/src/components/tables/templates/columns.tsx`
+- `apps/dashboard/src/components/tables/templates/data-table.tsx`
+- `apps/dashboard/src/components/tables/core/types.ts`
+- `apps/dashboard/src/components/forms/template-edit-form.tsx`
+- `brain`
+
+### Dashboard Table Action Meta Cleanup
+
+Completed: 2026-06-10
+
+Summary:
+
+- Removed stale `deleteJob` and `enrichCustomer` callbacks from shared table meta.
+- Removed an unused customer table action-menu separator import.
+- Updated Brain table standardization notes.
+
+Verification:
+
+- Focused whitespace and exact stale table action meta scans only, per fast Bun monorepo command discipline.
+
+Files changed:
+
+- `apps/dashboard/src/components/tables/core/types.ts`
+- `apps/dashboard/src/components/tables/customers/columns.tsx`
+- `brain`
+
+### Dashboard Zod Form Helper Typing
+
+Completed: 2026-06-10
+
+Summary:
+
+- Tightened the shared dashboard `useZodForm` helper around Zod form schemas.
+- Removed local `any` usage from the helper's schema generic and resolver wiring.
+- Updated Brain sheet/form standardization notes.
+
+Verification:
+
+- Focused whitespace and exact `useZodForm` loose-typing scans only, per fast Bun monorepo command discipline.
+
+Files changed:
+
+- `apps/dashboard/src/hooks/use-zod-form.ts`
+- `brain`
+
+### Dashboard Onboarding Metadata Export Alignment
+
+Completed: 2026-06-10
+
+Summary:
+
+- Replaced the onboarding route's async `generateMetadata` function with a static `metadata` export.
+- Kept the existing onboarding title and description unchanged.
+- Updated Brain page standardization notes.
+
+Verification:
+
+- Focused whitespace and exact onboarding metadata scans only, per fast Bun monorepo command discipline.
+
+Files changed:
+
+- `apps/dashboard/src/app/onboarding/page.tsx`
+- `brain`
+
+### Dashboard API Sort Helper Typing
+
+Completed: 2026-06-10
+
+Summary:
+
+- Typed the shared API table sort helper with Prisma order-by input types.
+- Removed loose `any` return and fallback types from dashboard table sort resolution.
+- Updated Brain table standardization notes.
+
+Verification:
+
+- Focused whitespace and exact API sort-helper loose-typing scans only, per fast Bun monorepo command discipline.
+
+Files changed:
+
+- `apps/api/src/routers/_app.ts`
+- `brain`
+
+### Dashboard Job Status Label Alignment
+
+Completed: 2026-06-10
+
+Summary:
+
+- Added shared display labels for service job statuses.
+- Reused those labels in jobs filter options and jobs table status badges.
+- Kept status values and API filter behavior unchanged.
+- Updated Brain table standardization notes.
+
+Verification:
+
+- Focused whitespace and exact job status-label scans only, per fast Bun monorepo command discipline.
+
+Files changed:
+
+- `apps/dashboard/src/hooks/use-job-filter-params.ts`
+- `apps/dashboard/src/components/jobs-search-filter.tsx`
+- `apps/dashboard/src/components/tables/jobs/columns.tsx`
+- `brain`
+
+### Follow-Up Create Date Control Alignment
+
+Completed: 2026-06-10
+
+Summary:
+
+- Replaced the follow-up create sheet due-date native date input with the shared calendar-popover control.
+- Matched the date field interaction pattern already used by the job create sheet.
+- Removed the now-unused date-input formatting helper.
+- Updated Brain sheet standardization notes.
+
+Verification:
+
+- Focused whitespace and exact follow-up date-control scans only, per fast Bun monorepo command discipline.
+
+Files changed:
+
+- `apps/dashboard/src/components/forms/follow-up-create-form.tsx`
+- `brain`
+
+### Follow-Up Sheet Date Control Alignment
+
+Completed: 2026-06-10
+
+Summary:
+
+- Replaced the remaining native date inputs in schedule follow-up and follow-up work reschedule forms with the shared calendar-popover control.
+- Removed the now-unused date-input formatting helpers from both forms.
+- Kept existing follow-up scheduling and rescheduling mutations unchanged.
+- Updated Brain sheet standardization notes.
+
+Verification:
+
+- Focused whitespace and exact native-date-control scans only, per fast Bun monorepo command discipline.
+
+Files changed:
+
+- `apps/dashboard/src/components/forms/schedule-follow-up-form.tsx`
+- `apps/dashboard/src/components/forms/follow-up-work-form.tsx`
+- `brain`
+
+### Job Create Amount Control Alignment
+
+Completed: 2026-06-10
+
+Summary:
+
+- Replaced the job create sheet amount native number input with the shared `CurrencyInput` primitive.
+- Kept the form value as dollars and preserved the existing submit conversion to cents.
+- Removed the now-unused `Input` import from the job create form.
+- Updated Brain sheet standardization notes.
+
+Verification:
+
+- Focused whitespace and exact job amount-control scans only, per fast Bun monorepo command discipline.
+
+Files changed:
+
+- `apps/dashboard/src/components/forms/job-create-form.tsx`
+- `brain`
+
+### Dashboard Date Filter Control Alignment
+
+Completed: 2026-06-10
+
+Summary:
+
+- Added a shared dashboard `DateRangeFilter` component backed by the calendar range picker.
+- Replaced duplicated native date inputs in jobs completed-date and follow-up due-date filter menus.
+- Preserved the existing `start` and `end` URL filter params and filter chip behavior.
+- Updated Brain table/filter standardization notes.
+
+Verification:
+
+- Focused whitespace and exact date-filter scans only, per fast Bun monorepo command discipline.
+
+Files changed:
+
+- `apps/dashboard/src/components/date-range-filter.tsx`
+- `apps/dashboard/src/components/jobs-search-filter.tsx`
+- `apps/dashboard/src/components/follow-up-search-filter.tsx`
+- `brain`
+
+### Dashboard Error Fallback State Alignment
+
+Completed: 2026-06-10
+
+Summary:
+
+- Replaced the bare shared dashboard error fallback with a structured card-style retry state.
+- Preserved the existing refresh retry behavior used by dashboard page error boundaries.
+- Updated Brain page standardization notes.
+
+Verification:
+
+- Focused whitespace and exact shared fallback scans only, per fast Bun monorepo command discipline.
+
+Files changed:
+
+- `apps/dashboard/src/components/error-fallback.tsx`
+- `brain`
+
+### Settings Card Section Alignment
+
+Completed: 2026-06-10
+
+Summary:
+
+- Wrapped workspace settings in a card-style settings section to match the Appearance card.
+- Grouped Settings page sections with shared vertical spacing instead of one-off margins.
+- Updated the workspace settings skeleton to render in the same card shell.
+- Updated Brain page and workspace settings notes.
+
+Verification:
+
+- Focused whitespace and exact settings card-section scans only, per fast Bun monorepo command discipline.
+
+Files changed:
+
+- `apps/dashboard/src/app/(sidebar)/settings/page.tsx`
+- `apps/dashboard/src/components/forms/update-workspace-form.tsx`
+- `brain`
+
+### Billing Plan Label Alignment
+
+Completed: 2026-06-10
+
+Summary:
+
+- Added billing plan and plan-status display labels in the dashboard billing component.
+- Replaced raw plan/status badge and metric copy with user-facing labels.
+- Kept billing API response values and entitlement logic unchanged.
+- Updated Brain billing notes.
+
+Verification:
+
+- Focused whitespace and exact billing label scans only, per fast Bun monorepo command discipline.
+
+Files changed:
+
+- `apps/dashboard/src/components/billing-overview.tsx`
+- `brain`
+
+### Template Edit Sheet Missing State
+
+Completed: 2026-06-10
+
+Summary:
+
+- Replaced the template edit sheet's missing-record skeleton fallback with a structured not-found state.
+- Added a close action for stale or archived template URLs.
+- Kept loading and successful edit form behavior unchanged.
+- Updated Brain sheet standardization notes.
+
+Verification:
+
+- Focused whitespace and exact template missing-state scans only, per fast Bun monorepo command discipline.
+
+Files changed:
+
+- `apps/dashboard/src/components/sheets/template-sheet.tsx`
+- `brain`
+
+### Dashboard Sheet Missing State Alignment
+
+Completed: 2026-06-10
+
+Summary:
+
+- Added a shared `SheetMissingState` component for stale or missing record-backed sheets.
+- Reused it in customer edit, follow-up work, schedule follow-up, and template edit sheets.
+- Preserved skeletons for loading states while replacing final missing-record skeleton fallbacks.
+- Updated Brain sheet standardization notes.
+
+Verification:
+
+- Focused whitespace and exact sheet missing-state scans only, per fast Bun monorepo command discipline.
+
+Files changed:
+
+- `apps/dashboard/src/components/sheets/sheet-missing-state.tsx`
+- `apps/dashboard/src/components/sheets/edit-customer-sheet.tsx`
+- `apps/dashboard/src/components/sheets/follow-up-card-sheet.tsx`
+- `apps/dashboard/src/components/sheets/schedule-follow-up-sheet.tsx`
+- `apps/dashboard/src/components/sheets/template-sheet.tsx`
+- `brain`
+
+### Follow-Up Filter Label Alignment
+
+Completed: 2026-06-10
+
+Summary:
+
+- Added shared display labels for follow-up statuses and channels.
+- Reused those labels in follow-up filter options and filter chips.
+- Kept URL filter values and API filter behavior unchanged.
+- Updated Brain table/filter standardization notes.
+
+Verification:
+
+- Focused whitespace and exact follow-up filter label scans only, per fast Bun monorepo command discipline.
+
+Files changed:
+
+- `apps/dashboard/src/hooks/use-follow-up-filter-params.ts`
+- `apps/dashboard/src/components/follow-up-search-filter.tsx`
+- `brain`
+
+### Template Filter Label Alignment
+
+Completed: 2026-06-10
+
+Summary:
+
+- Added shared display labels for template channels.
+- Reused those labels in template filter options and filter chips.
+- Kept URL filter values and API filter behavior unchanged.
+- Updated Brain table/filter standardization notes.
+
+Verification:
+
+- Focused whitespace and exact template filter label scans only, per fast Bun monorepo command discipline.
+
+Files changed:
+
+- `apps/dashboard/src/hooks/use-template-filter-params.ts`
+- `apps/dashboard/src/components/templates-search-filter.tsx`
+- `brain`
+
+### Sheet Channel Option Label Alignment
+
+Completed: 2026-06-10
+
+Summary:
+
+- Replaced duplicated channel option label arrays in template create/edit forms.
+- Replaced duplicated channel option label arrays in follow-up create/schedule forms.
+- Reused the shared template and follow-up channel label maps already used by filters.
+- Kept submitted channel values and API schemas unchanged.
+- Updated Brain sheet standardization notes.
+
+Verification:
+
+- Focused whitespace and exact channel-option scans only, per fast Bun monorepo command discipline.
+
+Files changed:
+
+- `apps/dashboard/src/components/forms/template-create-form.tsx`
+- `apps/dashboard/src/components/forms/template-edit-form.tsx`
+- `apps/dashboard/src/components/forms/follow-up-create-form.tsx`
+- `apps/dashboard/src/components/forms/schedule-follow-up-form.tsx`
+- `brain`
+
+### Settings Page Layout Rhythm Alignment
+
+Completed: 2026-06-10
+
+Summary:
+
+- Removed the extra settings page badge/header block.
+- Let the workspace and appearance cards provide the settings section structure.
+- Kept the constrained `max-w-[800px]` Midday settings width and increased section rhythm to `space-y-12`.
+- Confirmed the authenticated sidebar shell already matches Midday's `px-4 md:px-8` content padding.
+- Updated Brain page and workspace settings notes.
+
+Verification:
+
+- Focused whitespace and exact settings layout scans only, per fast Bun monorepo command discipline.
+
+Files changed:
+
+- `apps/dashboard/src/app/(sidebar)/settings/page.tsx`
+- `brain`
+
+### Follow-Up Channel Select Control Alignment
+
+Completed: 2026-06-10
+
+Summary:
+
+- Changed follow-up create channel select from uncontrolled default value to controlled value.
+- Changed schedule follow-up channel select from uncontrolled default value to controlled value.
+- Preserved shared channel labels, submitted values, and validation schemas.
+- Updated Brain sheet standardization notes.
+
+Verification:
+
+- Focused whitespace and exact controlled-select scans only, per fast Bun monorepo command discipline.
+
+Files changed:
+
+- `apps/dashboard/src/components/forms/follow-up-create-form.tsx`
+- `apps/dashboard/src/components/forms/schedule-follow-up-form.tsx`
+- `brain`
+
+### Filter Date Range Chip Alignment
+
+Completed: 2026-06-10
+
+Summary:
+
+- Collapsed start/end date filters into one displayed range chip when both are set.
+- Kept single-bound chips for start-only or end-only date filters.
+- Made date filter chip removal clear both date params together, matching the date-range picker behavior.
+- Preserved URL params, API filter inputs, and date picker behavior.
+- Updated Brain table/filter standardization notes.
+
+Verification:
+
+- Focused whitespace and exact date-chip behavior scans only, per fast Bun monorepo command discipline.
+
+Files changed:
+
+- `apps/dashboard/src/components/filter-list.tsx`
+- `brain`
+
+### Filter No-Results Detection Alignment
+
+Completed: 2026-06-10
+
+Summary:
+
+- Tightened customer filter `hasFilters` to count search text or non-empty tag arrays.
+- Tightened follow-up filter `hasFilters` to count search text, valid status/channel values, or date bounds.
+- Tightened template filter `hasFilters` to count search text or valid channel values.
+- Kept table queries, URL params, API inputs, and filter chip rendering unchanged.
+- Updated Brain table/filter standardization notes.
+
+Verification:
+
+- Focused whitespace and exact `hasFilters` scans only, per fast Bun monorepo command discipline.
+
+Files changed:
+
+- `apps/dashboard/src/hooks/use-customer-filter-params.ts`
+- `apps/dashboard/src/hooks/use-follow-up-filter-params.ts`
+- `apps/dashboard/src/hooks/use-template-filter-params.ts`
+- `brain`
+
+### Filter Option Empty State Alignment
+
+Completed: 2026-06-10
+
+Summary:
+
+- Added a shared `FilterMenuEmptyState` component for compact filter-menu empty rows.
+- Reused it for customer tag, job category, and job customer filter menus.
+- Preserved visible empty-state copy and filter option behavior.
+- Updated Brain table/filter standardization notes.
+
+Verification:
+
+- Focused whitespace and exact filter-empty-state scans only, per fast Bun monorepo command discipline.
+
+Files changed:
+
+- `apps/dashboard/src/components/filter-list.tsx`
+- `apps/dashboard/src/components/customers-search-filter.tsx`
+- `apps/dashboard/src/components/jobs-search-filter.tsx`
+- `brain`
+
+### Template Filter Active-State Helper Alignment
+
+Completed: 2026-06-10
+
+Summary:
+
+- Replaced inline template channel membership checks with the shared `toTemplateChannel` helper.
+- Kept filter button active-state behavior aligned with template query normalization and no-results detection.
+- Preserved URL params, API inputs, and filter option rendering.
+- Updated Brain table/filter standardization notes.
+
+Verification:
+
+- Focused whitespace and exact template filter active-state scans only, per fast Bun monorepo command discipline.
+
+Files changed:
+
+- `apps/dashboard/src/components/templates-search-filter.tsx`
+- `brain`
+
+### Overview Priority Follow-Up Empty State Alignment
+
+Completed: 2026-06-10
+
+Summary:
+
+- Replaced the empty priority follow-ups table row with a structured card empty state.
+- Added an icon, explanatory copy, and a small action linking to the follow-ups page.
+- Kept populated priority follow-up table rendering unchanged.
+- Updated Brain page standardization notes.
+
+Verification:
+
+- Focused whitespace and exact overview empty-state scans only, per fast Bun monorepo command discipline.
+
+Files changed:
+
+- `apps/dashboard/src/components/widgets/priority-follow-ups.tsx`
+- `brain`
+
+### Overview Recent Job Status Label Alignment
+
+Completed: 2026-06-10
+
+Summary:
+
+- Replaced inline recent job status formatting with the shared service job status label map.
+- Added a small typed row component so each recent job can normalize its status before rendering.
+- Preserved the recent jobs list layout, links, and unknown-status fallback.
+- Updated Brain page standardization notes.
+
+Verification:
+
+- Focused whitespace and exact recent-job status-label scans only, per fast Bun monorepo command discipline.
+
+Files changed:
+
+- `apps/dashboard/src/components/widgets/recent-jobs.tsx`
+- `brain`
+
+### Job Autocomplete Create Guard Alignment
+
+Completed: 2026-06-10
+
+Summary:
+
+- Confirmed the shared combobox renders create actions first when `createPosition="first"` is set.
+- Confirmed job customer, service-title, and category fields all use create-first autocomplete with `Create "..."` copy.
+- Updated service-title and category create callbacks to trim and guard empty values like customer creation.
+- Updated Brain sheet standardization notes.
+
+Verification:
+
+- Focused whitespace and exact job autocomplete create-guard scans only, per fast Bun monorepo command discipline.
+
+Files changed:
+
+- `apps/dashboard/src/components/forms/job-create-form.tsx`
 - `brain`

@@ -3,8 +3,8 @@ import { AuthShell } from "@/components/auth/auth-shell";
 import { ResetPasswordForm } from "@/components/auth/reset-password-form";
 
 export const metadata: Metadata = {
-  title: "Reset Password",
-  description: "Set a new password for your account",
+  title: "Reset password | afterservice",
+  description: "Set a new password for your afterservice dashboard account.",
 };
 
 export default function ResetPasswordPage() {

@@ -17,6 +17,8 @@ Implemented for MVP and updated on 2026-06-09 to follow the Midday settings-page
 
 ## Rules
 - Settings page uses a constrained Midday-style settings column.
+- The page does not render a separate hero/header; settings cards provide the section structure inside the shell padding.
+- Workspace settings render as a card-style settings section alongside the appearance card.
 - Form fields use shared shadcn-style primitives instead of raw HTML controls.
-- Workspace settings loading uses a field-shaped skeleton instead of a text placeholder.
+- Workspace settings loading uses a card-shaped, field-shaped skeleton instead of a text placeholder.
 - Business type changes clear the service category so suggestions stay contextual.

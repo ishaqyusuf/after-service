@@ -16,7 +16,7 @@ import { batchPrefetch, HydrateClient, trpc } from "@/trpc/server";
 import { getInitialTableSettings } from "@/utils/table-settings-server";
 
 export const metadata: Metadata = {
-  title: "Templates | After Service",
+  title: "Templates | afterservice",
   description: "Manage your follow-up templates.",
 };
 

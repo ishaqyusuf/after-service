@@ -14,22 +14,19 @@ import {
 } from "@afterservice/ui/dropdown-menu";
 import { Icons } from "@afterservice/ui/icons";
 import { Input } from "@afterservice/ui/input";
-import { Label } from "@afterservice/ui/label";
 import { useRef, useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
 import {
+  followUpChannelLabels,
   followUpChannels,
+  followUpStatusLabels,
   followUpStatuses,
+  toFollowUpChannel,
+  toFollowUpStatus,
   useFollowUpFilterParams,
 } from "@/hooks/use-follow-up-filter-params";
+import { DateRangeFilter } from "./date-range-filter";
 import { FilterList } from "./filter-list";
-
-const channelLabels = {
-  email: "Email",
-  phone: "Phone",
-  sms: "SMS",
-  whatsapp: "WhatsApp",
-} as const;
 
 export function FollowUpSearchFilter() {
   const { filter, setFilter } = useFollowUpFilterParams();
@@ -39,11 +36,11 @@ export function FollowUpSearchFilter() {
 
   const statusFilters = followUpStatuses.map((status) => ({
     id: status,
-    name: status.charAt(0).toUpperCase() + status.slice(1),
+    name: followUpStatusLabels[status],
   }));
   const channelFilters = followUpChannels.map((channel) => ({
     id: channel,
-    name: channelLabels[channel],
+    name: followUpChannelLabels[channel],
   }));
 
   useHotkeys(
@@ -84,9 +81,11 @@ export function FollowUpSearchFilter() {
     Object.entries(filter).filter(([key]) => key !== "q"),
   );
 
-  const hasValidFilters = Object.values(validFilters).some(
-    (value) => value !== null,
-  );
+  const hasValidFilters =
+    Boolean(toFollowUpChannel(filter.channel)) ||
+    Boolean(toFollowUpStatus(filter.status)) ||
+    Boolean(filter.start) ||
+    Boolean(filter.end);
 
   return (
     <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
@@ -209,45 +208,13 @@ export function FollowUpSearchFilter() {
               <DropdownMenuSubContent
                 sideOffset={14}
                 alignOffset={-4}
-                className="p-3"
+                className="p-0"
               >
-                <div className="flex flex-col gap-3">
-                  <div className="flex flex-col gap-1.5">
-                    <Label className="text-xs">From</Label>
-                    <Input
-                      type="date"
-                      value={filter.start ?? ""}
-                      onChange={(e) => {
-                        setFilter({
-                          start: e.target.value || null,
-                        });
-                      }}
-                    />
-                  </div>
-                  <div className="flex flex-col gap-1.5">
-                    <Label className="text-xs">To</Label>
-                    <Input
-                      type="date"
-                      value={filter.end ?? ""}
-                      onChange={(e) => {
-                        setFilter({
-                          end: e.target.value || null,
-                        });
-                      }}
-                    />
-                  </div>
-                  {(filter.start || filter.end) && (
-                    <button
-                      type="button"
-                      className="text-left text-xs text-muted-foreground hover:text-foreground"
-                      onClick={() => {
-                        setFilter({ start: null, end: null });
-                      }}
-                    >
-                      Clear date range
-                    </button>
-                  )}
-                </div>
+                <DateRangeFilter
+                  start={filter.start}
+                  end={filter.end}
+                  onSelect={setFilter}
+                />
               </DropdownMenuSubContent>
             </DropdownMenuPortal>
           </DropdownMenuSub>

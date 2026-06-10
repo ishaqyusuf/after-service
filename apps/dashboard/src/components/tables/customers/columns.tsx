@@ -10,7 +10,6 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuLabel,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@afterservice/ui";
 
@@ -129,14 +128,14 @@ export const columns: ColumnDef<Customer>[] = [
   {
     id: "lastServiceAt",
     accessorKey: "lastServiceAt",
-    header: "Last Service",
+    header: "Last service",
     size: 150,
     minSize: 120,
     maxSize: 200,
     enableResizing: true,
     meta: {
       skeleton: { type: "text", width: "w-20" },
-      headerLabel: "Last Service",
+      headerLabel: "Last service",
       className: "w-[150px] min-w-[120px]",
     },
     cell: ({ row }) => {
@@ -225,11 +224,10 @@ export const columns: ColumnDef<Customer>[] = [
             <DropdownMenuItem
               onClick={(e) => {
                 e.stopPropagation();
-                // We could dispatch an event or call a meta function here
-                table.options.meta?.deleteCustomer?.(row.original.id);
+                table.options.meta?.archiveCustomer?.(row.original.id);
               }}
             >
-              Delete customer
+              Archive customer
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
