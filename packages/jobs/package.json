@@ -7,13 +7,14 @@
   },
   "scripts": {
     "build": "tsc --noEmit",
-    "deploy": "bun run --filter @afterservice/db db:generate && bun ../../scripts/with-workspace-env.mjs --mode production -- trigger deploy",
-    "dev": "bun ../../scripts/with-workspace-env.mjs --mode local -- trigger dev",
+    "deploy": "bun run prisma.ts && bun run --filter @afterservice/db db:generate && bun ../../scripts/with-workspace-env.mjs --mode production -- bun ../../scripts/with-trigger-profile.mjs -- trigger deploy",
+    "dev": "bun ../../scripts/with-workspace-env.mjs --mode local -- bun ../../scripts/with-trigger-profile.mjs -- trigger dev",
     "lint": "biome check .",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "@afterservice/db": "workspace:*",
+    "@trigger.dev/build": "4.0.1",
     "@trigger.dev/sdk": "4.0.1"
   },
   "devDependencies": {

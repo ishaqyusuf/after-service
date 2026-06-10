@@ -84,6 +84,15 @@ signature/idempotency behavior.
 - Follow-up cron job: `POST https://dashboard.afterservice.app/api/jobs/follow-ups/dry-run` with `CRON_SECRET`
 - Observability: retain platform logs, configure `SENTRY_DSN`, and alert on API 5xxs, webhook failures, cron failures, and database connection saturation.
 
+### Trigger.dev Jobs
+
+`packages/jobs` reads `TRIGGER_PROJECT_ID` from the workspace env and deploys with
+the Trigger.dev CLI profile in `TRIGGER_PROFILE` when it is set. If Trigger.dev
+reports `Project not found` while using the `default` profile, run
+`bun --cwd packages/jobs trigger list-profiles`, log in to the intended account
+with `trigger login --profile <profile>`, then set `TRIGGER_PROFILE=<profile>`
+and replace `TRIGGER_PROJECT_ID` with the project ref from that account.
+
 ## Terminal Scripts
 
 Use the terminal script helper to discover and run common project commands:
