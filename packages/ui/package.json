@@ -134,7 +134,7 @@
     "tailwindcss": "^3.4.13",
     "tailwindcss-animate": "^1.0.7",
     "vaul": "^1.1.2",
-    "next": "^14.2.0",
+    "next": "^16.2.9",
     "react-hook-form": "^7.51.3",
     "tippy.js": "^6.3.7",
     "@afterservice/utils": "workspace:*"
@@ -150,11 +150,11 @@
   "devDependencies": {
     "@afterservice/tsconfig": "workspace:*",
     "@types/node": "^25.2.3",
-    "@types/react": "~19.1.0",
+    "@types/react": "^19.2.17",
     "autoprefixer": "^10.4.23",
     "next-themes": "^0.4.6",
-    "react": "19.1.0",
-    "react-dom": "19.1.0",
+    "react": "19.2.7",
+    "react-dom": "19.2.7",
     "typescript": "^5.9.3"
   }
 }

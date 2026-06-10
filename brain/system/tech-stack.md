@@ -10,10 +10,13 @@ This file records core technology choices.
 - Formatting/linting: Biome
 
 ## Apps
-- Website: Next.js App Router
-- Dashboard: Next.js App Router
+- Website: Next.js App Router (`next@^16.2.9`, React 19.2.x)
+- Dashboard: Next.js App Router (`next@^16.2.9`, React 19.2.x)
 - API: Hono with tRPC
 - Dashboard theme management: `next-themes` with class-based light/dark/system mode.
+
+## Dependency Notes
+- 2026-06-10: Aligned the monorepo Next.js packages on `next@^16.2.9` and React packages on 19.2.x. This keeps the website, dashboard, and shared UI package on one Next/React line.
 
 ## Data And Auth
 - Database: Postgres
