@@ -1,8 +1,10 @@
 "use client";
 
+import type { AppRouter } from "@afterservice/api/router";
 import { Badge } from "@afterservice/ui";
 import { format } from "date-fns";
 import type { ColumnDef } from "@tanstack/react-table";
+import type { inferRouterOutputs } from "@trpc/server";
 import { MoreHorizontal } from "lucide-react";
 import { Button } from "@afterservice/ui";
 import {
@@ -19,22 +21,14 @@ import {
   toFollowUpStatus,
 } from "@/hooks/use-follow-up-filter-params";
 
-export type FollowUp = {
-  id: string;
-  channel: string;
-  dueAt: string;
-  notes: string | null;
-  status: string;
-  closedAt: string | null;
-  sentAt: string | null;
-  customer?: { name: string; email: string | null } | null;
-  job?: { title: string } | null;
-};
+type FollowUpsListPage =
+  inferRouterOutputs<AppRouter>["followUps"]["listTable"];
+type FollowUp = FollowUpsListPage["items"][number];
 
 export const columns: ColumnDef<FollowUp>[] = [
   {
     id: "customer",
-    accessorKey: "customer.name",
+    accessorKey: "customerName",
     header: "Customer",
     size: 250,
     minSize: 200,
@@ -47,7 +41,9 @@ export const columns: ColumnDef<FollowUp>[] = [
       className:
         "w-[250px] min-w-[200px] md:sticky md:left-0 bg-background group-hover:bg-[#F2F1EF] group-hover:dark:bg-[#0f0f0f] z-20",
     },
-    cell: ({ row }) => <span className="font-medium">{row.original.customer?.name ?? "-"}</span>,
+    cell: ({ row }) => (
+      <span className="font-medium">{row.original.customerName}</span>
+    ),
   },
   {
     id: "status",
@@ -122,7 +118,7 @@ export const columns: ColumnDef<FollowUp>[] = [
   },
   {
     id: "job",
-    accessorKey: "job.title",
+    accessorKey: "serviceTitle",
     header: "Job",
     size: 200,
     minSize: 150,
@@ -133,7 +129,11 @@ export const columns: ColumnDef<FollowUp>[] = [
       headerLabel: "Job",
       className: "w-[200px] min-w-[150px]",
     },
-    cell: ({ row }) => <span className="truncate block w-full">{row.original.job?.title ?? "-"}</span>,
+    cell: ({ row }) => (
+      <span className="truncate block w-full">
+        {row.original.serviceTitle ?? "-"}
+      </span>
+    ),
   },
   {
     id: "notes",
