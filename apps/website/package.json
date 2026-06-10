@@ -13,6 +13,7 @@
     "@afterservice/site-nav": "workspace:*",
     "@afterservice/ui": "workspace:*",
     "@afterservice/utils": "workspace:*",
+    "lucide-react": "^1.17.0",
     "next": "^16.2.9",
     "react": "19.2.7",
     "react-dom": "19.2.7"
