@@ -58,6 +58,7 @@ In progress. Empty-state alignment, filter payload cleanup, customer tag filters
 - Customers, jobs, follow-ups, and templates route pages now load persisted table settings from the table-settings cookie and pass them into the table components.
 - Customers, jobs, follow-up history, and templates route pages now prefetch table data with `infiniteQueryOptions` to match their `useSuspenseInfiniteQuery` table consumers.
 - Customers, jobs, follow-up history, and templates table components type paginated data from the tRPC router outputs instead of `any`, and the virtualizer fallback no longer uses misleading no-results copy.
+- Customer, job, follow-up, and template table column definitions now derive row types from their matching tRPC router outputs so `ColumnDef` generics stay aligned with table data.
 - Customer, job, follow-up, and template tables now use domain-specific drag-and-drop context IDs.
 - Customer, job, follow-up, and template column visibility popovers use shared `Label` primitives for checkbox labels.
 - Customer, follow-up, and template action menus now call real table meta actions with behavior-matched callback names.

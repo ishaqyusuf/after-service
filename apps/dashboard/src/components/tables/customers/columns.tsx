@@ -1,8 +1,10 @@
 "use client";
 
+import type { AppRouter } from "@afterservice/api/router";
 import { Badge } from "@afterservice/ui";
 import { format } from "date-fns";
 import type { ColumnDef } from "@tanstack/react-table";
+import type { inferRouterOutputs } from "@trpc/server";
 import { MoreHorizontal, Mail, Phone, Building } from "lucide-react";
 import { Button } from "@afterservice/ui";
 import {
@@ -13,17 +15,8 @@ import {
   DropdownMenuTrigger,
 } from "@afterservice/ui";
 
-export type Customer = {
-  id: string;
-  name: string;
-  email: string | null;
-  phone: string | null;
-  companyName: string | null;
-  tags: string[];
-  lastServiceAt: string | null;
-  openFollowUpCount: number;
-  createdAt: string;
-};
+type CustomersListPage = inferRouterOutputs<AppRouter>["customers"]["list"];
+type Customer = CustomersListPage["items"][number];
 
 export const columns: ColumnDef<Customer>[] = [
   {

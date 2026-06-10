@@ -1,8 +1,10 @@
 "use client";
 
+import type { AppRouter } from "@afterservice/api/router";
 import { Badge } from "@afterservice/ui";
 import { format } from "date-fns";
 import type { ColumnDef } from "@tanstack/react-table";
+import type { inferRouterOutputs } from "@trpc/server";
 import { MoreHorizontal } from "lucide-react";
 import { Button } from "@afterservice/ui";
 import {
@@ -17,15 +19,8 @@ import {
   toTemplateChannel,
 } from "@/hooks/use-template-filter-params";
 
-export type Template = {
-  id: string;
-  name: string;
-  subject: string | null;
-  body: string;
-  channel: string;
-  isDefault: boolean;
-  createdAt: string;
-};
+type TemplatesListPage = inferRouterOutputs<AppRouter>["templates"]["list"];
+type Template = TemplatesListPage["items"][number];
 
 export const columns: ColumnDef<Template>[] = [
   {

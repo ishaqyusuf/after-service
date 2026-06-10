@@ -1,5 +1,6 @@
 "use client";
 
+import type { AppRouter } from "@afterservice/api/router";
 import { Button } from "@afterservice/ui";
 import { Badge } from "@afterservice/ui";
 import {
@@ -10,6 +11,7 @@ import {
   DropdownMenuTrigger,
 } from "@afterservice/ui";
 import type { ColumnDef } from "@tanstack/react-table";
+import type { inferRouterOutputs } from "@trpc/server";
 import { format } from "date-fns";
 import { MoreHorizontal } from "lucide-react";
 import {
@@ -17,16 +19,8 @@ import {
   toServiceJobStatus,
 } from "@/hooks/use-job-filter-params";
 
-export type ServiceJob = {
-  id: string;
-  title: string;
-  status: string;
-  serviceCategory: string | null;
-  amountCents: number | null;
-  notes: string | null;
-  completedAt: string;
-  customer?: { name: string };
-};
+type JobsListPage = inferRouterOutputs<AppRouter>["serviceJobs"]["list"];
+type ServiceJob = JobsListPage["items"][number];
 
 export const columns: ColumnDef<ServiceJob>[] = [
   {
