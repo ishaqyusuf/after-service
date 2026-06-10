@@ -1,4 +1,5 @@
 import { type NextRequest, NextResponse } from "next/server";
+import { hasAcceptedSessionCookie } from "@/lib/session-cookies";
 
 const PUBLIC_PREFIXES = [
   "/sign-in",
@@ -17,20 +18,6 @@ function isAuthPath(pathname: string): boolean {
   return pathname === "/sign-in" || pathname === "/sign-up";
 }
 
-function hasSessionCookie(request: NextRequest): boolean {
-  return request.cookies.getAll().some((cookie) => {
-    const normalizedName = cookie.name
-      .replace(/^__Secure-/, "")
-      .replace(/^__Host-/, "");
-
-    return (
-      normalizedName === "better-auth.session_token" ||
-      normalizedName === "better-auth-session_token" ||
-      normalizedName === "afterservice.session_token"
-    );
-  });
-}
-
 function getSafeReturnTo(request: NextRequest): string | null {
   const returnTo = request.nextUrl.searchParams.get("return_to");
   if (!returnTo?.startsWith("/")) return null;
@@ -43,7 +30,7 @@ export const config = {
 
 export default async function proxy(request: NextRequest) {
   const { pathname, search } = request.nextUrl;
-  const authenticated = hasSessionCookie(request);
+  const authenticated = hasAcceptedSessionCookie(request);
   const requestHeaders = new Headers(request.headers);
 
   requestHeaders.set("x-pathname", pathname);

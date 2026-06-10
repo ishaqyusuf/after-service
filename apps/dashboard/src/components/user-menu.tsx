@@ -15,6 +15,7 @@ import {
 } from "@afterservice/ui";
 import { LogOut, Settings, User } from "lucide-react";
 import { useState } from "react";
+import { signOut } from "@/lib/auth-client";
 import { ThemeSwitch } from "./theme-switch";
 
 export function UserMenu({
@@ -35,8 +36,12 @@ export function UserMenu({
         event: LogEvents.SignOut.name,
         channel: LogEvents.SignOut.channel,
       });
+      const result = await signOut();
+      if (result.error) {
+        throw new Error(result.error.message ?? "Sign out failed.");
+      }
+
       clearIdentity();
-      await fetch("/api/auth/sign-out", { method: "POST" });
       window.location.href = "/sign-in";
     } catch (error) {
       console.error("Sign out failed", error);

@@ -1,4 +1,5 @@
 import { auth } from "@afterservice/auth";
+import { appendAuthCookieExpiryFallbacks } from "@/lib/session-cookies";
 
 const AUTH_DEBUG =
   process.env.AFTERSERVICE_AUTH_DEBUG === "true" ||
@@ -51,6 +52,9 @@ async function handleAuth(request: Request) {
   try {
     const response = await auth.handler(request);
     await logAuthFailure(request, response);
+    if (isSignOutRequest(request)) {
+      return appendAuthCookieExpiryFallbacks(response);
+    }
     return response;
   } catch (error) {
     console.error(
@@ -63,6 +67,11 @@ async function handleAuth(request: Request) {
 
     throw error;
   }
+}
+
+function isSignOutRequest(request: Request) {
+  const url = new URL(request.url);
+  return request.method === "POST" && url.pathname.endsWith("/sign-out");
 }
 
 export function GET(request: Request) {
