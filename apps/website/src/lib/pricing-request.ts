@@ -1,7 +1,6 @@
-import { cookies, headers } from "next/headers";
+import { headers } from "next/headers";
 import {
   getHeaderPricingHints,
-  PRICING_REGION_COOKIE,
   resolvePricingRegion,
   type PricingResolution,
 } from "@afterservice/plans";
@@ -19,13 +18,13 @@ export async function getPricingResolution(
   searchParams?: SearchParams,
 ): Promise<PricingResolution> {
   const headerList = await headers();
-  const cookieStore = await cookies();
   const resolvedSearchParams = searchParams ? await searchParams : {};
-  const { continent, country } = getHeaderPricingHints(headerList);
+  const { acceptLanguage, continent, country } =
+    getHeaderPricingHints(headerList);
 
   return resolvePricingRegion({
+    acceptLanguage,
     continent,
-    cookieRegion: cookieStore.get(PRICING_REGION_COOKIE)?.value,
     country,
     queryCurrency: firstSearchValue(resolvedSearchParams.currency),
     queryRegion: firstSearchValue(resolvedSearchParams.region),

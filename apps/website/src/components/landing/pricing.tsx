@@ -5,30 +5,18 @@ import { useTrack } from "@afterservice/events/client";
 import { Button, Card } from "@afterservice/ui";
 import {
   getLocalizedPlanPrice,
-  pricingRegionOptions,
-  PRICING_REGION_COOKIE,
-  toPricingResolution,
-  type PricingRegion,
   type PricingResolution,
 } from "@afterservice/plans";
 import { Check } from "lucide-react";
-import { useState } from "react";
 import { publicPlans } from "./pricing-data";
 
 type LandingPricingProps = {
   initialPricing: PricingResolution;
 };
 
-const cookieMaxAge = 60 * 60 * 24 * 365;
-
 export function LandingPricing({ initialPricing }: LandingPricingProps) {
-  const [pricing, setPricing] = useState(initialPricing);
+  const pricing = initialPricing;
   const track = useTrack();
-
-  const updatePricingRegion = (region: PricingRegion) => {
-    setPricing(toPricingResolution(region, "cookie"));
-    document.cookie = `${PRICING_REGION_COOKIE}=${region}; path=/; max-age=${cookieMaxAge}; SameSite=Lax`;
-  };
 
   return (
     <section
@@ -47,31 +35,8 @@ export function LandingPricing({ initialPricing }: LandingPricingProps) {
           automation, reporting, and support. Beta users get founder-rate
           pricing when paid plans launch.
         </p>
-
-        <div className="mt-8 flex flex-col items-center justify-center gap-2 sm:flex-row">
-          <label
-            htmlFor="pricing-region"
-            className="text-xs font-bold uppercase tracking-wider text-muted-foreground"
-          >
-            Show prices for
-          </label>
-          <select
-            id="pricing-region"
-            value={pricing.region}
-            onChange={(event) =>
-              updatePricingRegion(event.target.value as PricingRegion)
-            }
-            className="h-10 rounded-lg border border-border bg-card px-3 text-sm font-semibold text-foreground shadow-sm outline-none transition-colors hover:border-[#009b98]/50 focus-visible:ring-2 focus-visible:ring-[#009b98]/50"
-          >
-            {pricingRegionOptions.map((option) => (
-              <option key={option.region} value={option.region}>
-                {option.label} ({option.currency})
-              </option>
-            ))}
-          </select>
-        </div>
         {pricing.note && (
-          <p className="mt-3 text-xs text-muted-foreground">{pricing.note}</p>
+          <p className="mt-6 text-xs text-muted-foreground">{pricing.note}</p>
         )}
       </div>
 

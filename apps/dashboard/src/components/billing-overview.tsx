@@ -12,16 +12,12 @@ import {
 } from "@afterservice/ui";
 import {
   getLocalizedPlanPrice,
-  pricingRegionOptions,
-  PRICING_REGION_COOKIE,
-  toPricingResolution,
-  type PricingRegion,
   type PricingResolution,
 } from "@afterservice/plans";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { ArrowUpRight, CreditCard } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useState, type ReactNode } from "react";
+import type { ReactNode } from "react";
 import { formatDate } from "@/lib/dashboard-format";
 import { useTRPC } from "@/trpc/client";
 
@@ -41,7 +37,6 @@ const planStatusLabels = {
 const billingMetricSkeletons = ["customers", "follow-ups", "templates", "team"];
 const billingUsageSkeletons = ["customers", "follow-ups", "templates", "team"];
 const billingHistorySkeletons = ["current", "renewal", "trial"];
-const cookieMaxAge = 60 * 60 * 24 * 365;
 const paidPlans = [
   { id: "starter", name: "Starter" },
   { id: "shop", name: "Shop" },
@@ -54,7 +49,7 @@ type BillingOverviewProps = {
 
 export function BillingOverview({ initialPricing }: BillingOverviewProps) {
   const trpc = useTRPC();
-  const [pricing, setPricing] = useState(initialPricing);
+  const pricing = initialPricing;
   const { data, isLoading } = useQuery(
     trpc.billing.getCurrentPlan.queryOptions(),
   );
@@ -70,11 +65,6 @@ export function BillingOverview({ initialPricing }: BillingOverviewProps) {
       },
     }),
   );
-
-  const updatePricingRegion = (region: PricingRegion) => {
-    setPricing(toPricingResolution(region, "cookie"));
-    document.cookie = `${PRICING_REGION_COOKIE}=${region}; path=/; max-age=${cookieMaxAge}; SameSite=Lax`;
-  };
 
   if (isLoading) {
     return <BillingOverviewSkeleton />;
@@ -227,26 +217,10 @@ export function BillingOverview({ initialPricing }: BillingOverviewProps) {
                 Planned paid pricing
               </CardTitle>
               <p className="text-sm text-muted-foreground">
-                Preview paid-plan prices in the same regional currency used on
-                the public pricing page.
+                Preview paid-plan prices in the regional currency resolved from
+                the current location and locale.
               </p>
             </div>
-            <label className="flex flex-col gap-1 text-xs font-medium text-muted-foreground">
-              Region
-              <select
-                value={pricing.region}
-                onChange={(event) =>
-                  updatePricingRegion(event.target.value as PricingRegion)
-                }
-                className="h-9 rounded-md border border-border bg-background px-2 text-sm font-medium text-foreground"
-              >
-                {pricingRegionOptions.map((option) => (
-                  <option key={option.region} value={option.region}>
-                    {option.label} ({option.currency})
-                  </option>
-                ))}
-              </select>
-            </label>
           </div>
           {pricing.note ? (
             <p className="mt-3 text-xs text-muted-foreground">

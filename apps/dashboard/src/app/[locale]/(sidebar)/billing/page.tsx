@@ -1,10 +1,9 @@
 import {
   getHeaderPricingHints,
-  PRICING_REGION_COOKIE,
   resolvePricingRegion,
 } from "@afterservice/plans";
 import type { Metadata } from "next";
-import { cookies, headers } from "next/headers";
+import { headers } from "next/headers";
 import { Suspense } from "react";
 import {
   BillingOverview,
@@ -21,12 +20,12 @@ export const metadata: Metadata = {
 };
 
 export default async function BillingPage() {
-  const cookieStore = await cookies();
   const headerList = await headers();
-  const { continent, country } = getHeaderPricingHints(headerList);
+  const { acceptLanguage, continent, country } =
+    getHeaderPricingHints(headerList);
   const initialPricing = resolvePricingRegion({
+    acceptLanguage,
     continent,
-    cookieRegion: cookieStore.get(PRICING_REGION_COOKIE)?.value,
     country,
   });
 

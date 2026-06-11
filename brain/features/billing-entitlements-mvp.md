@@ -5,7 +5,7 @@ Implemented foundation for MVP on 2026-05-30.
 
 Updated on 2026-06-09 with a fuller Midday-style billing page and structured loading skeleton.
 
-Updated on 2026-06-11 with a regional paid-pricing preview in the dashboard billing page. The preview uses the shared `@afterservice/plans` pricing catalog and stores the selected region in the same pricing-region cookie as the public website.
+Updated on 2026-06-11 with a regional paid-pricing preview in the dashboard billing page. The preview uses the shared `@afterservice/plans` pricing catalog and automatically resolves the display currency from request region headers, then locale headers, matching the public website pricing behavior.
 
 ## Scope
 - Billing page displays plan, status, usage, limits, and checkout action.

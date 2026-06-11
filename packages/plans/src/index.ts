@@ -1,11 +1,9 @@
-export const PRICING_REGION_COOKIE = "afterservice_pricing_region";
-
 export type PublicPlanId = "free_beta" | "starter" | "shop" | "growth";
 export type PricingRegion = "US" | "CA" | "GB" | "EU" | "NG" | "OTHER";
 export type PricingRegionSource =
-  | "cookie"
   | "country"
   | "fallback"
+  | "locale"
   | "query";
 
 type PricingCurrency = "CAD" | "EUR" | "GBP" | "NGN" | "USD";
@@ -40,19 +38,6 @@ export const planPricingUsd = {
   shop: { monthly: 79, yearly: 790 },
   growth: { monthly: 149, yearly: 1490 },
 } satisfies Record<PublicPlanId, PlanPrice>;
-
-export const pricingRegionOptions: Array<{
-  currency: PricingCurrency;
-  label: string;
-  region: PricingRegion;
-}> = [
-  { currency: "USD", label: "United States", region: "US" },
-  { currency: "CAD", label: "Canada", region: "CA" },
-  { currency: "GBP", label: "United Kingdom", region: "GB" },
-  { currency: "EUR", label: "Eurozone", region: "EU" },
-  { currency: "NGN", label: "Nigeria", region: "NG" },
-  { currency: "USD", label: "Other / USD", region: "OTHER" },
-];
 
 const euCountryCodes = new Set([
   "AT",
@@ -174,10 +159,31 @@ function getRegionFromCountry(value: string | null | undefined) {
   return null;
 }
 
+function getRegionFromLocale(value: string | null | undefined) {
+  if (!value) return null;
+
+  for (const language of value.split(",")) {
+    const tag = language.split(";")[0]?.trim().replace(/_/g, "-");
+
+    if (!tag) continue;
+
+    const country = tag
+      .split("-")
+      .reverse()
+      .find((part) => /^[a-z]{2}$/i.test(part));
+    const region = getRegionFromCountry(country);
+
+    if (region) return region;
+  }
+
+  return null;
+}
+
 export function getHeaderPricingHints(headers: {
   get(name: string): string | null;
 }) {
   return {
+    acceptLanguage: headers.get("accept-language"),
     continent:
       headers.get("x-user-continent") ??
       headers.get("x-vercel-ip-continent") ??
@@ -190,14 +196,14 @@ export function getHeaderPricingHints(headers: {
 }
 
 export function resolvePricingRegion({
+  acceptLanguage,
   continent,
-  cookieRegion,
   country,
   queryCurrency,
   queryRegion,
 }: {
+  acceptLanguage?: string | null;
   continent?: string | null;
-  cookieRegion?: string | null;
   country?: string | null;
   queryCurrency?: string | null;
   queryRegion?: string | null;
@@ -211,12 +217,6 @@ export function resolvePricingRegion({
     return toPricingResolution(queryResolvedRegion, "query");
   }
 
-  const normalizedCookieRegion = normalize(cookieRegion);
-
-  if (isPricingRegion(normalizedCookieRegion)) {
-    return toPricingResolution(normalizedCookieRegion, "cookie");
-  }
-
   const countryResolvedRegion = getRegionFromCountry(country);
 
   if (countryResolvedRegion) {
@@ -225,6 +225,12 @@ export function resolvePricingRegion({
 
   if (normalize(continent) === "EU") {
     return toPricingResolution("EU", "country", country);
+  }
+
+  const localeResolvedRegion = getRegionFromLocale(acceptLanguage);
+
+  if (localeResolvedRegion) {
+    return toPricingResolution(localeResolvedRegion, "locale");
   }
 
   return toPricingResolution("US", "fallback");

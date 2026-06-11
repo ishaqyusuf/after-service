@@ -3,7 +3,7 @@
 Date: 2026-06-11
 
 ## Status
-Phase 1 public display foundation and dashboard billing preview implemented on 2026-06-11. Do not expose paid checkout publicly until the paid pilot is intentionally enabled.
+Phase 1 public display foundation and dashboard billing preview implemented on 2026-06-11. Updated on 2026-06-11 to remove visible region selectors and rely on automatic region/locale resolution for price display. Do not expose paid checkout publicly until the paid pilot is intentionally enabled.
 
 ## Goal
 Show afterservice paid-plan prices in a visitor's regional or country-local currency, then send the same pricing context into Polar checkout so the marketing page, dashboard billing page, and payment page do not disagree.
@@ -19,7 +19,7 @@ Show afterservice paid-plan prices in a visitor's regional or country-local curr
 Use Polar product-level multi-currency pricing as the source of charged amounts, and use a small afterservice-owned pricing presentation layer for public display.
 
 The display layer should:
-- Resolve a pricing region from an explicit query/selector, existing user preference, or request geolocation.
+- Resolve a pricing region from request geolocation first, then locale headers, with explicit query params reserved for testing/support links.
 - Render a stable local-currency amount for known target markets.
 - Fall back to USD when the region is unknown or unsupported.
 - Mark converted/estimated amounts clearly until the exact Polar checkout amount can be confirmed.
@@ -50,13 +50,13 @@ Controlled tables avoid surprise daily FX movements and let afterservice price b
 - Replace `price: string` in website pricing data with canonical numeric USD monthly/yearly amounts and plan IDs.
 - Add a shared pricing localization module with supported currencies, country-to-currency mapping, formatted display labels, and fallback notes.
 - Add middleware or server helper to read country from deployment request headers when available.
-- Add a compact country/currency selector on `/pricing` and the landing pricing section for manual override.
-- Persist the override in a cookie so return visits and checkout intent use the same display currency.
+- Use automatic region/locale resolution on `/pricing`, the landing pricing section, and dashboard billing preview.
+- Do not show a manual "show prices for" selector on public pricing.
 
 Implementation notes:
-- `packages/plans/src/index.ts` owns the supported region table, controlled local-price table, cookie name, country/header mapping, canonical USD pricing, and `Intl.NumberFormat` formatting.
-- `apps/website/src/lib/pricing-request.ts` reads request headers, pricing query params, and the persisted region cookie for server-rendered initial pricing.
-- `apps/website/src/components/landing/pricing.tsx` renders the selector and localized monthly/yearly planned prices.
+- `packages/plans/src/index.ts` owns the supported region table, controlled local-price table, country/header/locale mapping, canonical USD pricing, and `Intl.NumberFormat` formatting.
+- `apps/website/src/lib/pricing-request.ts` reads request geolocation headers, `Accept-Language`, and pricing query params for server-rendered initial pricing.
+- `apps/website/src/components/landing/pricing.tsx` renders localized monthly/yearly planned prices without a visible manual region selector.
 
 ### Phase 2: Polar Configuration Alignment
 - Configure each paid Polar product with the supported currencies chosen above.
@@ -78,7 +78,7 @@ Implementation notes:
 
 Implementation notes:
 - `apps/dashboard/src/components/billing-overview.tsx` now shows planned paid-plan prices in the same supported regions as the website.
-- The dashboard selector persists to the shared `afterservice_pricing_region` cookie, so dashboard and website previews stay aligned.
+- The dashboard preview uses the same automatic request region/locale resolution as the website, so dashboard and website previews stay aligned without a manual selector.
 - API-level checkout currency input remains future Phase 3 work; entitlement state is still webhook-derived.
 
 ### Phase 5: QA And Analytics
@@ -91,7 +91,7 @@ Implementation notes:
 - Polar-driven charged amounts reduce billing risk, but require product setup discipline in the Polar dashboard.
 - afterservice-owned display tables are simple and stable, but must be kept in sync with Polar product prices.
 - Live FX conversion looks dynamic, but can create mismatch, tax ambiguity, and support issues. Avoid it for launch.
-- IP geolocation is useful by default, but it can be wrong with VPNs, proxies, and server-side checkout creation. Always provide a manual selector.
+- IP geolocation is useful by default, but it can be wrong with VPNs, proxies, and server-side checkout creation. Keep explicit query overrides available for support/testing even though the public UI no longer shows a manual selector.
 
 ## Open Questions
 - Which countries are in the first paid pilot?

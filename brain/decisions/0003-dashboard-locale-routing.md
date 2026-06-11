@@ -20,5 +20,5 @@ Use the Midday dashboard locale architecture in `apps/dashboard`:
 - Dashboard routes can remain user-facing as `/`, `/customers`, `/billing`, `/sign-in`, etc. while Next renders the internal `/en/...` route tree.
 - Future language support can add locale dictionaries and middleware locales without restructuring the dashboard app.
 - Website language routing is intentionally not introduced yet.
-- Pricing currency/region selection remains independent from language locale.
+- Pricing currency/region selection remains independent from the dashboard route locale; the pricing layer may use request locale headers only as a fallback signal after geolocation headers.
 - Regional pricing data lives in `@afterservice/plans`, matching Midday's package-boundary pattern for plan/pricing business rules.
