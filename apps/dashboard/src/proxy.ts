@@ -32,6 +32,7 @@ const PUBLIC_PREFIXES = [
   "/api/",
   "/_next/",
   "/favicon",
+  "/sentry-example-page",
 ];
 
 function isPublicPath(pathname: string): boolean {
