@@ -386,6 +386,14 @@ Commands:
 - `bun run dev:websites:portless`
 - `bun run dev:api:portless`
 
+## Dev Startup Ports
+
+As of 2026-06-11, root dev entrypoints use the School Clerk-style `dev:prepare` step before launching Turbo. `dev:prepare` runs `kill:ports`, which loads local workspace env through `scripts/with-workspace-env.mjs` and runs `scripts/kill-port.sh`.
+
+- `kill-port.sh` kills the default dev ports `1355 4100 4101 4102 5555`.
+- It also reads numeric `PORT` and `*_PORT` values from the loaded env, so `SITE_PORT`, `DASHBOARD_PORT`, `API_PORT`, and future app ports can override or extend the default set.
+- `AFTERSERVICE_KILL_PORTS` can replace the default explicit port list for unusual local setups.
+
 Manual checks:
 - Fixed local:
   - `http://localhost:4100/signup` redirects or links to dashboard sign-up correctly.

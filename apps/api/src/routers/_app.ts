@@ -7,6 +7,7 @@ import {
 import { LogEvents } from "@afterservice/events";
 import { setupAnalytics } from "@afterservice/events/server";
 import { Notifications } from "@afterservice/notifications";
+import { tasks } from "@trigger.dev/sdk/v3";
 import { initTRPC, TRPCError } from "@trpc/server";
 import superjson from "superjson";
 import { z } from "zod";
@@ -965,9 +966,7 @@ const followUpsRouter = t.router({
         orderBy: resolveSort(input.sort, followUpSorts, { dueAt: "asc" }),
         where: {
           channel: input.channel,
-          ...(Object.keys(dueAtFilter).length
-            ? { dueAt: dueAtFilter }
-            : {}),
+          ...(Object.keys(dueAtFilter).length ? { dueAt: dueAtFilter } : {}),
           status: input.status,
           workspaceId: ctx.workspace.id,
           customer: input.search
@@ -1050,26 +1049,38 @@ const followUpsRouter = t.router({
         workspaceId: ctx.workspace.id,
       });
 
-      await notifications.send(
-        "followup_message_sent",
-        ctx.workspace.id,
-        {
-          users: [
-            {
-              id: item.customer.id,
-              email: item.customer.email || "",
-              phone: item.customer.phone || undefined,
-              workspace_id: ctx.workspace.id,
-            },
-          ],
-          followUpId: item.id,
-          customerId: item.customerId,
-          body: input.body,
-          channel: followUp.channel,
-          recipient: input.recipient,
-        },
-        { channels: [followUp.channel] },
-      );
+      const notificationPayload = {
+        users: [
+          {
+            id: item.customer.id,
+            email: item.customer.email || "",
+            phone: item.customer.phone || undefined,
+            workspace_id: ctx.workspace.id,
+          },
+        ],
+        followUpId: item.id,
+        customerId: item.customerId,
+        body: input.body,
+        channel: followUp.channel,
+        recipient: input.recipient,
+      };
+
+      if (followUp.channel === "email") {
+        await tasks.trigger("notification", {
+          channels: ["email"],
+          payload: notificationPayload,
+          sendEmail: true,
+          type: "followup_message_sent",
+          workspaceId: ctx.workspace.id,
+        });
+      } else {
+        await notifications.send(
+          "followup_message_sent",
+          ctx.workspace.id,
+          notificationPayload,
+          { channels: [followUp.channel] },
+        );
+      }
 
       analytics.track({
         event: LogEvents.FollowUpStatusUpdated.name,

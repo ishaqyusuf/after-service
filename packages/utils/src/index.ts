@@ -1,4 +1,5 @@
 export * from "./app-urls";
+export * from "./email";
 export * from "./env";
 export * from "./metadata";
 export * from "./runtime-url";

@@ -59,6 +59,7 @@ export interface NotificationHandler<T = unknown> {
 }
 
 export type NotificationOptions = {
+  sendEmail?: boolean;
   priority?: number;
   channels?: Array<"email" | "sms" | "whatsapp" | "phone">;
 };

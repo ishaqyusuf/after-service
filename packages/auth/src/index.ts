@@ -1,5 +1,8 @@
 import { getDbClient } from "@afterservice/db";
-import { getDevAppUrlStrings } from "@afterservice/utils";
+import {
+  getDevAppUrlStrings,
+  resolveEmailRecipients,
+} from "@afterservice/utils";
 import { prismaAdapter } from "@better-auth/prisma-adapter";
 import { betterAuth } from "better-auth";
 
@@ -92,6 +95,8 @@ export const auth = betterAuth({
     sendResetPassword: async ({ user, url }) => {
       const resendApiKey = readNonEmptyEnv("RESEND_API_KEY");
       if (resendApiKey) {
+        const recipientResolution = resolveEmailRecipients(user.email);
+
         await fetch("https://api.resend.com/emails", {
           method: "POST",
           headers: {
@@ -99,8 +104,10 @@ export const auth = betterAuth({
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            from: readNonEmptyEnv("EMAIL_FROM_ADDRESS") ?? "noreply@afterservice.app",
-            to: user.email,
+            from:
+              readNonEmptyEnv("EMAIL_FROM_ADDRESS") ??
+              "noreply@afterservice.app",
+            to: recipientResolution.recipients,
             subject: "Reset your password",
             html: `<p>Click <a href="${url}">here</a> to reset your password.</p>`,
           }),

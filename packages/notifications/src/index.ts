@@ -7,6 +7,7 @@ import type {
   UserData,
 } from "./base";
 import type { NotificationTypes } from "./schemas";
+import { EmailService } from "./services/email-service";
 import { followUpMessageSent } from "./types/followup-message-sent";
 import { followUpScheduled } from "./types/followup-scheduled";
 import { jobCompletedCheckIn } from "./types/job-completed-checkin";
@@ -40,10 +41,12 @@ function jsonObject(
 
 export class Notifications {
   #db: PrismaClient;
+  #emailService: EmailService;
   #whatsappService: WhatsAppService | null = null;
 
   constructor(db: PrismaClient) {
     this.#db = db;
+    this.#emailService = new EmailService();
     // We optionally initialize it if env vars exist
     if (
       process.env.TWILIO_ACCOUNT_SID &&
@@ -146,33 +149,62 @@ export class Notifications {
         }
       }
 
-      // 5. Execute Dispatches (Mocked for now, to be replaced by actual Services)
+      // 5. Execute Dispatches
       let emailsSent = 0;
-      const emailsFailed = 0;
+      let emailsFailed = 0;
       let smsSent = 0;
       const smsFailed = 0;
       let whatsappSent = 0;
       const whatsappFailed = 0;
+      const shouldSendEmail = options?.sendEmail ?? false;
 
-      // Log Emails
       for (const dispatch of emailDispatches) {
+        const result = shouldSendEmail
+          ? await this.#emailService.send(dispatch)
+          : undefined;
+        const finalStatus = result?.status ?? "sent";
+        const recipient =
+          result?.recipients.join(", ") ||
+          result?.originalRecipients.join(", ") ||
+          dispatch.user.email;
+
         await this.#db.messageLog.create({
           data: {
             workspaceId: workspaceId,
             customerId: stringField(dispatch.data, "customerId"),
             followUpId: stringField(dispatch.data, "followUpId"),
             channel: "email",
-            recipient: dispatch.user.email,
+            recipient,
             subject: dispatch.subject,
             body:
               typeof dispatch.data?.body === "string"
                 ? dispatch.data.body
                 : JSON.stringify(dispatch.data),
-            status: "sent",
-            sentAt: new Date(),
+            provider: shouldSendEmail ? "resend" : null,
+            providerId: result?.providerId ?? null,
+            errorDetails: result?.error
+              ? jsonObject({
+                  error:
+                    result.error instanceof Error
+                      ? result.error.message
+                      : String(result.error),
+                })
+              : result?.wasRecipientOverridden
+                ? jsonObject({
+                    originalRecipients: result.originalRecipients,
+                    testEmailOverride: true,
+                  })
+                : undefined,
+            status: finalStatus,
+            sentAt: finalStatus === "sent" ? new Date() : null,
           },
         });
-        emailsSent++;
+
+        if (finalStatus === "sent") {
+          emailsSent++;
+        } else if (finalStatus === "failed") {
+          emailsFailed++;
+        }
       }
 
       // Log SMS

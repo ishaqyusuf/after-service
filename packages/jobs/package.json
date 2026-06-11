@@ -14,6 +14,7 @@
   },
   "dependencies": {
     "@afterservice/db": "workspace:*",
+    "@afterservice/notifications": "workspace:*",
     "@trigger.dev/build": "4.0.1",
     "@trigger.dev/sdk": "4.0.1"
   },

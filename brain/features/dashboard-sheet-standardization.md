@@ -50,6 +50,7 @@ In progress. Primary dashboard sheet forms aligned on 2026-06-09.
 - Follow-up sheet copy uses consistent hyphenated follow-up language.
 - Template and follow-up sheet forms now derive channel select options from the same shared channel label maps used by their filters.
 - Follow-up create and schedule forms use controlled channel selects so sheet resets and record changes cannot leave stale UI state.
+- Mobile left/right sheets now use the full viewport width below the `sm` breakpoint while preserving the Midday-style `sm:w-3/4` and desktop max-width behavior.
 
 ## Remaining Work
 - Continue the page and filter/filter-option sweep.
