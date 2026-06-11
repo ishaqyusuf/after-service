@@ -59,7 +59,7 @@ export function mergeCustomerTagOptions(
   return options;
 }
 
-function dedupeTags(tags: string[]) {
+function dedupeTags(tags: readonly string[]) {
   const seen = new Set<string>();
   const result: string[] = [];
 
