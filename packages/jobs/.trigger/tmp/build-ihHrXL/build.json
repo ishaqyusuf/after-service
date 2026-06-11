@@ -8,7 +8,7 @@
   "files": [
     {
       "entry": "src/tasks/follow-ups.ts",
-      "out": "/Users/M1PRO/Documents/code/micro-startups/after-service/packages/jobs/.trigger/tmp/build-WitSWU/packages/jobs/src/tasks/follow-ups.mjs"
+      "out": "/Users/M1PRO/Documents/code/micro-startups/after-service/packages/jobs/.trigger/tmp/build-ihHrXL/packages/jobs/src/tasks/follow-ups.mjs"
     }
   ],
   "sources": {
@@ -41,10 +41,10 @@
       "./src/tasks"
     ]
   },
-  "outputPath": "/Users/M1PRO/Documents/code/micro-startups/after-service/packages/jobs/.trigger/tmp/build-WitSWU",
-  "indexWorkerEntryPoint": "/Users/M1PRO/Documents/code/micro-startups/after-service/packages/jobs/.trigger/tmp/build-WitSWU/node_modules/.bun/trigger.dev@4.0.1+1fb4c65d43e298b9/node_modules/trigger.dev/dist/esm/entryPoints/dev-index-worker.mjs",
-  "runWorkerEntryPoint": "/Users/M1PRO/Documents/code/micro-startups/after-service/packages/jobs/.trigger/tmp/build-WitSWU/node_modules/.bun/trigger.dev@4.0.1+1fb4c65d43e298b9/node_modules/trigger.dev/dist/esm/entryPoints/dev-run-worker.mjs",
-  "configPath": "/Users/M1PRO/Documents/code/micro-startups/after-service/packages/jobs/.trigger/tmp/build-WitSWU/packages/jobs/trigger.config.mjs",
+  "outputPath": "/Users/M1PRO/Documents/code/micro-startups/after-service/packages/jobs/.trigger/tmp/build-ihHrXL",
+  "indexWorkerEntryPoint": "/Users/M1PRO/Documents/code/micro-startups/after-service/packages/jobs/.trigger/tmp/build-ihHrXL/node_modules/.bun/trigger.dev@4.0.1+1fb4c65d43e298b9/node_modules/trigger.dev/dist/esm/entryPoints/dev-index-worker.mjs",
+  "runWorkerEntryPoint": "/Users/M1PRO/Documents/code/micro-startups/after-service/packages/jobs/.trigger/tmp/build-ihHrXL/node_modules/.bun/trigger.dev@4.0.1+1fb4c65d43e298b9/node_modules/trigger.dev/dist/esm/entryPoints/dev-run-worker.mjs",
+  "configPath": "/Users/M1PRO/Documents/code/micro-startups/after-service/packages/jobs/.trigger/tmp/build-ihHrXL/packages/jobs/trigger.config.mjs",
   "customConditions": [],
   "deploy": {
     "env": {}

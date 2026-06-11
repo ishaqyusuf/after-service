@@ -1,5 +1,5 @@
 {
-  "configPath": "/Users/M1PRO/Documents/code/micro-startups/after-service/packages/jobs/.trigger/tmp/build-WitSWU/packages/jobs/trigger.config.mjs",
+  "configPath": "/Users/M1PRO/Documents/code/micro-startups/after-service/packages/jobs/.trigger/tmp/build-ihHrXL/packages/jobs/trigger.config.mjs",
   "tasks": [
     {
       "id": "mark-missed-follow-ups",
@@ -20,7 +20,7 @@
       },
       "maxDuration": 60,
       "filePath": "src/tasks/follow-ups.ts",
-      "entryPoint": "/Users/M1PRO/Documents/code/micro-startups/after-service/packages/jobs/.trigger/tmp/build-WitSWU/packages/jobs/src/tasks/follow-ups.mjs"
+      "entryPoint": "/Users/M1PRO/Documents/code/micro-startups/after-service/packages/jobs/.trigger/tmp/build-ihHrXL/packages/jobs/src/tasks/follow-ups.mjs"
     },
     {
       "id": "dry-run-due-follow-ups",
@@ -33,15 +33,15 @@
       },
       "maxDuration": 60,
       "filePath": "src/tasks/follow-ups.ts",
-      "entryPoint": "/Users/M1PRO/Documents/code/micro-startups/after-service/packages/jobs/.trigger/tmp/build-WitSWU/packages/jobs/src/tasks/follow-ups.mjs"
+      "entryPoint": "/Users/M1PRO/Documents/code/micro-startups/after-service/packages/jobs/.trigger/tmp/build-ihHrXL/packages/jobs/src/tasks/follow-ups.mjs"
     }
   ],
   "queues": [],
-  "workerEntryPoint": "/Users/M1PRO/Documents/code/micro-startups/after-service/packages/jobs/.trigger/tmp/build-WitSWU/node_modules/.bun/trigger.dev@4.0.1+1fb4c65d43e298b9/node_modules/trigger.dev/dist/esm/entryPoints/dev-run-worker.mjs",
+  "workerEntryPoint": "/Users/M1PRO/Documents/code/micro-startups/after-service/packages/jobs/.trigger/tmp/build-ihHrXL/node_modules/.bun/trigger.dev@4.0.1+1fb4c65d43e298b9/node_modules/trigger.dev/dist/esm/entryPoints/dev-run-worker.mjs",
   "runtime": "node",
   "runtimeVersion": "25.4.0",
   "customConditions": [],
   "timings": {
-    "src/tasks/follow-ups.ts": 21.060666999999995
+    "src/tasks/follow-ups.ts": 49.58420799999999
   }
 }
