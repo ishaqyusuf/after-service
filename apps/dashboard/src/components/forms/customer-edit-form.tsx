@@ -14,6 +14,7 @@ import {
 import { useMutation } from "@tanstack/react-query";
 import type { inferRouterOutputs } from "@trpc/server";
 import { useEffect } from "react";
+import { CustomerTagsInput } from "@/components/forms/customer-tags-input";
 import { useCustomerParams } from "@/hooks/use-customer-params";
 import { useDashboardInvalidations } from "@/hooks/use-dashboard-invalidations";
 import { useZodForm } from "@/hooks/use-zod-form";
@@ -97,7 +98,7 @@ export function CustomerEditForm({ customer }: Props) {
             name="email"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Email</FormLabel>
+                <FormLabel>Email (optional)</FormLabel>
                 <FormControl>
                   <Input type="email" {...field} />
                 </FormControl>
@@ -110,7 +111,7 @@ export function CustomerEditForm({ customer }: Props) {
             name="phone"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Phone</FormLabel>
+                <FormLabel>Phone (optional)</FormLabel>
                 <FormControl>
                   <Input {...field} />
                 </FormControl>
@@ -123,7 +124,7 @@ export function CustomerEditForm({ customer }: Props) {
             name="companyName"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Company</FormLabel>
+                <FormLabel>Company (optional)</FormLabel>
                 <FormControl>
                   <Input {...field} />
                 </FormControl>
@@ -136,9 +137,13 @@ export function CustomerEditForm({ customer }: Props) {
             name="tags"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Tags</FormLabel>
+                <FormLabel>Tags (optional)</FormLabel>
                 <FormControl>
-                  <Input {...field} />
+                  <CustomerTagsInput
+                    disabled={updateCustomer.isPending}
+                    onChange={field.onChange}
+                    value={field.value}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -149,7 +154,7 @@ export function CustomerEditForm({ customer }: Props) {
             name="notes"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Notes</FormLabel>
+                <FormLabel>Notes (optional)</FormLabel>
                 <FormControl>
                   <Textarea className="h-32" {...field} />
                 </FormControl>

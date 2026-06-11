@@ -11,6 +11,7 @@ import {
   FormMessage,
 } from "@afterservice/ui/form";
 import { useMutation } from "@tanstack/react-query";
+import { CustomerTagsInput } from "@/components/forms/customer-tags-input";
 import { QuickFill } from "@/components/quick-fill";
 import { useCustomerParams } from "@/hooks/use-customer-params";
 import { useDashboardInvalidations } from "@/hooks/use-dashboard-invalidations";
@@ -74,7 +75,7 @@ export function CustomerCreateForm() {
             name="phone"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Phone</FormLabel>
+                <FormLabel>Phone (optional)</FormLabel>
                 <FormControl>
                   <Input {...field} />
                 </FormControl>
@@ -87,7 +88,7 @@ export function CustomerCreateForm() {
             name="email"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Email</FormLabel>
+                <FormLabel>Email (optional)</FormLabel>
                 <FormControl>
                   <Input type="email" {...field} />
                 </FormControl>
@@ -100,7 +101,7 @@ export function CustomerCreateForm() {
             name="companyName"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Company</FormLabel>
+                <FormLabel>Company (optional)</FormLabel>
                 <FormControl>
                   <Input {...field} />
                 </FormControl>
@@ -113,9 +114,13 @@ export function CustomerCreateForm() {
             name="tags"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Tags</FormLabel>
+                <FormLabel>Tags (optional)</FormLabel>
                 <FormControl>
-                  <Input placeholder="warranty, vip" {...field} />
+                  <CustomerTagsInput
+                    disabled={createCustomerMutation.isPending}
+                    onChange={field.onChange}
+                    value={field.value}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -126,7 +131,7 @@ export function CustomerCreateForm() {
             name="notes"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Notes</FormLabel>
+                <FormLabel>Notes (optional)</FormLabel>
                 <FormControl>
                   <Textarea className="resize-y" {...field} />
                 </FormControl>

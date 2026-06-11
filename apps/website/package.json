@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@afterservice/events": "workspace:*",
+    "@afterservice/plans": "workspace:*",
     "@afterservice/site-nav": "workspace:*",
     "@afterservice/ui": "workspace:*",
     "@afterservice/utils": "workspace:*",

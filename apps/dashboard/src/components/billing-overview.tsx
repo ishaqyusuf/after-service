@@ -10,10 +10,18 @@ import {
   Progress,
   Skeleton,
 } from "@afterservice/ui";
+import {
+  getLocalizedPlanPrice,
+  pricingRegionOptions,
+  PRICING_REGION_COOKIE,
+  toPricingResolution,
+  type PricingRegion,
+  type PricingResolution,
+} from "@afterservice/plans";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { ArrowUpRight, CreditCard } from "lucide-react";
 import { useRouter } from "next/navigation";
-import type { ReactNode } from "react";
+import { useState, type ReactNode } from "react";
 import { formatDate } from "@/lib/dashboard-format";
 import { useTRPC } from "@/trpc/client";
 
@@ -33,9 +41,20 @@ const planStatusLabels = {
 const billingMetricSkeletons = ["customers", "follow-ups", "templates", "team"];
 const billingUsageSkeletons = ["customers", "follow-ups", "templates", "team"];
 const billingHistorySkeletons = ["current", "renewal", "trial"];
+const cookieMaxAge = 60 * 60 * 24 * 365;
+const paidPlans = [
+  { id: "starter", name: "Starter" },
+  { id: "shop", name: "Shop" },
+  { id: "growth", name: "Growth" },
+] as const;
 
-export function BillingOverview() {
+type BillingOverviewProps = {
+  initialPricing: PricingResolution;
+};
+
+export function BillingOverview({ initialPricing }: BillingOverviewProps) {
   const trpc = useTRPC();
+  const [pricing, setPricing] = useState(initialPricing);
   const { data, isLoading } = useQuery(
     trpc.billing.getCurrentPlan.queryOptions(),
   );
@@ -51,6 +70,11 @@ export function BillingOverview() {
       },
     }),
   );
+
+  const updatePricingRegion = (region: PricingRegion) => {
+    setPricing(toPricingResolution(region, "cookie"));
+    document.cookie = `${PRICING_REGION_COOKIE}=${region}; path=/; max-age=${cookieMaxAge}; SameSite=Lax`;
+  };
 
   if (isLoading) {
     return <BillingOverviewSkeleton />;
@@ -194,6 +218,68 @@ export function BillingOverview() {
           </CardContent>
         </Card>
       </section>
+
+      <Card>
+        <CardHeader className="border-b pb-5">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+            <div>
+              <CardTitle className="mb-1 text-base">
+                Planned paid pricing
+              </CardTitle>
+              <p className="text-sm text-muted-foreground">
+                Preview paid-plan prices in the same regional currency used on
+                the public pricing page.
+              </p>
+            </div>
+            <label className="flex flex-col gap-1 text-xs font-medium text-muted-foreground">
+              Region
+              <select
+                value={pricing.region}
+                onChange={(event) =>
+                  updatePricingRegion(event.target.value as PricingRegion)
+                }
+                className="h-9 rounded-md border border-border bg-background px-2 text-sm font-medium text-foreground"
+              >
+                {pricingRegionOptions.map((option) => (
+                  <option key={option.region} value={option.region}>
+                    {option.label} ({option.currency})
+                  </option>
+                ))}
+              </select>
+            </label>
+          </div>
+          {pricing.note ? (
+            <p className="mt-3 text-xs text-muted-foreground">
+              {pricing.note}
+            </p>
+          ) : null}
+        </CardHeader>
+        <CardContent className="grid gap-3 pt-6 sm:grid-cols-3">
+          {paidPlans.map((paidPlan) => {
+            const price = getLocalizedPlanPrice(paidPlan.id, pricing);
+
+            return (
+              <div
+                key={paidPlan.id}
+                className="rounded-md border border-border bg-muted/20 p-4"
+              >
+                <p className="text-sm font-medium">{paidPlan.name}</p>
+                <p className="mt-2 text-2xl font-semibold">
+                  {price.formattedMonthly}
+                </p>
+                <p className="text-xs text-muted-foreground">
+                  per month planned
+                </p>
+                {price.formattedYearly ? (
+                  <p className="mt-1 text-xs text-muted-foreground">
+                    {price.formattedYearly}/year planned
+                  </p>
+                ) : null}
+              </div>
+            );
+          })}
+        </CardContent>
+      </Card>
 
       <section className="space-y-3 border-t border-border pt-6">
         <h2 className="text-lg font-medium">Beta billing note</h2>

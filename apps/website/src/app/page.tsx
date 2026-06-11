@@ -6,6 +6,11 @@ import {
   organizationJsonLd,
   softwareApplicationJsonLd,
 } from "../lib/seo";
+import { getPricingResolution } from "../lib/pricing-request";
+
+type HomePageProps = {
+  searchParams?: Promise<Record<string, string | string[] | undefined>>;
+};
 
 export async function generateMetadata(): Promise<Metadata> {
   return createPageMetadata({
@@ -16,11 +21,13 @@ export async function generateMetadata(): Promise<Metadata> {
   });
 }
 
-export default async function HomePage() {
+export default async function HomePage({ searchParams }: HomePageProps) {
+  const initialPricing = await getPricingResolution(searchParams);
+
   return (
     <>
       <JsonLd data={[organizationJsonLd(), softwareApplicationJsonLd()]} />
-      <LaunchedPage />
+      <LaunchedPage initialPricing={initialPricing} />
     </>
   );
 }

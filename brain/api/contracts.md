@@ -55,6 +55,10 @@ type CustomerSummary = {
   lastServiceAt: string | null;
   openFollowUpCount: number;
 };
+
+type CustomerTagsResult = {
+  items: string[];
+};
 ```
 
 ## Service Jobs

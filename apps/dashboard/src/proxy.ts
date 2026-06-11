@@ -1,8 +1,29 @@
 import { type NextRequest, NextResponse } from "next/server";
+import { createI18nMiddleware } from "next-international/middleware";
 import {
   appendAuthCookieExpiryFallbacks,
   hasAcceptedSessionCookie,
 } from "@/lib/session-cookies";
+
+const I18nMiddleware = createI18nMiddleware({
+  locales: ["en"],
+  defaultLocale: "en",
+  urlMappingStrategy: "rewrite",
+});
+
+const LOCALES = new Set(["en"]);
+
+function stripSupportedLocale(pathname: string) {
+  const pathnameLocale = pathname.split("/", 2)?.[1];
+
+  if (!pathnameLocale || !LOCALES.has(pathnameLocale)) {
+    return pathname || "/";
+  }
+
+  const pathnameWithoutLocale = pathname.slice(pathnameLocale.length + 1);
+
+  return pathnameWithoutLocale || "/";
+}
 
 const PUBLIC_PREFIXES = [
   "/sign-in",
@@ -26,8 +47,10 @@ function isLogoutPath(pathname: string): boolean {
 }
 
 function isLogoutRequest(request: NextRequest): boolean {
+  const pathnameWithoutLocale = stripSupportedLocale(request.nextUrl.pathname);
+
   return (
-    isLogoutPath(request.nextUrl.pathname) ||
+    isLogoutPath(pathnameWithoutLocale || "/") ||
     request.nextUrl.searchParams.get("logout") === "true"
   );
 }
@@ -49,27 +72,26 @@ export const config = {
 };
 
 export default async function proxy(request: NextRequest) {
-  const { pathname, search } = request.nextUrl;
+  const response = I18nMiddleware(request);
+  const { search } = request.nextUrl;
   const authenticated = hasAcceptedSessionCookie(request);
-  const requestHeaders = new Headers(request.headers);
-
-  requestHeaders.set("x-pathname", pathname);
+  const normalizedPathname = stripSupportedLocale(request.nextUrl.pathname);
 
   if (authenticated) {
     if (isLogoutRequest(request)) {
       return redirectToSignInAfterLogout(request);
     }
 
-    if (isAuthPath(pathname)) {
+    if (isAuthPath(normalizedPathname)) {
       const returnTo = getSafeReturnTo(request);
       return NextResponse.redirect(new URL(returnTo ?? "/", request.url));
     }
 
-    return NextResponse.next({ request: { headers: requestHeaders } });
+    return response;
   }
 
-  if (isPublicPath(pathname)) {
-    return NextResponse.next({ request: { headers: requestHeaders } });
+  if (isPublicPath(normalizedPathname)) {
+    return response;
   }
 
   if (isLogoutRequest(request)) {
@@ -77,7 +99,7 @@ export default async function proxy(request: NextRequest) {
   }
 
   const signInUrl = new URL("/sign-in", request.url);
-  signInUrl.searchParams.set("return_to", `${pathname}${search}`);
+  signInUrl.searchParams.set("return_to", `${normalizedPathname}${search}`);
 
   return NextResponse.redirect(signInUrl);
 }

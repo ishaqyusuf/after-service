@@ -3,11 +3,14 @@
 ## Status
 Implemented for MVP on 2026-05-30.
 
+Updated on 2026-06-11 to add system tag suggestions and a creatable customer tag multiselect that also loads existing workspace tags.
+
 ## Scope
 - Workspace-scoped customer list/search.
 - Create, update, and archive customer records.
 - Customer selection in job and follow-up forms.
 - Customer summary includes contact fields, tags, notes, last service date, and open follow-up count.
+- Customer create/edit forms support system tag suggestions, existing workspace tag suggestions, deduped tag selection, and custom tag creation.
 
 ## Architecture
 - API owner: `apps/api/src/routers/_app.ts` `customers` router.
@@ -23,4 +26,3 @@ Implemented for MVP on 2026-05-30.
 - `bun run typecheck`
 - `bun run lint`
 - `bun run build`
-

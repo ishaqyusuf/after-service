@@ -439,6 +439,27 @@ const customersRouter = t.router({
 
       return { items: items.map(customerDto), nextCursor: null };
     }),
+  tags: protectedProcedure.query(async ({ ctx }) => {
+    const customers = await db.customer.findMany({
+      select: { tags: true },
+      where: { workspaceId: ctx.workspace.id },
+    });
+    const tags = new Set<string>();
+
+    for (const customer of customers) {
+      for (const tag of customer.tags) {
+        const value = tag.trim();
+
+        if (value) {
+          tags.add(value);
+        }
+      }
+    }
+
+    return {
+      items: Array.from(tags).sort((a, b) => a.localeCompare(b)),
+    };
+  }),
   update: protectedProcedure
     .input(
       z.object({

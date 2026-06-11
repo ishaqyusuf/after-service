@@ -1,3 +1,5 @@
+import { planPricingUsd, type PublicPlanId } from "@afterservice/plans";
+
 export type PublicPlan = {
   billingNote: string;
   buyer: string;
@@ -5,10 +7,14 @@ export type PublicPlan = {
   current?: boolean;
   description: string;
   features: string[];
+  id: PublicPlanId;
   limits: string[];
   name: string;
   planned?: boolean;
-  price: string;
+  price: {
+    monthlyUsd: number;
+    yearlyUsd: number | null;
+  };
   priceNote: string;
 };
 
@@ -27,8 +33,12 @@ export const publicPlans = [
       "Manual send logging",
     ],
     limits: ["1 owner/admin", "100 customers", "200 follow-ups", "5 templates"],
+    id: "free_beta",
     name: "Free Beta",
-    price: "$0",
+    price: {
+      monthlyUsd: planPricingUsd.free_beta.monthly,
+      yearlyUsd: planPricingUsd.free_beta.yearly,
+    },
     priceNote: "during early access",
   },
   {
@@ -44,9 +54,13 @@ export const publicPlans = [
       "Basic reports",
     ],
     limits: ["1 user", "250 customers", "750 follow-ups", "10 templates"],
+    id: "starter",
     name: "Starter",
     planned: true,
-    price: "$29",
+    price: {
+      monthlyUsd: planPricingUsd.starter.monthly,
+      yearlyUsd: planPricingUsd.starter.yearly,
+    },
     priceNote: "per month planned",
   },
   {
@@ -67,9 +81,13 @@ export const publicPlans = [
       "7,500 follow-ups",
       "50 templates",
     ],
+    id: "shop",
     name: "Shop",
     planned: true,
-    price: "$79",
+    price: {
+      monthlyUsd: planPricingUsd.shop.monthly,
+      yearlyUsd: planPricingUsd.shop.yearly,
+    },
     priceNote: "per month planned",
   },
   {
@@ -90,9 +108,13 @@ export const publicPlans = [
       "30,000 follow-ups",
       "150 templates",
     ],
+    id: "growth",
     name: "Growth",
     planned: true,
-    price: "$149",
+    price: {
+      monthlyUsd: planPricingUsd.growth.monthly,
+      yearlyUsd: planPricingUsd.growth.yearly,
+    },
     priceNote: "per month planned",
   },
 ] satisfies PublicPlan[];

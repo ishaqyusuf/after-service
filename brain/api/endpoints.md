@@ -25,6 +25,7 @@ The API service also keeps `/trpc/*` as a legacy/local compatibility mount, but 
 
 `customers`
 - `list`: search/list active or archived customers.
+- `tags`: list distinct workspace customer tags for autocomplete.
 - `get`: fetch one workspace-scoped customer.
 - `create`: create customer with entitlement limit enforcement.
 - `update`: update customer fields.

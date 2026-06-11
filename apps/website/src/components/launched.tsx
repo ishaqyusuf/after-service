@@ -11,8 +11,13 @@ import { LandingHowItWorks } from "./landing/how-it-works";
 import { LandingMetrics } from "./landing/metrics";
 import { MobileLandingPrompts } from "./landing/mobile-landing-prompts";
 import { LandingPricing } from "./landing/pricing";
+import type { PricingResolution } from "@afterservice/plans";
 
-export function LaunchedPage() {
+type LaunchedPageProps = {
+  initialPricing: PricingResolution;
+};
+
+export function LaunchedPage({ initialPricing }: LaunchedPageProps) {
   return (
     <div className="fullscreen-landing relative min-h-screen bg-background text-foreground overflow-hidden flex flex-col justify-between transition-colors duration-300">
       {/* Subtle grid background */}
@@ -29,7 +34,7 @@ export function LaunchedPage() {
       <LandingMetrics />
       <LandingFeatures />
       <LandingHowItWorks />
-      <LandingPricing />
+      <LandingPricing initialPricing={initialPricing} />
       <LandingFAQ />
       <LandingCTA />
       <LandingFooter />

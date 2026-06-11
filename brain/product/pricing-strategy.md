@@ -61,3 +61,6 @@ Do not gate the main value too early. Customers, jobs, the board, and basic temp
 
 ## Pricing Principle
 Stay clearly below full field-service platforms. afterservice should feel like a focused post-job tool, not a half-sized Jobber or Housecall Pro.
+
+## Regional Currency Pricing
+Proposed on 2026-06-11: show local currency for supported regions while keeping Polar as the source of charged amounts. See `brain/product/regional-currency-pricing-plan.md`.

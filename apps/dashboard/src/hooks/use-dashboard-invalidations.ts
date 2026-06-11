@@ -10,6 +10,7 @@ export function useDashboardInvalidations() {
   return {
     customers: (id?: string) => {
       invalidateProcedure(queryClient, ["customers", "list"]);
+      invalidateProcedure(queryClient, ["customers", "tags"]);
       queryClient.invalidateQueries({
         queryKey: id
           ? trpc.customers.get.queryKey({ id })

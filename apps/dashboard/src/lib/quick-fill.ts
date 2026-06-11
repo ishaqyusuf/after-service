@@ -2,6 +2,7 @@
 
 import { faker } from "@faker-js/faker";
 import type { FieldValues, UseFormReturn } from "react-hook-form";
+import { SYSTEM_CUSTOMER_TAGS } from "@/lib/customer-tags";
 
 type QuickFillForm = Pick<UseFormReturn<FieldValues>, "setValue">;
 type QuickFillCustomer = {
@@ -14,17 +15,6 @@ export type QuickFillArgs = {
     customers?: QuickFillCustomer[];
   };
 };
-
-const customerTags = [
-  "vip",
-  "warranty",
-  "fleet",
-  "follow-up",
-  "repeat",
-  "priority",
-  "inspection",
-  "maintenance",
-];
 
 const serviceCategories = [
   "Brake inspection",
@@ -63,7 +53,7 @@ function fillCustomer(form: QuickFillForm, _args?: QuickFillArgs["customer"]) {
   const emailName = faker.helpers
     .slugify(`${firstName}.${lastName}`)
     .toLowerCase();
-  const tags = faker.helpers.arrayElements(customerTags, {
+  const tags = faker.helpers.arrayElements(SYSTEM_CUSTOMER_TAGS, {
     max: 3,
     min: 2,
   });
