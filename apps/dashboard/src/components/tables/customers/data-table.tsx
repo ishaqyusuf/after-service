@@ -17,6 +17,7 @@ import {
 import { VirtualRow } from "@/components/tables/core";
 import { useCustomerFilterParams } from "@/hooks/use-customer-filter-params";
 import { useCustomerParams } from "@/hooks/use-customer-params";
+import { useDashboardInvalidations } from "@/hooks/use-dashboard-invalidations";
 import { useInfiniteScroll } from "@/hooks/use-infinite-scroll";
 import { useScrollHeader } from "@/hooks/use-scroll-header";
 import { useSortParams } from "@/hooks/use-sort-params";
@@ -46,6 +47,7 @@ type CustomerRow = CustomersListPage["items"][number];
 
 export function DataTable({ initialSettings }: Props) {
   const trpc = useTRPC();
+  const invalidate = useDashboardInvalidations();
   const { setParams } = useCustomerParams();
   const { filter, hasFilters } = useCustomerFilterParams();
   const { params } = useSortParams();
@@ -83,13 +85,13 @@ export function DataTable({ initialSettings }: Props) {
     },
   );
 
-  const { data, fetchNextPage, hasNextPage, isFetchingNextPage, refetch } =
+  const { data, fetchNextPage, hasNextPage, isFetchingNextPage } =
     useSuspenseInfiniteQuery(infiniteQueryOptions);
 
   const archiveCustomerMutation = useMutation(
     trpc.customers.archive.mutationOptions({
-      onSuccess: () => {
-        refetch();
+      onSuccess: (_data, variables) => {
+        invalidate.customers(variables.id);
       },
     }),
   );

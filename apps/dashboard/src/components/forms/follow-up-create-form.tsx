@@ -26,13 +26,14 @@ import {
   FormLabel,
   FormMessage,
 } from "@afterservice/ui/form";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { format } from "date-fns";
 import { useMemo } from "react";
 import {
   followUpChannelLabels,
   followUpChannels,
 } from "@/hooks/use-follow-up-filter-params";
+import { useDashboardInvalidations } from "@/hooks/use-dashboard-invalidations";
 import { useFollowUpParams } from "@/hooks/use-follow-up-params";
 import { useZodForm } from "@/hooks/use-zod-form";
 import { useTRPC } from "@/trpc/client";
@@ -46,7 +47,7 @@ const EMPTY_OPTION_VALUE = "__empty__";
 
 export function FollowUpCreateForm() {
   const trpc = useTRPC();
-  const queryClient = useQueryClient();
+  const invalidate = useDashboardInvalidations();
   const { setParams } = useFollowUpParams();
 
   const { data: customersData, isLoading: isLoadingCustomers } = useQuery(
@@ -93,9 +94,7 @@ export function FollowUpCreateForm() {
   const createCustomerMutation = useMutation(
     trpc.customers.create.mutationOptions({
       onSuccess: ({ item }) => {
-        queryClient.invalidateQueries({
-          queryKey: trpc.customers.list.queryKey(),
-        });
+        invalidate.customers(item.id);
         form.setValue("customerId", item.id, {
           shouldDirty: true,
           shouldValidate: true,
@@ -106,12 +105,7 @@ export function FollowUpCreateForm() {
   const createFollowUpMutation = useMutation(
     trpc.followUps.create.mutationOptions({
       onSuccess: () => {
-        queryClient.invalidateQueries({
-          queryKey: trpc.followUps.listBoard.queryKey(),
-        });
-        queryClient.invalidateQueries({
-          queryKey: trpc.followUps.listTable.queryKey(),
-        });
+        invalidate.followUps();
         form.reset();
         setParams({ createFollowUp: null });
       },

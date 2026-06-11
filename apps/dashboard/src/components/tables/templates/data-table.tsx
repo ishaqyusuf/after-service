@@ -15,6 +15,7 @@ import {
   useRef,
 } from "react";
 import { VirtualRow } from "@/components/tables/core";
+import { useDashboardInvalidations } from "@/hooks/use-dashboard-invalidations";
 import { useInfiniteScroll } from "@/hooks/use-infinite-scroll";
 import { useScrollHeader } from "@/hooks/use-scroll-header";
 import { useSortParams } from "@/hooks/use-sort-params";
@@ -49,6 +50,7 @@ type TemplateRow = TemplatesListPage["items"][number];
 
 export function DataTable({ initialSettings }: Props) {
   const trpc = useTRPC();
+  const invalidate = useDashboardInvalidations();
   const { setParams } = useTemplateParams();
   const { filter, hasFilters } = useTemplateFilterParams();
   const { params } = useSortParams();
@@ -85,13 +87,13 @@ export function DataTable({ initialSettings }: Props) {
     },
   );
 
-  const { data, fetchNextPage, hasNextPage, isFetchingNextPage, refetch } =
+  const { data, fetchNextPage, hasNextPage, isFetchingNextPage } =
     useSuspenseInfiniteQuery(infiniteQueryOptions);
 
   const archiveTemplateMutation = useMutation(
     trpc.templates.archive.mutationOptions({
-      onSuccess: () => {
-        refetch();
+      onSuccess: (_data, variables) => {
+        invalidate.templates(variables.id);
       },
     }),
   );

@@ -21,7 +21,8 @@ import {
   FormLabel,
   FormMessage,
 } from "@afterservice/ui/form";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
+import { useDashboardInvalidations } from "@/hooks/use-dashboard-invalidations";
 import {
   templateChannelLabels,
   templateChannels,
@@ -37,7 +38,7 @@ const channelOptions = templateChannels.map((channel) => ({
 
 export function TemplateCreateForm() {
   const trpc = useTRPC();
-  const queryClient = useQueryClient();
+  const invalidate = useDashboardInvalidations();
   const { setParams } = useTemplateParams();
 
   const form = useZodForm({
@@ -54,9 +55,7 @@ export function TemplateCreateForm() {
   const createTemplateMutation = useMutation(
     trpc.templates.create.mutationOptions({
       onSuccess: () => {
-        queryClient.invalidateQueries({
-          queryKey: trpc.templates.list.queryKey(),
-        });
+        invalidate.templates();
         form.reset();
         setParams({ createTemplate: null });
       },

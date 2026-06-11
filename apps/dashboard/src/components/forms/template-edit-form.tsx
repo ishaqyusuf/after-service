@@ -22,9 +22,10 @@ import {
   FormLabel,
   FormMessage,
 } from "@afterservice/ui/form";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import type { inferRouterOutputs } from "@trpc/server";
 import { useEffect } from "react";
+import { useDashboardInvalidations } from "@/hooks/use-dashboard-invalidations";
 import {
   templateChannelLabels,
   templateChannels,
@@ -47,15 +48,10 @@ const channelOptions = templateChannels.map((channel) => ({
 export function TemplateEditForm({ template }: Props) {
   const trpc = useTRPC();
   const { setParams } = useTemplateParams();
-  const queryClient = useQueryClient();
+  const invalidate = useDashboardInvalidations();
 
   const handleSuccess = () => {
-    queryClient.invalidateQueries({
-      queryKey: trpc.templates.list.queryKey(),
-    });
-    queryClient.invalidateQueries({
-      queryKey: trpc.templates.get.queryKey({ id: template.id }),
-    });
+    invalidate.templates(template.id);
     setParams(null);
   };
 

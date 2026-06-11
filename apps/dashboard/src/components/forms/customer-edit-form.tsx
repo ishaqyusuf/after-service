@@ -11,10 +11,11 @@ import {
   FormLabel,
   FormMessage,
 } from "@afterservice/ui/form";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import type { inferRouterOutputs } from "@trpc/server";
 import { useEffect } from "react";
 import { useCustomerParams } from "@/hooks/use-customer-params";
+import { useDashboardInvalidations } from "@/hooks/use-dashboard-invalidations";
 import { useZodForm } from "@/hooks/use-zod-form";
 import { useTRPC } from "@/trpc/client";
 
@@ -27,15 +28,10 @@ type Props = {
 export function CustomerEditForm({ customer }: Props) {
   const trpc = useTRPC();
   const { setParams } = useCustomerParams();
-  const queryClient = useQueryClient();
+  const invalidate = useDashboardInvalidations();
 
   const handleSuccess = () => {
-    queryClient.invalidateQueries({
-      queryKey: trpc.customers.list.queryKey(),
-    });
-    queryClient.invalidateQueries({
-      queryKey: trpc.customers.get.queryKey({ id: customer.id }),
-    });
+    invalidate.customers(customer.id);
     setParams(null);
   };
 

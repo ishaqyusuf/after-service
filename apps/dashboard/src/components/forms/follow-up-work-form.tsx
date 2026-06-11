@@ -20,11 +20,12 @@ import {
   FormLabel,
   FormMessage,
 } from "@afterservice/ui/form";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import type { inferRouterOutputs } from "@trpc/server";
 import { format } from "date-fns";
 import { useEffect } from "react";
 import { z } from "zod";
+import { useDashboardInvalidations } from "@/hooks/use-dashboard-invalidations";
 import { useFollowUpParams } from "@/hooks/use-follow-up-params";
 import { useZodForm } from "@/hooks/use-zod-form";
 import { resolveTemplate } from "@/lib/dashboard-format";
@@ -61,18 +62,10 @@ const closeSchema = z.object({
 export function FollowUpWorkForm({ followUp }: Props) {
   const trpc = useTRPC();
   const { setParams } = useFollowUpParams();
-  const queryClient = useQueryClient();
+  const invalidate = useDashboardInvalidations();
 
   const handleSuccess = () => {
-    queryClient.invalidateQueries({
-      queryKey: trpc.followUps.listBoard.queryKey(),
-    });
-    queryClient.invalidateQueries({
-      queryKey: trpc.followUps.listTable.queryKey(),
-    });
-    queryClient.invalidateQueries({
-      queryKey: trpc.followUps.get.queryKey({ id: followUp.id }),
-    });
+    invalidate.followUps(followUp.id);
     setParams(null);
   };
 

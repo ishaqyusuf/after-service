@@ -15,6 +15,7 @@ import {
   useRef,
 } from "react";
 import { VirtualRow } from "@/components/tables/core";
+import { useDashboardInvalidations } from "@/hooks/use-dashboard-invalidations";
 import {
   toFollowUpChannel,
   toFollowUpStatus,
@@ -51,6 +52,7 @@ type FollowUpRow = FollowUpsListPage["items"][number];
 
 export function DataTable({ initialSettings }: Props) {
   const trpc = useTRPC();
+  const invalidate = useDashboardInvalidations();
   const { setParams } = useFollowUpParams();
   const { filter, hasFilters } = useFollowUpFilterParams();
   const { params } = useSortParams();
@@ -92,13 +94,13 @@ export function DataTable({ initialSettings }: Props) {
     },
   );
 
-  const { data, fetchNextPage, hasNextPage, isFetchingNextPage, refetch } =
+  const { data, fetchNextPage, hasNextPage, isFetchingNextPage } =
     useSuspenseInfiniteQuery(infiniteQueryOptions);
 
   const closeFollowUpMutation = useMutation(
     trpc.followUps.close.mutationOptions({
-      onSuccess: () => {
-        refetch();
+      onSuccess: (_data, variables) => {
+        invalidate.followUps(variables.id);
       },
     }),
   );

@@ -24,11 +24,12 @@ import {
   FormLabel,
   FormMessage,
 } from "@afterservice/ui/form";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import type { inferRouterOutputs } from "@trpc/server";
 import { format } from "date-fns";
 import { useEffect } from "react";
 import { z } from "zod";
+import { useDashboardInvalidations } from "@/hooks/use-dashboard-invalidations";
 import {
   followUpChannelLabels,
   followUpChannels,
@@ -63,19 +64,12 @@ const EMPTY_OPTION_VALUE = "__empty__";
 
 export function ScheduleFollowUpForm({ job, templates, onSuccess }: Props) {
   const trpc = useTRPC();
-  const queryClient = useQueryClient();
+  const invalidate = useDashboardInvalidations();
   const createFollowUp = useMutation(
     trpc.serviceJobs.createFollowUp.mutationOptions({
       onSuccess: () => {
-        queryClient.invalidateQueries({
-          queryKey: trpc.serviceJobs.list.queryKey(),
-        });
-        queryClient.invalidateQueries({
-          queryKey: trpc.followUps.listTable.queryKey(),
-        });
-        queryClient.invalidateQueries({
-          queryKey: trpc.followUps.listBoard.queryKey(),
-        });
+        invalidate.serviceJobs(job.id);
+        invalidate.followUps();
         onSuccess();
       },
     }),

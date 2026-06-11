@@ -10,15 +10,16 @@ import {
   FormLabel,
   FormMessage,
 } from "@afterservice/ui/form";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import { QuickFill } from "@/components/quick-fill";
 import { useCustomerParams } from "@/hooks/use-customer-params";
+import { useDashboardInvalidations } from "@/hooks/use-dashboard-invalidations";
 import { useZodForm } from "@/hooks/use-zod-form";
 import { useTRPC } from "@/trpc/client";
 
 export function CustomerCreateForm() {
   const trpc = useTRPC();
-  const queryClient = useQueryClient();
+  const invalidate = useDashboardInvalidations();
   const { setParams } = useCustomerParams();
 
   const form = useZodForm({
@@ -36,9 +37,7 @@ export function CustomerCreateForm() {
   const createCustomerMutation = useMutation(
     trpc.customers.create.mutationOptions({
       onSuccess: () => {
-        queryClient.invalidateQueries({
-          queryKey: trpc.customers.list.queryKey(),
-        });
+        invalidate.customers();
         form.reset();
         setParams({ createCustomer: null });
       },

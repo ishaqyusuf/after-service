@@ -22,18 +22,19 @@ import {
   FormLabel,
   FormMessage,
 } from "@afterservice/ui/form";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { format } from "date-fns";
 import { useMemo } from "react";
 import type { z } from "zod";
 import { QuickFill } from "@/components/quick-fill";
+import { useDashboardInvalidations } from "@/hooks/use-dashboard-invalidations";
 import { useJobParams } from "@/hooks/use-job-params";
 import { useZodForm } from "@/hooks/use-zod-form";
 import { useTRPC } from "@/trpc/client";
 
 export function JobCreateForm() {
   const trpc = useTRPC();
-  const queryClient = useQueryClient();
+  const invalidate = useDashboardInvalidations();
   const { setParams } = useJobParams();
 
   const { data: customersData, isLoading: isLoadingCustomers } = useQuery(
@@ -82,9 +83,7 @@ export function JobCreateForm() {
   const createCustomerMutation = useMutation(
     trpc.customers.create.mutationOptions({
       onSuccess: ({ item }) => {
-        queryClient.invalidateQueries({
-          queryKey: trpc.customers.list.queryKey(),
-        });
+        invalidate.customers(item.id);
         form.setValue("customerId", item.id, {
           shouldDirty: true,
           shouldValidate: true,
@@ -95,9 +94,7 @@ export function JobCreateForm() {
   const createJobMutation = useMutation(
     trpc.serviceJobs.create.mutationOptions({
       onSuccess: () => {
-        queryClient.invalidateQueries({
-          queryKey: trpc.serviceJobs.list.queryKey(),
-        });
+        invalidate.serviceJobs();
         form.reset();
         setParams({ createJob: null });
       },
