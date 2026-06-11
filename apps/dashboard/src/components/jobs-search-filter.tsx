@@ -14,30 +14,36 @@ import {
 } from "@afterservice/ui/dropdown-menu";
 import { Icons } from "@afterservice/ui/icons";
 import { Input } from "@afterservice/ui/input";
+import { useQuery } from "@tanstack/react-query";
 import { useMemo, useRef, useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
-import { trpc } from "@/components/providers/trpc-provider";
 import {
-  serviceJobStatusLabels,
   serviceJobStatuses,
+  serviceJobStatusLabels,
   toServiceJobStatus,
   useJobFilterParams,
 } from "@/hooks/use-job-filter-params";
+import { useTRPC } from "@/trpc/client";
 import { DateRangeFilter } from "./date-range-filter";
 import { FilterList, FilterMenuEmptyState } from "./filter-list";
 
 export function JobsSearchFilter() {
+  const trpc = useTRPC();
   const { filter, setFilter } = useJobFilterParams();
   const [input, setInput] = useState(filter.q ?? "");
   const inputRef = useRef<HTMLInputElement>(null);
   const [isOpen, setIsOpen] = useState(false);
 
-  const { data: customersData } = trpc.customers.list.useQuery({
-    includeArchived: false,
-    limit: 100,
-  });
+  const { data: customersData } = useQuery(
+    trpc.customers.list.queryOptions({
+      includeArchived: false,
+      limit: 100,
+    }),
+  );
   const customers = customersData?.items ?? [];
-  const { data: jobsData } = trpc.serviceJobs.list.useQuery({ limit: 100 });
+  const { data: jobsData } = useQuery(
+    trpc.serviceJobs.list.queryOptions({ limit: 100 }),
+  );
   const allowedStatuses = serviceJobStatuses.map((status) => ({
     id: status,
     name: serviceJobStatusLabels[status],

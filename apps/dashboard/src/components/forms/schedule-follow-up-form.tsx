@@ -24,19 +24,21 @@ import {
   FormLabel,
   FormMessage,
 } from "@afterservice/ui/form";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import type { inferRouterOutputs } from "@trpc/server";
 import { format } from "date-fns";
 import { useEffect } from "react";
 import { z } from "zod";
-import { trpc } from "@/components/providers/trpc-provider";
 import {
   followUpChannelLabels,
   followUpChannels,
 } from "@/hooks/use-follow-up-filter-params";
 import { useZodForm } from "@/hooks/use-zod-form";
+import { useTRPC } from "@/trpc/client";
 
 type ServiceJob = inferRouterOutputs<AppRouter>["serviceJobs"]["get"]["item"];
-type Template = inferRouterOutputs<AppRouter>["templates"]["list"]["items"][number];
+type Template =
+  inferRouterOutputs<AppRouter>["templates"]["list"]["items"][number];
 
 type Props = {
   job: ServiceJob;
@@ -60,15 +62,24 @@ const channelOptions = followUpChannels.map((channel) => ({
 const EMPTY_OPTION_VALUE = "__empty__";
 
 export function ScheduleFollowUpForm({ job, templates, onSuccess }: Props) {
-  const utils = trpc.useUtils();
-  const createFollowUp = trpc.serviceJobs.createFollowUp.useMutation({
-    onSuccess: () => {
-      utils.serviceJobs.list.invalidate();
-      utils.followUps.listTable.invalidate();
-      utils.followUps.listBoard.invalidate();
-      onSuccess();
-    },
-  });
+  const trpc = useTRPC();
+  const queryClient = useQueryClient();
+  const createFollowUp = useMutation(
+    trpc.serviceJobs.createFollowUp.mutationOptions({
+      onSuccess: () => {
+        queryClient.invalidateQueries({
+          queryKey: trpc.serviceJobs.list.queryKey(),
+        });
+        queryClient.invalidateQueries({
+          queryKey: trpc.followUps.listTable.queryKey(),
+        });
+        queryClient.invalidateQueries({
+          queryKey: trpc.followUps.listBoard.queryKey(),
+        });
+        onSuccess();
+      },
+    }),
+  );
 
   const form = useZodForm({
     schema: scheduleFollowUpSchema,
@@ -170,7 +181,9 @@ export function ScheduleFollowUpForm({ job, templates, onSuccess }: Props) {
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
-                  <SelectItem value={EMPTY_OPTION_VALUE}>No template</SelectItem>
+                  <SelectItem value={EMPTY_OPTION_VALUE}>
+                    No template
+                  </SelectItem>
                   {templates.map((template) => (
                     <SelectItem key={template.id} value={template.id}>
                       {template.name}

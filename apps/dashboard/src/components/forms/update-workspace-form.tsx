@@ -15,9 +15,9 @@ import {
   Select,
   SelectContent,
   SelectItem,
-  Skeleton,
   SelectTrigger,
   SelectValue,
+  Skeleton,
 } from "@afterservice/ui";
 import {
   Form,
@@ -28,8 +28,8 @@ import {
   FormLabel,
   FormMessage,
 } from "@afterservice/ui/form";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useMemo } from "react";
-import { trpc } from "@/components/providers/trpc-provider";
 import { useZodForm } from "@/hooks/use-zod-form";
 import {
   BUSINESS_TYPE_SUGGESTIONS,
@@ -39,6 +39,7 @@ import {
   SERVICE_CATEGORY_SUGGESTIONS_BY_BUSINESS_TYPE,
   toCustomSuggestion,
 } from "@/lib/onboarding-suggestions";
+import { useTRPC } from "@/trpc/client";
 
 const followUpDelayOptions = [
   { label: "3 days", value: "3" },
@@ -47,21 +48,29 @@ const followUpDelayOptions = [
   { label: "30 days", value: "30" },
 ] as const;
 
+const workspaceSettingsSkeletons = ["name", "business", "service"];
+
 export function UpdateWorkspaceForm() {
-  const { data: workspaceData, isLoading } =
-    trpc.workspace.getCurrent.useQuery();
-  const utils = trpc.useUtils();
+  const trpc = useTRPC();
+  const queryClient = useQueryClient();
+  const { data: workspaceData, isLoading } = useQuery(
+    trpc.workspace.getCurrent.queryOptions(),
+  );
   const track = useTrack();
 
-  const updateMutation = trpc.workspace.updateSettings.useMutation({
-    onSuccess: () => {
-      utils.workspace.getCurrent.invalidate();
-      track({
-        event: LogEvents.WorkspaceUpdated.name,
-        channel: LogEvents.WorkspaceUpdated.channel,
-      });
-    },
-  });
+  const updateMutation = useMutation(
+    trpc.workspace.updateSettings.mutationOptions({
+      onSuccess: () => {
+        queryClient.invalidateQueries({
+          queryKey: trpc.workspace.getCurrent.queryKey(),
+        });
+        track({
+          event: LogEvents.WorkspaceUpdated.name,
+          channel: LogEvents.WorkspaceUpdated.channel,
+        });
+      },
+    }),
+  );
 
   const form = useZodForm({
     schema: updateWorkspaceSettingsSchema,
@@ -270,8 +279,8 @@ function WorkspaceSettingsSkeleton() {
 
       <CardContent className="space-y-8">
         <section className="space-y-4 border-b border-border pb-8">
-          {Array.from({ length: 3 }).map((_, index) => (
-            <div key={index} className="space-y-2">
+          {workspaceSettingsSkeletons.map((item) => (
+            <div key={item} className="space-y-2">
               <Skeleton className="h-4 w-32" />
               <Skeleton className="h-9 w-full" />
             </div>

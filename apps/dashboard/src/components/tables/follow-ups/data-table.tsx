@@ -3,7 +3,7 @@
 import type { AppRouter } from "@afterservice/api/router";
 import { Table, TableBody, TableCell, TableRow } from "@afterservice/ui/table";
 import { closestCenter, DndContext } from "@dnd-kit/core";
-import { useSuspenseInfiniteQuery } from "@tanstack/react-query";
+import { useMutation, useSuspenseInfiniteQuery } from "@tanstack/react-query";
 import { getCoreRowModel, useReactTable } from "@tanstack/react-table";
 import { useVirtualizer, type VirtualItem } from "@tanstack/react-virtual";
 import type { inferRouterOutputs } from "@trpc/server";
@@ -14,7 +14,6 @@ import {
   useMemo,
   useRef,
 } from "react";
-import { trpc } from "@/components/providers/trpc-provider";
 import { VirtualRow } from "@/components/tables/core";
 import {
   toFollowUpChannel,
@@ -30,6 +29,7 @@ import { useTableDnd } from "@/hooks/use-table-dnd";
 import { useTableScroll } from "@/hooks/use-table-scroll";
 import { useTableSettings } from "@/hooks/use-table-settings";
 import { useFollowUpsStore } from "@/store/follow-ups";
+import { useTRPC } from "@/trpc/client";
 import { STICKY_COLUMNS, SUMMARY_GRID_HEIGHTS } from "@/utils/table-configs";
 import { getColumnIds, type TableSettings } from "@/utils/table-settings";
 import { columns } from "./columns";
@@ -50,6 +50,7 @@ type FollowUpsListPage =
 type FollowUpRow = FollowUpsListPage["items"][number];
 
 export function DataTable({ initialSettings }: Props) {
+  const trpc = useTRPC();
   const { setParams } = useFollowUpParams();
   const { filter, hasFilters } = useFollowUpFilterParams();
   const { params } = useSortParams();
@@ -94,11 +95,13 @@ export function DataTable({ initialSettings }: Props) {
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage, refetch } =
     useSuspenseInfiniteQuery(infiniteQueryOptions);
 
-  const closeFollowUpMutation = trpc.followUps.close.useMutation({
-    onSuccess: () => {
-      refetch();
-    },
-  });
+  const closeFollowUpMutation = useMutation(
+    trpc.followUps.close.mutationOptions({
+      onSuccess: () => {
+        refetch();
+      },
+    }),
+  );
 
   const handleCloseFollowUp = useCallback(
     (id: string) => {

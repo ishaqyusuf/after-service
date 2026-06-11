@@ -11,11 +11,12 @@ import {
   FormLabel,
   FormMessage,
 } from "@afterservice/ui/form";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import type { inferRouterOutputs } from "@trpc/server";
 import { useEffect } from "react";
-import { trpc } from "@/components/providers/trpc-provider";
 import { useCustomerParams } from "@/hooks/use-customer-params";
 import { useZodForm } from "@/hooks/use-zod-form";
+import { useTRPC } from "@/trpc/client";
 
 type Customer = inferRouterOutputs<AppRouter>["customers"]["get"]["item"];
 
@@ -24,22 +25,31 @@ type Props = {
 };
 
 export function CustomerEditForm({ customer }: Props) {
+  const trpc = useTRPC();
   const { setParams } = useCustomerParams();
-  const utils = trpc.useUtils();
+  const queryClient = useQueryClient();
 
   const handleSuccess = () => {
-    utils.customers.list.invalidate();
-    utils.customers.get.invalidate({ id: customer.id });
+    queryClient.invalidateQueries({
+      queryKey: trpc.customers.list.queryKey(),
+    });
+    queryClient.invalidateQueries({
+      queryKey: trpc.customers.get.queryKey({ id: customer.id }),
+    });
     setParams(null);
   };
 
-  const updateCustomer = trpc.customers.update.useMutation({
-    onSuccess: handleSuccess,
-  });
+  const updateCustomer = useMutation(
+    trpc.customers.update.mutationOptions({
+      onSuccess: handleSuccess,
+    }),
+  );
 
-  const archiveCustomer = trpc.customers.archive.useMutation({
-    onSuccess: handleSuccess,
-  });
+  const archiveCustomer = useMutation(
+    trpc.customers.archive.mutationOptions({
+      onSuccess: handleSuccess,
+    }),
+  );
 
   const form = useZodForm({
     schema: updateCustomerSchema,

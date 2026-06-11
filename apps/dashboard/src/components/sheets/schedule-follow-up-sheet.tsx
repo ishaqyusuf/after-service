@@ -1,27 +1,26 @@
 "use client";
 
 import { Sheet } from "@afterservice/ui";
-import { ScheduleFollowUpForm } from "@/components/forms/schedule-follow-up-form";
-import { trpc } from "@/components/providers/trpc-provider";
+import { useQuery } from "@tanstack/react-query";
 import { useQueryState } from "nuqs";
+import { ScheduleFollowUpForm } from "@/components/forms/schedule-follow-up-form";
+import { useTRPC } from "@/trpc/client";
 import { DashboardSheetContent } from "./dashboard-sheet-content";
 import { SheetFormSkeleton } from "./sheet-form-skeleton";
 import { SheetMissingState } from "./sheet-missing-state";
 
 export function ScheduleFollowUpSheet() {
+  const trpc = useTRPC();
   const [jobId, setJobId] = useQueryState("schedule_follow_up");
+  const jobQueryId = jobId ?? "";
 
-  const { data: jobData, isLoading: isLoadingJob } =
-    trpc.serviceJobs.get.useQuery(
-      { id: jobId! },
-      { enabled: !!jobId },
-    );
+  const { data: jobData, isLoading: isLoadingJob } = useQuery(
+    trpc.serviceJobs.get.queryOptions({ id: jobQueryId }, { enabled: !!jobId }),
+  );
 
-  const { data: templatesData, isLoading: isLoadingTemplates } =
-    trpc.templates.list.useQuery(
-      { limit: 100 },
-      { enabled: !!jobId },
-    );
+  const { data: templatesData, isLoading: isLoadingTemplates } = useQuery(
+    trpc.templates.list.queryOptions({ limit: 100 }, { enabled: !!jobId }),
+  );
 
   const handleOpenChange = (open: boolean) => {
     if (!open) setJobId(null);

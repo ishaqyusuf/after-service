@@ -22,21 +22,30 @@ import {
   FormLabel,
   FormMessage,
 } from "@afterservice/ui/form";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { format } from "date-fns";
 import { useMemo } from "react";
 import type { z } from "zod";
-import { trpc } from "@/components/providers/trpc-provider";
 import { QuickFill } from "@/components/quick-fill";
 import { useJobParams } from "@/hooks/use-job-params";
 import { useZodForm } from "@/hooks/use-zod-form";
+import { useTRPC } from "@/trpc/client";
 
 export function JobCreateForm() {
+  const trpc = useTRPC();
+  const queryClient = useQueryClient();
   const { setParams } = useJobParams();
 
-  const { data: customersData, isLoading: isLoadingCustomers } =
-    trpc.customers.list.useQuery({ includeArchived: false, limit: 100 });
+  const { data: customersData, isLoading: isLoadingCustomers } = useQuery(
+    trpc.customers.list.queryOptions({
+      includeArchived: false,
+      limit: 100,
+    }),
+  );
   const customers = customersData?.items ?? [];
-  const { data: jobsData } = trpc.serviceJobs.list.useQuery({ limit: 100 });
+  const { data: jobsData } = useQuery(
+    trpc.serviceJobs.list.queryOptions({ limit: 100 }),
+  );
   const jobs = jobsData?.items ?? [];
 
   const customerItems = useMemo(
@@ -70,23 +79,30 @@ export function JobCreateForm() {
   });
   const selectedCustomerId = form.watch("customerId");
 
-  const utils = trpc.useUtils();
-  const createCustomerMutation = trpc.customers.create.useMutation({
-    onSuccess: ({ item }) => {
-      utils.customers.list.invalidate();
-      form.setValue("customerId", item.id, {
-        shouldDirty: true,
-        shouldValidate: true,
-      });
-    },
-  });
-  const createJobMutation = trpc.serviceJobs.create.useMutation({
-    onSuccess: () => {
-      utils.serviceJobs.list.invalidate();
-      form.reset();
-      setParams({ createJob: null });
-    },
-  });
+  const createCustomerMutation = useMutation(
+    trpc.customers.create.mutationOptions({
+      onSuccess: ({ item }) => {
+        queryClient.invalidateQueries({
+          queryKey: trpc.customers.list.queryKey(),
+        });
+        form.setValue("customerId", item.id, {
+          shouldDirty: true,
+          shouldValidate: true,
+        });
+      },
+    }),
+  );
+  const createJobMutation = useMutation(
+    trpc.serviceJobs.create.mutationOptions({
+      onSuccess: () => {
+        queryClient.invalidateQueries({
+          queryKey: trpc.serviceJobs.list.queryKey(),
+        });
+        form.reset();
+        setParams({ createJob: null });
+      },
+    }),
+  );
 
   const onSubmit = (data: z.infer<typeof createJobSchema>) => {
     createJobMutation.mutate({

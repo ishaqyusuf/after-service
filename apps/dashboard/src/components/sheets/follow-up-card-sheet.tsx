@@ -1,19 +1,24 @@
 "use client";
 
 import { Sheet } from "@afterservice/ui";
+import { useQuery } from "@tanstack/react-query";
 import { FollowUpWorkForm } from "@/components/forms/follow-up-work-form";
-import { trpc } from "@/components/providers/trpc-provider";
 import { useFollowUpParams } from "@/hooks/use-follow-up-params";
+import { useTRPC } from "@/trpc/client";
 import { DashboardSheetContent } from "./dashboard-sheet-content";
 import { SheetFormSkeleton } from "./sheet-form-skeleton";
 import { SheetMissingState } from "./sheet-missing-state";
 
 export function FollowUpCardSheet() {
+  const trpc = useTRPC();
   const { followUpId, setParams } = useFollowUpParams();
+  const followUpQueryId = followUpId ?? "";
 
-  const { data: followUpData, isLoading } = trpc.followUps.get.useQuery(
-    { id: followUpId! },
-    { enabled: !!followUpId },
+  const { data: followUpData, isLoading } = useQuery(
+    trpc.followUps.get.queryOptions(
+      { id: followUpQueryId },
+      { enabled: !!followUpId },
+    ),
   );
 
   const handleOpenChange = (open: boolean) => {

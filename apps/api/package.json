@@ -4,6 +4,7 @@
   "type": "module",
   "exports": {
     "./context": "./src/context.ts",
+    "./internal-api": "./src/internal-api.ts",
     "./router": "./src/routers/_app.ts",
     "./schemas": "./src/schemas/index.ts"
   },

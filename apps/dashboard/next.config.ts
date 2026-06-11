@@ -1,3 +1,4 @@
+import { withSentryConfig } from "@sentry/nextjs";
 import type { NextConfig } from "next";
 
 const apiBaseUrl =
@@ -19,4 +20,21 @@ const nextConfig: NextConfig = {
   },
 };
 
-export default nextConfig;
+const isProduction = process.env.NODE_ENV === "production";
+const sentryRelease =
+  process.env.SENTRY_RELEASE || process.env.GIT_COMMIT_SHA || undefined;
+
+export default isProduction
+  ? withSentryConfig(nextConfig, {
+      org: process.env.SENTRY_ORG,
+      project: process.env.SENTRY_PROJECT,
+      authToken: process.env.SENTRY_AUTH_TOKEN,
+      telemetry: false,
+      silent: !process.env.CI,
+      widenClientFileUpload: true,
+      ...(sentryRelease ? { release: { name: sentryRelease } } : {}),
+      sourcemaps: {
+        deleteSourcemapsAfterUpload: true,
+      },
+    })
+  : nextConfig;

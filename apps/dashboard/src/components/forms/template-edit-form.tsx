@@ -22,15 +22,16 @@ import {
   FormLabel,
   FormMessage,
 } from "@afterservice/ui/form";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import type { inferRouterOutputs } from "@trpc/server";
 import { useEffect } from "react";
-import { trpc } from "@/components/providers/trpc-provider";
 import {
   templateChannelLabels,
   templateChannels,
 } from "@/hooks/use-template-filter-params";
 import { useTemplateParams } from "@/hooks/use-template-params";
 import { useZodForm } from "@/hooks/use-zod-form";
+import { useTRPC } from "@/trpc/client";
 
 type Template = inferRouterOutputs<AppRouter>["templates"]["get"]["item"];
 
@@ -44,21 +45,30 @@ const channelOptions = templateChannels.map((channel) => ({
 }));
 
 export function TemplateEditForm({ template }: Props) {
+  const trpc = useTRPC();
   const { setParams } = useTemplateParams();
-  const utils = trpc.useUtils();
+  const queryClient = useQueryClient();
 
   const handleSuccess = () => {
-    utils.templates.list.invalidate();
-    utils.templates.get.invalidate({ id: template.id });
+    queryClient.invalidateQueries({
+      queryKey: trpc.templates.list.queryKey(),
+    });
+    queryClient.invalidateQueries({
+      queryKey: trpc.templates.get.queryKey({ id: template.id }),
+    });
     setParams(null);
   };
 
-  const updateMutation = trpc.templates.update.useMutation({
-    onSuccess: handleSuccess,
-  });
-  const archiveMutation = trpc.templates.archive.useMutation({
-    onSuccess: handleSuccess,
-  });
+  const updateMutation = useMutation(
+    trpc.templates.update.mutationOptions({
+      onSuccess: handleSuccess,
+    }),
+  );
+  const archiveMutation = useMutation(
+    trpc.templates.archive.mutationOptions({
+      onSuccess: handleSuccess,
+    }),
+  );
 
   const form = useZodForm({
     schema: updateTemplateSchema,

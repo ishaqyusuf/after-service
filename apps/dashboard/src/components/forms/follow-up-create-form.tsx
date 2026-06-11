@@ -26,15 +26,16 @@ import {
   FormLabel,
   FormMessage,
 } from "@afterservice/ui/form";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { format } from "date-fns";
 import { useMemo } from "react";
-import { trpc } from "@/components/providers/trpc-provider";
 import {
   followUpChannelLabels,
   followUpChannels,
 } from "@/hooks/use-follow-up-filter-params";
 import { useFollowUpParams } from "@/hooks/use-follow-up-params";
 import { useZodForm } from "@/hooks/use-zod-form";
+import { useTRPC } from "@/trpc/client";
 
 const channelOptions = followUpChannels.map((channel) => ({
   label: followUpChannelLabels[channel],
@@ -44,14 +45,22 @@ const channelOptions = followUpChannels.map((channel) => ({
 const EMPTY_OPTION_VALUE = "__empty__";
 
 export function FollowUpCreateForm() {
+  const trpc = useTRPC();
+  const queryClient = useQueryClient();
   const { setParams } = useFollowUpParams();
 
-  const { data: customersData, isLoading: isLoadingCustomers } =
-    trpc.customers.list.useQuery({ includeArchived: false, limit: 100 });
-  const { data: jobsData, isLoading: isLoadingJobs } =
-    trpc.serviceJobs.list.useQuery({ limit: 100 });
-  const { data: templatesData, isLoading: isLoadingTemplates } =
-    trpc.templates.list.useQuery({ limit: 100 });
+  const { data: customersData, isLoading: isLoadingCustomers } = useQuery(
+    trpc.customers.list.queryOptions({
+      includeArchived: false,
+      limit: 100,
+    }),
+  );
+  const { data: jobsData, isLoading: isLoadingJobs } = useQuery(
+    trpc.serviceJobs.list.queryOptions({ limit: 100 }),
+  );
+  const { data: templatesData, isLoading: isLoadingTemplates } = useQuery(
+    trpc.templates.list.queryOptions({ limit: 100 }),
+  );
 
   const customers = customersData?.items ?? [];
   const jobs = jobsData?.items ?? [];
@@ -81,24 +90,33 @@ export function FollowUpCreateForm() {
   });
   const selectedCustomerId = form.watch("customerId");
 
-  const utils = trpc.useUtils();
-  const createCustomerMutation = trpc.customers.create.useMutation({
-    onSuccess: ({ item }) => {
-      utils.customers.list.invalidate();
-      form.setValue("customerId", item.id, {
-        shouldDirty: true,
-        shouldValidate: true,
-      });
-    },
-  });
-  const createFollowUpMutation = trpc.followUps.create.useMutation({
-    onSuccess: () => {
-      utils.followUps.listBoard.invalidate();
-      utils.followUps.listTable.invalidate();
-      form.reset();
-      setParams({ createFollowUp: null });
-    },
-  });
+  const createCustomerMutation = useMutation(
+    trpc.customers.create.mutationOptions({
+      onSuccess: ({ item }) => {
+        queryClient.invalidateQueries({
+          queryKey: trpc.customers.list.queryKey(),
+        });
+        form.setValue("customerId", item.id, {
+          shouldDirty: true,
+          shouldValidate: true,
+        });
+      },
+    }),
+  );
+  const createFollowUpMutation = useMutation(
+    trpc.followUps.create.mutationOptions({
+      onSuccess: () => {
+        queryClient.invalidateQueries({
+          queryKey: trpc.followUps.listBoard.queryKey(),
+        });
+        queryClient.invalidateQueries({
+          queryKey: trpc.followUps.listTable.queryKey(),
+        });
+        form.reset();
+        setParams({ createFollowUp: null });
+      },
+    }),
+  );
 
   return (
     <Form {...form}>

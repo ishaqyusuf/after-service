@@ -1,19 +1,24 @@
 "use client";
 
 import { Sheet } from "@afterservice/ui";
+import { useQuery } from "@tanstack/react-query";
 import { TemplateEditForm } from "@/components/forms/template-edit-form";
-import { trpc } from "@/components/providers/trpc-provider";
 import { useTemplateParams } from "@/hooks/use-template-params";
+import { useTRPC } from "@/trpc/client";
 import { DashboardSheetContent } from "./dashboard-sheet-content";
 import { SheetFormSkeleton } from "./sheet-form-skeleton";
 import { SheetMissingState } from "./sheet-missing-state";
 
 export function TemplateSheet() {
+  const trpc = useTRPC();
   const { templateId, setParams } = useTemplateParams();
+  const templateQueryId = templateId ?? "";
 
-  const { data: templateData, isLoading } = trpc.templates.get.useQuery(
-    { id: templateId! },
-    { enabled: !!templateId },
+  const { data: templateData, isLoading } = useQuery(
+    trpc.templates.get.queryOptions(
+      { id: templateQueryId },
+      { enabled: !!templateId },
+    ),
   );
 
   const handleOpenChange = (open: boolean) => {

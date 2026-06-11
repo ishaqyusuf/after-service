@@ -6,9 +6,9 @@ import { Hedvig_Letters_Sans, Hedvig_Letters_Serif } from "next/font/google";
 import type { ReactNode } from "react";
 import "@afterservice/ui/globals.css";
 import { GlobalModalsProvider } from "@/components/modals/global-modals-provider";
-import { TRPCProvider } from "@/components/providers/trpc-provider";
 import { GlobalSheetsProvider } from "@/components/sheets/global-sheets-provider";
 import { ThemeProvider } from "@/components/theme-provider";
+import { TRPCReactProvider } from "@/trpc/client";
 
 export const metadata: Metadata = {
   description: "The afterservice operator dashboard.",
@@ -53,12 +53,12 @@ export default function RootLayout({ children }: { children: ReactNode }) {
           enableSystem
           disableTransitionOnChange
         >
-          <TRPCProvider>
+          <TRPCReactProvider>
             <GlobalSheetsProvider />
             <GlobalModalsProvider />
             <OpenPanelProvider />
             {children}
-          </TRPCProvider>
+          </TRPCReactProvider>
         </ThemeProvider>
       </body>
     </html>

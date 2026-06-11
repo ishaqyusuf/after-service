@@ -82,7 +82,7 @@ signature/idempotency behavior.
 - Public API: `https://dashboard.afterservice.app/api`
 - Lemon webhook: `https://dashboard.afterservice.app/api/webhooks/lemon-squeezy`
 - Follow-up cron job: `POST https://dashboard.afterservice.app/api/jobs/follow-ups/dry-run` with `CRON_SECRET`
-- Observability: retain platform logs, configure `SENTRY_DSN`, and alert on API 5xxs, webhook failures, cron failures, and database connection saturation.
+- Observability: retain platform logs, configure `NEXT_PUBLIC_SENTRY_DSN`, and alert on API 5xxs, webhook failures, cron failures, and database connection saturation.
 
 ### Trigger.dev Jobs
 

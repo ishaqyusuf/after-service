@@ -59,7 +59,7 @@ The dashboard proxy only checked `better-auth.session_token` and `afterservice.s
 - `LEMONSQUEEZY_WEBHOOK_SECRET`
 - Lemon variant IDs for Starter, Growth, and Pro.
 - `CRON_SECRET`
-- `SENTRY_DSN` or chosen observability keys.
+- `NEXT_PUBLIC_SENTRY_DSN` or chosen observability keys.
 
 ## Deployment Notes
 - Website domain: `afterservice.app`.
@@ -67,7 +67,7 @@ The dashboard proxy only checked `better-auth.session_token` and `afterservice.s
 - Public API base: `dashboard.afterservice.app/api`.
 - Lemon webhook target: `https://dashboard.afterservice.app/api/webhooks/lemon-squeezy`.
 - Cron follow-up job target: `https://dashboard.afterservice.app/api/jobs/follow-ups/dry-run`.
-- Observability baseline: retain platform logs, configure `SENTRY_DSN`, alert on API 5xxs, Lemon webhook failures, cron failures, and database connection saturation.
+- Observability baseline: retain platform logs, configure `NEXT_PUBLIC_SENTRY_DSN`, alert on API 5xxs, Lemon webhook failures, cron failures, and database connection saturation.
 - Run before deploy: `bun run db:validate`, `bun run db:generate`, `bun run typecheck`, `bun run lint`, `bun run build`, `bun run smoke:mvp`.
 
 ## Next Roadmap

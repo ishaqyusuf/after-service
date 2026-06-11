@@ -14,22 +14,26 @@ import {
 } from "@afterservice/ui/dropdown-menu";
 import { Icons } from "@afterservice/ui/icons";
 import { Input } from "@afterservice/ui/input";
+import { useQuery } from "@tanstack/react-query";
 import { useMemo, useRef, useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
-import { trpc } from "@/components/providers/trpc-provider";
 import { useCustomerFilterParams } from "@/hooks/use-customer-filter-params";
+import { useTRPC } from "@/trpc/client";
 import { FilterList, FilterMenuEmptyState } from "./filter-list";
 
 export function CustomersSearchFilter() {
+  const trpc = useTRPC();
   const { filter, setFilter } = useCustomerFilterParams();
   const [input, setInput] = useState(filter.q ?? "");
   const inputRef = useRef<HTMLInputElement>(null);
   const [isOpen, setIsOpen] = useState(false);
 
-  const { data } = trpc.customers.list.useQuery({
-    includeArchived: false,
-    limit: 100,
-  });
+  const { data } = useQuery(
+    trpc.customers.list.queryOptions({
+      includeArchived: false,
+      limit: 100,
+    }),
+  );
   const tagOptions = useMemo(() => {
     const tags = new Set<string>();
 
@@ -81,9 +85,7 @@ export function CustomersSearchFilter() {
   );
 
   const selectedTags = Array.isArray(filter.tags) ? filter.tags : [];
-  const hasValidFilters = selectedTags.some((tag) =>
-    tagOptions.includes(tag),
-  );
+  const hasValidFilters = selectedTags.some((tag) => tagOptions.includes(tag));
 
   return (
     <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>

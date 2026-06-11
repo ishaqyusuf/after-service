@@ -3,7 +3,7 @@
 import type { AppRouter } from "@afterservice/api/router";
 import { Table, TableBody, TableCell, TableRow } from "@afterservice/ui/table";
 import { closestCenter, DndContext } from "@dnd-kit/core";
-import { useSuspenseInfiniteQuery } from "@tanstack/react-query";
+import { useMutation, useSuspenseInfiniteQuery } from "@tanstack/react-query";
 import { getCoreRowModel, useReactTable } from "@tanstack/react-table";
 import { useVirtualizer, type VirtualItem } from "@tanstack/react-virtual";
 import type { inferRouterOutputs } from "@trpc/server";
@@ -14,7 +14,6 @@ import {
   useMemo,
   useRef,
 } from "react";
-import { trpc } from "@/components/providers/trpc-provider";
 import { VirtualRow } from "@/components/tables/core";
 import { useInfiniteScroll } from "@/hooks/use-infinite-scroll";
 import { useScrollHeader } from "@/hooks/use-scroll-header";
@@ -29,6 +28,7 @@ import {
 } from "@/hooks/use-template-filter-params";
 import { useTemplateParams } from "@/hooks/use-template-params";
 import { useTemplatesStore } from "@/store/templates";
+import { useTRPC } from "@/trpc/client";
 import { STICKY_COLUMNS, SUMMARY_GRID_HEIGHTS } from "@/utils/table-configs";
 import { getColumnIds, type TableSettings } from "@/utils/table-settings";
 import { columns } from "./columns";
@@ -48,6 +48,7 @@ type TemplatesListPage = inferRouterOutputs<AppRouter>["templates"]["list"];
 type TemplateRow = TemplatesListPage["items"][number];
 
 export function DataTable({ initialSettings }: Props) {
+  const trpc = useTRPC();
   const { setParams } = useTemplateParams();
   const { filter, hasFilters } = useTemplateFilterParams();
   const { params } = useSortParams();
@@ -87,11 +88,13 @@ export function DataTable({ initialSettings }: Props) {
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage, refetch } =
     useSuspenseInfiniteQuery(infiniteQueryOptions);
 
-  const archiveTemplateMutation = trpc.templates.archive.useMutation({
-    onSuccess: () => {
-      refetch();
-    },
-  });
+  const archiveTemplateMutation = useMutation(
+    trpc.templates.archive.mutationOptions({
+      onSuccess: () => {
+        refetch();
+      },
+    }),
+  );
 
   const handleArchiveTemplate = useCallback(
     (id: string) => {

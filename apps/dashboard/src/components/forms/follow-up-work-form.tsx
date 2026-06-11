@@ -20,14 +20,15 @@ import {
   FormLabel,
   FormMessage,
 } from "@afterservice/ui/form";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import type { inferRouterOutputs } from "@trpc/server";
 import { format } from "date-fns";
 import { useEffect } from "react";
 import { z } from "zod";
-import { trpc } from "@/components/providers/trpc-provider";
 import { useFollowUpParams } from "@/hooks/use-follow-up-params";
 import { useZodForm } from "@/hooks/use-zod-form";
 import { resolveTemplate } from "@/lib/dashboard-format";
+import { useTRPC } from "@/trpc/client";
 
 type FollowUp = inferRouterOutputs<AppRouter>["followUps"]["get"]["item"];
 
@@ -58,28 +59,43 @@ const closeSchema = z.object({
 });
 
 export function FollowUpWorkForm({ followUp }: Props) {
+  const trpc = useTRPC();
   const { setParams } = useFollowUpParams();
-  const utils = trpc.useUtils();
+  const queryClient = useQueryClient();
 
   const handleSuccess = () => {
-    utils.followUps.listBoard.invalidate();
-    utils.followUps.listTable.invalidate();
-    utils.followUps.get.invalidate({ id: followUp.id });
+    queryClient.invalidateQueries({
+      queryKey: trpc.followUps.listBoard.queryKey(),
+    });
+    queryClient.invalidateQueries({
+      queryKey: trpc.followUps.listTable.queryKey(),
+    });
+    queryClient.invalidateQueries({
+      queryKey: trpc.followUps.get.queryKey({ id: followUp.id }),
+    });
     setParams(null);
   };
 
-  const rescheduleMutation = trpc.followUps.reschedule.useMutation({
-    onSuccess: handleSuccess,
-  });
-  const markSentMutation = trpc.followUps.markSent.useMutation({
-    onSuccess: handleSuccess,
-  });
-  const markRepliedMutation = trpc.followUps.markReplied.useMutation({
-    onSuccess: handleSuccess,
-  });
-  const closeMutation = trpc.followUps.close.useMutation({
-    onSuccess: handleSuccess,
-  });
+  const rescheduleMutation = useMutation(
+    trpc.followUps.reschedule.mutationOptions({
+      onSuccess: handleSuccess,
+    }),
+  );
+  const markSentMutation = useMutation(
+    trpc.followUps.markSent.mutationOptions({
+      onSuccess: handleSuccess,
+    }),
+  );
+  const markRepliedMutation = useMutation(
+    trpc.followUps.markReplied.mutationOptions({
+      onSuccess: handleSuccess,
+    }),
+  );
+  const closeMutation = useMutation(
+    trpc.followUps.close.mutationOptions({
+      onSuccess: handleSuccess,
+    }),
+  );
 
   const rescheduleForm = useZodForm({
     schema: rescheduleSchema,

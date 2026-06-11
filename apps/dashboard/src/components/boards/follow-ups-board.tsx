@@ -2,24 +2,30 @@
 
 import type { AppRouter } from "@afterservice/api/router";
 import { Badge, Button, Card, CardContent, Skeleton } from "@afterservice/ui";
+import { useSuspenseQuery } from "@tanstack/react-query";
 import type { inferRouterOutputs } from "@trpc/server";
 import { ClipboardList } from "lucide-react";
 import Link from "next/link";
-import { trpc } from "@/components/providers/trpc-provider";
 import {
   followUpChannelLabels,
   toFollowUpChannel,
 } from "@/hooks/use-follow-up-filter-params";
 import { useFollowUpParams } from "@/hooks/use-follow-up-params";
 import { resolveTemplate } from "@/lib/dashboard-format";
+import { useTRPC } from "@/trpc/client";
 
 type FollowUpsBoardData =
   inferRouterOutputs<AppRouter>["followUps"]["listBoard"];
 type FollowUpsBoardColumns = FollowUpsBoardData["columns"];
 type BoardItem = FollowUpsBoardColumns[keyof FollowUpsBoardColumns][number];
 
+const boardColumns = ["due", "upcoming", "waiting", "replied", "closed"];
+const boardCardSkeletons = ["first", "second", "third"];
+
 export function FollowUpsBoard() {
-  const [{ columns }] = trpc.followUps.listBoard.useSuspenseQuery();
+  const trpc = useTRPC();
+  const { data } = useSuspenseQuery(trpc.followUps.listBoard.queryOptions());
+  const { columns } = data;
 
   if (!columns) return null;
 
@@ -48,7 +54,7 @@ export function FollowUpsBoard() {
 export function FollowUpsBoardSkeleton() {
   return (
     <div className="flex gap-4 overflow-x-auto pb-4 snap-x">
-      {["due", "upcoming", "waiting", "replied", "closed"].map((column) => (
+      {boardColumns.map((column) => (
         <div
           key={column}
           className="flex w-[300px] shrink-0 snap-start flex-col rounded-lg bg-muted/50 p-3"
@@ -58,9 +64,9 @@ export function FollowUpsBoardSkeleton() {
             <Skeleton className="h-5 w-8 rounded-full" />
           </div>
           <div className="space-y-3">
-            {Array.from({ length: 3 }).map((_, index) => (
+            {boardCardSkeletons.map((card) => (
               <div
-                key={`${column}-${index}`}
+                key={`${column}-${card}`}
                 className="rounded-md border border-border bg-card p-3"
               >
                 <div className="mb-2 flex items-center justify-between gap-2">
@@ -146,7 +152,9 @@ function FollowUpCard({ item }: { item: BoardItem }) {
       className="block bg-card rounded-md border border-border p-3 shadow-sm hover:border-primary/50 transition-colors text-left"
     >
       <div className="flex items-center justify-between gap-2 mb-1">
-        <span className="text-sm font-medium truncate">{item.customerName}</span>
+        <span className="text-sm font-medium truncate">
+          {item.customerName}
+        </span>
         <Badge variant="outline" className="shrink-0">
           {channel ? followUpChannelLabels[channel] : item.channel}
         </Badge>
@@ -154,9 +162,7 @@ function FollowUpCard({ item }: { item: BoardItem }) {
       <div className="text-xs text-muted-foreground mb-2 truncate">
         {item.serviceTitle}
       </div>
-      <p className="text-sm line-clamp-2 text-foreground/80">
-        {body}
-      </p>
+      <p className="text-sm line-clamp-2 text-foreground/80">{body}</p>
     </Link>
   );
 }

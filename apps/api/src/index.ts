@@ -314,6 +314,8 @@ export default {
   port: Number(process.env.PORT ?? 4102),
 };
 
+export { app };
+
 type LemonWebhookPayload = {
   data?: {
     attributes?: Record<string, unknown>;

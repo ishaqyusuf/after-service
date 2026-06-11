@@ -15,7 +15,6 @@ import {
   useMemo,
   useRef,
 } from "react";
-import { trpc } from "@/components/providers/trpc-provider";
 import { VirtualRow } from "@/components/tables/core";
 import { useInfiniteScroll } from "@/hooks/use-infinite-scroll";
 import {
@@ -29,6 +28,7 @@ import { useTableDnd } from "@/hooks/use-table-dnd";
 import { useTableScroll } from "@/hooks/use-table-scroll";
 import { useTableSettings } from "@/hooks/use-table-settings";
 import { useJobsStore } from "@/store/jobs";
+import { useTRPC } from "@/trpc/client";
 import { STICKY_COLUMNS, SUMMARY_GRID_HEIGHTS } from "@/utils/table-configs";
 import { getColumnIds, type TableSettings } from "@/utils/table-settings";
 import { columns } from "./columns";
@@ -48,6 +48,7 @@ type JobsListPage = inferRouterOutputs<AppRouter>["serviceJobs"]["list"];
 type JobRow = JobsListPage["items"][number];
 
 export function DataTable({ initialSettings }: Props) {
+  const trpc = useTRPC();
   const [, setScheduleFollowUpId] = useQueryState("schedule_follow_up");
   const { filter, hasFilters } = useJobFilterParams();
   const { params } = useSortParams();

@@ -10,12 +10,15 @@ import {
   FormLabel,
   FormMessage,
 } from "@afterservice/ui/form";
-import { trpc } from "@/components/providers/trpc-provider";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { QuickFill } from "@/components/quick-fill";
 import { useCustomerParams } from "@/hooks/use-customer-params";
 import { useZodForm } from "@/hooks/use-zod-form";
+import { useTRPC } from "@/trpc/client";
 
 export function CustomerCreateForm() {
+  const trpc = useTRPC();
+  const queryClient = useQueryClient();
   const { setParams } = useCustomerParams();
 
   const form = useZodForm({
@@ -30,14 +33,17 @@ export function CustomerCreateForm() {
     },
   });
 
-  const utils = trpc.useUtils();
-  const createCustomerMutation = trpc.customers.create.useMutation({
-    onSuccess: () => {
-      utils.customers.list.invalidate();
-      form.reset();
-      setParams({ createCustomer: null });
-    },
-  });
+  const createCustomerMutation = useMutation(
+    trpc.customers.create.mutationOptions({
+      onSuccess: () => {
+        queryClient.invalidateQueries({
+          queryKey: trpc.customers.list.queryKey(),
+        });
+        form.reset();
+        setParams({ createCustomer: null });
+      },
+    }),
+  );
 
   return (
     <Form {...form}>
@@ -135,9 +141,7 @@ export function CustomerCreateForm() {
           disabled={createCustomerMutation.isPending}
           className="w-full"
         >
-          {createCustomerMutation.isPending
-            ? "Creating..."
-            : "Create customer"}
+          {createCustomerMutation.isPending ? "Creating..." : "Create customer"}
         </Button>
       </form>
     </Form>

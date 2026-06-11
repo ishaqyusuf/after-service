@@ -1,8 +1,9 @@
 "use client";
 
 import { Button, Card, CardContent } from "@afterservice/ui";
+import { useQuery } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
-import { trpc } from "@/components/providers/trpc-provider";
+import { useTRPC } from "@/trpc/client";
 import { ChannelCards } from "./channel-cards";
 import { FollowUpHealthCard } from "./follow-up-health-card";
 import { OverviewHeader } from "./overview-header";
@@ -40,7 +41,8 @@ function normalizeOverviewData(data: DashboardOverviewData) {
 }
 
 export function OverviewView() {
-  const { data, isLoading } = trpc.dashboard.overview.useQuery();
+  const trpc = useTRPC();
+  const { data, isLoading } = useQuery(trpc.dashboard.overview.queryOptions());
   const router = useRouter();
 
   if (isLoading) {

@@ -3,7 +3,7 @@
 import type { AppRouter } from "@afterservice/api/router";
 import { Table, TableBody, TableCell, TableRow } from "@afterservice/ui/table";
 import { closestCenter, DndContext } from "@dnd-kit/core";
-import { useSuspenseInfiniteQuery } from "@tanstack/react-query";
+import { useMutation, useSuspenseInfiniteQuery } from "@tanstack/react-query";
 import { getCoreRowModel, useReactTable } from "@tanstack/react-table";
 import { useVirtualizer, type VirtualItem } from "@tanstack/react-virtual";
 import type { inferRouterOutputs } from "@trpc/server";
@@ -14,7 +14,6 @@ import {
   useMemo,
   useRef,
 } from "react";
-import { trpc } from "@/components/providers/trpc-provider";
 import { VirtualRow } from "@/components/tables/core";
 import { useCustomerFilterParams } from "@/hooks/use-customer-filter-params";
 import { useCustomerParams } from "@/hooks/use-customer-params";
@@ -26,6 +25,7 @@ import { useTableDnd } from "@/hooks/use-table-dnd";
 import { useTableScroll } from "@/hooks/use-table-scroll";
 import { useTableSettings } from "@/hooks/use-table-settings";
 import { useCustomersStore } from "@/store/customers";
+import { useTRPC } from "@/trpc/client";
 import { STICKY_COLUMNS, SUMMARY_GRID_HEIGHTS } from "@/utils/table-configs";
 import { getColumnIds, type TableSettings } from "@/utils/table-settings";
 import { columns } from "./columns";
@@ -45,6 +45,7 @@ type CustomersListPage = inferRouterOutputs<AppRouter>["customers"]["list"];
 type CustomerRow = CustomersListPage["items"][number];
 
 export function DataTable({ initialSettings }: Props) {
+  const trpc = useTRPC();
   const { setParams } = useCustomerParams();
   const { filter, hasFilters } = useCustomerFilterParams();
   const { params } = useSortParams();
@@ -85,11 +86,13 @@ export function DataTable({ initialSettings }: Props) {
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage, refetch } =
     useSuspenseInfiniteQuery(infiniteQueryOptions);
 
-  const archiveCustomerMutation = trpc.customers.archive.useMutation({
-    onSuccess: () => {
-      refetch();
-    },
-  });
+  const archiveCustomerMutation = useMutation(
+    trpc.customers.archive.mutationOptions({
+      onSuccess: () => {
+        refetch();
+      },
+    }),
+  );
 
   const handleArchiveCustomer = useCallback(
     (id: string) => {

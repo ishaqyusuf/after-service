@@ -10,11 +10,12 @@ import {
   Progress,
   Skeleton,
 } from "@afterservice/ui";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { ArrowUpRight, CreditCard } from "lucide-react";
 import { useRouter } from "next/navigation";
 import type { ReactNode } from "react";
-import { trpc } from "@/components/providers/trpc-provider";
 import { formatDate } from "@/lib/dashboard-format";
+import { useTRPC } from "@/trpc/client";
 
 const planLabels = {
   growth: "Shop",
@@ -29,16 +30,27 @@ const planStatusLabels = {
   trialing: "Trialing",
 } as const;
 
+const billingMetricSkeletons = ["customers", "follow-ups", "templates", "team"];
+const billingUsageSkeletons = ["customers", "follow-ups", "templates", "team"];
+const billingHistorySkeletons = ["current", "renewal", "trial"];
+
 export function BillingOverview() {
-  const { data, isLoading } = trpc.billing.getCurrentPlan.useQuery();
-  const { data: portalData } = trpc.billing.getPortalUrl.useQuery();
+  const trpc = useTRPC();
+  const { data, isLoading } = useQuery(
+    trpc.billing.getCurrentPlan.queryOptions(),
+  );
+  const { data: portalData } = useQuery(
+    trpc.billing.getPortalUrl.queryOptions(),
+  );
   const router = useRouter();
 
-  const checkoutMutation = trpc.billing.createCheckout.useMutation({
-    onSuccess: (data) => {
-      router.push(data.checkoutUrl);
-    },
-  });
+  const checkoutMutation = useMutation(
+    trpc.billing.createCheckout.mutationOptions({
+      onSuccess: (data) => {
+        router.push(data.checkoutUrl);
+      },
+    }),
+  );
 
   if (isLoading) {
     return <BillingOverviewSkeleton />;
@@ -217,8 +229,8 @@ export function BillingOverviewSkeleton() {
       </header>
 
       <section className="grid gap-3 md:grid-cols-2 lg:grid-cols-4">
-        {Array.from({ length: 4 }).map((_, index) => (
-          <Card key={index}>
+        {billingMetricSkeletons.map((item) => (
+          <Card key={item}>
             <CardContent className="space-y-3 p-5">
               <Skeleton className="h-4 w-20" />
               <Skeleton className="h-8 w-28" />
@@ -235,8 +247,8 @@ export function BillingOverviewSkeleton() {
             <Skeleton className="h-4 w-64" />
           </CardHeader>
           <CardContent className="space-y-5 pt-6">
-            {Array.from({ length: 4 }).map((_, index) => (
-              <div key={index} className="space-y-2">
+            {billingUsageSkeletons.map((item) => (
+              <div key={item} className="space-y-2">
                 <div className="flex items-center justify-between">
                   <Skeleton className="h-4 w-24" />
                   <Skeleton className="h-4 w-16" />
@@ -253,8 +265,8 @@ export function BillingOverviewSkeleton() {
             <Skeleton className="h-4 w-56" />
           </CardHeader>
           <CardContent className="space-y-4 p-6">
-            {Array.from({ length: 3 }).map((_, index) => (
-              <div key={index} className="flex items-center justify-between">
+            {billingHistorySkeletons.map((item) => (
+              <div key={item} className="flex items-center justify-between">
                 <Skeleton className="h-4 w-32" />
                 <Skeleton className="h-4 w-40" />
               </div>

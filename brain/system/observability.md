@@ -19,8 +19,12 @@ This file captures the MVP observability baseline for afterservice production re
 - Dashboard analytics attach the current workspace by internal ID/slug only; user PII must not be sent in identify payloads.
 
 ## Error Monitoring
-- `SENTRY_DSN` is documented in `.env.example` as the default error-monitoring hook.
-- A production deploy should configure source maps, release identifiers, and alerts for API/dashboard exceptions before live customer data is collected.
+- Sentry follows the Midday dashboard pattern for `@afterservice/dashboard`.
+- `NEXT_PUBLIC_SENTRY_DSN` is documented in `.env.example` for browser, server, and edge SDK initialization.
+- 2026-06-11: `NEXT_PUBLIC_SENTRY_DSN`, `SENTRY_ORG`, `SENTRY_PROJECT`, and `SENTRY_AUTH_TOKEN` are configured in the local production env and Vercel production.
+- Production builds wrap the dashboard Next config with `withSentryConfig`; `SENTRY_ORG` and `SENTRY_PROJECT` are read from the environment.
+- Source maps use `SENTRY_AUTH_TOKEN` at build time and prefer `SENTRY_RELEASE`, then `GIT_COMMIT_SHA`, for release naming.
+- A production deploy should configure Sentry alerts for API/dashboard exceptions before live customer data is collected.
 
 ## Alerts
 - Alert on repeated 5xx responses from `dashboard.afterservice.app/api`.

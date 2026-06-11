@@ -21,13 +21,14 @@ import {
   FormLabel,
   FormMessage,
 } from "@afterservice/ui/form";
-import { trpc } from "@/components/providers/trpc-provider";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   templateChannelLabels,
   templateChannels,
 } from "@/hooks/use-template-filter-params";
 import { useTemplateParams } from "@/hooks/use-template-params";
 import { useZodForm } from "@/hooks/use-zod-form";
+import { useTRPC } from "@/trpc/client";
 
 const channelOptions = templateChannels.map((channel) => ({
   label: templateChannelLabels[channel],
@@ -35,6 +36,8 @@ const channelOptions = templateChannels.map((channel) => ({
 }));
 
 export function TemplateCreateForm() {
+  const trpc = useTRPC();
+  const queryClient = useQueryClient();
   const { setParams } = useTemplateParams();
 
   const form = useZodForm({
@@ -48,14 +51,17 @@ export function TemplateCreateForm() {
     },
   });
 
-  const utils = trpc.useUtils();
-  const createTemplateMutation = trpc.templates.create.useMutation({
-    onSuccess: () => {
-      utils.templates.list.invalidate();
-      form.reset();
-      setParams({ createTemplate: null });
-    },
-  });
+  const createTemplateMutation = useMutation(
+    trpc.templates.create.mutationOptions({
+      onSuccess: () => {
+        queryClient.invalidateQueries({
+          queryKey: trpc.templates.list.queryKey(),
+        });
+        form.reset();
+        setParams({ createTemplate: null });
+      },
+    }),
+  );
 
   return (
     <Form {...form}>
@@ -161,9 +167,7 @@ export function TemplateCreateForm() {
           className="w-full"
           disabled={createTemplateMutation.isPending}
         >
-          {createTemplateMutation.isPending
-            ? "Creating..."
-            : "Create template"}
+          {createTemplateMutation.isPending ? "Creating..." : "Create template"}
         </Button>
       </form>
     </Form>
