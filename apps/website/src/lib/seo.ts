@@ -2,6 +2,12 @@ import { appMetadata, siteRootDomain } from "@afterservice/utils";
 import type { Metadata, MetadataRoute } from "next";
 
 export const siteUrl = `https://${siteRootDomain}`;
+export const socialImage = {
+  alt: "afterservice - one board for every post-job customer follow-up",
+  height: 630,
+  path: "/opengraph-image",
+  width: 1200,
+} as const;
 
 export type PublicRoute = {
   path: string;
@@ -73,6 +79,7 @@ export function createPageMetadata({
   title: string;
 }): Metadata {
   const url = absoluteUrl(path);
+  const imageUrl = absoluteUrl(socialImage.path);
 
   return {
     alternates: {
@@ -81,6 +88,14 @@ export function createPageMetadata({
     description,
     openGraph: {
       description,
+      images: [
+        {
+          alt: socialImage.alt,
+          height: socialImage.height,
+          url: imageUrl,
+          width: socialImage.width,
+        },
+      ],
       locale: "en_US",
       siteName: appMetadata.name,
       title,
@@ -99,8 +114,14 @@ export function createPageMetadata({
         },
     title,
     twitter: {
-      card: "summary",
+      card: "summary_large_image",
       description,
+      images: [
+        {
+          alt: socialImage.alt,
+          url: imageUrl,
+        },
+      ],
       title,
     },
   };

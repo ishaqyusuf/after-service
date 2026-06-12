@@ -41,6 +41,7 @@ Core search themes:
 
 - Add crawlable sitemap and robots routes for `afterservice.app`.
 - Add canonical URLs, Open Graph metadata, Twitter metadata, and production `metadataBase`.
+  - 2026-06-12: Added a root generated Open Graph image route and wired the global metadata helper to use `summary_large_image` cards for X/Twitter and image-backed Open Graph previews.
 - Add structured data for Organization, SoftwareApplication, and BreadcrumbList where relevant.
 - Keep login-style utility pages out of the index when they do not help searchers.
 - Verify Google Search Console and submit the sitemap.
