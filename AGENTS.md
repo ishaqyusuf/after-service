@@ -1,7 +1,43 @@
-# Rules
+# Afterservice Agent Instructions
 
-- Always use the `brain` folder as the project brain and reference it.
-- Update the relevant files in the `brain` folder for decisions, roadmap state changes, or architectural choices.
+## Brain Protocol
+
+`brain/` is the project memory and source of truth for product direction, architecture, tasks, marketing context, and implementation state. Treat Brain documentation as part of the definition of done for every meaningful change.
+
+Before starting work:
+
+- Read the relevant Brain files for the task. Start with `brain/BRAIN.md`, `brain/SYSTEM_OVERVIEW.md`, `brain/system/overview.md`, `brain/system/architecture.md`, `brain/engineering/ai-rules.md`, `brain/engineering/coding-standards.md`, and `brain/tasks/in-progress.md`.
+- For feature, product, marketing, pricing, or research work, also read the matching file under `brain/features/`, `brain/product/`, `brain/marketing/`, or `brain/research/`.
+- For API, auth, permission, database, or migration work, read the matching files under `brain/api/` and `brain/database/`.
+
+After code changes:
+
+- Run a Brain documentation impact check before finishing.
+- Update `brain/database/schema.md`, `brain/database/relationships.md`, or `brain/database/migrations.md` for database changes.
+- Update `brain/api/endpoints.md`, `brain/api/contracts.md`, or `brain/api/permissions.md` for API, contract, auth, or permission changes.
+- Update or create `brain/features/<feature>.md` for feature behavior changes.
+- Add an ADR under `brain/decisions/` for durable architecture, product, integration, or implementation decisions.
+- Update `brain/tasks/backlog.md`, `brain/tasks/in-progress.md`, `brain/tasks/done.md`, or `brain/tasks/roadmap.md` when task state changes.
+- If no Brain update is needed, state that explicitly in the final response with the reason.
+
+Final responses must include the Brain files updated, or `No Brain documentation updates required` with a short rationale.
+
+## Project Commands
+
+- Package manager: `bun`.
+- Start the full dev stack with `bun run dev`.
+- Start dashboard work with `bun run dev:dashboard`.
+- Start website work with `bun run dev:website`.
+- Start jobs work with `bun run dev:jobs`.
+- Prefer portless dev scripts when debugging auth or callback behavior: `bun run dev:dashboard:portless`, `bun run dev:website:portless`, or `bun run dev:websites:portless`.
 - When debugging production page-load failures, reproduce with the production env first: run `bun run terminal prod:dashboard` for dashboard pages or `bun run terminal prod:website` for marketing pages.
-- Always use `tailwindcss` (wait, the project is configured with vanilla CSS, but the user rule says "Always use tailwindcss for styling in UI components". Since there's no tailwind config in this repo yet, we must install and configure tailwind CSS in `apps/website`, or use standard Tailwind if we configure it, or write tailwind-like styled CSS / set up Tailwind CSS. Let's see if we should set up Tailwind CSS in the `apps/website` app. Yes, setting up TailwindCSS in `apps/website` is a very good idea to make sure we follow "Always use tailwindcss for styling in UI components"!)
-- The project brand is `afterservice`. Use the domain `afterservice.app`.
+- Validate broad changes with `bun run typecheck` and the narrowest relevant build, lint, smoke, or package-level command.
+
+## Product And UI Rules
+
+- The project brand is `afterservice`.
+- Use the domain `afterservice.app`.
+- Use Tailwind CSS for UI component styling where Tailwind is configured; when it is not configured in a target app, preserve the existing styling system unless the task includes setting Tailwind up.
+- Preserve the existing monorepo layout under `apps/` and `packages/`.
+- Do not edit secrets in `.env*` files unless the user explicitly asks.
+- Keep changes scoped to the requested task and avoid unrelated formatting churn.
