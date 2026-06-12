@@ -16,6 +16,8 @@ type BeforeInstallPromptEvent = Event & {
   }>;
 };
 
+type FallbackMode = "android-chrome" | "ios-chrome";
+
 const DISMISSED_UNTIL_KEY = "afterservice:pwa-install-dismissed-until";
 const INSTALLED_KEY = "afterservice:pwa-installed";
 const DISMISS_DURATION = 7 * 24 * 60 * 60 * 1000;
@@ -54,6 +56,36 @@ function suppressInstallPrompt() {
   setStorageItem(DISMISSED_UNTIL_KEY, String(Date.now() + DISMISS_DURATION));
 }
 
+function isStandaloneDisplay() {
+  return (
+    window.matchMedia("(display-mode: standalone)").matches ||
+    Boolean(
+      (window.navigator as Navigator & { standalone?: boolean }).standalone,
+    )
+  );
+}
+
+function getFallbackMode(): FallbackMode | null {
+  const userAgent = window.navigator.userAgent;
+  const isAndroid = /Android/i.test(userAgent);
+  const isIos = /iPhone|iPad|iPod/i.test(userAgent);
+  const isChromeIos = /CriOS/i.test(userAgent);
+  const isChromeAndroid =
+    isAndroid &&
+    /Chrome\//i.test(userAgent) &&
+    !/EdgA|OPR|SamsungBrowser|Firefox/i.test(userAgent);
+
+  if (isChromeAndroid) {
+    return "android-chrome";
+  }
+
+  if (isIos && isChromeIos) {
+    return "ios-chrome";
+  }
+
+  return null;
+}
+
 export function MobileInstallTopSheet({
   onVisibilityChange,
 }: {
@@ -61,15 +93,38 @@ export function MobileInstallTopSheet({
 }) {
   const [deferredPrompt, setDeferredPrompt] =
     useState<BeforeInstallPromptEvent | null>(null);
+  const [fallbackMode, setFallbackMode] = useState<FallbackMode | null>(null);
   const [isDismissed, setIsDismissed] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
+  const hasPromptRef = useRef(false);
   const promptShownTracked = useRef(false);
   const track = useTrack();
 
   const isVisible = useMemo(
-    () => Boolean(deferredPrompt && isMobile && !isDismissed),
-    [deferredPrompt, isDismissed, isMobile],
+    () => Boolean((deferredPrompt || fallbackMode) && isMobile && !isDismissed),
+    [deferredPrompt, fallbackMode, isDismissed, isMobile],
   );
+
+  const promptCopy = useMemo(() => {
+    if (deferredPrompt) {
+      return {
+        subtitle: "Open faster from your home screen",
+        title: "Install afterservice",
+      };
+    }
+
+    if (fallbackMode === "ios-chrome") {
+      return {
+        subtitle: "Open in Safari to add it to your home screen",
+        title: "Install from Safari",
+      };
+    }
+
+    return {
+      subtitle: "Use Chrome menu, then Add to Home screen",
+      title: "Install afterservice",
+    };
+  }, [deferredPrompt, fallbackMode]);
 
   useEffect(() => {
     onVisibilityChange(isVisible);
@@ -80,9 +135,10 @@ export function MobileInstallTopSheet({
         event: LogEvents.PwaInstallPromptShown.name,
         channel: LogEvents.PwaInstallPromptShown.channel,
         location: "mobile_install_top_sheet",
+        mode: deferredPrompt ? "browser_prompt" : fallbackMode,
       });
     }
-  }, [isVisible, onVisibilityChange, track]);
+  }, [deferredPrompt, fallbackMode, isVisible, onVisibilityChange, track]);
 
   useEffect(() => {
     const mobileQuery = window.matchMedia("(max-width: 767px)");
@@ -97,12 +153,14 @@ export function MobileInstallTopSheet({
   useEffect(() => {
     const onBeforeInstallPrompt = (event: Event) => {
       event.preventDefault();
+      hasPromptRef.current = true;
 
       if (getInstallSuppression()) {
         return;
       }
 
       setDeferredPrompt(event as BeforeInstallPromptEvent);
+      setFallbackMode(null);
       setIsDismissed(false);
     };
 
@@ -121,10 +179,27 @@ export function MobileInstallTopSheet({
     };
   }, []);
 
+  useEffect(() => {
+    if (!isMobile || getInstallSuppression() || isStandaloneDisplay()) {
+      return;
+    }
+
+    const timeout = window.setTimeout(() => {
+      if (hasPromptRef.current) {
+        return;
+      }
+
+      setFallbackMode(getFallbackMode());
+    }, 2500);
+
+    return () => window.clearTimeout(timeout);
+  }, [isMobile]);
+
   const dismissPrompt = useCallback(
     (reason: string) => {
       suppressInstallPrompt();
       setDeferredPrompt(null);
+      setFallbackMode(null);
       setIsDismissed(true);
       track({
         event: LogEvents.PwaInstallDismissed.name,
@@ -147,30 +222,43 @@ export function MobileInstallTopSheet({
       location: "mobile_install_top_sheet",
     });
 
-    await deferredPrompt.prompt();
-    const choice = await deferredPrompt.userChoice;
+    try {
+      await deferredPrompt.prompt();
+      const choice = await deferredPrompt.userChoice;
 
-    if (choice.outcome === "accepted") {
-      setStorageItem(INSTALLED_KEY, "true");
-      track({
-        event: LogEvents.PwaInstallAccepted.name,
-        channel: LogEvents.PwaInstallAccepted.channel,
-        location: "mobile_install_top_sheet",
-        platform: choice.platform,
-      });
-    } else {
-      suppressInstallPrompt();
+      if (choice.outcome === "accepted") {
+        setStorageItem(INSTALLED_KEY, "true");
+        setIsDismissed(true);
+        track({
+          event: LogEvents.PwaInstallAccepted.name,
+          channel: LogEvents.PwaInstallAccepted.channel,
+          location: "mobile_install_top_sheet",
+          platform: choice.platform,
+        });
+      } else {
+        suppressInstallPrompt();
+        setIsDismissed(true);
+        track({
+          event: LogEvents.PwaInstallDismissed.name,
+          channel: LogEvents.PwaInstallDismissed.channel,
+          location: "mobile_install_top_sheet",
+          platform: choice.platform,
+          reason: "browser_prompt",
+        });
+      }
+
+      setDeferredPrompt(null);
+      setFallbackMode(null);
+    } catch {
+      setDeferredPrompt(null);
+      setFallbackMode(getFallbackMode());
       track({
         event: LogEvents.PwaInstallDismissed.name,
         channel: LogEvents.PwaInstallDismissed.channel,
         location: "mobile_install_top_sheet",
-        platform: choice.platform,
-        reason: "browser_prompt",
+        reason: "prompt_failed",
       });
     }
-
-    setDeferredPrompt(null);
-    setIsDismissed(true);
   }, [deferredPrompt, track]);
 
   return (
@@ -199,21 +287,23 @@ export function MobileInstallTopSheet({
 
       <div className="min-w-0 flex-1">
         <p className="text-sm font-bold leading-tight text-white">
-          Install afterservice
+          {promptCopy.title}
         </p>
         <p className="mt-0.5 text-xs font-medium leading-tight text-white/65">
-          Open faster from your home screen
+          {promptCopy.subtitle}
         </p>
       </div>
 
-      <button
-        type="button"
-        onClick={installApp}
-        className="inline-flex h-10 shrink-0 items-center justify-center gap-1.5 rounded-full bg-white px-4 text-sm font-bold text-[#0a0a0a] shadow-sm transition-colors hover:bg-[#eef8f0] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0a0a0a]"
-      >
-        Install now
-        <Download className="h-4 w-4" />
-      </button>
+      {deferredPrompt && (
+        <button
+          type="button"
+          onClick={installApp}
+          className="inline-flex h-10 shrink-0 items-center justify-center gap-1.5 rounded-full bg-white px-4 text-sm font-bold text-[#0a0a0a] shadow-sm transition-colors hover:bg-[#eef8f0] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0a0a0a]"
+        >
+          Install now
+          <Download className="h-4 w-4" />
+        </button>
+      )}
 
       <button
         type="button"

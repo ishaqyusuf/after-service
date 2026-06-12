@@ -11,6 +11,28 @@ This file stores reusable prelaunch marketing drafts and angles for afterservice
 
 ## Current Audience-Seeking Drafts
 
+### First X Post
+
+X/Twitter:
+```text
+I'm building afterservice for local service businesses.
+
+Simple idea: one board for every customer check-in after the job is done.
+
+Repair shops, installers, contractors, field teams: how do you remember who needs a follow-up right now?
+```
+
+### Public Beta Launch Post
+
+X/Twitter:
+```text
+I'm opening up afterservice as a free beta.
+
+It helps local service businesses keep track of customer follow-ups after the job is done: check-ins, review requests, issue resolution, and repeat work.
+
+Repair shops, installers, contractors, field teams: afterservice.app
+```
+
 ### General Local Operators
 
 X/Twitter:

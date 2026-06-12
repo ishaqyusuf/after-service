@@ -39,6 +39,15 @@ export const metadata: Metadata = {
     title: "afterservice | Post-job follow-up board for service shops",
   }),
   applicationName: appMetadata.name,
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: appMetadata.name,
+  },
+  formatDetection: {
+    telephone: false,
+  },
+  manifest: "/manifest.webmanifest",
   metadataBase: new URL(siteUrl),
 };
 
