@@ -8,7 +8,7 @@ export default function manifest(): MetadataRoute.Manifest {
     description: appMetadata.description,
     dir: "ltr",
     display: "standalone",
-    display_override: ["standalone", "minimal-ui"],
+    display_override: ["standalone", "minimal-ui", "browser"],
     icons: [
       {
         purpose: "any",
@@ -34,9 +34,10 @@ export default function manifest(): MetadataRoute.Manifest {
     name: appMetadata.name,
     orientation: "portrait-primary",
     prefer_related_applications: false,
+    related_applications: [],
     scope: "/",
     short_name: appMetadata.name,
-    start_url: "/",
+    start_url: "/?source=pwa",
     theme_color: "#009b98",
   };
 }

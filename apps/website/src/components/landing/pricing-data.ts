@@ -1,4 +1,4 @@
-import { planPricingUsd, type PublicPlanId } from "@afterservice/plans";
+import { type PublicPlanId, planPricingUsd } from "@afterservice/plans";
 
 export type PublicPlan = {
   billingNote: string;

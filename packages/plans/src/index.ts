@@ -1,12 +1,8 @@
 export type PublicPlanId = "free_beta" | "starter" | "shop" | "growth";
 export type PricingRegion = "US" | "CA" | "GB" | "EU" | "NG" | "OTHER";
-export type PricingRegionSource =
-  | "country"
-  | "fallback"
-  | "locale"
-  | "query";
+export type PricingRegionSource = "country" | "fallback" | "locale" | "query";
 
-type PricingCurrency = "CAD" | "EUR" | "GBP" | "NGN" | "USD";
+export type PricingCurrency = "CAD" | "EUR" | "GBP" | "NGN" | "USD";
 
 type PlanPrice = {
   monthly: number;
@@ -19,7 +15,6 @@ type RegionPricing = {
   label: string;
   locale: string;
   note: string | null;
-  prices?: Partial<Record<PublicPlanId, PlanPrice>>;
 };
 
 export type PricingResolution = {
@@ -38,6 +33,14 @@ export const planPricingUsd = {
   shop: { monthly: 79, yearly: 790 },
   growth: { monthly: 149, yearly: 1490 },
 } satisfies Record<PublicPlanId, PlanPrice>;
+
+export const localCurrencyConversionFromUsd = {
+  CAD: 1.35,
+  EUR: 0.93,
+  GBP: 0.86,
+  NGN: 1550,
+  USD: 1,
+} satisfies Record<PricingCurrency, number>;
 
 const euCountryCodes = new Set([
   "AT",
@@ -76,11 +79,6 @@ const regionPricing: Record<PricingRegion, RegionPricing> = {
     label: "Canada",
     locale: "en-CA",
     note: "Planned local display; checkout will confirm the final billing amount.",
-    prices: {
-      growth: { monthly: 199, yearly: 1990 },
-      shop: { monthly: 109, yearly: 1090 },
-      starter: { monthly: 39, yearly: 390 },
-    },
   },
   GB: {
     countryCode: "GB",
@@ -88,11 +86,6 @@ const regionPricing: Record<PricingRegion, RegionPricing> = {
     label: "United Kingdom",
     locale: "en-GB",
     note: "Planned local display; checkout will confirm the final billing amount.",
-    prices: {
-      growth: { monthly: 129, yearly: 1290 },
-      shop: { monthly: 69, yearly: 690 },
-      starter: { monthly: 25, yearly: 250 },
-    },
   },
   EU: {
     countryCode: null,
@@ -107,11 +100,6 @@ const regionPricing: Record<PricingRegion, RegionPricing> = {
     label: "Nigeria",
     locale: "en-NG",
     note: "Planned local display; checkout will confirm local currency availability.",
-    prices: {
-      growth: { monthly: 235000, yearly: 2350000 },
-      shop: { monthly: 125000, yearly: 1250000 },
-      starter: { monthly: 45000, yearly: 450000 },
-    },
   },
   OTHER: {
     countryCode: null,
@@ -201,12 +189,14 @@ export function resolvePricingRegion({
   country,
   queryCurrency,
   queryRegion,
+  routeLocale,
 }: {
   acceptLanguage?: string | null;
   continent?: string | null;
   country?: string | null;
   queryCurrency?: string | null;
   queryRegion?: string | null;
+  routeLocale?: string | null;
 }): PricingResolution {
   const normalizedQueryRegion = normalize(queryRegion);
   const queryResolvedRegion = isPricingRegion(normalizedQueryRegion)
@@ -225,6 +215,12 @@ export function resolvePricingRegion({
 
   if (normalize(continent) === "EU") {
     return toPricingResolution("EU", "country", country);
+  }
+
+  const routeLocaleResolvedRegion = getRegionFromLocale(routeLocale);
+
+  if (routeLocaleResolvedRegion) {
+    return toPricingResolution(routeLocaleResolvedRegion, "locale");
   }
 
   const localeResolvedRegion = getRegionFromLocale(acceptLanguage);
@@ -260,9 +256,14 @@ export function getLocalizedPlanPrice(
 ) {
   const region = regionPricing[pricing.region];
   const sourcePrice = planPricingUsd[planId];
-  const override = region.prices?.[planId];
-  const monthly = override?.monthly ?? sourcePrice.monthly;
-  const yearly = override?.yearly ?? sourcePrice.yearly;
+  const monthly = convertUsdToLocalCurrency(
+    sourcePrice.monthly,
+    region.currency,
+  );
+  const yearly =
+    sourcePrice.yearly === null
+      ? null
+      : convertUsdToLocalCurrency(sourcePrice.yearly, region.currency);
 
   return {
     currency: region.currency,
@@ -282,6 +283,15 @@ export function getLocalizedPlanPrice(
     monthly,
     yearly,
   };
+}
+
+export function convertUsdToLocalCurrency(
+  amountUsd: number,
+  currency: PricingCurrency,
+) {
+  const convertedAmount = amountUsd * localCurrencyConversionFromUsd[currency];
+
+  return Math.round(convertedAmount);
 }
 
 export function formatCurrency({

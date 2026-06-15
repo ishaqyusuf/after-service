@@ -5,6 +5,7 @@
     "build": "bun ../../scripts/with-workspace-env.mjs --mode production -- next build --turbopack",
     "dev": "bun ../../scripts/with-workspace-env.mjs --mode local -- next dev --turbopack -p 4100",
     "lint": "biome check .",
+    "pwa:verify": "bun ../../scripts/verify-website-pwa.mjs",
     "start": "bun ../../scripts/with-workspace-env.mjs --mode production -- next start -p 4100",
     "typecheck": "tsc --noEmit"
   },

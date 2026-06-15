@@ -3,7 +3,7 @@
 Date: 2026-06-11
 
 ## Status
-Phase 1 public display foundation and dashboard billing preview implemented on 2026-06-11. Updated on 2026-06-11 to remove visible region selectors and rely on automatic region/locale resolution for price display. Do not expose paid checkout publicly until the paid pilot is intentionally enabled.
+Phase 1 public display foundation and dashboard billing preview implemented on 2026-06-11. Updated on 2026-06-11 to remove visible region selectors and rely on automatic region/locale resolution for price display. Updated on 2026-06-15 so local display prices are converted from canonical USD amounts through a const currency conversion table in `@afterservice/plans`, with dashboard `[locale]` passed in as an additional pricing signal. Do not expose paid checkout publicly until the paid pilot is intentionally enabled.
 
 ## Goal
 Show afterservice paid-plan prices in a visitor's regional or country-local currency, then send the same pricing context into Polar checkout so the marketing page, dashboard billing page, and payment page do not disagree.
@@ -20,7 +20,7 @@ Use Polar product-level multi-currency pricing as the source of charged amounts,
 
 The display layer should:
 - Resolve a pricing region from request geolocation first, then locale headers, with explicit query params reserved for testing/support links.
-- Render a stable local-currency amount for known target markets.
+- Render a stable local-currency amount for known target markets by converting canonical USD plan amounts through a const currency conversion table.
 - Fall back to USD when the region is unknown or unsupported.
 - Mark converted/estimated amounts clearly until the exact Polar checkout amount can be confirmed.
 
@@ -54,7 +54,7 @@ Controlled tables avoid surprise daily FX movements and let afterservice price b
 - Do not show a manual "show prices for" selector on public pricing.
 
 Implementation notes:
-- `packages/plans/src/index.ts` owns the supported region table, controlled local-price table, country/header/locale mapping, canonical USD pricing, and `Intl.NumberFormat` formatting.
+- `packages/plans/src/index.ts` owns the supported region table, const USD-to-local-currency conversion table, country/header/locale mapping, canonical USD pricing, and `Intl.NumberFormat` formatting.
 - `apps/website/src/lib/pricing-request.ts` reads request geolocation headers, `Accept-Language`, and pricing query params for server-rendered initial pricing.
 - `apps/website/src/components/landing/pricing.tsx` renders localized monthly/yearly planned prices without a visible manual region selector.
 
@@ -78,7 +78,7 @@ Implementation notes:
 
 Implementation notes:
 - `apps/dashboard/src/components/billing-overview.tsx` now shows planned paid-plan prices in the same supported regions as the website.
-- The dashboard preview uses the same automatic request region/locale resolution as the website, so dashboard and website previews stay aligned without a manual selector.
+- The dashboard preview uses the same automatic request region/locale resolution as the website, and passes the Midday-style `[locale]` route param to pricing resolution as a pricing-only signal. This does not introduce translated dashboard copy or a language switcher.
 - API-level checkout currency input remains future Phase 3 work; entitlement state is still webhook-derived.
 
 ### Phase 5: QA And Analytics
@@ -89,7 +89,7 @@ Implementation notes:
 
 ## Trade-Offs
 - Polar-driven charged amounts reduce billing risk, but require product setup discipline in the Polar dashboard.
-- afterservice-owned display tables are simple and stable, but must be kept in sync with Polar product prices.
+- afterservice-owned conversion tables are simple and stable, but must be kept in sync with Polar product prices.
 - Live FX conversion looks dynamic, but can create mismatch, tax ambiguity, and support issues. Avoid it for launch.
 - IP geolocation is useful by default, but it can be wrong with VPNs, proxies, and server-side checkout creation. Keep explicit query overrides available for support/testing even though the public UI no longer shows a manual selector.
 
@@ -97,7 +97,7 @@ Implementation notes:
 - Which countries are in the first paid pilot?
 - Should Nigeria use NGN from day one or display USD until the buyer/payment flow is verified?
 - Will yearly pricing launch with monthly pricing, or stay hidden until monthly conversion is proven?
-- Should local prices be pure currency equivalents or region-adjusted prices?
+- Should local prices remain pure currency equivalents, or should a future paid pilot replace the conversion table with region-adjusted price points?
 
 ## Brain Links
 - Pricing strategy: `brain/product/pricing-strategy.md`

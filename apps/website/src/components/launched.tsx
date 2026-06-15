@@ -1,6 +1,7 @@
 /* biome-ignore-all lint/a11y/noSvgWithoutTitle: Inline icons are decorative and paired with visible text. */
 /* biome-ignore-all lint/a11y/useValidAnchor: Hash links navigate to page sections and close the mobile menu. */
 
+import type { PricingResolution } from "@afterservice/plans";
 import { LandingCTA } from "./landing/cta";
 import { LandingFAQ } from "./landing/faq";
 import { LandingFeatures } from "./landing/features";
@@ -11,7 +12,6 @@ import { LandingHowItWorks } from "./landing/how-it-works";
 import { LandingMetrics } from "./landing/metrics";
 import { MobileLandingPrompts } from "./landing/mobile-landing-prompts";
 import { LandingPricing } from "./landing/pricing";
-import type { PricingResolution } from "@afterservice/plans";
 
 type LaunchedPageProps = {
   initialPricing: PricingResolution;

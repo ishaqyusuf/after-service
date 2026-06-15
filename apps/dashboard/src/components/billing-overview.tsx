@@ -1,6 +1,10 @@
 "use client";
 
 import {
+  getLocalizedPlanPrice,
+  type PricingResolution,
+} from "@afterservice/plans";
+import {
   Badge,
   Button,
   Card,
@@ -10,10 +14,6 @@ import {
   Progress,
   Skeleton,
 } from "@afterservice/ui";
-import {
-  getLocalizedPlanPrice,
-  type PricingResolution,
-} from "@afterservice/plans";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { ArrowUpRight, CreditCard } from "lucide-react";
 import { useRouter } from "next/navigation";
@@ -223,9 +223,7 @@ export function BillingOverview({ initialPricing }: BillingOverviewProps) {
             </div>
           </div>
           {pricing.note ? (
-            <p className="mt-3 text-xs text-muted-foreground">
-              {pricing.note}
-            </p>
+            <p className="mt-3 text-xs text-muted-foreground">{pricing.note}</p>
           ) : null}
         </CardHeader>
         <CardContent className="grid gap-3 pt-6 sm:grid-cols-3">

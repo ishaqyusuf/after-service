@@ -1,9 +1,9 @@
-import { headers } from "next/headers";
 import {
   getHeaderPricingHints,
-  resolvePricingRegion,
   type PricingResolution,
+  resolvePricingRegion,
 } from "@afterservice/plans";
+import { headers } from "next/headers";
 
 type SearchParams =
   | Promise<Record<string, string | string[] | undefined>>
@@ -16,6 +16,7 @@ function firstSearchValue(value: string | string[] | undefined) {
 
 export async function getPricingResolution(
   searchParams?: SearchParams,
+  routeLocale?: string | null,
 ): Promise<PricingResolution> {
   const headerList = await headers();
   const resolvedSearchParams = searchParams ? await searchParams : {};
@@ -28,5 +29,6 @@ export async function getPricingResolution(
     country,
     queryCurrency: firstSearchValue(resolvedSearchParams.currency),
     queryRegion: firstSearchValue(resolvedSearchParams.region),
+    routeLocale,
   });
 }

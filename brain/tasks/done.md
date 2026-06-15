@@ -6,6 +6,27 @@ This file records completed work.
 
 ## Completed
 
+### Regional Pricing Locale Conversion Fix
+
+Completed: 2026-06-15
+
+Summary:
+
+- Refactored `@afterservice/plans` so local display prices derive from canonical USD plan amounts through a const USD-to-local-currency conversion table.
+- Added dashboard `[locale]` route-param input to pricing resolution as a Midday-style pricing-only signal, while keeping country headers and support query overrides ahead of locale fallback.
+- Updated the website pricing request helper to accept a future route-locale signal without adding website language routing.
+- Documented the pricing behavior in the regional pricing plan, dashboard locale decision, and billing entitlements feature notes.
+
+Verification:
+
+- Direct Bun pricing check confirmed route-locale, `Accept-Language`, country-header precedence, query override, and conversion-table pricing cases.
+- `bunx biome check packages/plans/src/index.ts apps/website/src/lib/pricing-request.ts 'apps/dashboard/src/app/[locale]/(sidebar)/billing/page.tsx'`
+- `bun run --filter @afterservice/website lint`
+- `bun run --filter @afterservice/plans typecheck`
+- `bun run --filter @afterservice/website typecheck`
+- `bun run --filter @afterservice/dashboard typecheck`
+- `bun run typecheck`
+
 ### Dashboard Overview Upgrade
 
 Completed: 2026-06-09

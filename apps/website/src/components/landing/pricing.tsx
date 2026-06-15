@@ -2,11 +2,11 @@
 
 import { LogEvents } from "@afterservice/events";
 import { useTrack } from "@afterservice/events/client";
-import { Button, Card } from "@afterservice/ui";
 import {
   getLocalizedPlanPrice,
   type PricingResolution,
 } from "@afterservice/plans";
+import { Button, Card } from "@afterservice/ui";
 import { Check } from "lucide-react";
 import { publicPlans } from "./pricing-data";
 

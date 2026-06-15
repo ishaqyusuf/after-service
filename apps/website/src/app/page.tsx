@@ -1,12 +1,12 @@
 import type { Metadata } from "next";
 import { JsonLd } from "../components/json-ld";
 import { LaunchedPage } from "../components/launched";
+import { getPricingResolution } from "../lib/pricing-request";
 import {
   createPageMetadata,
   organizationJsonLd,
   softwareApplicationJsonLd,
 } from "../lib/seo";
-import { getPricingResolution } from "../lib/pricing-request";
 
 type HomePageProps = {
   searchParams?: Promise<Record<string, string | string[] | undefined>>;

@@ -27,6 +27,14 @@ export const LogEvents = {
     name: "PWA Install Accepted",
     channel: "marketing",
   },
+  PwaInstallFailed: {
+    name: "PWA Install Failed",
+    channel: "marketing",
+  },
+  PwaInstallUnavailable: {
+    name: "PWA Install Unavailable",
+    channel: "marketing",
+  },
   PwaInstallDismissed: {
     name: "PWA Install Dismissed",
     channel: "marketing",

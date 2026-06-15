@@ -14,10 +14,12 @@ This file tracks active work.
 - Priority: High
 - Description: Track plan in `brain/plans/2026-06-12-bug-fix-mobile-chrome-install-not-working.md`.
 - Related Feature: Fix Mobile Chrome Install Not Working
-- Status: In Progress
-- Plan Status: In Progress
+- Status: Implemented - Pending Device Verification
+- Plan Status: Implemented - Pending Device Verification
 - Plan File: brain/plans/2026-06-12-bug-fix-mobile-chrome-install-not-working.md
 - Created Date: 2026-06-12
+- Current Notes: Code-side PWA install hardening is implemented for the website service worker, manifest, mobile install sheet, analytics events, and repeatable `pwa:verify` checks. Local production response checks and direct system Chrome mobile DOM/CDP smoke passed on 2026-06-15, including zero Chrome manifest/installability errors and a registered/controlling service worker. A `Pixel_3a_API_34` emulator booted and Android Chrome was launched, but System UI ANR/black-screen instability prevented trustworthy native install-dialog verification.
+- Next Step: Re-test on physical Android Chrome or Chrome DevTools with installability diagnostics and confirm the install dialog opens when criteria are met.
 
 ## Template
 ```md

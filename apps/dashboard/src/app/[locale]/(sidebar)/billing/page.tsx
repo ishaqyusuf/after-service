@@ -19,7 +19,12 @@ export const metadata: Metadata = {
   description: "Manage your subscription and billing details.",
 };
 
-export default async function BillingPage() {
+type BillingPageProps = {
+  params: Promise<{ locale: string }>;
+};
+
+export default async function BillingPage({ params }: BillingPageProps) {
+  const { locale } = await params;
   const headerList = await headers();
   const { acceptLanguage, continent, country } =
     getHeaderPricingHints(headerList);
@@ -27,6 +32,7 @@ export default async function BillingPage() {
     acceptLanguage,
     continent,
     country,
+    routeLocale: locale,
   });
 
   batchPrefetch([

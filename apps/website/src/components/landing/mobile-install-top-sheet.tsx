@@ -16,7 +16,8 @@ type BeforeInstallPromptEvent = Event & {
   }>;
 };
 
-type FallbackMode = "android-chrome" | "ios-chrome";
+type FallbackMode = "android-chrome" | "ios-chrome" | "unsupported";
+type PromptFailureReason = "prompt_failed" | "prompt_unavailable";
 
 const DISMISSED_UNTIL_KEY = "afterservice:pwa-install-dismissed-until";
 const INSTALLED_KEY = "afterservice:pwa-installed";
@@ -96,8 +97,12 @@ export function MobileInstallTopSheet({
   const [fallbackMode, setFallbackMode] = useState<FallbackMode | null>(null);
   const [isDismissed, setIsDismissed] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
+  const [isPrompting, setIsPrompting] = useState(false);
+  const [promptFailureReason, setPromptFailureReason] =
+    useState<PromptFailureReason | null>(null);
   const hasPromptRef = useRef(false);
   const promptShownTracked = useRef(false);
+  const unavailableTracked = useRef<string | null>(null);
   const track = useTrack();
 
   const isVisible = useMemo(
@@ -106,6 +111,19 @@ export function MobileInstallTopSheet({
   );
 
   const promptCopy = useMemo(() => {
+    if (promptFailureReason) {
+      return {
+        subtitle:
+          fallbackMode === "ios-chrome"
+            ? "Open in Safari to add it to your home screen"
+            : "Use Chrome menu, then Add to Home screen",
+        title:
+          promptFailureReason === "prompt_failed"
+            ? "Install prompt did not open"
+            : "Install prompt unavailable",
+      };
+    }
+
     if (deferredPrompt) {
       return {
         subtitle: "Open faster from your home screen",
@@ -124,7 +142,27 @@ export function MobileInstallTopSheet({
       subtitle: "Use Chrome menu, then Add to Home screen",
       title: "Install afterservice",
     };
-  }, [deferredPrompt, fallbackMode]);
+  }, [deferredPrompt, fallbackMode, promptFailureReason]);
+
+  const trackInstallUnavailable = useCallback(
+    (reason: string, mode: FallbackMode | null) => {
+      const trackingKey = `${reason}:${mode ?? "unknown"}`;
+
+      if (unavailableTracked.current === trackingKey) {
+        return;
+      }
+
+      unavailableTracked.current = trackingKey;
+      track({
+        event: LogEvents.PwaInstallUnavailable.name,
+        channel: LogEvents.PwaInstallUnavailable.channel,
+        location: "mobile_install_top_sheet",
+        mode: mode ?? "unknown",
+        reason,
+      });
+    },
+    [track],
+  );
 
   useEffect(() => {
     onVisibilityChange(isVisible);
@@ -162,6 +200,7 @@ export function MobileInstallTopSheet({
       setDeferredPrompt(event as BeforeInstallPromptEvent);
       setFallbackMode(null);
       setIsDismissed(false);
+      setPromptFailureReason(null);
     };
 
     const onAppInstalled = () => {
@@ -180,6 +219,12 @@ export function MobileInstallTopSheet({
   }, []);
 
   useEffect(() => {
+    if (isStandaloneDisplay()) {
+      setStorageItem(INSTALLED_KEY, "true");
+      setIsDismissed(true);
+      return;
+    }
+
     if (!isMobile || getInstallSuppression() || isStandaloneDisplay()) {
       return;
     }
@@ -189,17 +234,26 @@ export function MobileInstallTopSheet({
         return;
       }
 
-      setFallbackMode(getFallbackMode());
+      const mode = getFallbackMode();
+
+      if (!mode) {
+        return;
+      }
+
+      setFallbackMode(mode);
+      setPromptFailureReason(null);
+      trackInstallUnavailable("beforeinstallprompt_missing", mode);
     }, 2500);
 
     return () => window.clearTimeout(timeout);
-  }, [isMobile]);
+  }, [isMobile, trackInstallUnavailable]);
 
   const dismissPrompt = useCallback(
     (reason: string) => {
       suppressInstallPrompt();
       setDeferredPrompt(null);
       setFallbackMode(null);
+      setPromptFailureReason(null);
       setIsDismissed(true);
       track({
         event: LogEvents.PwaInstallDismissed.name,
@@ -213,9 +267,20 @@ export function MobileInstallTopSheet({
 
   const installApp = useCallback(async () => {
     if (!deferredPrompt) {
+      const mode = getFallbackMode() ?? "unsupported";
+
+      setFallbackMode(mode);
+      setPromptFailureReason("prompt_unavailable");
+      trackInstallUnavailable("install_clicked_without_prompt", mode);
       return;
     }
 
+    if (isPrompting) {
+      return;
+    }
+
+    setIsPrompting(true);
+    setPromptFailureReason(null);
     track({
       event: LogEvents.PwaInstallClicked.name,
       channel: LogEvents.PwaInstallClicked.channel,
@@ -250,16 +315,22 @@ export function MobileInstallTopSheet({
       setDeferredPrompt(null);
       setFallbackMode(null);
     } catch {
+      const mode = getFallbackMode() ?? "unsupported";
+
       setDeferredPrompt(null);
-      setFallbackMode(getFallbackMode());
+      setFallbackMode(mode);
+      setPromptFailureReason("prompt_failed");
       track({
-        event: LogEvents.PwaInstallDismissed.name,
-        channel: LogEvents.PwaInstallDismissed.channel,
+        event: LogEvents.PwaInstallFailed.name,
+        channel: LogEvents.PwaInstallFailed.channel,
         location: "mobile_install_top_sheet",
+        mode,
         reason: "prompt_failed",
       });
+    } finally {
+      setIsPrompting(false);
     }
-  }, [deferredPrompt, track]);
+  }, [deferredPrompt, isPrompting, track, trackInstallUnavailable]);
 
   return (
     <div
@@ -273,6 +344,7 @@ export function MobileInstallTopSheet({
           : "pointer-events-none -translate-y-4 opacity-0",
       ].join(" ")}
       aria-hidden={!isVisible}
+      role="status"
     >
       <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-white">
         <Image
@@ -298,9 +370,10 @@ export function MobileInstallTopSheet({
         <button
           type="button"
           onClick={installApp}
-          className="inline-flex h-10 shrink-0 items-center justify-center gap-1.5 rounded-full bg-white px-4 text-sm font-bold text-[#0a0a0a] shadow-sm transition-colors hover:bg-[#eef8f0] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0a0a0a]"
+          disabled={isPrompting}
+          className="inline-flex h-10 shrink-0 items-center justify-center gap-1.5 rounded-full bg-white px-4 text-sm font-bold text-[#0a0a0a] shadow-sm transition-colors hover:bg-[#eef8f0] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0a0a0a] disabled:cursor-wait disabled:opacity-70"
         >
-          Install now
+          {isPrompting ? "Opening..." : "Install now"}
           <Download className="h-4 w-4" />
         </button>
       )}
