@@ -25,6 +25,8 @@ type MutationResult<T> = {
 ```
 
 ## Workspace
+Workspace onboarding and settings reject reserved platform/system workspace names such as `afterservice`, `admin`, `api`, `dashboard`, `support`, `system`, `test`, and `demo`.
+
 ```ts
 type WorkspaceCurrent = {
   item: {

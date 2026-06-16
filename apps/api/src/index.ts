@@ -9,6 +9,7 @@ import { cors } from "hono/cors";
 import { z } from "zod";
 import { createContext } from "./context";
 import { appRouter } from "./routers/_app";
+import { onboardingSchema } from "./schemas";
 
 const app = new Hono();
 const trustedOrigins = getTrustedOrigins();
@@ -24,13 +25,6 @@ app.use(
     },
   }),
 );
-
-const onboardingSchema = z.object({
-  businessName: z.string().trim().min(1),
-  businessType: z.string().trim().optional(),
-  defaultFollowUpDelayDays: z.coerce.number().int().min(1).max(365).default(7),
-  serviceCategory: z.string().trim().optional(),
-});
 
 const followUpJobSchema = z.object({
   markMissed: z.boolean().default(false),
@@ -86,7 +80,12 @@ app.post("/api/onboarding", async (c) => {
   const parsed = onboardingSchema.safeParse(await c.req.json());
 
   if (!parsed.success) {
-    return c.json({ error: "Invalid onboarding payload" }, 400);
+    return c.json(
+      {
+        error: parsed.error.issues[0]?.message ?? "Invalid onboarding payload",
+      },
+      400,
+    );
   }
 
   const db = getDbClient();

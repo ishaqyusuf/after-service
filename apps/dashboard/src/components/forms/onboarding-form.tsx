@@ -11,9 +11,13 @@ import {
   Select,
   SelectContent,
   SelectItem,
-  Skeleton,
   SelectTrigger,
   SelectValue,
+  Skeleton,
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
 } from "@afterservice/ui";
 import {
   Form,
@@ -23,6 +27,7 @@ import {
   FormLabel,
   FormMessage,
 } from "@afterservice/ui/form";
+import { Info } from "lucide-react";
 import { useMemo, useState } from "react";
 import type { z } from "zod";
 import { useZodForm } from "@/hooks/use-zod-form";
@@ -40,6 +45,13 @@ const followUpDelayOptions = [
   { label: "7 days", value: "7" },
   { label: "14 days", value: "14" },
   { label: "30 days", value: "30" },
+] as const;
+
+const onboardingSkeletonFields = [
+  "business-name",
+  "business-type",
+  "service-category",
+  "follow-up-delay",
 ] as const;
 
 export function OnboardingForm() {
@@ -74,7 +86,11 @@ export function OnboardingForm() {
     }
 
     if (!response.ok) {
-      setError("Workspace setup failed.");
+      const payload = (await response.json().catch(() => null)) as {
+        error?: string;
+      } | null;
+
+      setError(payload?.error ?? "Workspace setup failed.");
       return;
     }
 
@@ -202,7 +218,24 @@ export function OnboardingForm() {
             name="defaultFollowUpDelayDays"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Default follow-up delay</FormLabel>
+                <TooltipProvider delayDuration={150}>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <FormLabel className="inline-flex w-fit items-center gap-1.5">
+                        Default follow-up delay
+                        <Info
+                          aria-hidden="true"
+                          className="size-3.5 text-muted-foreground"
+                        />
+                      </FormLabel>
+                    </TooltipTrigger>
+                    <TooltipContent className="max-w-64 text-balance">
+                      How many days after a completed job afterservice uses as
+                      the starting due date for new follow-ups. You can change
+                      individual follow-ups later.
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
                 <Select
                   onValueChange={(value) => field.onChange(Number(value))}
                   value={String(field.value)}
@@ -240,8 +273,8 @@ export function OnboardingFormSkeleton() {
   return (
     <div className="space-y-6">
       <div className="space-y-4">
-        {Array.from({ length: 4 }).map((_, index) => (
-          <div key={index} className="space-y-2">
+        {onboardingSkeletonFields.map((field) => (
+          <div key={field} className="space-y-2">
             <Skeleton className="h-4 w-36" />
             <Skeleton className="h-9 w-full" />
           </div>

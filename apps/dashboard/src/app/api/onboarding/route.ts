@@ -1,13 +1,6 @@
+import { onboardingSchema } from "@afterservice/api/schemas";
 import { auth } from "@afterservice/auth";
 import { buildWorkspaceTemplateSeed, getDbClient } from "@afterservice/db";
-import { z } from "zod";
-
-const onboardingSchema = z.object({
-  businessName: z.string().trim().min(1),
-  businessType: z.string().trim().optional(),
-  defaultFollowUpDelayDays: z.coerce.number().int().min(1).max(365).default(7),
-  serviceCategory: z.string().trim().optional(),
-});
 
 function slugify(value: string) {
   return (
@@ -32,7 +25,9 @@ export async function POST(request: Request) {
 
   if (!parsed.success) {
     return Response.json(
-      { error: "Invalid onboarding payload" },
+      {
+        error: parsed.error.issues[0]?.message ?? "Invalid onboarding payload",
+      },
       { status: 400 },
     );
   }

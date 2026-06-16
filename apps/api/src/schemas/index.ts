@@ -1,5 +1,44 @@
 import { z } from "zod";
 
+export const RESERVED_BUSINESS_NAMES = [
+  "admin",
+  "administrator",
+  "afterservice",
+  "afterservice app",
+  "api",
+  "dashboard",
+  "demo",
+  "root",
+  "support",
+  "system",
+  "test",
+] as const;
+
+const RESERVED_BUSINESS_NAME_KEYS = new Set(
+  RESERVED_BUSINESS_NAMES.map((name) => normalizeBusinessName(name)),
+);
+
+export function normalizeBusinessName(value: string) {
+  return value
+    .toLowerCase()
+    .replace(/&/g, " and ")
+    .replace(/[^a-z0-9]+/g, " ")
+    .trim()
+    .replace(/\s+/g, " ");
+}
+
+export function isReservedBusinessName(value: string) {
+  return RESERVED_BUSINESS_NAME_KEYS.has(normalizeBusinessName(value));
+}
+
+const businessNameSchema = z
+  .string()
+  .trim()
+  .min(1, "Business name is required")
+  .refine((value) => !isReservedBusinessName(value), {
+    message: "Use your business name instead of a reserved afterservice name",
+  });
+
 export const channelSchema = z.enum(["email", "sms", "phone", "whatsapp"]);
 export const followUpStatusSchema = z.enum([
   "open",
@@ -94,12 +133,12 @@ export const updateTemplateSchema = z.object({
 export const updateWorkspaceSettingsSchema = z.object({
   businessType: z.string().trim().optional(),
   defaultFollowUpDelayDays: z.coerce.number().int().min(1).max(365),
-  name: z.string().trim().min(1),
+  name: businessNameSchema,
   serviceCategory: z.string().trim().optional(),
 });
 
 export const onboardingSchema = z.object({
-  businessName: z.string().trim().min(1),
+  businessName: businessNameSchema,
   businessType: z.string().trim().optional(),
   defaultFollowUpDelayDays: z.coerce.number().int().min(1).max(365).default(7),
   serviceCategory: z.string().trim().optional(),
