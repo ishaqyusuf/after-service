@@ -2,7 +2,7 @@
 
 set -eu
 
-default_ports="${AFTERSERVICE_KILL_PORTS:-1355 4100 4101 4102 5555}"
+default_ports="${AFTERSERVICE_KILL_PORTS:-4100 4101 4102 5555}"
 
 ports=$(
   {

@@ -1,19 +1,31 @@
+import { syncEnvVars } from "@trigger.dev/build/extensions/core";
 import { prismaExtension } from "@trigger.dev/build/extensions/prisma";
 import { defineConfig } from "@trigger.dev/sdk/v3";
 
+const syncedProductionEnvVars = [
+  "AFTERSERVICE_ENV_MODE",
+  "DATABASE_URL",
+  "EMAIL_FROM_ADDRESS",
+  "RESEND_API_KEY",
+  "TEST_EMAIL",
+] as const;
+
 function getTriggerProjectId() {
-  const projectId = process.env.TRIGGER_PROJECT_ID;
+  return process.env.TRIGGER_PROJECT_ID?.trim() || "remote-indexer-project-ref";
+}
 
-  if (!projectId) {
-    throw new Error("TRIGGER_PROJECT_ID is required to configure jobs.");
-  }
-
-  return projectId;
+function getSyncedProductionEnv() {
+  return Object.fromEntries(
+    syncedProductionEnvVars.flatMap((key) => {
+      const value = process.env[key]?.trim();
+      return value ? [[key, value]] : [];
+    }),
+  );
 }
 
 export default defineConfig({
   project: getTriggerProjectId(),
-  runtime: "node",
+  runtime: "node-22",
   logLevel: "log",
   maxDuration: 60,
   retries: {
@@ -28,6 +40,7 @@ export default defineConfig({
   },
   build: {
     extensions: [
+      syncEnvVars(() => getSyncedProductionEnv(), { override: true }),
       prismaExtension({
         directUrlEnvVarName: "DATABASE_URL",
         schema: "./src/schema.prisma",
