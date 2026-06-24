@@ -1,7 +1,7 @@
 import { appMetadata, siteRootDomain } from "@afterservice/utils";
 import type { Metadata, MetadataRoute } from "next";
 
-export const siteUrl = `https://${siteRootDomain}`;
+export const siteUrl = `https://www.${siteRootDomain}`;
 export const socialImage = {
   alt: "afterservice - one board for every post-job customer follow-up",
   height: 630,
@@ -13,54 +13,100 @@ export type PublicRoute = {
   path: string;
   priority: number;
   changeFrequency: MetadataRoute.Sitemap[number]["changeFrequency"];
+  lastModified: string;
 };
 
 export const publicRoutes: PublicRoute[] = [
-  { path: "/", priority: 1, changeFrequency: "weekly" },
-  { path: "/pricing", priority: 0.8, changeFrequency: "monthly" },
-  { path: "/features", priority: 0.8, changeFrequency: "monthly" },
+  {
+    path: "/",
+    priority: 1,
+    changeFrequency: "weekly",
+    lastModified: "2026-06-18",
+  },
+  {
+    path: "/pricing",
+    priority: 0.8,
+    changeFrequency: "monthly",
+    lastModified: "2026-06-15",
+  },
+  {
+    path: "/features",
+    priority: 0.8,
+    changeFrequency: "monthly",
+    lastModified: "2026-06-18",
+  },
   {
     path: "/features/follow-up-board",
     priority: 0.7,
     changeFrequency: "monthly",
+    lastModified: "2026-06-18",
   },
-  { path: "/features/templates", priority: 0.7, changeFrequency: "monthly" },
+  {
+    path: "/features/templates",
+    priority: 0.7,
+    changeFrequency: "monthly",
+    lastModified: "2026-06-18",
+  },
   {
     path: "/features/customer-history",
     priority: 0.7,
     changeFrequency: "monthly",
+    lastModified: "2026-06-18",
   },
-  { path: "/customers", priority: 0.7, changeFrequency: "monthly" },
-  { path: "/signup", priority: 0.7, changeFrequency: "monthly" },
   {
     path: "/solutions/repair-shops",
     priority: 0.8,
     changeFrequency: "monthly",
+    lastModified: "2026-06-18",
   },
-  { path: "/solutions/installers", priority: 0.8, changeFrequency: "monthly" },
-  { path: "/solutions/contractors", priority: 0.8, changeFrequency: "monthly" },
+  {
+    path: "/solutions/installers",
+    priority: 0.8,
+    changeFrequency: "monthly",
+    lastModified: "2026-06-18",
+  },
+  {
+    path: "/solutions/contractors",
+    priority: 0.8,
+    changeFrequency: "monthly",
+    lastModified: "2026-06-18",
+  },
   {
     path: "/solutions/field-service-teams",
     priority: 0.8,
     changeFrequency: "monthly",
+    lastModified: "2026-06-18",
   },
   {
     path: "/guides/post-job-follow-up",
     priority: 0.7,
     changeFrequency: "monthly",
+    lastModified: "2026-06-18",
   },
   {
     path: "/guides/review-request-workflow",
     priority: 0.7,
     changeFrequency: "monthly",
+    lastModified: "2026-06-18",
   },
   {
     path: "/guides/issue-recovery-follow-up",
     priority: 0.7,
     changeFrequency: "monthly",
+    lastModified: "2026-06-18",
   },
-  { path: "/privacy", priority: 0.2, changeFrequency: "yearly" },
-  { path: "/terms", priority: 0.2, changeFrequency: "yearly" },
+  {
+    path: "/privacy",
+    priority: 0.2,
+    changeFrequency: "yearly",
+    lastModified: "2026-06-09",
+  },
+  {
+    path: "/terms",
+    priority: 0.2,
+    changeFrequency: "yearly",
+    lastModified: "2026-06-09",
+  },
 ];
 
 export function absoluteUrl(path = "/") {
@@ -165,5 +211,45 @@ export function breadcrumbJsonLd(items: Array<{ name: string; path: string }>) {
       name: item.name,
       position: index + 1,
     })),
+  };
+}
+
+export function faqJsonLd(items: Array<{ answer: string; question: string }>) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: items.map((item) => ({
+      "@type": "Question",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: item.answer,
+      },
+      name: item.question,
+    })),
+  };
+}
+
+export function articleJsonLd({
+  description,
+  path,
+  title,
+}: {
+  description: string;
+  path: string;
+  title: string;
+}) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    dateModified: "2026-06-18",
+    datePublished: "2026-06-09",
+    description,
+    headline: title.replace(" | afterservice", ""),
+    mainEntityOfPage: absoluteUrl(path),
+    publisher: {
+      "@type": "Organization",
+      name: appMetadata.name,
+      url: siteUrl,
+    },
   };
 }

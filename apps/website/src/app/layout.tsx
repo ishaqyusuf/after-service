@@ -49,6 +49,11 @@ export const metadata: Metadata = {
   },
   manifest: "/manifest.webmanifest",
   metadataBase: new URL(siteUrl),
+  verification: process.env.GOOGLE_SITE_VERIFICATION
+    ? {
+        google: process.env.GOOGLE_SITE_VERIFICATION,
+      }
+    : undefined,
 };
 
 export default async function RootLayout({

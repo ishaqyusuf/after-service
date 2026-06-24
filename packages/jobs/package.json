@@ -6,7 +6,6 @@
     ".": "./src/index.ts"
   },
   "scripts": {
-    "build": "tsc --noEmit",
     "deploy": "bun run prisma.ts && bun run --filter @afterservice/db db:generate && bun ../../scripts/with-workspace-env.mjs --mode production -- bun ../../scripts/with-trigger-profile.mjs -- trigger deploy",
     "dev": "bun ../../scripts/with-workspace-env.mjs --mode local -- bun ../../scripts/with-trigger-profile.mjs -- trigger dev",
     "lint": "biome check .",

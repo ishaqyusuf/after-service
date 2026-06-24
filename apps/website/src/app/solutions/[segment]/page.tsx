@@ -1,7 +1,12 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { JsonLd } from "../../../components/json-ld";
-import { breadcrumbJsonLd, createPageMetadata } from "../../../lib/seo";
+import { SeoFaq } from "../../../components/seo-faq";
+import {
+  breadcrumbJsonLd,
+  createPageMetadata,
+  faqJsonLd,
+} from "../../../lib/seo";
 import {
   getSolutionPage,
   guidePages,
@@ -46,11 +51,14 @@ export default async function SolutionPage({ params }: SolutionPageProps) {
   return (
     <main className="bg-background text-foreground">
       <JsonLd
-        data={breadcrumbJsonLd([
-          { name: "Home", path: "/" },
-          { name: "Solutions", path: "/features" },
-          { name: page.audience, path: page.path },
-        ])}
+        data={[
+          breadcrumbJsonLd([
+            { name: "Home", path: "/" },
+            { name: "Solutions", path: "/features" },
+            { name: page.audience, path: page.path },
+          ]),
+          faqJsonLd(page.faqs),
+        ]}
       />
       <section className="mx-auto max-w-5xl px-6 py-16 sm:px-8 lg:py-24">
         <p className="text-sm font-semibold uppercase tracking-[0.18em] text-[#009b98]">
@@ -117,6 +125,27 @@ export default async function SolutionPage({ params }: SolutionPageProps) {
           ))}
         </div>
       </section>
+
+      <section className="border-y border-border bg-muted/30">
+        <div className="mx-auto max-w-5xl px-6 py-16 sm:px-8">
+          <h2 className="text-2xl font-semibold text-[#18211c] dark:text-white">
+            A practical follow-up cadence
+          </h2>
+          <div className="mt-8 divide-y divide-border border-y border-border">
+            {page.cadence.map((item) => (
+              <div
+                className="grid gap-3 py-6 md:grid-cols-[14rem_1fr] md:gap-8"
+                key={item.timing}
+              >
+                <h3 className="font-semibold text-foreground">{item.timing}</h3>
+                <p className="leading-7 text-muted-foreground">{item.action}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <SeoFaq items={page.faqs} />
 
       <section className="mx-auto max-w-5xl px-6 pb-20 sm:px-8">
         <h2 className="text-2xl font-semibold text-[#18211c] dark:text-white">

@@ -1,7 +1,13 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { JsonLd } from "../../../components/json-ld";
-import { breadcrumbJsonLd, createPageMetadata } from "../../../lib/seo";
+import { SeoFaq } from "../../../components/seo-faq";
+import {
+  articleJsonLd,
+  breadcrumbJsonLd,
+  createPageMetadata,
+  faqJsonLd,
+} from "../../../lib/seo";
 import {
   getGuidePage,
   guidePages,
@@ -46,11 +52,19 @@ export default async function GuidePage({ params }: GuidePageProps) {
   return (
     <main className="bg-background text-foreground">
       <JsonLd
-        data={breadcrumbJsonLd([
-          { name: "Home", path: "/" },
-          { name: "Guides", path: "/features" },
-          { name: page.title, path: page.path },
-        ])}
+        data={[
+          articleJsonLd({
+            description: page.description,
+            path: page.path,
+            title: page.title,
+          }),
+          breadcrumbJsonLd([
+            { name: "Home", path: "/" },
+            { name: "Guides", path: "/features" },
+            { name: page.title, path: page.path },
+          ]),
+          faqJsonLd(page.faqs),
+        ]}
       />
       <article className="mx-auto max-w-3xl px-6 py-16 sm:px-8 lg:py-24">
         <p className="text-sm font-semibold uppercase tracking-[0.18em] text-[#009b98]">
@@ -69,9 +83,28 @@ export default async function GuidePage({ params }: GuidePageProps) {
               <h2 className="text-2xl font-semibold text-[#18211c] dark:text-white">
                 {section.title}
               </h2>
-              <p className="mt-4 leading-8 text-muted-foreground">
-                {section.body}
-              </p>
+              <div className="mt-4 space-y-4 leading-8 text-muted-foreground">
+                {section.body.map((paragraph) => (
+                  <p key={paragraph}>{paragraph}</p>
+                ))}
+              </div>
+              {section.checklist && (
+                <ul className="mt-5 list-disc space-y-2 pl-6 leading-7 text-muted-foreground">
+                  {section.checklist.map((item) => (
+                    <li key={item}>{item}</li>
+                  ))}
+                </ul>
+              )}
+              {section.example && (
+                <div className="mt-5 border-l-2 border-[#009b98] bg-muted/40 px-5 py-4">
+                  <p className="text-sm font-semibold text-foreground">
+                    Example
+                  </p>
+                  <p className="mt-2 leading-7 text-muted-foreground">
+                    {section.example}
+                  </p>
+                </div>
+              )}
             </section>
           ))}
         </div>
@@ -92,6 +125,8 @@ export default async function GuidePage({ params }: GuidePageProps) {
           </a>
         </div>
       </article>
+
+      <SeoFaq items={page.faqs} />
 
       <section className="border-t border-border bg-muted/30">
         <div className="mx-auto max-w-5xl px-6 py-14 sm:px-8">

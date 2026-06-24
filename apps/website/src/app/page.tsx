@@ -1,9 +1,11 @@
 import type { Metadata } from "next";
 import { JsonLd } from "../components/json-ld";
+import { landingFaqs } from "../components/landing/faq";
 import { LaunchedPage } from "../components/launched";
 import { getPricingResolution } from "../lib/pricing-request";
 import {
   createPageMetadata,
+  faqJsonLd,
   organizationJsonLd,
   softwareApplicationJsonLd,
 } from "../lib/seo";
@@ -26,7 +28,13 @@ export default async function HomePage({ searchParams }: HomePageProps) {
 
   return (
     <>
-      <JsonLd data={[organizationJsonLd(), softwareApplicationJsonLd()]} />
+      <JsonLd
+        data={[
+          organizationJsonLd(),
+          softwareApplicationJsonLd(),
+          faqJsonLd(landingFaqs),
+        ]}
+      />
       <LaunchedPage initialPricing={initialPricing} />
     </>
   );

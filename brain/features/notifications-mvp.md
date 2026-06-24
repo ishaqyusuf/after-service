@@ -26,3 +26,4 @@ Updated on 2026-06-11 so explicit manual email sends are queued through Trigger.
 
 ## Safety Rule
 No automatic customer outbound messaging is sent in MVP. Real email is limited to explicit manual-send paths, queued through jobs, and dev/local mode must route recipients through `TEST_EMAIL` when it is set.
+2026-06-18: The daily combined analytics review is an internal owner report sent directly from `packages/jobs` to `TEST_EMAIL`. It does not use `packages/notifications`, does not create customer-facing `MessageLog` records, and does not change customer notification delivery behavior.

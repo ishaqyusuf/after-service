@@ -6,6 +6,44 @@ This file records completed work.
 
 ## Completed
 
+### Daily Combined Analytics Review
+
+Completed: 2026-06-18
+
+Summary:
+
+- Added a Trigger.dev scheduled owner-report job that runs at `08:00 Africa/Lagos`.
+- The report covers the previous Lagos calendar day and combines OpenPanel website insights with platform database counts.
+- Sends the internal review directly to `TEST_EMAIL` through Resend without using customer notification delivery or workspace message logs.
+
+Verification:
+
+- `bun --filter @afterservice/jobs typecheck`.
+- `git diff --check -- packages/jobs/src/tasks/analytics-review.ts packages/jobs/trigger.config.ts .env.example brain/system/observability.md brain/features/jobs-mvp.md brain/features/notifications-mvp.md`.
+
+### Website SEO Hardening And Content Expansion
+
+Completed: 2026-06-18
+
+Summary:
+
+- Aligned canonical metadata, sitemap URLs, robots output, and environment documentation with the live `www.afterservice.app` production host.
+- Removed auth entry routes and the duplicate `/customers` page from the indexable sitemap surface; `/customers` now permanently redirects to the canonical customer-history feature page.
+- Added environment-driven Google Search Console verification support, route-specific sitemap modification dates, homepage FAQ data, and Article/FAQ structured data for search pages.
+- Rebuilt the features hub and expanded feature, solution, and guide pages with practical workflows, cadence guidance, examples, checklists, internal links, and page-specific FAQs.
+
+Verification:
+
+- `bunx biome check` on all changed website, SEO, environment, and navigation files.
+- `bun --filter @afterservice/website typecheck`.
+- `bun --filter @afterservice/website build` generated all 24 routes successfully.
+- Local production responses confirmed the `/customers` 308 redirect, crawl exclusions, canonical `www` sitemap URLs, and route-specific modification dates.
+- Generated server artifacts contain the canonical origin and Article/FAQ structured-data output.
+
+Operational follow-up:
+
+- Add the Google-issued verification token to production as `GOOGLE_SITE_VERIFICATION`, deploy, verify the Search Console property, and submit `https://www.afterservice.app/sitemap.xml`.
+
 ### Regional Pricing Locale Conversion Fix
 
 Completed: 2026-06-15

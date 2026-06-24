@@ -9,7 +9,6 @@
     "./server": "./src/server.ts"
   },
   "scripts": {
-    "build": "tsc --noEmit",
     "lint": "biome check .",
     "typecheck": "tsc --noEmit"
   },

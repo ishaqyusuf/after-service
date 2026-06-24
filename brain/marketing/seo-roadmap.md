@@ -13,6 +13,21 @@ This file is the source of truth for afterservice organic search strategy.
 - Secondary SEO goal: build topical authority around post-job follow-up workflows before broad paid launch.
 - Non-goal: compete for broad CRM, field service management, or reputation-management keywords before beta usage proves the wedge.
 
+## Implementation Status
+
+Updated: 2026-06-18
+
+- `https://www.afterservice.app` is the canonical marketing origin, matching the live apex-to-www production redirect.
+- The sitemap contains 15 indexable marketing, solution, feature, guide, pricing, and legal URLs with route-specific modification dates.
+- Login and signup entry routes are excluded from crawling and the sitemap because they redirect to dashboard authentication.
+- `/customers` permanently redirects to `/features/customer-history` to avoid competing customer-history pages.
+- Global metadata includes canonical URLs, Open Graph, X/Twitter cards, and optional Google Search Console verification through `GOOGLE_SITE_VERIFICATION`.
+- Organization and SoftwareApplication structured data are present on the homepage.
+- Article, BreadcrumbList, and FAQPage structured data are present where relevant.
+- The features hub links to every feature, priority solution segment, and practical guide.
+- Three feature pages, four solution pages, and three guides now include workflow-specific detail, examples, checklists, cadence guidance, and FAQs.
+- Google Search Console ownership verification and sitemap submission remain operational steps. Add the Google-issued token to `GOOGLE_SITE_VERIFICATION`, deploy, verify ownership, and submit `https://www.afterservice.app/sitemap.xml`.
+
 ## Search Positioning
 
 afterservice should own a narrow, practical category:
@@ -39,28 +54,28 @@ Core search themes:
 
 ### Weeks 1-2: Technical Foundation
 
-- Add crawlable sitemap and robots routes for `afterservice.app`.
-- Add canonical URLs, Open Graph metadata, Twitter metadata, and production `metadataBase`.
+- [x] Add crawlable sitemap and robots routes for `afterservice.app`.
+- [x] Add canonical URLs, Open Graph metadata, Twitter metadata, and production `metadataBase`.
   - 2026-06-12: Added a root generated Open Graph image route and wired the global metadata helper to use `summary_large_image` cards for X/Twitter and image-backed Open Graph previews.
-- Add structured data for Organization, SoftwareApplication, and BreadcrumbList where relevant.
-- Keep login-style utility pages out of the index when they do not help searchers.
-- Verify Google Search Console and submit the sitemap.
+- [x] Add structured data for Organization, SoftwareApplication, Article, FAQPage, and BreadcrumbList where relevant.
+- [x] Keep login-style utility pages out of the index when they do not help searchers.
+- [ ] Verify Google Search Console and submit the sitemap. Code support is complete; the Google-issued verification token and Search Console property access are required.
 
 ### Weeks 2-4: High-Intent Pages
 
-- Publish solution pages for repair shops, installers, contractors, and field service teams.
-- Publish deeper feature pages for follow-up board, templates, and customer history.
-- Link solution and guide pages from homepage/footer navigation.
-- Keep every page free-beta aligned: "Join Free Beta" and "no credit card required."
+- [x] Publish solution pages for repair shops, installers, contractors, and field service teams.
+- [x] Publish deeper feature pages for follow-up board, templates, and customer history.
+- [x] Link solution and guide pages from homepage/footer navigation and the features hub.
+- [x] Keep every page free-beta aligned: "Join Free Beta" and "no credit card required."
 
 ### Weeks 4-8: Helpful Content Cluster
 
-- Publish practical guides grounded in real operator workflows:
-  - Post-job follow-up checklist.
-  - Review request workflow for service businesses.
-  - Issue recovery follow-up after completed work.
-  - Spreadsheet vs follow-up board for service teams.
-  - Follow-up templates for repair shops, installers, and contractors.
+- [x] Publish practical guides grounded in real operator workflows:
+  - [x] Post-job follow-up checklist.
+  - [x] Review request workflow for service businesses.
+  - [x] Issue recovery follow-up after completed work.
+  - [ ] Spreadsheet vs follow-up board for service teams.
+  - [ ] Follow-up templates for repair shops, installers, and contractors.
 - Use beta feedback and operator language from `brain/marketing/feedback.md`.
 - Avoid generic AI-style articles and unsupported automation claims.
 

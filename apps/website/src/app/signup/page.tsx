@@ -8,6 +8,7 @@ export async function generateMetadata(): Promise<Metadata> {
     title: "Join Free Beta | afterservice",
     description:
       "Create a free beta afterservice workspace for post-job customer follow-up. No credit card required.",
+    noIndex: true,
     path: "/signup",
   });
 }
