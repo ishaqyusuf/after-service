@@ -64,3 +64,8 @@ Require active membership:
 - Safe redirect validation:
   - Only allow same-origin relative paths beginning with `/`.
   - Reject `//evil.com`, absolute URLs, and backslash variants.
+# QA maintenance
+
+- Only users whose global `platformRole` is `platform_admin` may discover,
+  adopt, preview, start, or poll QA purge runs.
+- Workspace owner/admin roles do not grant platform maintenance authority.

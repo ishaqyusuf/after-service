@@ -44,7 +44,7 @@ export class EmailService {
     const from = email.from || readNonEmptyEnv("EMAIL_FROM_ADDRESS");
     const recipients = resolveEmailRecipients(email.user.email);
 
-    if (!apiKey || !from || recipients.recipients.length === 0) {
+    if (!from || recipients.recipients.length === 0) {
       return {
         originalRecipients: recipients.originalRecipients,
         recipients: recipients.recipients,
@@ -53,40 +53,58 @@ export class EmailService {
       };
     }
 
+    let providerId: string | undefined;
     try {
-      const response = await fetch("https://api.resend.com/emails", {
-        body: JSON.stringify({
-          from,
-          html: emailBodyFromInput(email),
-          subject: email.subject,
-          to: recipients.recipients,
-        }),
-        headers: {
-          Authorization: `Bearer ${apiKey}`,
-          "Content-Type": "application/json",
-        },
-        method: "POST",
-      });
-      const payload = (await response.json().catch(() => null)) as {
-        error?: unknown;
-        id?: string;
-      } | null;
+      for (const route of recipients.routes) {
+        if (route.transport === "console") {
+          console.info("[email:console]", {
+            recipient: route.originalRecipient,
+            subject: email.subject,
+          });
+          continue;
+        }
+        if (!apiKey)
+          throw new Error("RESEND_API_KEY is required for provider delivery.");
+        const response = await fetch("https://api.resend.com/emails", {
+          body: JSON.stringify({
+            from,
+            headers: route.qaRouted
+              ? { "X-QA-Original-Recipient": route.originalRecipient }
+              : undefined,
+            html: route.qaRouted
+              ? `<p><strong>QA routed for ${route.originalRecipient}</strong></p>${emailBodyFromInput(email)}`
+              : emailBodyFromInput(email),
+            subject: route.qaRouted
+              ? `[QA: ${route.originalRecipient}] ${email.subject}`
+              : email.subject,
+            to: [route.recipient],
+          }),
+          headers: {
+            Authorization: `Bearer ${apiKey}`,
+            "Content-Type": "application/json",
+          },
+          method: "POST",
+        });
+        const payload = (await response.json().catch(() => null)) as {
+          error?: unknown;
+          id?: string;
+        } | null;
 
-      if (!response.ok || payload?.error) {
-        return {
-          error: payload?.error ?? response.statusText,
-          originalRecipients: recipients.originalRecipients,
-          recipients: recipients.recipients,
-          status: "failed",
-          wasRecipientOverridden: recipients.isOverridden,
-        };
+        if (!response.ok || payload?.error) {
+          throw payload?.error ?? new Error(response.statusText);
+        }
+        providerId = payload?.id ?? providerId;
       }
 
       return {
         originalRecipients: recipients.originalRecipients,
-        providerId: payload?.id,
+        providerId,
         recipients: recipients.recipients,
-        status: "sent",
+        status: recipients.routes.some(
+          (route) => route.transport === "provider",
+        )
+          ? "sent"
+          : "skipped",
         wasRecipientOverridden: recipients.isOverridden,
       };
     } catch (error) {

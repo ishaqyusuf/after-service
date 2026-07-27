@@ -94,27 +94,36 @@ export const auth = betterAuth({
     enabled: true,
     sendResetPassword: async ({ user, url }) => {
       const resendApiKey = readNonEmptyEnv("RESEND_API_KEY");
-      if (resendApiKey) {
-        const recipientResolution = resolveEmailRecipients(user.email);
-
-        await fetch("https://api.resend.com/emails", {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${resendApiKey}`,
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            from:
-              readNonEmptyEnv("EMAIL_FROM_ADDRESS") ??
-              "noreply@afterservice.app",
-            to: recipientResolution.recipients,
-            subject: "Reset your password",
-            html: `<p>Click <a href="${url}">here</a> to reset your password.</p>`,
-          }),
-        });
-      } else {
+      const recipientResolution = resolveEmailRecipients(user.email);
+      const [route] = recipientResolution.routes;
+      if (!route) throw new Error("At least one email recipient is required.");
+      if (route.transport === "console") {
         console.log(`[PASSWORD RESET] Send this link to ${user.email}: ${url}`);
+        return;
       }
+      if (!resendApiKey) {
+        throw new Error("RESEND_API_KEY is required for provider delivery.");
+      }
+
+      await fetch("https://api.resend.com/emails", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${resendApiKey}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          from:
+            readNonEmptyEnv("EMAIL_FROM_ADDRESS") ?? "noreply@afterservice.app",
+          to: [route.recipient],
+          subject: route.qaRouted
+            ? `[QA: ${route.originalRecipient}] Reset your password`
+            : "Reset your password",
+          headers: route.qaRouted
+            ? { "X-QA-Original-Recipient": route.originalRecipient }
+            : undefined,
+          html: `${route.qaRouted ? `<p><strong>QA routed for ${route.originalRecipient}</strong></p>` : ""}<p>Click <a href="${url}">here</a> to reset your password.</p>`,
+        }),
+      });
     },
   },
   socialProviders: {

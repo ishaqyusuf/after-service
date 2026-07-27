@@ -16,6 +16,7 @@ export type ApiContext = {
   session: BetterAuthSession | null;
   user: BetterAuthSession["user"] | null;
   workspace: ApiWorkspaceContext;
+  platformRole: "user" | "platform_admin";
 };
 
 export async function createContext(request?: Request): Promise<ApiContext> {
@@ -25,36 +26,46 @@ export async function createContext(request?: Request): Promise<ApiContext> {
       })
     : null;
   const db = getDbClient();
-  const membership = session?.user
-    ? await db.membership.findFirst({
-        orderBy: {
-          createdAt: "asc",
-        },
-        select: {
-          role: true,
-          workspace: {
-            select: {
-              id: true,
-              slug: true,
+  const [membership, platformUser] = session?.user
+    ? await Promise.all([
+        db.membership.findFirst({
+          orderBy: {
+            createdAt: "asc",
+          },
+          select: {
+            role: true,
+            workspace: {
+              select: {
+                id: true,
+                slug: true,
+                qaPurgeStartedAt: true,
+              },
             },
           },
-        },
-        where: {
-          userId: session.user.id,
-        },
-      })
-    : null;
+          where: {
+            userId: session.user.id,
+          },
+        }),
+        db.user.findUnique({
+          where: { id: session.user.id },
+          select: { platformRole: true },
+        }),
+      ])
+    : [null, null];
 
   return {
     session,
     requestId: crypto.randomUUID(),
     user: session?.user ?? null,
+    platformRole: platformUser?.platformRole ?? "user",
     workspace: membership
-      ? {
-          id: membership.workspace.id,
-          role: membership.role,
-          slug: membership.workspace.slug,
-        }
+      ? membership.workspace.qaPurgeStartedAt
+        ? null
+        : {
+            id: membership.workspace.id,
+            role: membership.role,
+            slug: membership.workspace.slug,
+          }
       : null,
   };
 }

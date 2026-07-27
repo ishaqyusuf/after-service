@@ -53,6 +53,25 @@ enum BillingProvider {
   stripe
 }
 
+enum PlatformRole {
+  user
+  platform_admin
+}
+
+enum QaDataClassification {
+  normal
+  qa
+}
+
+enum QaPurgeRunStatus {
+  pending
+  running
+  completed
+  partial
+  failed
+  blocked
+}
+
 model User {
   id            String       @id @default(cuid())
   email         String       @unique
@@ -64,6 +83,7 @@ model User {
   accounts      Account[]
   memberships   Membership[]
   sessions      Session[]
+  platformRole  PlatformRole @default(user)
 }
 
 model Session {
@@ -129,6 +149,26 @@ model Workspace {
   messageLogs              MessageLog[]
   subscriptions            Subscription[]
   templates                FollowUpTemplate[]
+  dataClassification       QaDataClassification @default(normal)
+  qaSourceDomain            String?
+  qaMarkedAt                DateTime?
+  qaPurgeStartedAt          DateTime?
+}
+
+model QaPurgeRun {
+  id                    String           @id @default(cuid())
+  actorUserId           String
+  status                QaPurgeRunStatus @default(pending)
+  activeKey             String?          @unique
+  startedAt             DateTime?
+  completedAt           DateTime?
+  deletedWorkspaceCount Int              @default(0)
+  deletedRecordCount    Int              @default(0)
+  deletedFileCount      Int              @default(0)
+  deletedFileBytes      BigInt           @default(0)
+  errorCategory         String?
+  createdAt             DateTime         @default(now())
+  updatedAt             DateTime         @updatedAt
 }
 
 model Membership {

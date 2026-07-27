@@ -10,6 +10,9 @@ export {
   ServiceJobStatus,
   WorkspacePlan,
   WorkspacePlanStatus,
+  PlatformRole,
+  QaDataClassification,
+  QaPurgeRunStatus,
 } from "../generated/prisma/enums";
 export {
   buildWorkspaceTemplateSeed,

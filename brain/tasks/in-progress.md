@@ -31,3 +31,8 @@ Goal:
 Current Notes:
 Next Step:
 ```
+# Cross-product QA email and cleanup
+
+- Product implementation is integrated. Schema rollout, secure route
+  propagation, canary delivery, and first reviewed purge remain deployment
+  work.

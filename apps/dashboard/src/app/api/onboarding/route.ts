@@ -1,6 +1,10 @@
 import { onboardingSchema } from "@afterservice/api/schemas";
 import { auth } from "@afterservice/auth";
-import { buildWorkspaceTemplateSeed, getDbClient } from "@afterservice/db";
+import {
+  buildWorkspaceTemplateSeed,
+  getDbClient,
+  getQaWorkspaceClassification,
+} from "@afterservice/db";
 
 function slugify(value: string) {
   return (
@@ -80,6 +84,7 @@ export async function POST(request: Request) {
         name: parsed.data.businessName,
         serviceCategory: parsed.data.serviceCategory,
         slug,
+        ...getQaWorkspaceClassification(session.user.email),
       },
       select: {
         id: true,

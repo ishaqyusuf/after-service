@@ -1,7 +1,12 @@
+import { createHmac, timingSafeEqual } from "node:crypto";
 import {
+  adoptQaWorkspaces,
+  createQaWorkspacePurgeRun,
+  discoverQaWorkspaceCandidates,
   getDashboardOverview,
   getDbClient,
   type Prisma,
+  previewQaWorkspacePurge,
   type WorkspacePlan,
 } from "@afterservice/db";
 import { LogEvents } from "@afterservice/events";
@@ -171,6 +176,49 @@ const protectedProcedure = t.procedure.use(({ ctx, next }) => {
     },
   });
 });
+
+const platformAdminProcedure = t.procedure.use(({ ctx, next }) => {
+  if (!ctx.user) throw new TRPCError({ code: "UNAUTHORIZED" });
+  if (ctx.platformRole !== "platform_admin") {
+    throw new TRPCError({
+      code: "FORBIDDEN",
+      message: "Platform administrator access is required.",
+    });
+  }
+  return next({ ctx: { ...ctx, user: ctx.user } });
+});
+
+function qaMaintenanceSecret() {
+  const secret =
+    process.env.QA_MAINTENANCE_SECRET?.trim() ??
+    process.env.BETTER_AUTH_SECRET?.trim();
+  if (!secret) throw new Error("QA maintenance secret is not configured.");
+  return secret;
+}
+
+function signQaPreview(fingerprint: string, expiresAt: number) {
+  const payload = `${expiresAt}.${fingerprint}`;
+  return `${payload}.${createHmac("sha256", qaMaintenanceSecret()).update(payload).digest("hex")}`;
+}
+
+function validateQaPreview(token: string, fingerprint: string) {
+  const [expiry, signedFingerprint, signature] = token.split(".");
+  const expiresAt = Number(expiry);
+  if (
+    !signature ||
+    signedFingerprint !== fingerprint ||
+    !Number.isFinite(expiresAt) ||
+    expiresAt <= Date.now()
+  ) {
+    return false;
+  }
+  const expected =
+    signQaPreview(fingerprint, expiresAt).split(".").at(-1) ?? "";
+  return (
+    expected.length === signature.length &&
+    timingSafeEqual(Buffer.from(expected), Buffer.from(signature))
+  );
+}
 
 async function getWorkspaceForLimits(workspaceId: string) {
   const workspace = await db.workspace.findUniqueOrThrow({
@@ -1363,7 +1411,7 @@ const billingRouter = t.router({
       } catch {
         polarCustomer = await polarApi.customers.create({
           externalId: ctx.workspace.id,
-          email: ctx.user!.email ?? "",
+          email: ctx.user?.email ?? "",
           name: workspace.name ?? undefined,
         });
       }
@@ -1460,6 +1508,54 @@ const dashboardRouter = t.router({
   }),
 });
 
+const qaMaintenanceRouter = t.router({
+  candidates: platformAdminProcedure.query(() =>
+    discoverQaWorkspaceCandidates(db),
+  ),
+  adopt: platformAdminProcedure
+    .input(z.object({ workspaceIds: z.array(z.string().min(1)).min(1) }))
+    .mutation(({ input }) => adoptQaWorkspaces(input.workspaceIds, db)),
+  preview: platformAdminProcedure.query(async () => {
+    const preview = await previewQaWorkspacePurge(db);
+    const expiresAt = Date.now() + 10 * 60_000;
+    return {
+      ...preview,
+      previewExpiresAt: new Date(expiresAt),
+      previewToken: signQaPreview(preview.fingerprint, expiresAt),
+    };
+  }),
+  start: platformAdminProcedure
+    .input(
+      z.object({
+        confirmation: z.literal("PURGE ALL QA DATA"),
+        previewToken: z.string().min(1),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      const preview = await previewQaWorkspacePurge(db);
+      if (!validateQaPreview(input.previewToken, preview.fingerprint)) {
+        throw new TRPCError({
+          code: "CONFLICT",
+          message: "The QA purge preview expired or changed.",
+        });
+      }
+      if (!preview.workspaces.length || preview.blockers.length) {
+        throw new TRPCError({
+          code: "PRECONDITION_FAILED",
+          message: "QA purge is empty or blocked by live resources.",
+        });
+      }
+      const run = await createQaWorkspacePurgeRun(ctx.user.id);
+      await tasks.trigger("qa-purge", { runId: run.id });
+      return { id: run.id, status: run.status };
+    }),
+  run: platformAdminProcedure
+    .input(z.object({ runId: z.string().min(1) }))
+    .query(({ input }) =>
+      db.qaPurgeRun.findUnique({ where: { id: input.runId } }),
+    ),
+});
+
 export const appRouter = t.router({
   billing: billingRouter,
   customers: customersRouter,
@@ -1470,6 +1566,7 @@ export const appRouter = t.router({
     service: "afterservice-api",
   })),
   serviceJobs: serviceJobsRouter,
+  qaMaintenance: qaMaintenanceRouter,
   templates: templatesRouter,
   workspace: workspaceRouter,
 });

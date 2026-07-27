@@ -49,3 +49,10 @@ This file documents the implemented Prisma/Postgres schema in `packages/db`.
 ## Validation
 - `bunx prisma validate` in `packages/db` passed on 2026-05-30.
 - `bun run db:generate` in `packages/db` passed on 2026-05-30.
+# QA workspace lifecycle
+
+- `User.platformRole` adds the global platform-admin capability.
+- `Workspace` stores QA classification, source domain, marked timestamp, and
+  purge-start timestamp.
+- `QaPurgeRun` is global and stores only actor, timestamps, status, aggregate
+  counts, and error category.

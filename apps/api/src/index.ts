@@ -1,6 +1,10 @@
 import { createHmac, timingSafeEqual } from "node:crypto";
 import { auth, getTrustedOrigins } from "@afterservice/auth";
-import { buildWorkspaceTemplateSeed, getDbClient } from "@afterservice/db";
+import {
+  buildWorkspaceTemplateSeed,
+  getDbClient,
+  getQaWorkspaceClassification,
+} from "@afterservice/db";
 import { markMissedFollowUps, runDueFollowUpsDryRun } from "@afterservice/jobs";
 import { getDevAppUrlStrings } from "@afterservice/utils";
 import { fetchRequestHandler } from "@trpc/server/adapters/fetch";
@@ -137,6 +141,7 @@ app.post("/api/onboarding", async (c) => {
         name: parsed.data.businessName,
         serviceCategory: parsed.data.serviceCategory,
         slug,
+        ...getQaWorkspaceClassification(session.user.email),
       },
       select: {
         id: true,

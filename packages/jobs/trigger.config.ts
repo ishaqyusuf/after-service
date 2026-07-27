@@ -10,7 +10,10 @@ const syncedProductionEnvVars = [
   "OPENPANEL_READ_CLIENT_ID",
   "OPENPANEL_READ_CLIENT_SECRET",
   "RESEND_API_KEY",
-  "TEST_EMAIL",
+  "EMAIL_DELIVERY_MODE",
+  "EMAIL_QA_DOMAIN_ROUTES",
+  "QA_MAINTENANCE_SECRET",
+  "POLAR_ACCESS_TOKEN",
 ] as const;
 
 function getTriggerProjectId() {

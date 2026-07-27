@@ -37,3 +37,8 @@ This file documents intended entity relationships.
 - Business objects cannot cross workspaces.
 - Follow-up ownership is optional at first but must reference a membership when assigned.
 - Provider event IDs must be unique for idempotency.
+# QA cleanup boundary
+
+- The QA marker belongs to the workspace aggregate root and covers memberships,
+  customers, jobs, follow-ups, templates, messages, and subscriptions.
+- `QaPurgeRun` has no workspace relation so the counts-only receipt survives.

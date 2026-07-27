@@ -94,15 +94,22 @@
     "apps/website": {
       "name": "@afterservice/website",
       "dependencies": {
+        "@afterservice/api": "workspace:*",
         "@afterservice/events": "workspace:*",
         "@afterservice/plans": "workspace:*",
         "@afterservice/site-nav": "workspace:*",
         "@afterservice/ui": "workspace:*",
         "@afterservice/utils": "workspace:*",
+        "@tanstack/react-query": "^5.100.14",
+        "@trpc/client": "^11.17.0",
+        "@trpc/react-query": "^11.17.0",
+        "@trpc/server": "^11.17.0",
+        "@trpc/tanstack-react-query": "^11.17.0",
         "lucide-react": "^1.17.0",
         "next": "^16.2.9",
         "react": "19.2.7",
         "react-dom": "19.2.7",
+        "superjson": "^2.2.6",
       },
       "devDependencies": {
         "@afterservice/tsconfig": "workspace:*",
@@ -163,6 +170,7 @@
       "dependencies": {
         "@afterservice/db": "workspace:*",
         "@afterservice/notifications": "workspace:*",
+        "@polar-sh/sdk": "^0.34.0",
         "@trigger.dev/build": "4.0.1",
         "@trigger.dev/sdk": "4.0.1",
       },
