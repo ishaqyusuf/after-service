@@ -6,14 +6,15 @@
     ".": "./src/index.ts"
   },
   "scripts": {
-    "deploy": "bun run prisma.ts && bun run --filter @afterservice/db db:generate && bun ../../scripts/with-workspace-env.mjs --mode production -- bun ../../scripts/with-trigger-profile.mjs -- trigger deploy",
-    "dev": "bun ../../scripts/with-workspace-env.mjs --mode local -- bun ../../scripts/with-trigger-profile.mjs -- trigger dev",
+    "deploy": "bun run prisma.ts && bun run --filter @afterservice/db db:generate && bun --env-file=/dev/null ../../../../local-infra-kit/bin/with-env.ts --profile afterservice --mode prod -- bun ../../scripts/with-trigger-profile.mjs -- trigger deploy",
+    "dev": "bun --env-file=/dev/null ../../../../local-infra-kit/bin/with-env.ts --profile afterservice -- bun ../../scripts/with-trigger-profile.mjs -- trigger dev",
     "lint": "biome check .",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "@afterservice/db": "workspace:*",
     "@afterservice/notifications": "workspace:*",
+    "@ishaqyusuf/logly-server": "^0.2.0",
     "@polar-sh/sdk": "^0.34.0",
     "@trigger.dev/build": "4.0.1",
     "@trigger.dev/sdk": "4.0.1"
@@ -21,6 +22,7 @@
   "devDependencies": {
     "@afterservice/tsconfig": "workspace:*",
     "@types/node": "^25.2.3",
+    "import-in-the-middle": "1.11.0",
     "trigger.dev": "4.0.1",
     "typescript": "^5.9.3"
   }

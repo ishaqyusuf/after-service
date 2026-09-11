@@ -12,6 +12,7 @@ import {
   FormMessage,
 } from "@afterservice/ui/form";
 import { useMutation } from "@tanstack/react-query";
+import { QuickFill } from "@/components/quick-fill";
 import type { inferRouterOutputs } from "@trpc/server";
 import { useEffect } from "react";
 import { CustomerTagsInput } from "@/components/forms/customer-tags-input";
@@ -80,6 +81,9 @@ export function CustomerEditForm({ customer }: Props) {
           onSubmit={form.handleSubmit((data) => updateCustomer.mutate(data))}
           className="space-y-4"
         >
+          <div className="flex justify-end">
+            <QuickFill name="customer" />
+          </div>
           <FormField
             control={form.control}
             name="name"

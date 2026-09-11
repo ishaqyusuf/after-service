@@ -25,6 +25,7 @@ import type { inferRouterOutputs } from "@trpc/server";
 import { format } from "date-fns";
 import { useEffect } from "react";
 import { z } from "zod";
+import { QuickFill } from "@/components/quick-fill";
 import { useDashboardInvalidations } from "@/hooks/use-dashboard-invalidations";
 import { useFollowUpParams } from "@/hooks/use-follow-up-params";
 import { useZodForm } from "@/hooks/use-zod-form";
@@ -131,6 +132,9 @@ export function FollowUpWorkForm({ followUp }: Props) {
             )}
             className="space-y-3"
           >
+            <div className="flex justify-end">
+              <QuickFill name="scheduleFollowUp" />
+            </div>
             <FormField
               control={rescheduleForm.control}
               name="dueAt"
@@ -191,6 +195,9 @@ export function FollowUpWorkForm({ followUp }: Props) {
             )}
             className="space-y-3"
           >
+            <div className="flex justify-end">
+              <QuickFill name="messageDraft" />
+            </div>
             <FormField
               control={sendForm.control}
               name="recipient"
@@ -251,6 +258,9 @@ export function FollowUpWorkForm({ followUp }: Props) {
             )}
             className="space-y-3"
           >
+            <div className="flex justify-end">
+              <QuickFill name="workNote" />
+            </div>
             <FormField
               control={repliedForm.control}
               name="notes"

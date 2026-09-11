@@ -30,6 +30,7 @@ import {
 import { Info } from "lucide-react";
 import { useMemo, useState } from "react";
 import type { z } from "zod";
+import { QuickFill } from "@/components/quick-fill";
 import { useZodForm } from "@/hooks/use-zod-form";
 import {
   BUSINESS_TYPE_SUGGESTIONS,
@@ -159,6 +160,9 @@ export function OnboardingForm() {
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+        <div className="flex justify-end">
+          <QuickFill name="onboarding" />
+        </div>
         <div className="space-y-4">
           <FormField
             control={form.control}

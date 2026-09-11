@@ -37,6 +37,17 @@ This file records implementation standards for afterservice.
 - Use GND as the reference for the standard notification package system.
 - Use Plot Keys as the reference for local URL handling, Portless/proxy support, and generated links.
 
+## Local QA And Dev Commands
+
+- Website/dashboard QA should start the local web stack with `bun run dev --local --filter dashboard website` when those apps are in scope. Include `jobs` only when background job behavior is part of the QA slice.
+- Website QA must use Portless hostnames instead of raw localhost ports:
+  - website: `afterservice.localhost`
+  - dashboard: `app-afterservice.localhost`
+  - API: `api-afterservice.localhost`
+- Use raw localhost ports only for low-level debugging when Portless itself is the suspected failure.
+- For schema readiness checks, use the repository DB push command against the intended profile. If profile flags are added to this repo, use `bun run db:push --local` for local checks and `bun run db:push --prod` only for explicitly requested production validation.
+- Do not run production-profile DB commands unless the task explicitly calls for production validation and the target database is confirmed.
+
 ## API
 - Validate external input with schemas.
 - Enforce session and workspace permissions server-side.
@@ -72,3 +83,14 @@ This file records implementation standards for afterservice.
 - The website proxy redirects `/login` and `/signup` to the dashboard sign-in/sign-up pages.
 - Use safe `return_to` validation: only allow same-origin relative paths starting with `/`.
 - Dev quick-fill components must never render in production builds.
+
+<!-- personal-coding-rules:start -->
+## Global Personal Coding Rules
+
+Agents must treat these global coding rule references as non-negotiable:
+
+- `/Users/M1PRO/.me/coding-standards/global.md`
+- `/Users/M1PRO/.me/coding-standards/nextjs.md`
+
+Project-specific exceptions require an ADR in `brain/decisions/` before agents may diverge.
+<!-- personal-coding-rules:end -->

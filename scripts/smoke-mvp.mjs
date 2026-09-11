@@ -87,6 +87,19 @@ async function createCallerFromCookie(cookieHeader) {
   return appRouter.createCaller(context);
 }
 
+async function waitForMessageLog(followUpId) {
+  for (let attempt = 1; attempt <= 40; attempt += 1) {
+    const messageLog = await db.messageLog.findFirst({
+      where: { followUpId },
+      orderBy: { createdAt: "desc" },
+    });
+    if (messageLog) return messageLog;
+    await Bun.sleep(250);
+  }
+
+  return null;
+}
+
 function createCallerFromContext(context) {
   return appRouter.createCaller({
     requestId: crypto.randomUUID(),
@@ -97,7 +110,7 @@ function createCallerFromContext(context) {
 
 async function runAuthAndOperatorSmoke() {
   const id = uniqueId();
-  const email = `smoke-${id}@afterservice.test`;
+  const email = `smoke-${id}@afterservice.invalid`;
   const password = "password123";
   const workspaceName = `Smoke Workspace ${id.slice(0, 8)}`;
   createdUserEmails.add(email);
@@ -163,7 +176,7 @@ async function runAuthAndOperatorSmoke() {
 
   const customer = await caller.customers.create({
     companyName: "Smoke Co",
-    email: `customer-${id}@afterservice.test`,
+    email: `customer-${id}@afterservice.invalid`,
     name: "Smoke Customer",
     notes: "Created by smoke:mvp",
     phone: "555-0100",
@@ -200,14 +213,12 @@ async function runAuthAndOperatorSmoke() {
   const sent = await caller.followUps.markSent({
     body: "Checking in after the smoke service.",
     id: followUp.item.id,
-    recipient: `customer-${id}@afterservice.test`,
+    recipient: `customer-${id}@afterservice.invalid`,
     subject: "Checking in",
   });
   assert(sent.item.status === "sent", "markSent did not update status");
-  assert(
-    sent.item.messageLogs.length > 0,
-    "markSent did not create a message log",
-  );
+  const sentMessageLog = await waitForMessageLog(followUp.item.id);
+  assert(sentMessageLog, "notification job did not create a message log");
 
   const replied = await caller.followUps.markReplied({
     id: followUp.item.id,
@@ -269,7 +280,7 @@ async function runPermissionAndScopeSmoke(primary) {
 
   const staffCaller = createCallerFromContext({
     user: {
-      email: "staff@afterservice.test",
+      email: "staff@afterservice.invalid",
       id: "smoke-staff",
       name: "Staff",
     },
@@ -303,7 +314,7 @@ async function runPermissionAndScopeSmoke(primary) {
   createdWorkspaceIds.add(limitWorkspace.id);
   const limitUser = await db.user.create({
     data: {
-      email: `limit-${uniqueId()}@afterservice.test`,
+      email: `limit-${uniqueId()}@afterservice.invalid`,
       name: "Limit User",
     },
   });

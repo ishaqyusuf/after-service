@@ -1,4 +1,3 @@
-import { Provider as OpenPanelProvider } from "@afterservice/events/client";
 import { cn } from "@afterservice/ui";
 import { appMetadata } from "@afterservice/utils";
 import type { Metadata } from "next";
@@ -53,7 +52,6 @@ export default async function RootLayout({
     >
       <body className="min-h-screen overscroll-none bg-background text-foreground antialiased">
         <Providers locale={locale}>{children}</Providers>
-        <OpenPanelProvider />
       </body>
     </html>
   );

@@ -8,11 +8,16 @@
   "scripts": {
     "build": "bun run db:generate && tsc --noEmit",
     "--build": "prisma generate && tsc",
-    "db:generate": "bun ../../scripts/with-workspace-env.mjs --mode local -- prisma generate",
-    "db:migrate": "bun ../../scripts/with-workspace-env.mjs --mode local -- prisma migrate dev",
-    "db:push": "bun ../../scripts/with-workspace-env.mjs --mode production -- prisma db push",
-    "db:validate": "bun ../../scripts/with-workspace-env.mjs --mode local -- prisma validate",
+    "db:generate": "prisma generate",
+    "db:migrate": "prisma migrate dev",
+    "db:migrate:deploy": "prisma migrate deploy",
+    "db:pull": "prisma db pull",
+    "db:push": "prisma db push",
+    "db:studio": "prisma studio",
+    "db:validate": "prisma validate",
     "lint": "biome check .",
+    "qa:credential:issue": "bun --env-file=/dev/null ../../../../local-infra-kit/bin/with-env.ts --profile afterservice -- bun scripts/issue-qa-tester-credential.ts",
+    "qa:credential:revoke": "bun --env-file=/dev/null ../../../../local-infra-kit/bin/with-env.ts --profile afterservice -- bun scripts/revoke-qa-tester-credential.ts",
     "typecheck": "bun run db:generate && tsc --noEmit"
   },
   "devDependencies": {

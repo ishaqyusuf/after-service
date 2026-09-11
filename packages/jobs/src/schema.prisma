@@ -90,15 +90,22 @@ model User {
 }
 
 model Session {
-  id        String   @id @default(cuid())
-  token     String   @unique
-  userId    String
-  expiresAt DateTime
-  ipAddress String?
-  userAgent String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id                String                 @id @default(cuid())
+  token             String                 @unique
+  userId            String
+  expiresAt         DateTime
+  ipAddress         String?
+  userAgent         String?
+  qaAuthorizationId String?
+  qaMembershipId    String?
+  qaWorkspaceId     String?
+  createdAt         DateTime               @default(now())
+  updatedAt         DateTime               @updatedAt
+  user              User                   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  qaAuthorization   QaClientAuthorization? @relation(fields: [qaAuthorizationId], references: [id], onDelete: Cascade)
+
+  @@index([qaAuthorizationId])
+  @@index([qaMembershipId, qaWorkspaceId])
 }
 
 model Account {
@@ -172,6 +179,92 @@ model QaPurgeRun {
   errorCategory         String?
   createdAt             DateTime         @default(now())
   updatedAt             DateTime         @updatedAt
+}
+
+model QaTesterGrant {
+  id               String                  @id @default(cuid())
+  qaDomain         String
+  testerIdentity   String
+  credentialDigest String                  @unique
+  status           String                  @default("ACTIVE")
+  expiresAt        DateTime
+  revokedAt        DateTime?
+  createdAt        DateTime                @default(now())
+  updatedAt        DateTime                @updatedAt
+  authorizations   QaClientAuthorization[]
+  auditEvents      QaAccessAuditEvent[]
+
+  @@index([qaDomain, status, expiresAt])
+  @@index([testerIdentity, status])
+}
+
+model QaClientAuthorization {
+  id                 String                     @id @default(cuid())
+  grantId            String
+  clientIdDigest     String
+  clientPlatform     String
+  contractVersion    Int
+  tokenDigest        String                     @unique
+  status             String                     @default("ACTIVE")
+  expiresAt          DateTime
+  revokedAt          DateTime?
+  lastValidatedAt    DateTime                   @default(now())
+  createdAt          DateTime                   @default(now())
+  updatedAt          DateTime                   @updatedAt
+  grant              QaTesterGrant              @relation(fields: [grantId], references: [id], onDelete: Cascade)
+  sessions           Session[]
+  profileSelections  QaAccessProfileSelection[]
+  auditEvents        QaAccessAuditEvent[]
+
+  @@unique([grantId, clientIdDigest, clientPlatform])
+  @@index([status, expiresAt])
+  @@index([clientIdDigest, clientPlatform])
+}
+
+model QaAccessProfileSelection {
+  id              String                @id @default(cuid())
+  authorizationId String
+  referenceDigest String                @unique
+  membershipId    String
+  workspaceId     String
+  expiresAt       DateTime
+  consumedAt      DateTime?
+  createdAt       DateTime              @default(now())
+  authorization   QaClientAuthorization @relation(fields: [authorizationId], references: [id], onDelete: Cascade)
+
+  @@index([authorizationId, expiresAt])
+  @@index([membershipId, workspaceId])
+}
+
+model QaAccessAttemptBucket {
+  id              String    @id @default(cuid())
+  bucketDigest    String    @unique
+  failedCount     Int       @default(0)
+  windowStartedAt DateTime  @default(now())
+  lockedUntil     DateTime?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  @@index([lockedUntil])
+}
+
+model QaAccessAuditEvent {
+  id              String                 @id @default(cuid())
+  grantId         String?
+  authorizationId String?
+  eventType       String
+  outcome         String
+  domainDigest    String?
+  clientDigest    String?
+  networkDigest   String?
+  metadata        Json?
+  createdAt       DateTime               @default(now())
+  grant           QaTesterGrant?         @relation(fields: [grantId], references: [id], onDelete: SetNull)
+  authorization   QaClientAuthorization? @relation(fields: [authorizationId], references: [id], onDelete: SetNull)
+
+  @@index([eventType, createdAt])
+  @@index([grantId, createdAt])
+  @@index([authorizationId, createdAt])
 }
 
 model Membership {
@@ -359,4 +452,3 @@ model BillingEvent {
 
   @@index([workspaceId])
 }
-

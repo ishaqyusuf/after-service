@@ -20,8 +20,9 @@ type DbAccountDebug = {
 };
 
 const AUTH_DEBUG =
-  process.env.AFTERSERVICE_AUTH_DEBUG === "true" ||
-  process.env.AUTH_DEBUG === "true";
+  process.env.NODE_ENV !== "production" &&
+  (process.env.AFTERSERVICE_AUTH_DEBUG === "true" ||
+    process.env.AUTH_DEBUG === "true");
 
 export default async function SignInPage() {
   return <SignInView dbAccountDebug={await getDbAccountDebug()} />;

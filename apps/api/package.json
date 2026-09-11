@@ -9,8 +9,9 @@
     "./schemas": "./src/schemas/index.ts"
   },
   "scripts": {
-    "dev": "bun ../../scripts/with-workspace-env.mjs --mode local -- bun --watch src/index.ts",
-    "dev:portless": "PORTLESS_APP_PORT=${PORTLESS_APP_PORT:-4102} PORTLESS_WILDCARD=${PORTLESS_WILDCARD:-1} PORTLESS_SYNC_HOSTS=${PORTLESS_SYNC_HOSTS:-0} portless api-afterservice bun --watch src/index.ts",
+    "dev": "bun --env-file=/dev/null ../../../../local-infra-kit/bin/with-env.ts --profile afterservice -- PORTLESS_WILDCARD=1 PORTLESS_APP_PORT=${PORTLESS_APP_PORT:-${API_PORT:-4102}} portless api-afterservice bun --watch src/index.ts",
+    "dev:fixed": "bun --env-file=/dev/null ../../../../local-infra-kit/bin/with-env.ts --profile afterservice -- bun --watch src/index.ts",
+    "dev:prod": "bun --env-file=/dev/null ../../../../local-infra-kit/bin/with-env.ts --profile afterservice --mode prod -- bun --watch src/index.ts",
     "lint": "biome check .",
     "typecheck": "tsc --noEmit"
   },

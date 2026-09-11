@@ -15,7 +15,8 @@ Use a hybrid architecture:
 
 - Keep user preferences, segmentation, campaign definitions, event triggers, delivery ledger, and suppression rules inside afterservice.
 - Use a dedicated email provider for actual email delivery once domain authentication is configured.
-- Continue using OpenPanel for analytics and product event measurement.
+- Use Logly for the minimal analytics and product event measurement retained by
+  the current architecture; do not restore OpenPanel identity/group tracking.
 - Keep customer-facing follow-up messaging separate from signed-in-user marketing. The signed-in marketing system sends to afterservice users and workspace members, not to the operator's end customers.
 
 This keeps afterservice in control of consent, workspace context, and product-aware targeting while avoiding custom SMTP/deliverability work.
@@ -379,5 +380,6 @@ Acceptance:
 - Reuse `packages/notifications` for typed message contracts, but add a signed-in-user message namespace separate from customer follow-up message types.
 - Reuse `packages/jobs` for scheduled weekly/lifecycle dispatchers.
 - Keep `MessageLog` for operator-to-customer follow-up messaging; create a separate user-facing delivery ledger to avoid mixing customer communications with afterservice marketing.
-- Keep OpenPanel analytics payloads PII-free, using internal user and workspace IDs only.
+- Keep Logly analytics payloads PII-free and exclude raw authenticated user IDs,
+  raw workspace IDs, and workspace slugs from both event properties and identity.
 - Follow afterservice copy rules: say "Free Beta" and "free early access"; do not imply broad paid launch or fully automated messaging before those gates are met.

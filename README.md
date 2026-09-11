@@ -40,8 +40,10 @@ This repository is a private Bun/Turbo workspace.
 Requirements:
 
 - Bun `1.3.9`
-- Postgres-compatible database
-- Project environment variables in `.env`
+- Docker for the managed local Postgres profile
+- The shared `local-infra-kit` sibling at `../../local-infra-kit`
+- Base environment values in `.env` and mode-specific values in `.env.local`,
+  `.env.dev`, `.env.preview`, or `.env.production`
 
 Install dependencies:
 
@@ -49,19 +51,30 @@ Install dependencies:
 bun install
 ```
 
-Start the full local stack:
+Start the full local Portless stack:
 
 ```bash
 bun run dev
 ```
 
+The default command loads `.env.local`, verifies port `55433`, starts the
+repository Docker Postgres service when needed, and then starts the selected
+apps. Hosted profiles are explicit:
+
+```bash
+bun run dev --dev
+bun run dev --preview
+bun run dev --prod
+```
+
 Run one surface at a time:
 
 ```bash
-bun run dev:website
-bun run dev:dashboard
-bun run dev:api
-bun run dev:jobs
+bun run dev -f website
+bun run dev -f dashboard
+bun run dev -f api
+bun run dev -f jobs
+bun run dev -f website dashboard jobs
 ```
 
 Fixed-port localhost URLs:
@@ -78,15 +91,15 @@ Install [Portless](https://portless.dev) once, then run:
 
 ```bash
 # All apps
-bun run dev:portless
+bun run dev
 
 # One app at a time
-bun run dev:website:portless
-bun run dev:dashboard:portless
-bun run dev:api:portless
+bun run dev -f website
+bun run dev -f dashboard
+bun run dev -f api
 
 # Website + dashboard + jobs
-bun run dev:websites:portless
+bun run dev -f website dashboard jobs
 ```
 
 Expected Portless URLs, using the default proxy on port `1355`:
@@ -101,10 +114,12 @@ Prefer the Portless scripts when debugging auth, redirects, callback behavior, o
 
 ## Environment
 
-Environment configuration is loaded from the workspace root.
+Environment configuration is loaded by the shared local-infrastructure kit
+from the workspace root.
 
-- Local development commands load `.env`.
-- Production build/start commands load `.env.production`.
+- Every command loads `.env` plus exactly one selected mode file.
+- Local mode is the default and uses `.env.local` plus Docker Postgres.
+- Development, preview, and production modes must be selected explicitly.
 - `.env.example` documents the required keys and is safe to commit.
 - Do not commit real secret values.
 
@@ -116,6 +131,17 @@ bun run db:generate
 bun run db:migrate
 bun run db:push
 ```
+
+For an enabled internal QA build, issue a short-lived tester credential only
+for an exact domain in `EMAIL_QA_DOMAIN_ROUTES`:
+
+```bash
+bun run qa:credential:issue -- afterservice.qa.test tester-name 24
+bun run qa:credential:revoke -- <grant-id>
+```
+
+Only the issued credential is shown once. Stored grants and client
+authorizations contain keyed digests, not reusable plaintext secrets.
 
 Production env sync helpers:
 

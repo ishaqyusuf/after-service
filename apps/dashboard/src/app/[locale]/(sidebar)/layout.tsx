@@ -1,6 +1,5 @@
 import { auth } from "@afterservice/auth";
-import { getDbClient } from "@afterservice/db";
-import { IdentifyUser } from "@afterservice/events/client";
+import { getDbClient, validateQaDerivedSession } from "@afterservice/db";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import type { ReactNode } from "react";
@@ -21,6 +20,12 @@ export default async function SidebarLayout({
   }
 
   const db = getDbClient();
+  const qaValidation = session.session.qaAuthorizationId
+    ? await validateQaDerivedSession(db, session.session.id)
+    : null;
+  if (qaValidation?.active === false) {
+    redirect("/sign-in");
+  }
   const membership = await db.membership.findFirst({
     orderBy: {
       createdAt: "asc",
@@ -36,6 +41,7 @@ export default async function SidebarLayout({
       },
     },
     where: {
+      id: qaValidation?.scope?.membershipId,
       userId: session.user.id,
     },
   });
@@ -46,11 +52,6 @@ export default async function SidebarLayout({
 
   return (
     <div className="relative">
-      <IdentifyUser
-        userId={session.user.id}
-        workspaceId={membership.workspace.id}
-        workspaceSlug={membership.workspace.slug}
-      />
       <Sidebar />
       <div className="md:ml-[70px] pb-4">
         <Header />

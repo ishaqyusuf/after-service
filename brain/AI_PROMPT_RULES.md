@@ -36,3 +36,14 @@ This file captures persistent instructions for AI agents working on afterservice
 - Update brain docs with meaningful changes.
 - Add ADRs for architecture-level choices.
 - Keep roadmap updates concrete and dated.
+
+<!-- personal-coding-rules:start -->
+## Global Personal Coding Rules
+
+Agents must treat these global coding rule references as non-negotiable:
+
+- `/Users/M1PRO/.me/coding-standards/global.md`
+- `/Users/M1PRO/.me/coding-standards/nextjs.md`
+
+Project-specific exceptions require an ADR in `brain/decisions/` before agents may diverge.
+<!-- personal-coding-rules:end -->

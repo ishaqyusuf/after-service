@@ -25,6 +25,7 @@ import {
 import { useMutation } from "@tanstack/react-query";
 import type { inferRouterOutputs } from "@trpc/server";
 import { useEffect } from "react";
+import { QuickFill } from "@/components/quick-fill";
 import { useDashboardInvalidations } from "@/hooks/use-dashboard-invalidations";
 import {
   templateChannelLabels,
@@ -96,6 +97,9 @@ export function TemplateEditForm({ template }: Props) {
           onSubmit={form.handleSubmit((data) => updateMutation.mutate(data))}
           className="space-y-4"
         >
+          <div className="flex justify-end">
+            <QuickFill name="template" />
+          </div>
           <FormField
             control={form.control}
             name="name"

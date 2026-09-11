@@ -2,24 +2,12 @@
 
 import { LogEvents } from "@afterservice/events";
 import { useTrack } from "@afterservice/events/client";
-import dynamic from "next/dynamic";
-import { useRef } from "react";
 import { AuthFooter, AuthShell } from "@/components/auth/auth-shell";
 import { SignUpForm } from "@/components/auth/sign-up-form";
-import type { QuickFillFormAdapter } from "@/components/dev/quick-fill";
-
-const DevSignupFab = dynamic(
-  () =>
-    import("@/components/dev/dev-signup-fab").then((mod) => ({
-      default: mod.DevSignupFab,
-    })),
-  { ssr: false },
-);
 
 type SignUpValues = { name: string; email: string; password: string };
 
 export function SignUpView() {
-  const adapterRef = useRef<QuickFillFormAdapter<SignUpValues> | null>(null);
   const track = useTrack();
 
   async function handleSignUp(values: SignUpValues) {
@@ -49,21 +37,6 @@ export function SignUpView() {
       method: "email",
     });
 
-    if (process.env.NODE_ENV !== "production") {
-      try {
-        const { addDevAccount } = await import(
-          "@/components/dev/dev-auth-store"
-        );
-        addDevAccount({
-          name: values.name,
-          email: values.email,
-          password: values.password,
-        });
-      } catch {
-        // dev store is best-effort
-      }
-    }
-
     window.location.href = "/onboarding";
   }
 
@@ -77,14 +50,7 @@ export function SignUpView() {
       }
       title="Create your account"
     >
-      <SignUpForm onSignUp={handleSignUp} adapterRef={adapterRef} />
-      {process.env.NODE_ENV !== "production" && (
-        <DevSignupFab
-          onFill={(values: SignUpValues) => {
-            adapterRef.current?.reset(values);
-          }}
-        />
-      )}
+      <SignUpForm onSignUp={handleSignUp} />
     </AuthShell>
   );
 }

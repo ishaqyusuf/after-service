@@ -1,16 +1,24 @@
 import { getDbClient } from "@afterservice/db";
 import {
+  assertQaAcceleratorStartupSafety,
   getDevAppUrlStrings,
   resolveEmailRecipients,
 } from "@afterservice/utils";
 import { prismaAdapter } from "@better-auth/prisma-adapter";
 import { betterAuth } from "better-auth";
 
+export {
+  clearBetterAuthSessionCookieHeaders,
+  createBetterAuthSessionCookieHeaders,
+} from "./qa-session-cookie";
+
 function unique(values: Array<string | undefined>) {
   return [
     ...new Set(values.filter((value): value is string => Boolean(value))),
   ];
 }
+
+assertQaAcceleratorStartupSafety(process.env);
 
 function readNonEmptyEnv(name: string) {
   const value = process.env[name]?.trim();
@@ -124,6 +132,25 @@ export const auth = betterAuth({
           html: `${route.qaRouted ? `<p><strong>QA routed for ${route.originalRecipient}</strong></p>` : ""}<p>Click <a href="${url}">here</a> to reset your password.</p>`,
         }),
       });
+    },
+  },
+  session: {
+    additionalFields: {
+      qaAuthorizationId: {
+        input: false,
+        required: false,
+        type: "string",
+      },
+      qaMembershipId: {
+        input: false,
+        required: false,
+        type: "string",
+      },
+      qaWorkspaceId: {
+        input: false,
+        required: false,
+        type: "string",
+      },
     },
   },
   socialProviders: {

@@ -30,6 +30,7 @@ import {
 } from "@afterservice/ui/form";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useMemo } from "react";
+import { QuickFill } from "@/components/quick-fill";
 import { useZodForm } from "@/hooks/use-zod-form";
 import {
   BUSINESS_TYPE_SUGGESTIONS,
@@ -150,6 +151,9 @@ export function UpdateWorkspaceForm() {
             onSubmit={form.handleSubmit((data) => updateMutation.mutate(data))}
             className="space-y-8"
           >
+            <div className="flex justify-end">
+              <QuickFill name="workspace" />
+            </div>
             <section className="space-y-4 border-b border-border pb-8">
               <div className="space-y-4">
                 <FormField

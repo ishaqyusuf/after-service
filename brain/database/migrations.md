@@ -4,7 +4,8 @@
 This file defines migration policy.
 
 ## Tooling
-Prisma migrations will be introduced in Phase 5.
+Prisma migrations are stored in `packages/db/prisma/migrations` and run through
+the shared local-infrastructure profile commands.
 
 ## Rules
 
@@ -29,10 +30,15 @@ bun run db:migrate
 - API and dashboard typecheck.
 - Brain schema docs updated.
 
-## Pending
-- Add Prisma package.
-- Add Postgres datasource.
-- Add initial migration.
+## QA Accelerator Migration
+
+- `20260830010000_qa_accelerator` adds the five authorization/audit models and
+  QA-derived session scope fields, indexes, and cascade behavior.
+- Apply locally with `bun run db:migrate` after installing workspace
+  dependencies. Apply to hosted environments only through the normal reviewed
+  migration workflow.
+- Migration application was not performed during the source implementation
+  because this checkout has no installed Prisma executable or dependencies.
 # QA cleanup schema
 
 - Adds global platform roles, workspace QA lifecycle fields, and purge receipts.

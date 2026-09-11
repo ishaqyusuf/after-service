@@ -1,6 +1,18 @@
 import { withSentryConfig } from "@sentry/nextjs";
 import type { NextConfig } from "next";
 
+function isInternalQaBuild(env = process.env) {
+  const mode = (
+    env.AFTERSERVICE_ENV_MODE ??
+    env.NODE_ENV ??
+    "production"
+  ).toLowerCase();
+  return (
+    env.QA_ACCELERATOR_ENABLED === "true" &&
+    new Set(["local", "dev", "development", "preview"]).has(mode)
+  );
+}
+
 const apiBaseUrl =
   process.env.API_PROXY_URL ??
   (process.env.NODE_ENV === "development"
@@ -8,6 +20,18 @@ const apiBaseUrl =
     : (process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4102"));
 
 const nextConfig: NextConfig = {
+  pageExtensions: isInternalQaBuild()
+    ? ["qa.ts", "tsx", "ts", "jsx", "js"]
+    : ["tsx", "ts", "jsx", "js"],
+  turbopack: {
+    resolveAlias: isInternalQaBuild()
+      ? {}
+      : {
+          "@/components/qa/qa-access-panel":
+            "@/components/qa/qa-access-panel.production",
+          "@/components/quick-fill": "@/components/quick-fill.production",
+        },
+  },
   async rewrites() {
     return {
       afterFiles: [

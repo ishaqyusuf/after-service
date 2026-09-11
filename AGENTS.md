@@ -26,10 +26,10 @@ Final responses must include the Brain files updated, or `No Brain documentation
 
 - Package manager: `bun`.
 - Start the full dev stack with `bun run dev`.
-- Start dashboard work with `bun run dev:dashboard`.
-- Start website work with `bun run dev:website`.
-- Start jobs work with `bun run dev:jobs`.
-- Prefer portless dev scripts when debugging auth or callback behavior: `bun run dev:dashboard:portless`, `bun run dev:website:portless`, or `bun run dev:websites:portless`.
+- Start dashboard work with `bun run dev -f dashboard`.
+- Start website work with `bun run dev -f website`.
+- Start jobs work with `bun run dev -f jobs`.
+- Portless dev is the default for auth or callback behavior: `bun run dev -f dashboard`, `bun run dev -f website`, or `bun run dev -f website dashboard jobs`.
 - When debugging production page-load failures, reproduce with the production env first: run `bun run terminal prod:dashboard` for dashboard pages or `bun run terminal prod:website` for marketing pages.
 - Validate broad changes with `bun run typecheck` and the narrowest relevant build, lint, smoke, or package-level command.
 

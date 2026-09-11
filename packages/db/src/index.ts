@@ -7,19 +7,19 @@ export {
   FollowUpChannel,
   FollowUpStatus,
   MembershipRole,
-  ServiceJobStatus,
-  WorkspacePlan,
-  WorkspacePlanStatus,
   PlatformRole,
   QaDataClassification,
   QaPurgeRunStatus,
+  ServiceJobStatus,
+  WorkspacePlan,
+  WorkspacePlanStatus,
 } from "../generated/prisma/enums";
+export * from "./queries";
 export {
   buildWorkspaceTemplateSeed,
   type StarterTemplate,
   starterFollowUpTemplates,
 } from "./seed";
-export * from "./queries";
 export { PrismaClient };
 
 const globalForDb = globalThis as typeof globalThis & {

@@ -43,11 +43,11 @@ Add the same style of local development ergonomics used in Plot Keys and School 
   - `/Users/M1PRO/Documents/code/school-clerk/apps/dashboard/src/components/dev-tenant-quick-login-fab.tsx`
 
 ## Current Afterservice State
-- Root scripts already include fixed-port dev commands:
-  - `dev:website` -> `4100`
-  - `dev:dashboard` -> `4101`
-  - `dev:api` -> `4102`
-  - `dev:websites` -> website + dashboard
+- Root development now runs through `scripts/dev.ts`:
+  - `bun run dev -f website` -> `4100`
+  - `bun run dev -f dashboard` -> `4101`
+  - `bun run dev -f api` -> `4102`
+  - `bun run dev -f website dashboard jobs` -> website + dashboard + jobs
 - `packages/utils/src/env.ts` currently has only strict public app URL parsing through `getAppUrls`.
 - `apps/dashboard/src/lib/api-url.ts` currently returns `""`, meaning browser auth calls are same-origin.
 - `apps/dashboard/src/lib/auth-form.tsx` is functional but placeholder-like:
@@ -90,12 +90,12 @@ Steps:
      - `PORTLESS_APP_PORT=${PORTLESS_APP_PORT:-4101} PORTLESS_WILDCARD=${PORTLESS_WILDCARD:-1} PORTLESS_SYNC_HOSTS=${PORTLESS_SYNC_HOSTS:-0} portless app-afterservice next dev --turbopack`
    - API:
      - `PORTLESS_APP_PORT=${PORTLESS_APP_PORT:-4102} PORTLESS_WILDCARD=${PORTLESS_WILDCARD:-1} PORTLESS_SYNC_HOSTS=${PORTLESS_SYNC_HOSTS:-0} portless api-afterservice bun --watch src/index.ts`
-2. Add root scripts:
-   - `dev:portless`
-   - `dev:website:portless`
-   - `dev:dashboard:portless`
-   - `dev:api:portless`
-   - `dev:websites:portless`
+2. Add root dev router support:
+   - `bun run dev`
+   - `bun run dev -f website`
+   - `bun run dev -f dashboard`
+   - `bun run dev -f api`
+   - `bun run dev -f website dashboard jobs`
 3. Add `dev:portless` to `turbo.json`:
    - `cache: false`
    - `persistent: true`
@@ -104,11 +104,11 @@ Steps:
    - run all apps
    - run one app
    - expected URLs
-5. Keep fixed-port scripts. Portless is additive, not a replacement.
+5. Keep app-level Turbo `dev:portless` tasks. Root app-specific scripts are replaced by the dev router.
 
 Validation:
-- `bun run dev:portless -- --dry-run=json` should select the three app-level `dev:portless` tasks.
-- `bun run dev:websites:portless -- --dry-run=json` should select only website and dashboard.
+- `bun run dev --filter @afterservice/website @afterservice/dashboard @afterservice/jobs -- --dry-run=json` should select the three app-level `dev:portless` tasks.
+- `bun run dev -f website dashboard` should select only website and dashboard.
 - Start one app at a time and verify a 200 response from the named host.
 
 ### 2. Add Runtime URL And Dev URL Library
@@ -382,9 +382,9 @@ Commands:
 - `bun run typecheck`
 - `bun run lint`
 - `bun run build`
-- `bun run dev:portless`
-- `bun run dev:websites:portless`
-- `bun run dev:api:portless`
+- `bun run dev`
+- `bun run dev -f website dashboard jobs`
+- `bun run dev -f api`
 
 ## Dev Startup Ports
 

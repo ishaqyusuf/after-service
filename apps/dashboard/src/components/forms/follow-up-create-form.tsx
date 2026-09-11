@@ -29,6 +29,7 @@ import {
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { format } from "date-fns";
 import { useMemo } from "react";
+import { QuickFill } from "@/components/quick-fill";
 import {
   followUpChannelLabels,
   followUpChannels,
@@ -124,6 +125,12 @@ export function FollowUpCreateForm() {
         )}
         className="space-y-6"
       >
+        <div className="flex justify-end">
+          <QuickFill
+            name="followUp"
+            args={{ customers, jobs, templates }}
+          />
+        </div>
         <div className="space-y-4">
           <FormField
             control={form.control}

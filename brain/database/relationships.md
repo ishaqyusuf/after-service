@@ -37,6 +37,13 @@ This file documents intended entity relationships.
 - Business objects cannot cross workspaces.
 - Follow-up ownership is optional at first but must reference a membership when assigned.
 - Provider event IDs must be unique for idempotency.
+- One `QaTesterGrant` has many `QaClientAuthorization` records and audit events.
+- One `QaClientAuthorization` has many profile selections, derived sessions,
+  and audit events.
+- A QA-derived `Session` belongs to one authorization and stores the exact
+  membership/workspace scope revalidated by request context.
+- Revoking a grant or authorization deletes all derived sessions; consuming a
+  profile reference cannot be replayed.
 # QA cleanup boundary
 
 - The QA marker belongs to the workspace aggregate root and covers memberships,

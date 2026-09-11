@@ -2,8 +2,9 @@ import { auth } from "@afterservice/auth";
 import { appendAuthCookieExpiryFallbacks } from "@/lib/session-cookies";
 
 const AUTH_DEBUG =
-  process.env.AFTERSERVICE_AUTH_DEBUG === "true" ||
-  process.env.AUTH_DEBUG === "true";
+  process.env.NODE_ENV !== "production" &&
+  (process.env.AFTERSERVICE_AUTH_DEBUG === "true" ||
+    process.env.AUTH_DEBUG === "true");
 
 function authLogPayload(request: Request, response?: Response) {
   const url = new URL(request.url);

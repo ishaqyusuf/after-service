@@ -29,6 +29,7 @@ import type { inferRouterOutputs } from "@trpc/server";
 import { format } from "date-fns";
 import { useEffect } from "react";
 import { z } from "zod";
+import { QuickFill } from "@/components/quick-fill";
 import { useDashboardInvalidations } from "@/hooks/use-dashboard-invalidations";
 import {
   followUpChannelLabels,
@@ -95,6 +96,9 @@ export function ScheduleFollowUpForm({ job, templates, onSuccess }: Props) {
         )}
         className="mt-6 space-y-4"
       >
+        <div className="flex justify-end">
+          <QuickFill name="scheduleFollowUp" args={{ templates }} />
+        </div>
         <FormField
           control={form.control}
           name="dueAt"

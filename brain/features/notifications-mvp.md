@@ -18,12 +18,22 @@ Updated on 2026-06-11 so explicit manual email sends are queued through Trigger.
 - Email delivery owner: `packages/jobs/src/tasks/notifications.ts`, which instantiates `@afterservice/notifications` inside the job worker.
 - Production email smoke testing uses the internal `email-smoke-test` Trigger.dev task. It creates isolated test workspace/customer/follow-up records in the worker runtime database, sends one email to the explicit test recipient, and returns the resulting message-log status.
 - Jobs runner: `packages/jobs` follows the GND Trigger.dev package pattern for `dev` and `deploy` scripts while preserving manual-send-only messaging.
-- Local website/dashboard development should include the jobs runner: both `dev:websites` and `dev:websites:portless` run `@afterservice/jobs` alongside the public website and dashboard.
+- Local website/dashboard development should include the jobs runner: `bun run dev -f website dashboard jobs` runs `@afterservice/jobs` alongside the public website and dashboard.
 - Jobs deploy mirrors GND's Prisma packaging step: `packages/jobs/prisma.ts` refreshes `packages/jobs/src/schema.prisma` from the shared DB schema before `trigger deploy`, and `trigger.config.ts` points Trigger's Prisma build extension at that task-local schema.
 - Jobs deploy pins the Trigger.dev runtime to `node-22` because Prisma 7 requires Node `20.19+`, `22.12+`, or `24.0+`; Trigger.dev 4.0.1's default `node` runtime image uses Node 21 and fails during remote image dependency installation.
 - Jobs deploy syncs the production runtime variables required by the worker (`DATABASE_URL`, `RESEND_API_KEY`, `EMAIL_FROM_ADDRESS`, `TEST_EMAIL`, and `AFTERSERVICE_ENV_MODE`) through Trigger.dev's `syncEnvVars` build extension so deployed tasks use the same production database and email provider configuration as the deploy environment.
 - Trigger.dev project selection is env-driven: `TRIGGER_PROJECT_ID` supplies the project ref, and `TRIGGER_PROFILE` optionally selects the CLI login profile for jobs `dev`/`deploy`. `scripts/with-trigger-profile.mjs` validates `TRIGGER_PROJECT_ID` before local `trigger dev`/`trigger deploy`; `trigger.config.ts` must remain importable without that env var because Trigger's remote deployment indexer imports the config inside the built image.
+- Local `trigger dev` also receives an ephemeral `0600` env file containing the
+  allowlisted values from the active local-infra profile. This intentionally
+  overrides Trigger.dev's remote project variables for the local worker and is
+  deleted on worker shutdown.
 
 ## Safety Rule
 No automatic customer outbound messaging is sent in MVP. Real email is limited to explicit manual-send paths, queued through jobs, and dev/local mode must route recipients through `TEST_EMAIL` when it is set.
 2026-06-18: The daily combined analytics review is an internal owner report sent directly from `packages/jobs` to `TEST_EMAIL`. It does not use `packages/notifications`, does not create customer-facing `MessageLog` records, and does not change customer notification delivery behavior.
+
+## Local Verification
+
+`bun run smoke:mvp` uses reserved `.invalid` recipient addresses so local
+console delivery cannot accidentally contact a customer. It polls for the
+asynchronous `MessageLog` and now passes through the real Trigger.dev task.

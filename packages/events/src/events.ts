@@ -1,122 +1,122 @@
 export const LogEvents = {
   CTA: {
-    name: "CTA Clicked",
+    name: "cta_clicked",
     channel: "marketing",
   },
   JoinFreeBeta: {
-    name: "Join Free Beta Clicked",
+    name: "join_free_beta_clicked",
     channel: "marketing",
   },
   PricingViewed: {
-    name: "Pricing Viewed",
+    name: "pricing_viewed",
     channel: "marketing",
   },
   PlannedPaidPlanInterest: {
-    name: "Planned Paid Plan Interest Clicked",
+    name: "planned_paid_plan_interest_clicked",
     channel: "marketing",
   },
   PwaInstallPromptShown: {
-    name: "PWA Install Prompt Shown",
+    name: "pwa_install_prompt_shown",
     channel: "marketing",
   },
   PwaInstallClicked: {
-    name: "PWA Install Clicked",
+    name: "pwa_install_clicked",
     channel: "marketing",
   },
   PwaInstallAccepted: {
-    name: "PWA Install Accepted",
+    name: "pwa_install_accepted",
     channel: "marketing",
   },
   PwaInstallFailed: {
-    name: "PWA Install Failed",
+    name: "pwa_install_failed",
     channel: "marketing",
   },
   PwaInstallUnavailable: {
-    name: "PWA Install Unavailable",
+    name: "pwa_install_unavailable",
     channel: "marketing",
   },
   PwaInstallDismissed: {
-    name: "PWA Install Dismissed",
+    name: "pwa_install_dismissed",
     channel: "marketing",
   },
   SignIn: {
-    name: "User Signed In",
+    name: "user_signed_in",
     channel: "login",
   },
   SignOut: {
-    name: "User Signed Out",
+    name: "user_signed_out",
     channel: "login",
   },
   SignUpStarted: {
-    name: "Sign Up Started",
+    name: "sign_up_started",
     channel: "signup",
   },
   SignUpCompleted: {
-    name: "Sign Up Completed",
+    name: "sign_up_completed",
     channel: "signup",
   },
   WorkspaceCreated: {
-    name: "Workspace Created",
+    name: "workspace_created",
     channel: "workspace",
   },
   WorkspaceUpdated: {
-    name: "Workspace Updated",
+    name: "workspace_updated",
     channel: "workspace",
   },
   TeamInviteSent: {
-    name: "Team Invite Sent",
+    name: "team_invite_sent",
     channel: "team",
   },
   TeamInviteAccepted: {
-    name: "Team Invite Accepted",
+    name: "team_invite_accepted",
     channel: "team",
   },
   CustomerCreated: {
-    name: "Customer Created",
+    name: "customer_created",
     channel: "customer",
   },
   ServiceJobCreated: {
-    name: "Service Job Created",
+    name: "service_job_created",
     channel: "job",
   },
   ServiceJobStatusUpdated: {
-    name: "Service Job Status Updated",
+    name: "service_job_status_updated",
     channel: "job",
   },
   FollowUpCreated: {
-    name: "Follow Up Created",
+    name: "follow_up_created",
     channel: "followup",
   },
   FollowUpStatusUpdated: {
-    name: "Follow Up Status Updated",
+    name: "follow_up_status_updated",
     channel: "followup",
   },
   MessageSent: {
-    name: "Message Sent",
+    name: "message_sent",
     channel: "messaging",
   },
   FollowUpTemplateCreated: {
-    name: "Follow Up Template Created",
+    name: "follow_up_template_created",
     channel: "messaging",
   },
   SubscriptionStarted: {
-    name: "Subscription Started",
+    name: "subscription_started",
     channel: "billing",
   },
   SubscriptionCanceled: {
-    name: "Subscription Canceled",
+    name: "subscription_canceled",
     channel: "billing",
   },
   PlanUpgraded: {
-    name: "Plan Upgraded",
+    name: "plan_upgraded",
     channel: "billing",
   },
   SearchOpened: {
-    name: "Search Opened",
+    name: "search_opened",
     channel: "general",
   },
   SearchPerformed: {
-    name: "Search Performed",
+    name: "search_performed",
     channel: "general",
   },
 };

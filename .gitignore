@@ -6,6 +6,8 @@ build
 packages/db/generated
 .env
 .env.local
+.env.dev
+.env.preview
 .env.production
 .DS_Store
 .gstack/

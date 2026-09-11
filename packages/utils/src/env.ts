@@ -123,7 +123,9 @@ export function validateWorkspaceEnv(
 
   if (mode === "production") {
     const authUrl = normalizeUrl(readEnv(env, "BETTER_AUTH_URL"));
-    const dashboardUrl = normalizeUrl(readEnv(env, "NEXT_PUBLIC_DASHBOARD_URL"));
+    const dashboardUrl = normalizeUrl(
+      readEnv(env, "NEXT_PUBLIC_DASHBOARD_URL"),
+    );
 
     if (authUrl && dashboardUrl && authUrl !== dashboardUrl) {
       invalid.push("BETTER_AUTH_URL");

@@ -1,8 +1,8 @@
 import { getDbClient } from "@afterservice/db";
+import { createAdminClient } from "@ishaqyusuf/logly-server";
 import { logger, schedules } from "@trigger.dev/sdk/v3";
 
 const TASK_ID = "daily-analytics-review" as const;
-const OPENPANEL_INSIGHTS_BASE_URL = "https://api.openpanel.dev/insights";
 const LAGOS_UTC_OFFSET = "+01:00";
 
 type EmailEnv = {
@@ -11,17 +11,17 @@ type EmailEnv = {
   testEmail: string;
 };
 
-type OpenPanelEnv = {
-  openPanelClientId: string;
-  openPanelClientSecret: string;
-  openPanelProjectId: string;
+type LoglyEnv = {
+  collectorUrl: string;
+  project: string;
+  readKey: string;
 };
 
 type AnalyticsReviewEnv = {
   email: EmailEnv | null;
   missingEmailKeys: string[];
-  missingOpenPanelKeys: string[];
-  openPanel: OpenPanelEnv | null;
+  logly: LoglyEnv | null;
+  missingLoglyKeys: string[];
 };
 
 type ReportWindow = {
@@ -34,23 +34,30 @@ type ReportWindow = {
   startDate: string;
 };
 
-type OpenPanelSection = {
+type AnalyticsSection = {
   error?: string;
-  rows: OpenPanelRow[];
+  rows: AnalyticsRow[];
 };
 
-type OpenPanelRow = {
+type AnalyticsRow = {
   label: string;
   value: string;
 };
 
-type OpenPanelReport = {
-  country: OpenPanelSection;
-  device: OpenPanelSection;
-  metrics: OpenPanelSection;
-  pages: OpenPanelSection;
-  referrers: OpenPanelSection;
-  utmSources: OpenPanelSection;
+type AnalyticsReport = {
+  events: AnalyticsSection;
+  metrics: AnalyticsSection;
+  referrers: AnalyticsSection;
+  routes: AnalyticsSection;
+};
+
+type LoglyEvent = {
+  name: string;
+  occurredAt: string;
+  referrerHost: string | null;
+  route: string | null;
+  visitKind: "new" | "returning" | null;
+  visitorKey: string | null;
 };
 
 type DatabaseReport = {
@@ -106,40 +113,44 @@ function readEnvGroup<const Key extends string>(
   return { missing, values };
 }
 
+function requiredEnvValue<const Key extends string>(
+  values: Partial<Record<Key, string>>,
+  key: Key,
+) {
+  const value = values[key];
+  if (!value) throw new Error(`Missing required env var: ${key}`);
+  return value;
+}
+
 function readAnalyticsReviewEnv(): AnalyticsReviewEnv {
   const emailKeys = [
     "EMAIL_FROM_ADDRESS",
     "RESEND_API_KEY",
     "TEST_EMAIL",
   ] as const;
-  const openPanelKeys = [
-    "OPENPANEL_PROJECT_ID",
-    "OPENPANEL_READ_CLIENT_ID",
-    "OPENPANEL_READ_CLIENT_SECRET",
-  ] as const;
+  const loglyKeys = ["LOGLY_COLLECTOR_URL", "LOGLY_READ_KEY"] as const;
   const email = readEnvGroup(emailKeys);
-  const openPanel = readEnvGroup(openPanelKeys);
+  const logly = readEnvGroup(loglyKeys);
 
   return {
     email:
       email.missing.length === 0
         ? {
-            emailFrom: email.values.EMAIL_FROM_ADDRESS!,
-            resendApiKey: email.values.RESEND_API_KEY!,
-            testEmail: email.values.TEST_EMAIL!,
+            emailFrom: requiredEnvValue(email.values, "EMAIL_FROM_ADDRESS"),
+            resendApiKey: requiredEnvValue(email.values, "RESEND_API_KEY"),
+            testEmail: requiredEnvValue(email.values, "TEST_EMAIL"),
           }
         : null,
     missingEmailKeys: email.missing,
-    missingOpenPanelKeys: openPanel.missing,
-    openPanel:
-      openPanel.missing.length === 0
+    logly:
+      logly.missing.length === 0
         ? {
-            openPanelClientId: openPanel.values.OPENPANEL_READ_CLIENT_ID!,
-            openPanelClientSecret:
-              openPanel.values.OPENPANEL_READ_CLIENT_SECRET!,
-            openPanelProjectId: openPanel.values.OPENPANEL_PROJECT_ID!,
+            collectorUrl: requiredEnvValue(logly.values, "LOGLY_COLLECTOR_URL"),
+            project: process.env.LOGLY_PROJECT?.trim() || "afterservice",
+            readKey: requiredEnvValue(logly.values, "LOGLY_READ_KEY"),
           }
         : null,
+    missingLoglyKeys: logly.missing,
   };
 }
 
@@ -147,16 +158,14 @@ function missingReason(keys: string[]) {
   return `Missing required env vars: ${keys.join(", ")}`;
 }
 
-function unavailableOpenPanelReport(reason: string): OpenPanelReport {
+function unavailableAnalyticsReport(reason: string): AnalyticsReport {
   const section = { error: reason, rows: [] };
 
   return {
-    country: section,
-    device: section,
+    events: section,
     metrics: section,
-    pages: section,
     referrers: section,
-    utmSources: section,
+    routes: section,
   };
 }
 
@@ -227,10 +236,6 @@ function getReportWindow(now = new Date()): ReportWindow {
   };
 }
 
-function isRecord(value: unknown): value is Record<string, unknown> {
-  return typeof value === "object" && value !== null && !Array.isArray(value);
-}
-
 function escapeHtml(value: string) {
   return value
     .replaceAll("&", "&amp;")
@@ -244,253 +249,73 @@ function formatNumber(value: number) {
   return new Intl.NumberFormat("en-US").format(value);
 }
 
-function formatPercent(value: number) {
-  const normalized = value > 1 ? value : value * 100;
-  return `${normalized.toFixed(1)}%`;
-}
-
-function formatDuration(seconds: number) {
-  if (!Number.isFinite(seconds) || seconds <= 0) {
-    return "0s";
+function countRows(values: Array<string | null>): AnalyticsRow[] {
+  const counts = new Map<string, number>();
+  for (const value of values) {
+    if (value) counts.set(value, (counts.get(value) ?? 0) + 1);
   }
-
-  const minutes = Math.floor(seconds / 60);
-  const remainder = Math.round(seconds % 60);
-
-  return minutes > 0 ? `${minutes}m ${remainder}s` : `${remainder}s`;
+  return [...counts]
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 5)
+    .map(([label, value]) => ({ label, value: formatNumber(value) }));
 }
 
-function numberFromRecord(record: Record<string, unknown>, keys: string[]) {
-  for (const key of keys) {
-    const value = record[key];
-
-    if (typeof value === "number" && Number.isFinite(value)) {
-      return value;
-    }
-
-    if (typeof value === "string") {
-      const parsed = Number(value);
-
-      if (Number.isFinite(parsed)) {
-        return parsed;
-      }
-    }
-  }
-
-  return undefined;
-}
-
-function stringFromRecord(record: Record<string, unknown>, keys: string[]) {
-  for (const key of keys) {
-    const value = record[key];
-
-    if (typeof value === "string" && value.trim()) {
-      return value.trim();
-    }
-  }
-
-  return undefined;
-}
-
-function collectRecords(value: unknown): Record<string, unknown>[] {
-  if (Array.isArray(value)) {
-    return value.flatMap((item) =>
-      isRecord(item) ? [item, ...collectRecords(Object.values(item))] : [],
-    );
-  }
-
-  if (!isRecord(value)) {
-    return [];
-  }
-
-  return [
-    value,
-    ...Object.values(value).flatMap((nested) => collectRecords(nested)),
-  ];
-}
-
-function firstMetric(payload: unknown, keys: string[]) {
-  for (const record of collectRecords(payload)) {
-    const value = numberFromRecord(record, keys);
-
-    if (value !== undefined) {
-      return value;
-    }
-  }
-
-  return undefined;
-}
-
-function createMetricsRows(payload: unknown): OpenPanelRow[] {
-  const sessions = firstMetric(payload, ["sessions", "session"]);
-  const visitors = firstMetric(payload, [
-    "visitors",
-    "uniqueVisitors",
-    "unique_visitors",
-    "users",
-  ]);
-  const pageviews = firstMetric(payload, [
-    "pageviews",
-    "pageViews",
-    "views",
-  ]);
-  const bounceRate = firstMetric(payload, [
-    "bounceRate",
-    "bounce_rate",
-    "bounce",
-  ]);
-  const duration = firstMetric(payload, [
-    "averageSessionDuration",
-    "avgSessionDuration",
-    "avg_duration",
-    "duration",
-  ]);
-
-  return [
-    sessions === undefined
-      ? undefined
-      : { label: "Sessions", value: formatNumber(sessions) },
-    visitors === undefined
-      ? undefined
-      : { label: "Visitors", value: formatNumber(visitors) },
-    pageviews === undefined
-      ? undefined
-      : { label: "Pageviews", value: formatNumber(pageviews) },
-    bounceRate === undefined
-      ? undefined
-      : { label: "Bounce rate", value: formatPercent(bounceRate) },
-    duration === undefined
-      ? undefined
-      : { label: "Avg duration", value: formatDuration(duration) },
-  ].filter((row): row is OpenPanelRow => Boolean(row));
-}
-
-function createTopRows(payload: unknown, fallbackLabel: string): OpenPanelRow[] {
-  return collectRecords(payload)
-    .map((record) => {
-      const label =
-        stringFromRecord(record, [
-          "path",
-          "url",
-          "page",
-          "name",
-          "title",
-          "referrer",
-          "referrer_name",
-          "utm_source",
-          "device",
-          "country",
-          "label",
-          "key",
-          "value",
-        ]) ?? fallbackLabel;
-      const value = numberFromRecord(record, [
-        "pageviews",
-        "pageViews",
-        "sessions",
-        "visitors",
-        "count",
-        "total",
-        "value",
-      ]);
-
-      return value === undefined
-        ? undefined
-        : {
-            label,
-            value: formatNumber(value),
-          };
-    })
-    .filter((row): row is OpenPanelRow => Boolean(row))
-    .filter(
-      (row, index, rows) =>
-        rows.findIndex(
-          (candidate) =>
-            candidate.label === row.label && candidate.value === row.value,
-        ) === index,
-    )
-    .slice(0, 5);
-}
-
-async function fetchOpenPanelJson(
-  env: OpenPanelEnv,
-  endpoint: string,
-  window: ReportWindow,
-) {
-  const url = new URL(
-    `${OPENPANEL_INSIGHTS_BASE_URL}/${env.openPanelProjectId}/${endpoint}`,
-  );
-  url.searchParams.set("range", "custom");
-  url.searchParams.set("startDate", window.start.toISOString());
-  url.searchParams.set("endDate", window.end.toISOString());
-
-  const response = await fetch(url, {
-    headers: {
-      "openpanel-client-id": env.openPanelClientId,
-      "openpanel-client-secret": env.openPanelClientSecret,
-    },
-  });
-
-  if (!response.ok) {
-    throw new Error(`OpenPanel ${endpoint} returned ${response.status}`);
-  }
-
-  return response.json() as Promise<unknown>;
-}
-
-async function getOpenPanelSection(
-  env: OpenPanelEnv,
-  endpoint: string,
-  window: ReportWindow,
-  parser: (payload: unknown) => OpenPanelRow[],
-): Promise<OpenPanelSection> {
-  try {
-    const payload = await fetchOpenPanelJson(env, endpoint, window);
-    const rows = parser(payload);
-
-    return rows.length > 0
-      ? { rows }
-      : { error: "No parseable rows returned.", rows: [] };
-  } catch (error) {
-    return {
-      error: error instanceof Error ? error.message : String(error),
-      rows: [],
-    };
-  }
-}
-
-async function getOpenPanelReport(
-  env: OpenPanelEnv | null,
+async function getAnalyticsReport(
+  env: LoglyEnv | null,
   window: ReportWindow,
   unavailableReason?: string,
-): Promise<OpenPanelReport> {
+): Promise<AnalyticsReport> {
   if (!env) {
-    return unavailableOpenPanelReport(
-      unavailableReason ?? "OpenPanel env is not configured.",
+    return unavailableAnalyticsReport(
+      unavailableReason ?? "Logly env is not configured.",
     );
   }
 
-  const [metrics, pages, referrers, utmSources, device, country] =
-    await Promise.all([
-      getOpenPanelSection(env, "overview", window, createMetricsRows),
-      getOpenPanelSection(env, "pages", window, (payload) =>
-        createTopRows(payload, "Page"),
-      ),
-      getOpenPanelSection(env, "traffic/referrers", window, (payload) =>
-        createTopRows(payload, "Referrer"),
-      ),
-      getOpenPanelSection(env, "utm_source", window, (payload) =>
-        createTopRows(payload, "UTM source"),
-      ),
-      getOpenPanelSection(env, "device", window, (payload) =>
-        createTopRows(payload, "Device"),
-      ),
-      getOpenPanelSection(env, "country", window, (payload) =>
-        createTopRows(payload, "Country"),
-      ),
-    ]);
+  try {
+    const client = createAdminClient({
+      collectorUrl: env.collectorUrl,
+      readKey: env.readKey,
+    });
+    const response = await client.read<{ data: LoglyEvent[] }>(
+      `/v1/dashboard/events?project=${encodeURIComponent(env.project)}`,
+    );
+    const events = response.data.filter((event) => {
+      const occurredAt = new Date(event.occurredAt);
+      return occurredAt >= window.start && occurredAt < window.end;
+    });
+    const visitors = new Set(
+      events.flatMap((event) => (event.visitorKey ? [event.visitorKey] : [])),
+    );
+    const newVisitors = events.filter(
+      (event) => event.name === "site_visit" && event.visitKind === "new",
+    ).length;
+    const returningVisitors = events.filter(
+      (event) => event.name === "site_visit" && event.visitKind === "returning",
+    ).length;
 
-  return { country, device, metrics, pages, referrers, utmSources };
+    return {
+      events: { rows: countRows(events.map((event) => event.name)) },
+      metrics: {
+        rows: [
+          { label: "Visitors", value: formatNumber(visitors.size) },
+          { label: "New visitors", value: formatNumber(newVisitors) },
+          {
+            label: "Returning visitors",
+            value: formatNumber(returningVisitors),
+          },
+          { label: "Events", value: formatNumber(events.length) },
+        ],
+      },
+      referrers: {
+        rows: countRows(events.map((event) => event.referrerHost)),
+      },
+      routes: { rows: countRows(events.map((event) => event.route)) },
+    };
+  } catch (error) {
+    return unavailableAnalyticsReport(
+      error instanceof Error ? error.message : String(error),
+    );
+  }
 }
 
 function addActivity(
@@ -510,7 +335,9 @@ function addActivity(
   activity.set(workspaceId, current);
 }
 
-async function getDatabaseReport(window: ReportWindow): Promise<DatabaseReport> {
+async function getDatabaseReport(
+  window: ReportWindow,
+): Promise<DatabaseReport> {
   const db = getDbClient();
   const dateWhere = {
     createdAt: {
@@ -686,7 +513,7 @@ async function getDatabaseReport(window: ReportWindow): Promise<DatabaseReport> 
   };
 }
 
-function renderKeyValueGrid(rows: OpenPanelRow[]) {
+function renderKeyValueGrid(rows: AnalyticsRow[]) {
   if (rows.length === 0) {
     return '<p style="margin:0;color:#667085;">Unavailable.</p>';
   }
@@ -701,7 +528,7 @@ function renderKeyValueGrid(rows: OpenPanelRow[]) {
     .join("")}</table>`;
 }
 
-function renderSection(title: string, section: OpenPanelSection) {
+function renderSection(title: string, section: AnalyticsSection) {
   const note = section.error
     ? `<p style="margin:8px 0 0;color:#667085;font-size:12px;">${escapeHtml(section.error)}</p>`
     : "";
@@ -773,7 +600,7 @@ function renderTopWorkspaces(workspaces: DatabaseReport["topWorkspaces"]) {
 
 function renderEmail(
   window: ReportWindow,
-  openPanel: OpenPanelReport,
+  analytics: AnalyticsReport,
   database: DatabaseReport,
   unavailableNotes: string[],
 ) {
@@ -828,12 +655,10 @@ function renderEmail(
       </section>
 
       <div style="display:grid;gap:16px;">
-        ${renderSection("Website overview", openPanel.metrics)}
-        ${renderSection("Top pages", openPanel.pages)}
-        ${renderSection("Top referrers", openPanel.referrers)}
-        ${renderSection("Top UTM sources", openPanel.utmSources)}
-        ${renderSection("Top devices", openPanel.device)}
-        ${renderSection("Top countries", openPanel.country)}
+        ${renderSection("Website overview", analytics.metrics)}
+        ${renderSection("Top routes", analytics.routes)}
+        ${renderSection("Top referrers", analytics.referrers)}
+        ${renderSection("Top events", analytics.events)}
       </div>
     </main>
   </body>
@@ -882,27 +707,27 @@ export const dailyAnalyticsReview = schedules.task({
     const env = readAnalyticsReviewEnv();
     const window = getReportWindow();
     const unavailableNotes = [
-      env.missingOpenPanelKeys.length > 0
+      env.missingLoglyKeys.length > 0
         ? `Website analytics unavailable: ${missingReason(
-            env.missingOpenPanelKeys,
+            env.missingLoglyKeys,
           )}`
         : undefined,
       env.missingEmailKeys.length > 0
         ? `Email delivery skipped: ${missingReason(env.missingEmailKeys)}`
         : undefined,
     ].filter((note): note is string => Boolean(note));
-    const [openPanel, database] = await Promise.all([
-      getOpenPanelReport(
-        env.openPanel,
+    const [analytics, database] = await Promise.all([
+      getAnalyticsReport(
+        env.logly,
         window,
-        env.missingOpenPanelKeys.length > 0
-          ? missingReason(env.missingOpenPanelKeys)
+        env.missingLoglyKeys.length > 0
+          ? missingReason(env.missingLoglyKeys)
           : undefined,
       ),
       getDatabaseReport(window),
     ]);
     const subject = `afterservice daily analytics review - ${window.reportDate}`;
-    const html = renderEmail(window, openPanel, database, unavailableNotes);
+    const html = renderEmail(window, analytics, database, unavailableNotes);
     const providerId = env.email
       ? await sendEmail(env.email, subject, html)
       : null;
@@ -912,10 +737,10 @@ export const dailyAnalyticsReview = schedules.task({
     logger.info("Processed daily analytics review", {
       deliveryStatus,
       missingEmailKeys: env.missingEmailKeys,
-      missingOpenPanelKeys: env.missingOpenPanelKeys,
-      openPanelSections: Object.values(openPanel).filter(
+      analyticsSections: Object.values(analytics).filter(
         (section) => section.rows.length > 0,
       ).length,
+      missingLoglyKeys: env.missingLoglyKeys,
       providerId: providerId ? "set" : null,
       reportDate: window.reportDate,
       topWorkspaces: database.topWorkspaces.length,
@@ -926,7 +751,7 @@ export const dailyAnalyticsReview = schedules.task({
       database: databaseSummary,
       deliveryStatus,
       missingEmailKeys: env.missingEmailKeys,
-      missingOpenPanelKeys: env.missingOpenPanelKeys,
+      missingLoglyKeys: env.missingLoglyKeys,
       providerId: providerId ? "set" : null,
       reportDate: window.reportDate,
       sentTo: env.email ? "TEST_EMAIL" : null,

@@ -13,6 +13,8 @@ This file defines authorization rules.
 - Sign-up/sign-in pages.
 - API health.
 - Lemon Squeezy webhook endpoint with signature verification.
+- Internal QA capability and credential exchange routes exist only in enabled
+  non-production build artifacts; they are not production public routes.
 
 ## Internal Routes
 - `POST /api/jobs/follow-ups/dry-run` requires `CRON_SECRET` through a bearer token or `x-cron-secret` header.
@@ -40,6 +42,16 @@ Require active membership:
 - Never trust workspace ID from the client without membership lookup.
 - Permission checks must run in API procedures.
 - UI gates are helpful but not security boundaries.
+- QA profile discovery requires an active digest-backed authorization and may
+  return only workspaces whose explicit QA source domain matches the grant.
+- QA-derived sessions are ordinary Better Auth sessions but remain bound to one
+  active authorization, membership, and workspace on every server context.
+- QA-derived sessions never inherit the selected identity's global
+  `platform_admin` authority; platform QA maintenance requires a separately
+  authenticated normal administrator session.
+- QA workspaces may send only exactly routed QA email. SMS, phone, WhatsApp,
+  payment, subscription, and destructive effects fail closed before provider
+  invocation unless an approved QA adapter exists.
 
 ## Auth Proxy Behavior
 - Browser OAuth:

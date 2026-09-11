@@ -22,6 +22,7 @@ import {
   FormMessage,
 } from "@afterservice/ui/form";
 import { useMutation } from "@tanstack/react-query";
+import { QuickFill } from "@/components/quick-fill";
 import { useDashboardInvalidations } from "@/hooks/use-dashboard-invalidations";
 import {
   templateChannelLabels,
@@ -70,6 +71,9 @@ export function TemplateCreateForm() {
         )}
         className="space-y-6"
       >
+        <div className="flex justify-end">
+          <QuickFill name="template" />
+        </div>
         <div className="space-y-4">
           <FormField
             control={form.control}

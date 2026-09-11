@@ -10,7 +10,7 @@ const workspaceRoot = resolve(scriptDir, "..");
 const terminalScripts = {
   api: {
     description: "Start only the API dev server.",
-    steps: [{ command: "bun", args: ["run", "dev:api"] }],
+    steps: [{ command: "bun", args: ["run", "dev", "-f", "api"] }],
   },
   build: {
     description: "Run the production build across the workspace.",
@@ -26,7 +26,7 @@ const terminalScripts = {
   },
   dashboard: {
     description: "Start only the dashboard dev server.",
-    steps: [{ command: "bun", args: ["run", "dev:dashboard"] }],
+    steps: [{ command: "bun", args: ["run", "dev", "-f", "dashboard"] }],
   },
   "db:generate": {
     description: "Generate the Prisma client.",
@@ -85,7 +85,7 @@ const terminalScripts = {
   },
   website: {
     description: "Start only the website dev server.",
-    steps: [{ command: "bun", args: ["run", "dev:website"] }],
+    steps: [{ command: "bun", args: ["run", "dev", "-f", "website"] }],
   },
 };
 

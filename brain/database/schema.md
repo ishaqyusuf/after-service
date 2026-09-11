@@ -5,7 +5,8 @@ This file documents the implemented Prisma/Postgres schema in `packages/db`.
 
 ## Auth Models
 - `User`: Better Auth identity record.
-- `Session`: Better Auth session.
+- `Session`: Better Auth session. QA-derived sessions additionally bind the
+  issuing authorization, membership, and workspace.
 - `Account`: provider/account link.
 - `Verification`: email or token verification.
 
@@ -23,8 +24,20 @@ This file documents the implemented Prisma/Postgres schema in `packages/db`.
 - `MessageLog`: record of manual or provider-sent messages.
 
 ## Billing Models
-- `Subscription`: current Lemon Squeezy-backed plan state.
-- `BillingEvent`: idempotent Lemon Squeezy webhook event log.
+- `Subscription`: current provider-backed plan state.
+- `BillingEvent`: idempotent billing-provider webhook event log.
+
+## QA Accelerator Models
+
+- `QaTesterGrant`: exact QA domain, tester label, credential digest, expiry,
+  status, and revocation timestamp.
+- `QaClientAuthorization`: short-lived, revocable client authorization with
+  client/token digests and contract version.
+- `QaAccessProfileSelection`: short-lived single-use reference binding one
+  authorization to an eligible membership and workspace.
+- `QaAccessAttemptBucket`: atomic failed-exchange counter and timed lock.
+- `QaAccessAuditEvent`: redacted authorization lifecycle audit record.
+- `QaPurgeRun`: aggregate-only receipt for QA workspace cleanup.
 
 ## Enums
 - `WorkspacePlan`: `starter | growth | pro`
@@ -33,18 +46,23 @@ This file documents the implemented Prisma/Postgres schema in `packages/db`.
 - `ServiceJobStatus`: `completed | needs_follow_up | resolved`
 - `FollowUpStatus`: `open | scheduled | sent | replied | closed | missed`
 - `FollowUpChannel`: `email | sms | phone | whatsapp`
-- `BillingProvider`: `lemon_squeezy`
+- `BillingProvider`: `polar | stripe`
 
 ## Workspace Scoping
 - Customer, job, follow-up, template, event, message, subscription, and billing-event reads/writes are scoped by workspace.
 - API procedures derive workspace from session membership and do not trust client workspace IDs.
+- QA-derived sessions must resolve their bound membership and workspace, whose
+  QA source domain must still match the active grant.
 
 ## Index Requirements
 - Workspace foreign keys on all business tables.
 - Customer search fields.
 - Service job completion date.
 - Follow-up due date and status.
-- Lemon Squeezy event ID/provider references.
+- Billing event ID/provider references.
+- QA credential and authorization token digests are unique; grant/domain,
+  client/platform, expiry/status, lock, selection, session, and audit lookup
+  paths are indexed.
 
 ## Validation
 - `bunx prisma validate` in `packages/db` passed on 2026-05-30.

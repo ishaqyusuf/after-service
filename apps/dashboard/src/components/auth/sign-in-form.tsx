@@ -1,10 +1,6 @@
 "use client";
 
-import {
-  Button,
-  Input,
-  Icons
-} from "@afterservice/ui";
+import { Button, Icons, Input } from "@afterservice/ui";
 import {
   Form,
   FormControl,
@@ -15,31 +11,16 @@ import {
 } from "@afterservice/ui/form";
 import { Loader2 } from "lucide-react";
 import { useState } from "react";
-import { z } from "zod";
 import { useZodForm } from "@/hooks/use-zod-form";
 import { signIn } from "@/lib/auth-client";
-
-const signInSchema = z.object({
-  email: z.string().email("Enter a valid email address."),
-  password: z.string().min(8, "Password must be at least 8 characters."),
-});
-
-type FieldValues = z.infer<typeof signInSchema>;
+import { type SignInFieldValues, signInSchema } from "./sign-in-schema";
 
 type Props = {
-  onSignIn: (values: FieldValues) => Promise<void>;
+  onSignIn: (values: SignInFieldValues) => Promise<void>;
   returnTo?: string | null;
-  adapterRef?: React.MutableRefObject<QuickFillFormAdapter<FieldValues> | null>;
 };
 
-// inline to avoid extra file
-type QuickFillFormAdapter<TValues extends Record<string, unknown>> = {
-  getValues: () => TValues;
-  reset: (values: TValues) => void;
-  setValue: (name: string, value: unknown) => void;
-};
-
-export function SignInForm({ onSignIn, returnTo, adapterRef }: Props) {
+export function SignInForm({ onSignIn, returnTo }: Props) {
   const [error, setError] = useState<string | null>(null);
   const [isGooglePending, setIsGooglePending] = useState(false);
   const form = useZodForm({
@@ -52,22 +33,7 @@ export function SignInForm({ onSignIn, returnTo, adapterRef }: Props) {
 
   const isPending = form.formState.isSubmitting;
 
-  if (adapterRef) {
-    adapterRef.current = {
-      getValues: () => form.getValues(),
-      reset: (values) => form.reset(values as FieldValues),
-      setValue: (name, value) => {
-        if (name === "email" || name === "password") {
-          form.setValue(name, String(value), {
-            shouldDirty: true,
-            shouldValidate: true,
-          });
-        }
-      },
-    };
-  }
-
-  async function handleSubmit(values: FieldValues) {
+  async function handleSubmit(values: SignInFieldValues) {
     setError(null);
 
     try {
@@ -114,9 +80,9 @@ export function SignInForm({ onSignIn, returnTo, adapterRef }: Props) {
   return (
     <div className="space-y-6">
       <div className="flex flex-col space-y-4">
-        <Button 
-          type="button" 
-          variant="outline" 
+        <Button
+          type="button"
+          variant="outline"
           onClick={handleGoogleSignIn}
           disabled={isGooglePending || isPending}
           className="w-full h-11 relative"
@@ -212,4 +178,4 @@ export function SignInForm({ onSignIn, returnTo, adapterRef }: Props) {
   );
 }
 
-export type { FieldValues as SignInFieldValues };
+export type { SignInFieldValues } from "./sign-in-schema";

@@ -1,5 +1,9 @@
 import { auth } from "@afterservice/auth";
-import { getDbClient, type MembershipRole } from "@afterservice/db";
+import {
+  getDbClient,
+  type MembershipRole,
+  validateQaDerivedSession,
+} from "@afterservice/db";
 
 type BetterAuthSession = NonNullable<
   Awaited<ReturnType<typeof auth.api.getSession>>
@@ -26,7 +30,11 @@ export async function createContext(request?: Request): Promise<ApiContext> {
       })
     : null;
   const db = getDbClient();
-  const [membership, platformUser] = session?.user
+  const qaValidation = session?.session.qaAuthorizationId
+    ? await validateQaDerivedSession(db, session.session.id)
+    : null;
+  const effectiveSession = qaValidation?.active === false ? null : session;
+  const [membership, platformUser] = effectiveSession?.user
     ? await Promise.all([
         db.membership.findFirst({
           orderBy: {
@@ -43,21 +51,24 @@ export async function createContext(request?: Request): Promise<ApiContext> {
             },
           },
           where: {
-            userId: session.user.id,
+            id: qaValidation?.scope?.membershipId,
+            userId: effectiveSession.user.id,
           },
         }),
         db.user.findUnique({
-          where: { id: session.user.id },
+          where: { id: effectiveSession.user.id },
           select: { platformRole: true },
         }),
       ])
     : [null, null];
 
   return {
-    session,
+    session: effectiveSession,
     requestId: crypto.randomUUID(),
-    user: session?.user ?? null,
-    platformRole: platformUser?.platformRole ?? "user",
+    user: effectiveSession?.user ?? null,
+    platformRole: qaValidation?.scope
+      ? "user"
+      : (platformUser?.platformRole ?? "user"),
     workspace: membership
       ? membership.workspace.qaPurgeStartedAt
         ? null

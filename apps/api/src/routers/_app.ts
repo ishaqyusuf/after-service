@@ -12,6 +12,11 @@ import {
 import { LogEvents } from "@afterservice/events";
 import { setupAnalytics } from "@afterservice/events/server";
 import { Notifications } from "@afterservice/notifications";
+import {
+  resolveEmailRecipients,
+  resolveQaExternalEffectPolicy,
+  type QaExternalEffect,
+} from "@afterservice/utils";
 import { tasks } from "@trigger.dev/sdk/v3";
 import { initTRPC, TRPCError } from "@trpc/server";
 import superjson from "superjson";
@@ -25,6 +30,78 @@ const t = initTRPC.context<ApiContext>().create({
 
 const db = getDbClient();
 const notifications = new Notifications(db);
+
+async function assertQaExternalEffectAllowed(input: {
+  effect: QaExternalEffect;
+  recipient?: string;
+  workspaceId: string;
+}) {
+  const workspace = await db.workspace.findUniqueOrThrow({
+    select: { dataClassification: true, qaSourceDomain: true },
+    where: { id: input.workspaceId },
+  });
+  if (workspace.dataClassification !== "qa") return;
+
+  let isRoutedQaEmail = false;
+  if (input.effect === "email" && input.recipient) {
+    try {
+      const route = resolveEmailRecipients(input.recipient).routes[0];
+      const domain = input.recipient.trim().toLowerCase().split("@").at(-1);
+      isRoutedQaEmail = Boolean(
+        route?.qaRouted && domain === workspace.qaSourceDomain,
+      );
+    } catch {
+      isRoutedQaEmail = false;
+    }
+  }
+  const policy = resolveQaExternalEffectPolicy({
+    effect: input.effect,
+    isQaWorkspace: true,
+    isRoutedQaEmail,
+  });
+  if (!policy.allowed) {
+    throw new TRPCError({
+      code: "FORBIDDEN",
+      message: "This external effect is blocked for QA workspaces.",
+    });
+  }
+}
+
+async function resolveNotificationDispatch(input: {
+  recipient?: string | null;
+  workspaceId: string;
+}) {
+  const workspace = await db.workspace.findUniqueOrThrow({
+    select: { dataClassification: true, qaSourceDomain: true },
+    where: { id: input.workspaceId },
+  });
+  if (workspace.dataClassification !== "qa") {
+    return { options: undefined, send: true as const };
+  }
+  if (!input.recipient) {
+    return { send: false as const };
+  }
+
+  let isRoutedQaEmail = false;
+  try {
+    const route = resolveEmailRecipients(input.recipient).routes[0];
+    const domain = input.recipient.trim().toLowerCase().split("@").at(-1);
+    isRoutedQaEmail = Boolean(
+      route?.qaRouted && domain === workspace.qaSourceDomain,
+    );
+  } catch {
+    isRoutedQaEmail = false;
+  }
+
+  const policy = resolveQaExternalEffectPolicy({
+    effect: "email",
+    isQaWorkspace: true,
+    isRoutedQaEmail,
+  });
+  return policy.allowed
+    ? { options: { channels: ["email" as const] }, send: true as const }
+    : { send: false as const };
+}
 
 const channelSchema = z.enum(["email", "sms", "phone", "whatsapp"]);
 const followUpStatusSchema = z.enum([
@@ -361,6 +438,10 @@ const customersRouter = t.router({
   archive: protectedProcedure
     .input(z.object({ id: z.string().min(1) }))
     .mutation(async ({ ctx, input }) => {
+      await assertQaExternalEffectAllowed({
+        effect: "destructive",
+        workspaceId: ctx.workspace.id,
+      });
       const item = await db.customer.update({
         data: { archivedAt: new Date() },
         where: { id: input.id, workspaceId: ctx.workspace.id },
@@ -720,6 +801,20 @@ const serviceJobsRouter = t.router({
   markCompleted: protectedProcedure
     .input(z.object({ id: z.string().min(1) }))
     .mutation(async ({ ctx, input }) => {
+      const current = await db.serviceJob.findFirstOrThrow({
+        select: { customerId: true },
+        where: { id: input.id, workspaceId: ctx.workspace.id },
+      });
+      const customer = await db.customer.findFirstOrThrow({
+        where: {
+          id: current.customerId,
+          workspaceId: ctx.workspace.id,
+        },
+      });
+      const notificationDispatch = await resolveNotificationDispatch({
+        recipient: customer.email,
+        workspaceId: ctx.workspace.id,
+      });
       const item = await db.serviceJob.update({
         data: { completedAt: new Date(), status: "completed" },
         where: { id: input.id, workspaceId: ctx.workspace.id },
@@ -733,26 +828,29 @@ const serviceJobsRouter = t.router({
         workspaceId: ctx.workspace.id,
       });
 
-      const customer = await db.customer.findUniqueOrThrow({
-        where: { id: item.customerId },
-      });
-
       // Async dispatch notification
-      notifications
-        .send("job_completed_checkin", ctx.workspace.id, {
-          users: [
+      if (notificationDispatch.send) {
+        notifications
+          .send(
+            "job_completed_checkin",
+            ctx.workspace.id,
             {
-              id: customer.id,
-              email: customer.email || "",
-              phone: customer.phone || undefined,
-              workspace_id: ctx.workspace.id,
+              users: [
+                {
+                  id: customer.id,
+                  email: customer.email || "",
+                  phone: customer.phone || undefined,
+                  workspace_id: ctx.workspace.id,
+                },
+              ],
+              jobId: item.id,
+              customerId: item.customerId,
+              completedAt: item.completedAt.toISOString(),
             },
-          ],
-          jobId: item.id,
-          customerId: item.customerId,
-          completedAt: item.completedAt.toISOString(),
-        })
-        .catch(console.error);
+            notificationDispatch.options,
+          )
+          .catch(console.error);
+      }
 
       return { item };
     }),
@@ -884,8 +982,12 @@ const followUpsRouter = t.router({
     .mutation(async ({ ctx, input }) => {
       await assertUnderLimit(ctx.workspace.id, "followUps");
 
-      await db.customer.findFirstOrThrow({
+      const customer = await db.customer.findFirstOrThrow({
         where: { id: input.customerId, workspaceId: ctx.workspace.id },
+      });
+      const notificationDispatch = await resolveNotificationDispatch({
+        recipient: customer.email,
+        workspaceId: ctx.workspace.id,
       });
 
       const item = await db.followUp.create({
@@ -923,23 +1025,30 @@ const followUpsRouter = t.router({
         workspaceId: ctx.workspace.id,
       });
 
-      notifications
-        .send("followup_scheduled", ctx.workspace.id, {
-          users: [
+      if (notificationDispatch.send) {
+        notifications
+          .send(
+            "followup_scheduled",
+            ctx.workspace.id,
             {
-              id: item.customer.id,
-              email: item.customer.email || "",
-              phone: item.customer.phone || undefined,
-              workspace_id: ctx.workspace.id,
+              users: [
+                {
+                  id: item.customer.id,
+                  email: item.customer.email || "",
+                  phone: item.customer.phone || undefined,
+                  workspace_id: ctx.workspace.id,
+                },
+              ],
+              jobId: item.jobId || undefined,
+              customerId: item.customerId,
+              dueAt: item.dueAt.toISOString(),
+              notes: item.notes || undefined,
+              channel: item.channel,
             },
-          ],
-          jobId: item.jobId || undefined,
-          customerId: item.customerId,
-          dueAt: item.dueAt.toISOString(),
-          notes: item.notes || undefined,
-          channel: item.channel,
-        })
-        .catch(console.error);
+            notificationDispatch.options,
+          )
+          .catch(console.error);
+      }
 
       return { item: followUpDto(item) };
     }),
@@ -1073,6 +1182,11 @@ const followUpsRouter = t.router({
     .mutation(async ({ ctx, input }) => {
       const followUp = await db.followUp.findFirstOrThrow({
         where: { id: input.id, workspaceId: ctx.workspace.id },
+      });
+      await assertQaExternalEffectAllowed({
+        effect: followUp.channel === "email" ? "email" : followUp.channel,
+        recipient: input.recipient,
+        workspaceId: ctx.workspace.id,
       });
       const item = await db.followUp.update({
         data: {
@@ -1224,6 +1338,10 @@ const templatesRouter = t.router({
   archive: protectedProcedure
     .input(z.object({ id: z.string().min(1) }))
     .mutation(async ({ ctx, input }) => {
+      await assertQaExternalEffectAllowed({
+        effect: "destructive",
+        workspaceId: ctx.workspace.id,
+      });
       await db.followUpTemplate.delete({
         where: { id: input.id, workspaceId: ctx.workspace.id },
       });
@@ -1391,6 +1509,10 @@ const workspaceRouter = t.router({
 const billingRouter = t.router({
   createCheckout: protectedProcedure.mutation(async ({ ctx }) => {
     requireOwnerOrAdmin(ctx);
+    await assertQaExternalEffectAllowed({
+      effect: "payment",
+      workspaceId: ctx.workspace.id,
+    });
 
     if (process.env.AFTERSERVICE_PAID_CHECKOUT_ENABLED !== "true") {
       return { checkoutUrl: "/billing?checkout=beta" };
@@ -1478,6 +1600,10 @@ const billingRouter = t.router({
   }),
   getPortalUrl: protectedProcedure.query(async ({ ctx }) => {
     requireOwnerOrAdmin(ctx);
+    await assertQaExternalEffectAllowed({
+      effect: "subscription",
+      workspaceId: ctx.workspace.id,
+    });
 
     try {
       let polarCustomer: { id: string };
@@ -1505,6 +1631,38 @@ const billingRouter = t.router({
 const dashboardRouter = t.router({
   overview: protectedProcedure.query(async ({ ctx }) => {
     return getDashboardOverview(db, ctx.workspace.id);
+  }),
+});
+
+const qaAcceleratorRouter = t.router({
+  fixtureContext: protectedProcedure.query(async ({ ctx }) => {
+    const authorizationId = ctx.session?.session.qaAuthorizationId;
+    if (!authorizationId) {
+      return { enabled: false as const, qaDomain: null, seed: null };
+    }
+    const authorization = await db.qaClientAuthorization.findFirst({
+      where: {
+        expiresAt: { gt: new Date() },
+        id: authorizationId,
+        revokedAt: null,
+        status: "ACTIVE",
+      },
+      select: {
+        grant: { select: { qaDomain: true } },
+        id: true,
+      },
+    });
+    if (!authorization) {
+      throw new TRPCError({
+        code: "UNAUTHORIZED",
+        message: "QA authorization must be renewed.",
+      });
+    }
+    return {
+      enabled: true as const,
+      qaDomain: authorization.grant.qaDomain,
+      seed: `${ctx.workspace.id}:${authorization.id}`,
+    };
   }),
 });
 
@@ -1566,6 +1724,7 @@ export const appRouter = t.router({
     service: "afterservice-api",
   })),
   serviceJobs: serviceJobsRouter,
+  qaAccelerator: qaAcceleratorRouter,
   qaMaintenance: qaMaintenanceRouter,
   templates: templatesRouter,
   workspace: workspaceRouter,

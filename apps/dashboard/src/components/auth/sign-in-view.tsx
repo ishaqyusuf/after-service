@@ -2,29 +2,15 @@
 
 import { Button } from "@afterservice/ui";
 import { Database, X } from "lucide-react";
-import dynamic from "next/dynamic";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { AuthFooter, AuthShell } from "@/components/auth/auth-shell";
 import {
   type SignInFieldValues,
   SignInForm,
 } from "@/components/auth/sign-in-form";
-
-const DevLoginFab = dynamic(
-  () =>
-    import("@/components/dev/dev-login-fab").then((mod) => ({
-      default: mod.DevLoginFab,
-    })),
-  { ssr: false },
-);
+import { QaAccessPanel } from "@/components/qa/qa-access-panel";
 
 type SignInValues = SignInFieldValues;
-type SignInAdapter = React.MutableRefObject<{
-  getValues: () => SignInValues;
-  reset: (values: SignInValues) => void;
-  setValue: (name: string, value: unknown) => void;
-} | null>;
-
 type DbAccountDebug = {
   accounts: Array<{
     accountId: string;
@@ -40,7 +26,6 @@ type SignInViewProps = {
 };
 
 export function SignInView({ dbAccountDebug }: SignInViewProps) {
-  const adapterRef = useRef<SignInAdapter["current"]>(null);
   const [accountDebugOpen, setAccountDebugOpen] = useState(false);
   const [returnTo, setReturnTo] = useState("/");
 
@@ -83,7 +68,6 @@ export function SignInView({ dbAccountDebug }: SignInViewProps) {
       <SignInForm
         onSignIn={handleSignIn}
         returnTo={returnTo}
-        adapterRef={adapterRef}
       />
       {dbAccountDebug ? (
         <DbAccountDebugFab
@@ -92,27 +76,7 @@ export function SignInView({ dbAccountDebug }: SignInViewProps) {
           onOpenChange={setAccountDebugOpen}
         />
       ) : null}
-      {process.env.NODE_ENV !== "production" && (
-        <DevLoginFab
-          onFill={(account: { email: string; password: string }) => {
-            adapterRef.current?.reset({
-              email: account.email,
-              password: account.password,
-            });
-          }}
-          onSignIn={(account: { email: string; password: string }) => {
-            handleSignIn({
-              email: account.email,
-              password: account.password,
-            }).catch(() => {
-              adapterRef.current?.reset({
-                email: account.email,
-                password: account.password,
-              });
-            });
-          }}
-        />
-      )}
+      <QaAccessPanel />
     </AuthShell>
   );
 }

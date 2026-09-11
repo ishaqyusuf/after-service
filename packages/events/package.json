@@ -6,14 +6,18 @@
   "exports": {
     ".": "./src/index.ts",
     "./client": "./src/client.tsx",
+    "./route": "./src/route.ts",
     "./server": "./src/server.ts"
   },
   "scripts": {
     "lint": "biome check .",
+    "test": "bun test src",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@openpanel/nextjs": "latest",
+    "@ishaqyusuf/logly-core": "^0.2.0",
+    "@ishaqyusuf/logly-next": "^0.2.0",
+    "@ishaqyusuf/logly-server": "^0.2.0",
     "server-only": "^0.0.1"
   },
   "devDependencies": {

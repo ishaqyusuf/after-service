@@ -14,7 +14,7 @@ import {
 import { Loader2 } from "lucide-react";
 import { useState } from "react";
 import { z } from "zod";
-import type { QuickFillFormAdapter } from "@/components/dev/quick-fill";
+import { QuickFill } from "@/components/quick-fill";
 import { useZodForm } from "@/hooks/use-zod-form";
 import { signIn } from "@/lib/auth-client";
 
@@ -32,10 +32,9 @@ type FieldValues = {
 
 type Props = {
   onSignUp: (values: FieldValues) => Promise<void>;
-  adapterRef?: React.MutableRefObject<QuickFillFormAdapter<FieldValues> | null>;
 };
 
-export function SignUpForm({ onSignUp, adapterRef }: Props) {
+export function SignUpForm({ onSignUp }: Props) {
   const [error, setError] = useState<string | null>(null);
   const [isGooglePending, setIsGooglePending] = useState(false);
   const track = useTrack();
@@ -49,21 +48,6 @@ export function SignUpForm({ onSignUp, adapterRef }: Props) {
   });
 
   const isPending = form.formState.isSubmitting;
-
-  if (adapterRef) {
-    adapterRef.current = {
-      getValues: () => form.getValues(),
-      reset: (values) => form.reset(values as FieldValues),
-      setValue: (name, value) => {
-        if (name === "name" || name === "email" || name === "password") {
-          form.setValue(name, String(value), {
-            shouldDirty: true,
-            shouldValidate: true,
-          });
-        }
-      },
-    };
-  }
 
   async function handleSubmit(values: FieldValues) {
     setError(null);
@@ -154,6 +138,9 @@ export function SignUpForm({ onSignUp, adapterRef }: Props) {
 
       <Form {...form}>
         <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
+          <div className="flex justify-end">
+            <QuickFill name="signUpIdentity" label="Fill QA identity" />
+          </div>
           <FormField
             control={form.control}
             name="name"
