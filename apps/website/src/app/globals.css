@@ -291,9 +291,8 @@ html {
   font-size: 10px;
 }
 .care-hero-scene > .care-illustrative {
-  position: absolute;
-  right: 5%;
-  bottom: 12px;
+  margin-top: 16px;
+  text-align: right;
 }
 .care-hero-under {
   display: flex;
@@ -727,23 +726,6 @@ html {
   .care-wrap {
     width: min(100% - 64px, 1280px);
   }
-  .care-nav {
-    gap: 15px;
-  }
-  .care-hero-intro {
-    gap: 30px;
-  }
-  .care-hero-intro h1 {
-    font-size: clamp(55px, 7vw, 78px);
-  }
-}
-@media (max-width: 720px) {
-  .care-hero-intro h1 em {
-    display: block;
-  }
-  .care-wrap {
-    width: min(100% - 36px, 1280px);
-  }
   .care-header-inner {
     min-height: 74px;
   }
@@ -781,6 +763,23 @@ html {
     width: 44px;
     height: 44px;
     place-items: center;
+  }
+  .care-journey-cards {
+    min-height: 370px;
+  }
+  .care-hero-intro {
+    gap: 30px;
+  }
+  .care-hero-intro h1 {
+    font-size: clamp(55px, 7vw, 78px);
+  }
+}
+@media (max-width: 720px) {
+  .care-hero-intro h1 em {
+    display: block;
+  }
+  .care-wrap {
+    width: min(100% - 36px, 1280px);
   }
   .care-hero {
     padding-top: 42px;
@@ -857,10 +856,6 @@ html {
   .care-reply > svg {
     width: 18px;
     margin-top: 14px;
-  }
-  .care-hero-scene > .care-illustrative {
-    right: 14px;
-    bottom: 10px;
   }
   .care-journey-bottom {
     flex-wrap: wrap;

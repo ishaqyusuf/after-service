@@ -14,7 +14,7 @@ Summary:
 
 - Implemented selected v2 direction 01 on the production website: the job/check-in/reply demonstration, native-scroll customer record story, service examples, manual-first product explanation, FAQs, and real beta signup links.
 - Applied the light teal and green design system, local fonts, shared navigation, and footer across pricing, features, solutions, guides, and legal pages while retaining pricing logic, SEO, analytics, PWA prompts, and auth redirects.
-- Production code commit `39d9601` is deployed through the linked Vercel marketing project at `https://www.afterservice.app`. The production deployment reached Ready and the public alias was checked against its deployment ID.
+- The linked Vercel marketing project serves the redesign at `https://www.afterservice.app`. The production deployment reached Ready and the public alias was checked against its deployment ID.
 
 Verification:
 
