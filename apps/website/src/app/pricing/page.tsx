@@ -1,6 +1,4 @@
 import type { Metadata } from "next";
-import { LandingFooter } from "../../components/landing/footer";
-import { LandingHeader } from "../../components/landing/header";
 import { LandingPricing } from "../../components/landing/pricing";
 import { getPricingResolution } from "../../lib/pricing-request";
 import { createPageMetadata } from "../../lib/seo";
@@ -22,10 +20,18 @@ export default async function PricingPage({ searchParams }: PricingPageProps) {
   const initialPricing = await getPricingResolution(searchParams);
 
   return (
-    <main className="min-h-screen bg-background text-foreground">
-      <LandingHeader />
+    <main className="care-inner-page min-h-screen bg-background text-foreground">
+      <div className="care-page-intro">
+        <div className="care-wrap">
+          <p className="care-eyebrow">A straightforward start</p>
+          <h1>Good care starts here.</h1>
+          <p>
+            Start with the free beta. See what is available now and what is
+            planned for later.
+          </p>
+        </div>
+      </div>
       <LandingPricing initialPricing={initialPricing} />
-      <LandingFooter />
     </main>
   );
 }

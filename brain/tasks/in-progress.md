@@ -5,6 +5,15 @@ This file tracks active work.
 
 ## Current
 
+### Marketing website: The care continues
+- Priority: High
+- Description: Implement selected v2 direction 01 across the production marketing website and connected routes.
+- Related Feature: `brain/features/marketing-website-care-continues.md`
+- Status: Implemented locally; production release in progress
+- Started Date: 2026-09-29
+- Current Notes: Shared marketing shell, customer journey, responsive narrative, pricing, SEO route families, local fonts, and Brain decision are implemented. Local typecheck, website source lint, production-profile webpack build, PWA response check, and browser route and interaction QA passed.
+- Next Step: Commit, deploy the linked after-service-marketing Vercel project, verify the live production URL, and move this entry to done.
+
 ### Replace OpenPanel With Logly
 - Priority: High
 - Description: Install the thin Logly SDK packages and use the standalone,
