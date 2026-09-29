@@ -1,336 +1,284 @@
 import { ImageResponse } from "next/og";
 
 export const alt =
-  "afterservice - one board for every post-job customer follow-up";
+  "afterservice — The job ends. The care carries on. A service journey from completed work to a recorded customer reply.";
 export const contentType = "image/png";
 export const runtime = "edge";
-export const size = {
-  height: 630,
-  width: 1200,
-};
+export const size = { height: 630, width: 1200 };
 
-export default function Image() {
+const ink = "#143c37";
+const accent = "#007a6e";
+
+export default async function Image() {
+  const inter = await fetch(
+    new URL("./fonts/inter-regular.ttf", import.meta.url),
+  ).then((res) => res.arrayBuffer());
+
   return new ImageResponse(
     <div
       style={{
-        alignItems: "center",
-        background: "#f7fbf7",
-        color: "#17232b",
+        background: "#f6faf9",
+        color: ink,
         display: "flex",
-        fontFamily: "Arial, Helvetica, sans-serif",
         height: "100%",
-        justifyContent: "center",
-        padding: 64,
+        overflow: "hidden",
+        padding: "52px 58px",
         position: "relative",
         width: "100%",
       }}
     >
       <div
         style={{
-          backgroundImage:
-            "radial-gradient(circle at 1px 1px, rgba(23, 35, 43, 0.1) 1px, transparent 0)",
-          backgroundSize: "34px 34px",
-          display: "flex",
-          inset: 0,
-          opacity: 0.42,
-          position: "absolute",
-        }}
-      />
-      <div
-        style={{
-          background:
-            "linear-gradient(135deg, rgba(0, 155, 152, 0.18), rgba(169, 211, 183, 0.08))",
+          background: "#e4f1eb",
           borderRadius: 999,
           display: "flex",
-          filter: "blur(12px)",
-          height: 360,
+          height: 560,
           position: "absolute",
-          right: -92,
-          top: -84,
-          width: 360,
+          right: -195,
+          top: -270,
+          width: 560,
         }}
       />
       <div
         style={{
-          alignItems: "stretch",
+          background: "#e4f1eb",
+          borderRadius: 999,
+          bottom: -275,
           display: "flex",
-          gap: 48,
+          height: 480,
+          left: -210,
+          position: "absolute",
+          width: 480,
+        }}
+      />
+
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "column",
           height: "100%",
+          justifyContent: "space-between",
           position: "relative",
-          width: "100%",
+          width: 635,
+        }}
+      >
+        <div style={{ alignItems: "center", display: "flex", gap: 13 }}>
+          <div
+            style={{
+              alignItems: "center",
+              background: ink,
+              borderRadius: 13,
+              color: "#f6faf9",
+              display: "flex",
+              height: 47,
+              justifyContent: "center",
+              width: 47,
+            }}
+          >
+            <svg
+              aria-hidden="true"
+              fill="none"
+              height="32"
+              viewBox="0 0 64 64"
+              width="32"
+            >
+              <path
+                d="M50 51V29C50 18.5 41.5 10 31 10S12 18.5 12 29s8.5 19 19 19c5.1 0 9.8-2 13.2-5.3"
+                stroke="currentColor"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="12"
+              />
+              <circle cx="31" cy="29" fill="#62c6aa" r="6.5" />
+            </svg>
+          </div>
+          <div
+            style={{
+              display: "flex",
+              fontFamily: "Inter",
+              fontSize: 32,
+              fontWeight: 700,
+              letterSpacing: -1,
+            }}
+          >
+            afterservice
+          </div>
+        </div>
+
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            gap: 22,
+            paddingBottom: 26,
+          }}
+        >
+          <div
+            style={{
+              alignItems: "center",
+              color: accent,
+              display: "flex",
+              fontFamily: "Inter",
+              fontSize: 17,
+              gap: 10,
+              letterSpacing: 2.5,
+              textTransform: "uppercase",
+            }}
+          >
+            <div
+              style={{
+                background: accent,
+                borderRadius: 999,
+                display: "flex",
+                height: 9,
+                width: 9,
+              }}
+            />
+            Better follow-through
+          </div>
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              fontFamily: "Inter",
+              fontSize: 76,
+              fontWeight: 700,
+              gap: 1,
+              letterSpacing: -3.8,
+              lineHeight: 1.02,
+            }}
+          >
+            <span>The job ends.</span>
+            <span style={{ color: accent }}>The care</span>
+            <span style={{ color: accent }}>carries on.</span>
+          </div>
+          <div
+            style={{
+              color: "#526e67",
+              display: "flex",
+              fontFamily: "Inter",
+              fontSize: 22,
+              lineHeight: 1.35,
+              maxWidth: 560,
+            }}
+          >
+            A check-in remembered. A reply kept in context.
+          </div>
+        </div>
+
+        <div
+          style={{
+            alignItems: "center",
+            display: "flex",
+            fontFamily: "Inter",
+            fontSize: 17,
+            gap: 12,
+          }}
+        >
+          <span>Built for local service teams</span>
+          <span style={{ color: "#9bb9ad" }}>·</span>
+          <span style={{ color: accent }}>afterservice.app</span>
+        </div>
+      </div>
+
+      <div
+        style={{
+          background: ink,
+          borderRadius: 10,
+          boxShadow: "0 20px 44px rgba(20, 60, 55, 0.18)",
+          color: "#f6faf9",
+          display: "flex",
+          flexDirection: "column",
+          height: 492,
+          justifyContent: "space-between",
+          marginLeft: "auto",
+          marginTop: 17,
+          padding: "31px 30px",
+          position: "relative",
+          width: 383,
         }}
       >
         <div
           style={{
+            color: "#a9d5c7",
             display: "flex",
-            flex: "1 1 0",
-            flexDirection: "column",
-            justifyContent: "space-between",
-            minWidth: 0,
+            fontFamily: "Inter",
+            fontSize: 14,
+            letterSpacing: 2.1,
+            textTransform: "uppercase",
           }}
         >
+          The customer journey
+        </div>
+        {[
+          {
+            number: "01",
+            title: "The work",
+            detail: "Job completed and recorded",
+          },
+          {
+            number: "02",
+            title: "The follow-through",
+            detail: "A useful check-in planned",
+          },
+          {
+            number: "03",
+            title: "The relationship",
+            detail: "Customer reply kept in context",
+          },
+        ].map((step) => (
           <div
+            key={step.number}
             style={{
-              alignItems: "center",
+              alignItems: "flex-start",
+              borderTop: "1px solid #52716b",
               display: "flex",
-              gap: 16,
+              gap: 20,
+              paddingTop: 22,
             }}
           >
             <div
               style={{
-                alignItems: "center",
-                background: "#17232b",
-                borderRadius: 18,
-                color: "#f7fbf7",
+                color: "#84d0b4",
                 display: "flex",
-                height: 64,
-                justifyContent: "center",
-                width: 64,
+                fontFamily: "Inter",
+                fontSize: 18,
+                paddingTop: 3,
               }}
             >
-              <svg
-                aria-hidden="true"
-                fill="none"
-                height="44"
-                viewBox="0 0 64 64"
-                width="44"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  d="M50 51V29C50 18.5 41.5 10 31 10S12 18.5 12 29s8.5 19 19 19c5.1 0 9.8-2 13.2-5.3"
-                  stroke="currentColor"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="12"
-                />
-                <circle cx="31" cy="29" fill="#009b98" r="6.5" />
-              </svg>
+              {step.number}
             </div>
-            <div
-              style={{
-                display: "flex",
-                flexDirection: "column",
-                gap: 2,
-              }}
-            >
+            <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
               <div
                 style={{
-                  fontSize: 34,
-                  fontWeight: 800,
-                  letterSpacing: 0,
-                  lineHeight: 1,
+                  display: "flex",
+                  fontFamily: "Inter",
+                  fontSize: 27,
+                  fontWeight: 700,
+                  lineHeight: 1.1,
                 }}
               >
-                afterservice
+                {step.title}
               </div>
               <div
                 style={{
-                  color: "#52615a",
-                  fontSize: 20,
-                  fontWeight: 700,
+                  color: "#c0d8d0",
+                  display: "flex",
+                  fontFamily: "Inter",
+                  fontSize: 16,
                   lineHeight: 1.2,
                 }}
               >
-                Post-job follow-up software
+                {step.detail}
               </div>
             </div>
           </div>
-
-          <div
-            style={{
-              display: "flex",
-              flexDirection: "column",
-              gap: 24,
-              maxWidth: 660,
-            }}
-          >
-            <div
-              style={{
-                color: "#009b98",
-                fontSize: 26,
-                fontWeight: 800,
-                letterSpacing: 0,
-                lineHeight: 1.1,
-              }}
-            >
-              Free early access for service operators
-            </div>
-            <div
-              style={{
-                fontSize: 70,
-                fontWeight: 900,
-                letterSpacing: 0,
-                lineHeight: 0.98,
-              }}
-            >
-              One board for every post-job follow-up.
-            </div>
-            <div
-              style={{
-                color: "#52615a",
-                fontSize: 30,
-                fontWeight: 700,
-                lineHeight: 1.24,
-              }}
-            >
-              Customer check-ins, review-safe requests, issue recovery, and
-              repeat-service reminders.
-            </div>
-          </div>
-
-          <div
-            style={{
-              alignItems: "center",
-              color: "#17232b",
-              display: "flex",
-              fontSize: 24,
-              fontWeight: 800,
-              gap: 12,
-            }}
-          >
-            <div
-              style={{
-                background: "#009b98",
-                borderRadius: 999,
-                display: "flex",
-                height: 12,
-                width: 12,
-              }}
-            />
-            afterservice.app
-          </div>
-        </div>
-
-        <div
-          style={{
-            alignItems: "stretch",
-            background: "#ffffff",
-            border: "2px solid rgba(23, 35, 43, 0.1)",
-            borderRadius: 28,
-            boxShadow: "0 28px 80px rgba(23, 35, 43, 0.16)",
-            display: "flex",
-            flex: "0 0 388px",
-            flexDirection: "column",
-            overflow: "hidden",
-          }}
-        >
-          <div
-            style={{
-              alignItems: "center",
-              borderBottom: "2px solid rgba(23, 35, 43, 0.08)",
-              display: "flex",
-              gap: 10,
-              height: 64,
-              padding: "0 24px",
-            }}
-          >
-            {["#ef4444", "#f59e0b", "#22c55e"].map((color) => (
-              <div
-                key={color}
-                style={{
-                  background: color,
-                  borderRadius: 999,
-                  display: "flex",
-                  height: 13,
-                  width: 13,
-                }}
-              />
-            ))}
-            <div
-              style={{
-                color: "#69766f",
-                fontSize: 16,
-                fontWeight: 800,
-                marginLeft: 10,
-              }}
-            >
-              Follow-up board
-            </div>
-          </div>
-          <div
-            style={{
-              display: "flex",
-              flexDirection: "column",
-              gap: 14,
-              padding: 24,
-            }}
-          >
-            {[
-              {
-                accent: "#f59e0b",
-                label: "Due today",
-                title: "HVAC maintenance",
-              },
-              {
-                accent: "#009b98",
-                label: "Sent",
-                title: "Plumbing install",
-              },
-              {
-                accent: "#22c55e",
-                label: "Replied",
-                title: "Electrical panel",
-              },
-            ].map((item) => (
-              <div
-                key={item.title}
-                style={{
-                  background: "#f9fcf9",
-                  border: "2px solid rgba(23, 35, 43, 0.08)",
-                  borderRadius: 18,
-                  display: "flex",
-                  flexDirection: "column",
-                  gap: 9,
-                  padding: 16,
-                }}
-              >
-                <div
-                  style={{
-                    alignItems: "center",
-                    color: item.accent,
-                    display: "flex",
-                    fontSize: 15,
-                    fontWeight: 900,
-                    gap: 10,
-                    textTransform: "uppercase",
-                  }}
-                >
-                  <div
-                    style={{
-                      background: item.accent,
-                      borderRadius: 999,
-                      display: "flex",
-                      height: 10,
-                      width: 10,
-                    }}
-                  />
-                  {item.label}
-                </div>
-                <div
-                  style={{
-                    color: "#17232b",
-                    fontSize: 24,
-                    fontWeight: 900,
-                    lineHeight: 1.05,
-                  }}
-                >
-                  {item.title}
-                </div>
-                <div
-                  style={{
-                    color: "#69766f",
-                    fontSize: 16,
-                    fontWeight: 700,
-                  }}
-                >
-                  Customer check-in ready
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
+        ))}
       </div>
     </div>,
-    size,
+    {
+      ...size,
+      fonts: [{ name: "Inter", data: inter, weight: 400 }],
+    },
   );
 }

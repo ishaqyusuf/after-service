@@ -3,7 +3,7 @@ import type { Metadata, MetadataRoute } from "next";
 
 export const siteUrl = `https://www.${siteRootDomain}`;
 export const socialImage = {
-  alt: "afterservice - one board for every post-job customer follow-up",
+  alt: "afterservice — The job ends. The care carries on. A service journey from completed work to a recorded customer reply.",
   height: 630,
   path: "/opengraph-image",
   width: 1200,

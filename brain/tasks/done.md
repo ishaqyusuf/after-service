@@ -6,6 +6,20 @@ This file records completed work.
 
 ## Completed
 
+### Redesign marketing link preview image
+
+Completed: 2026-09-29
+
+Summary:
+
+- Replaced the old follow-up board preview with a 1200×630 image matching the care-continues website: updated brand colors, headline, and three-step customer journey.
+- Updated shared Open Graph and Twitter image alt text for all public website routes.
+
+Verification:
+
+- Full `bun run typecheck` and production-profile website webpack build passed.
+- The generated image returned HTTP 200 as a 1200×630 PNG, and local homepage metadata pointed both social previews to it with the new alt text.
+
 ### Marketing website: The care continues
 
 Completed: 2026-09-29

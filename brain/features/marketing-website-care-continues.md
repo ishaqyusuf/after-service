@@ -15,6 +15,7 @@ Implemented for the public website.
 - Signup actions use the website `/signup` redirect to the dashboard sign-up flow. Pricing keeps the existing localized plan resolution and planned-plan analytics.
 - Shared navigation, typography, palette, spacing, and footer apply to the homepage, pricing, feature, solution, guide, and legal route families. The `/customers` redirect and auth redirects retain their existing behavior.
 - Existing SEO metadata, structured data, sitemap, analytics providers, consent handling, and PWA prompts remain wired through their established components.
+- The shared 1200×630 Open Graph and Twitter image carries the care-continues headline and a three-step work, follow-through, and relationship journey. Its alt text describes the same scene, and all public routes reference the generated `/opengraph-image` asset.
 
 ## Design decision
 
