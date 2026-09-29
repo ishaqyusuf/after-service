@@ -227,14 +227,14 @@ function HeroJourney() {
 
 function Story() {
   const [active, setActive] = useState(0);
-  const [manual, setManual] = useState(false);
+  const manualUntil = useRef(0);
   useEffect(() => {
     const targets = document.querySelectorAll<HTMLElement>(
       "[data-care-chapter]",
     );
     const observer = new IntersectionObserver(
       (entries) => {
-        if (manual) return;
+        if (performance.now() < manualUntil.current) return;
         entries.forEach((entry) => {
           if (entry.isIntersecting)
             setActive(
@@ -248,7 +248,7 @@ function Story() {
       observer.observe(target);
     });
     return () => observer.disconnect();
-  }, [manual]);
+  }, []);
   const chapter = chapters[active] ?? chapters[0];
   return (
     <section className="care-story care-wrap" id="story">
@@ -300,7 +300,7 @@ function Story() {
                 aria-label={`Chapter ${index + 1}: ${item.label}`}
                 aria-pressed={active === index}
                 onClick={() => {
-                  setManual(true);
+                  manualUntil.current = performance.now() + 2000;
                   setActive(index);
                   document
                     .getElementById(`care-chapter-${index}`)
@@ -311,7 +311,6 @@ function Story() {
                         : "smooth",
                       block: "center",
                     });
-                  window.setTimeout(() => setManual(false), 900);
                 }}
               >
                 <span>0{index + 1}</span>
