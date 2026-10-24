@@ -74,3 +74,14 @@ Additive migration creates six assistant tables, their unique/index/foreign-key
 constraints and `ServiceJob.currency` with default USD. Generated from the copied
 baseline Prisma schema. Applied and tested only in the separate local
 `afterservice_assistant` database; not applied to hosted databases by this task.
+
+### Production migration verification — 2026-10-24
+
+Preflight found missing prompt/capability-version columns in the original SQL
+artifact. Regenerated through the explicit Prisma config, applied the exact SQL
+to a separate local baseline database, and confirmed no schema diff. The read-only
+production diff then matched that tested SQL byte for byte: six assistant tables
+and `ServiceJob.currency`, with no drops. Applied in one transaction with bounded
+lock/statement timeouts; existing user/customer/job/follow-up counts were unchanged.
+The post-apply production diff is empty. Existing production has no Prisma
+migration-history table, so historical migrations were not replayed.
