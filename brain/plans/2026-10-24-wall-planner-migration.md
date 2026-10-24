@@ -177,7 +177,9 @@ Justified omissions: no week job totals/chips from the capped recent-job query;
 no new bulk/import/export/selection workflow absent from the domain; no rewrite
 of accepted assistant business behavior or removal of unrelated legacy files.
 The older preview's disabled paid action is superseded by current source-owned
-Free/Business checkout. Implementation is local, without commit/PR/deployment.
+Free/Business checkout. Implementation is on the isolated
+`codex/wall-planner-redesign` branch in commits `80a2079` and `ea0aa45`, pushed
+to origin. No PR exists and deployment remains in progress.
 
 Brain impact: updated this contract, the Workshop feature record, marketing
 history, ADR 0026 and task state. Root PRODUCT.md/DESIGN.md capture the accepted
@@ -186,4 +188,5 @@ contracts are unchanged; local schema readiness only synced existing merged code
 
 Workshop receipts: marketing `6da342ba-9a03-4758-a385-52eb11eb5637`;
 dashboard `d90c1bf2-baa7-4d62-b78e-2047b09ad2e7`. Both exact selected revisions
-are recorded as implemented locally; no release is claimed.
+are recorded as implemented in the isolated release branch; no live release is
+claimed.

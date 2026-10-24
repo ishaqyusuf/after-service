@@ -201,7 +201,10 @@ Codex inspected their source changes, repaired integration issues and ran all QA
   precedence over older preview copy. No providers are enabled by this redesign.
 - Existing unused legacy presentation files with concurrent changes were retained;
   they are not imported into the new overview/homepage compositions.
-- This is a local implementation; no commit, PR, push or deployment was requested.
+- The implementation is committed as `80a2079` and `ea0aa45` on the isolated
+  `codex/wall-planner-redesign` release branch, which is pushed to origin. No PR
+  exists and deployment remains in progress; this record does not claim a live
+  release.
   Firefox, WebKit, production-scale data-volume benchmarking and physical-device installation were not rerun in this slice.
 
 Screenshots: task visualization directory contains

@@ -21,7 +21,8 @@ Chromium/Pixel cases covered after targeted reruns. Manual desktop light/dark an
 implementation receipts: marketing `6da342ba-9a03-4758-a385-52eb11eb5637`;
 dashboard `d90c1bf2-baa7-4d62-b78e-2047b09ad2e7`.
 
-No commit, push or deployment. See
+Implementation commits `80a2079` and `ea0aa45` are pushed to
+`codex/wall-planner-redesign`. No PR exists and deployment remains in progress. See
 [feature and verification record](../features/complete-ui-redesign-workshop.md),
 [migration audit](../plans/2026-10-24-wall-planner-migration.md) and ADR 0026.
 
