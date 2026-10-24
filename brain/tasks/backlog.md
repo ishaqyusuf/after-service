@@ -17,7 +17,7 @@ This file tracks unstarted work outside the active phase checklist.
 - Operations assistant extensions (voice/files/WhatsApp/approved automation; core implemented and verified).
 
 ## Operations Assistant Integration
-Status: core implemented and verified in isolated worktree; see in-progress task
+Status: core merged, deployed and live verified; see production rollout record
 Phase: post-MVP operator workflow improvement
 Owner: product/engineering
 Plan: [Detailed integration plan](../plans/2026-10-24-feature-operations-assistant.md)
@@ -30,9 +30,10 @@ Acceptance:
 - Existing domain validation, plan limits and QA effect restrictions apply.
 - Text/dashboard release passes isolation, recovery and responsive acceptance.
 - Email dispatch remains gated; voice/files/WhatsApp and automation are extensions.
-Next step: Hosted pilot activation requires the additive migration and equivalent
-server configuration. Extensions remain backlog. Existing MVP rollout work
-remains tracked separately; this feature does not mark it complete.
+Next step: Observe operator use and gather feedback before selecting extensions.
+The production migration/provider configuration and live verification are
+complete; see `brain/handoffs/2026-10-24-assistant-production-rollout.md`.
+Existing MVP rollout work remains tracked separately.
 
 ## Customer Self-Onboarding Job Flow
 Status: backlog

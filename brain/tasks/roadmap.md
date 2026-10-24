@@ -213,7 +213,7 @@ Tasks:
 - [x] Typed editable proposals, explicit revision confirmation and saved receipts.
 - [x] Token allowance, rollout controls and isolation/permission verification.
 - [x] Desktop/mobile and real DeepSeek synthetic acceptance.
-- [ ] Hosted pilot activation with migration and server configuration.
+- [x] Production activation, migration, sensitive provider configuration and live verification.
 - [ ] Separately scoped voice, files, linked WhatsApp and approved automation.
 
 See [assistant verification](../engineering/assistant-verification.md).

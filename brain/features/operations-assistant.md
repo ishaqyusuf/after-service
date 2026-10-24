@@ -1,7 +1,7 @@
 # Feature: Operations Assistant
 
 Date: 2026-10-24
-Status: implemented and verified in isolated worktree; hosted activation separate
+Status: deployed to production and live verified on 2026-10-24
 Phase: post-MVP operator workflow improvement
 Owner: product/engineering
 
@@ -56,4 +56,5 @@ introduced by copying the Ewatrade interaction pattern.
 - [x] Brain API/database/architecture/testing documents reflect implemented scope.
 
 Implementation and verification evidence: [Assistant verification](../engineering/assistant-verification.md).
-Hosted activation and real email dispatch remain separate release gates.
+Hosted activation is complete. Direct assistant email dispatch remains a separate
+release gate. See [production rollout](../handoffs/2026-10-24-assistant-production-rollout.md).

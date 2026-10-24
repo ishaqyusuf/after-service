@@ -24,7 +24,7 @@ Set server-side values through the existing secret/environment workflow:
 
 No key is stored in source, browser configuration, analytics, screenshots, or
 Brain docs. Hosted deployments require the additive migration and equivalent
-server configuration before enablement. This task does not deploy production.
+server configuration before enablement. The follow-up production rollout is complete; see the dated rollout handoff.
 
 ## Local Test Isolation
 
@@ -131,8 +131,9 @@ No assistant transcript or customer content is sent to product analytics.
 
 ## Release Boundary
 
-Implementation and isolated acceptance do not activate hosted environments.
-Hosted activation requires the additive migration and server configuration.
+The isolated acceptance above was followed by an explicitly authorized
+production rollout. The additive migration and server configuration are applied;
+see the dated rollout handoff for deployment IDs and live acceptance.
 Real customer email delivery, voice, file intake, linked WhatsApp, autonomous
 outreach and team administration remain the separately documented extensions.
 
@@ -164,3 +165,11 @@ Turbo explicitly hashes and passes the assistant rollout, allowance, provider,
 model and server-key variables. The first remote build exposed missing entries;
 they were corrected before production domain promotion. No provider key is
 embedded in client bundles. Runtime configuration remains server-selected.
+
+## Production Rollout Completed
+
+The migration, dedicated sensitive DeepSeek configuration, dashboard/API
+deployments and live verification are complete. Eight live model turns and a
+private-browser session verified read/draft/edit/confirm/receipt/reload behavior;
+synthetic fixtures were cleaned up. See
+[production rollout and evidence](../handoffs/2026-10-24-assistant-production-rollout.md).

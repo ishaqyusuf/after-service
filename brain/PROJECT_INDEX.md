@@ -55,6 +55,8 @@ Use this file to quickly locate the right project brain document.
 - `engineering/assistant-verification.md`: configuration, local/live acceptance and Brain impact manifest.
 - `decisions/0024-add-reviewed-operations-assistant.md`: adopted assistant architecture and provider contracts.
 
+- `handoffs/2026-10-24-assistant-production-rollout.md`: merged source, production deployment IDs, migration/configuration and live acceptance.
+
 ## Templates
 - `templates/feature.md`: feature doc template.
 - `templates/adr.md`: architecture decision template.

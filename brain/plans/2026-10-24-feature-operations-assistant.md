@@ -1,7 +1,7 @@
 # Operations Assistant Integration Plan
 
 Date: 2026-10-24
-Status: implemented and verified in `codex/operations-assistant`; hosted activation separate
+Status: implemented, merged and production verified on 2026-10-24
 Scope: Ewatrade-style assistance for the existing afterservice operator workflows
 Feature: [Operations assistant](../features/operations-assistant.md)
 
@@ -15,7 +15,8 @@ summaries, settings assistance, and billing explanations/navigation.
 Build dashboard text chat first. Voice, files, linked WhatsApp chat, public
 website assistance, and autonomous messaging are separate extensions. Responsive
 dashboard support is part of the first release; a native mobile app is not.
-This plan is implemented and verified locally; it does not activate hosted environments.
+The dashboard text release is deployed and live verified; see the dated
+[production rollout](../handoffs/2026-10-24-assistant-production-rollout.md).
 
 ## Evidence And Reference Choice
 
@@ -317,3 +318,11 @@ seven controlled real DeepSeek scenarios pass. See
 The monetary implementation uses per-job currency rather than a new workspace
 currency setting. Legacy records remain USD; no conversion or reinterpretation.
 Onboarding help remains curated, and signup/workspace creation stay in forms.
+
+## Production Completion — 2026-10-24
+
+PR #2 is merged. The additive migration and dedicated sensitive DeepSeek
+configuration are applied to production. Dashboard/API releases are promoted,
+eight real model runs and a private-browser check passed, and the generated
+workspace/account were removed. Preserved the concurrently deployed onboarding
+recovery fix. [Full rollout evidence](../handoffs/2026-10-24-assistant-production-rollout.md).

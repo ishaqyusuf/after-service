@@ -6,6 +6,16 @@ This file records completed work.
 
 ## Completed
 
+### Operations Assistant Production Rollout — 2026-10-24
+
+Merged PR #2 and deployed the assistant to dashboard/API production. Applied the
+exact locally tested additive migration, configured the dedicated sensitive
+DeepSeek key, preserved concurrent onboarding fixes, and passed eight real live
+model runs plus browser and health checks. Explicit confirmation created one
+customer and one receipt; repeated confirmation created no duplicate. No outbound
+message was logged, and the synthetic workspace/account were cleaned up.
+See [full rollout evidence](../handoffs/2026-10-24-assistant-production-rollout.md).
+
 ### Operations Assistant Local Implementation — 2026-10-24
 
 - Implemented all basic operator capabilities from the approved integration plan

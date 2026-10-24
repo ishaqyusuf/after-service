@@ -140,5 +140,5 @@ Next Step:
 
 Core implementation and isolated verification are complete in
 `codex/operations-assistant`. See the done entry and
-[verification record](../engineering/assistant-verification.md). Hosted pilot
-activation is a separate pending rollout; no deployment was performed.
+[verification record](../engineering/assistant-verification.md). Production activation and live verification are complete; see the dated
+[rollout record](../handoffs/2026-10-24-assistant-production-rollout.md).
