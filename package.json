@@ -8,6 +8,7 @@
   ],
   "scripts": {
     "brand:icons": "bun scripts/generate-brand-icons.mjs",
+    "api:deploy": "vercel deploy . --project prj_AFjHpqFEKDEJU8Wivz3REePoR0rc --scope team_BV5rgKHJH4fMyFL1YfscZIZK --prod --yes && bun run smoke:api",
     "build": "bun --env-file=/dev/null ../../local-infra-kit/bin/with-env.ts --profile afterservice --mode prod -- turbo build",
     "clean": "git clean -xdf node_modules .turbo apps/*/.next apps/*/.turbo packages/*/.turbo",
     "dev:prepare": "bun run dev:services",
@@ -30,17 +31,27 @@
     "qa:credential:issue": "bun --filter @afterservice/db qa:credential:issue",
     "qa:credential:revoke": "bun --filter @afterservice/db qa:credential:revoke",
     "smoke:mvp": "bun --env-file=/dev/null ../../local-infra-kit/bin/with-env.ts --profile afterservice --mode local -- bun scripts/smoke-mvp.mjs",
+    "smoke:api": "bun --env-file=/dev/null scripts/smoke-api.mjs",
     "smoke:logly:local": "bun --env-file=/dev/null ../../local-infra-kit/bin/with-env.ts --profile afterservice --mode local -- bun scripts/smoke-logly-local.mjs",
     "start:dashboard:prod": "bun --cwd apps/dashboard ../../scripts/with-workspace-env.mjs --mode production -- bun run next start -p 4101",
     "start:website:prod": "bun --cwd apps/website ../../scripts/with-workspace-env.mjs --mode production -- bun run next start -p 4100",
     "terminal": "bun scripts/terminal.mjs",
     "test:password-recovery": "bun --env-file=/dev/null test apps/dashboard/src/proxy.test.ts packages/auth/src/password-reset-email.test.ts && bun --env-file=/dev/null ../../local-infra-kit/bin/with-env.ts --profile afterservice --mode local -- bun test ./tests/integration/password-recovery.integration.ts",
-    "typecheck": "turbo typecheck"
+    "test:e2e": "bun --env-file=/dev/null ../../local-infra-kit/bin/with-env.ts --profile afterservice --mode local -- bunx playwright test",
+    "test:integration": "bun --env-file=/dev/null ../../local-infra-kit/bin/with-env.ts --profile afterservice --mode local -- bun test ./tests/integration/mvp.integration.ts ./tests/integration/qa-access.integration.ts",
+    "test:typecheck": "tsc --noEmit -p tests/tsconfig.json",
+    "test:unit": "bun --env-file=/dev/null test apps packages scripts tests/support",
+    "typecheck": "turbo typecheck",
+    "test:assistant": "bun test ./packages/assistant/src/contracts.test.ts ./tests/integration/assistant.integration.ts",
+    "test:assistant:e2e": "playwright test --config playwright.assistant.config.ts",
+    "smoke:logly:country": "bun --env-file=/dev/null ../../local-infra-kit/bin/with-env.ts --profile afterservice --mode local -- bun scripts/smoke-logly-country.ts"
   },
   "devDependencies": {
     "@biomejs/biome": "^2.3.0",
+    "@playwright/test": "^1.64.1",
     "turbo": "^2.5.0",
-    "typescript": "^5.9.0"
+    "typescript": "^5.9.0",
+    "@ai-sdk/provider": "3.0.8"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",
@@ -48,5 +59,9 @@
     "@dnd-kit/utilities": "^3.2.2",
     "@radix-ui/react-portal": "^1.1.10",
     "framer-motion": "^12.40.0"
+  },
+  "patchedDependencies": {
+    "@ishaqyusuf/logly-core@0.2.0": "patches/@ishaqyusuf%2Flogly-core@0.2.0.patch",
+    "@ishaqyusuf/logly-next@0.2.1": "patches/@ishaqyusuf%2Flogly-next@0.2.1.patch"
   }
 }

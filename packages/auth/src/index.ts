@@ -6,6 +6,9 @@ import {
 import { prismaAdapter } from "@better-auth/prisma-adapter";
 import { betterAuth } from "better-auth";
 import { sendPasswordResetEmail } from "./password-reset-email";
+import { getAuthBaseUrl } from "./base-url";
+
+export { getAuthBaseUrl } from "./base-url";
 
 export {
   clearBetterAuthSessionCookieHeaders,
@@ -60,23 +63,6 @@ export function getTrustedOrigins() {
     ].flatMap((value) =>
       value?.split(",").map((origin: string) => origin.trim()),
     ),
-  );
-}
-
-export function getAuthBaseUrl() {
-  const isLocalRuntime =
-    process.env.AFTERSERVICE_ENV_MODE === "local" ||
-    process.env.NODE_ENV !== "production";
-  const devUrls = isLocalRuntime ? "http://localhost:4101" : undefined;
-
-  if (devUrls) {
-    return readNonEmptyEnv("BETTER_AUTH_LOCAL_URL") ?? devUrls;
-  }
-
-  return (
-    readNonEmptyEnv("BETTER_AUTH_URL") ??
-    readNonEmptyEnv("NEXT_PUBLIC_DASHBOARD_URL") ??
-    undefined
   );
 }
 

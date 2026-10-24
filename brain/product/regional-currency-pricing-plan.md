@@ -3,7 +3,7 @@
 Date: 2026-06-11
 
 ## Status
-Phase 1 public display foundation and dashboard billing preview implemented on 2026-06-11. Updated on 2026-06-11 to remove visible region selectors and rely on automatic region/locale resolution for price display. Updated on 2026-06-15 so local display prices are converted from canonical USD amounts through a const currency conversion table in `@afterservice/plans`, with dashboard `[locale]` passed in as an additional pricing signal. Do not expose paid checkout publicly until the paid pilot is intentionally enabled.
+Phase 1 public display foundation and dashboard billing preview implemented on 2026-06-11. Fixed on 2026-10-24 to resolve currency from visitor country instead of browser/route language or continent. Cloudflare visitor country takes precedence over Vercel proxy geolocation. Missing or unsupported countries use a disclosed USD fallback. Fixed conversion prices remain planned estimates. Do not expose paid checkout publicly until the paid pilot is intentionally enabled. See ADR 0017.
 
 ## Goal
 Show afterservice paid-plan prices in a visitor's regional or country-local currency, then send the same pricing context into Polar checkout so the marketing page, dashboard billing page, and payment page do not disagree.
@@ -12,14 +12,14 @@ Show afterservice paid-plan prices in a visitor's regional or country-local curr
 - afterservice is still free beta first. Local currency pricing should support the planned Starter, Shop, and Growth launch without implying paid plans are live today.
 - Billing provider is Polar, per `brain/decisions/0002-migrate-to-polar-billing.md`.
 - Entitlement truth must remain verified webhook state, not checkout redirects.
-- Current public pricing data in `apps/website/src/components/landing/pricing-data.ts` is static USD text.
+- Public plan IDs and canonical USD prices are localized through `@afterservice/plans`.
 - Current checkout creation in `apps/api/src/routers/_app.ts` is server-side, so Polar needs the real customer IP passed into checkout creation for geolocation-based currency selection.
 
 ## Decision
 Use Polar product-level multi-currency pricing as the source of charged amounts, and use a small afterservice-owned pricing presentation layer for public display.
 
 The display layer should:
-- Resolve a pricing region from request geolocation first, then locale headers, with explicit query params reserved for testing/support links.
+- Resolve a pricing region from visitor-country headers, with explicit query params reserved for testing/support links. Language and continent are not country evidence.
 - Render a stable local-currency amount for known target markets by converting canonical USD plan amounts through a const currency conversion table.
 - Fall back to USD when the region is unknown or unsupported.
 - Mark converted/estimated amounts clearly until the exact Polar checkout amount can be confirmed.
@@ -50,12 +50,12 @@ Controlled tables avoid surprise daily FX movements and let afterservice price b
 - Replace `price: string` in website pricing data with canonical numeric USD monthly/yearly amounts and plan IDs.
 - Add a shared pricing localization module with supported currencies, country-to-currency mapping, formatted display labels, and fallback notes.
 - Add middleware or server helper to read country from deployment request headers when available.
-- Use automatic region/locale resolution on `/pricing`, the landing pricing section, and dashboard billing preview.
+- Use automatic visitor-country resolution on `/pricing`, the landing pricing section, and dashboard billing preview.
 - Do not show a manual "show prices for" selector on public pricing.
 
 Implementation notes:
-- `packages/plans/src/index.ts` owns the supported region table, const USD-to-local-currency conversion table, country/header/locale mapping, canonical USD pricing, and `Intl.NumberFormat` formatting.
-- `apps/website/src/lib/pricing-request.ts` reads request geolocation headers, `Accept-Language`, and pricing query params for server-rendered initial pricing.
+- `packages/plans/src/index.ts` owns the supported region table, const USD-to-local-currency conversion table, country/header mapping, canonical USD pricing, and `Intl.NumberFormat` formatting. Country precedence is Cloudflare visitor country, otherwise Vercel, then the existing custom hint. Cloudflare requests without a country never use the Vercel proxy's location.
+- `apps/website/src/lib/pricing-request.ts` reads request geolocation headers and pricing query params for server-rendered initial pricing. The pricing component displays the selected currency code.
 - `apps/website/src/components/landing/pricing.tsx` renders localized monthly/yearly planned prices without a visible manual region selector.
 
 ### Phase 2: Polar Configuration Alignment
@@ -78,7 +78,7 @@ Implementation notes:
 
 Implementation notes:
 - `apps/dashboard/src/components/billing-overview.tsx` now shows planned paid-plan prices in the same supported regions as the website.
-- The dashboard preview uses the same automatic request region/locale resolution as the website, and passes the Midday-style `[locale]` route param to pricing resolution as a pricing-only signal. This does not introduce translated dashboard copy or a language switcher.
+- The dashboard preview uses the same automatic visitor-country resolution as the website. The `[locale]` route param controls language routing and does not select a currency.
 - API-level checkout currency input remains future Phase 3 work; entitlement state is still webhook-derived.
 
 ### Phase 5: QA And Analytics

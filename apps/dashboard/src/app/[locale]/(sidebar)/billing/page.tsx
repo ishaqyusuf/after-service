@@ -19,26 +19,13 @@ export const metadata: Metadata = {
   description: "Manage your subscription and billing details.",
 };
 
-type BillingPageProps = {
-  params: Promise<{ locale: string }>;
-};
-
-export default async function BillingPage({ params }: BillingPageProps) {
-  const { locale } = await params;
+export default async function BillingPage() {
   const headerList = await headers();
-  const { acceptLanguage, continent, country } =
-    getHeaderPricingHints(headerList);
-  const initialPricing = resolvePricingRegion({
-    acceptLanguage,
-    continent,
-    country,
-    routeLocale: locale,
-  });
+  const initialPricing = resolvePricingRegion(
+    getHeaderPricingHints(headerList),
+  );
 
-  batchPrefetch([
-    trpc.billing.getCurrentPlan.queryOptions(),
-    trpc.billing.getPortalUrl.queryOptions(),
-  ]);
+  batchPrefetch([trpc.billing.getCurrentPlan.queryOptions()]);
 
   return (
     <HydrateClient>

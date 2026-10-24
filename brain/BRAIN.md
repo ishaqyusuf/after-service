@@ -15,8 +15,8 @@ This is the durable project memory for afterservice. It gives humans and AI agen
 - Architecture target: Plot Keys-style Bun/Turbo monorepo.
 - Apps:
   - `apps/website`: marketing site for `afterservice.app`.
-  - `apps/dashboard`: operator dashboard for `dashboard.afterservice.app`.
-  - `apps/api`: Hono/tRPC API exposed publicly under `dashboard.afterservice.app/api`.
+  - `apps/dashboard`: operator dashboard for `dash.afterservice.app`.
+  - `apps/api`: independently deployed Hono/tRPC API at `api.afterservice.app`.
 - Shared packages exist as placeholders under `packages/*`.
 
 ## Product Summary
@@ -28,6 +28,7 @@ The canonical detailed roadmap lives in `brain/product/roadmap.md`. The executio
 ## Core Engineering Docs
 - AI prompt rules: `brain/AI_PROMPT_RULES.md`
 - Coding standards: `brain/engineering/coding-standards.md`
+- MVP unit, integration, and browser tests: `brain/engineering/testing.md`
 - Repo structure: `brain/engineering/repo-structure.md`
 - Reference projects: `brain/system/reference-projects.md`
 

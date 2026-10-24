@@ -10,3 +10,16 @@ export function assertLocalTestDatabase() {
     );
   }
 }
+
+export function localBrowserUrl(value: string, hostname: string) {
+  const url = new URL(value);
+  if (
+    !["http:", "https:"].includes(url.protocol) ||
+    url.hostname !== hostname
+  ) {
+    throw new Error(
+      `Browser tests require the local Portless host ${hostname}.`,
+    );
+  }
+  return url.origin;
+}

@@ -1,6 +1,8 @@
 import { getDbClient } from "@afterservice/db";
+import { getSafeReturnTo } from "@afterservice/utils";
 import type { Metadata } from "next";
 import { SignInView } from "@/components/auth/sign-in-view";
+import { redirectAuthenticatedUser } from "@/lib/redirect-authenticated-user";
 
 export const dynamic = "force-dynamic";
 
@@ -27,13 +29,16 @@ const AUTH_DEBUG =
 export default async function SignInPage({
   searchParams,
 }: {
-  searchParams: Promise<{ password_reset?: string }>;
+  searchParams: Promise<{ password_reset?: string; return_to?: string }>;
 }) {
   const query = await searchParams;
+  const returnTo = getSafeReturnTo(query.return_to);
+  await redirectAuthenticatedUser(returnTo);
   return (
     <SignInView
       dbAccountDebug={await getDbAccountDebug()}
       passwordResetComplete={query.password_reset === "success"}
+      returnTo={returnTo}
     />
   );
 }

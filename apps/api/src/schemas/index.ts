@@ -1,5 +1,31 @@
 import { z } from "zod";
 
+export const lemonWebhookSchema = z
+  .object({
+    data: z
+      .object({
+        id: z.union([z.string(), z.number()]).optional(),
+        attributes: z.record(z.string(), z.unknown()).optional(),
+      })
+      .passthrough()
+      .optional(),
+    meta: z
+      .object({
+        event_id: z.union([z.string(), z.number()]).optional(),
+        event_name: z.string().optional(),
+        custom_data: z
+          .object({
+            workspace_id: z.string().nullish(),
+            workspaceId: z.string().nullish(),
+          })
+          .passthrough()
+          .optional(),
+      })
+      .passthrough()
+      .optional(),
+  })
+  .passthrough();
+
 export const RESERVED_BUSINESS_NAMES = [
   "admin",
   "administrator",

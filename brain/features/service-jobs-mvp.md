@@ -29,3 +29,18 @@ Updated on 2026-06-11 so inline new-customer creation from the job form can coll
 - `bun run typecheck`
 - `bun run lint`
 - `bun run build`
+
+
+## Preview Quick Fill Dates — 2026-10-19
+
+Job Quick Fill supplies Date objects to completed/next-follow-up controls,
+matching ordinary form types. The previous string values left date pickers
+visually empty. Unit and deployed Chrome checks pass. Fill/reset remain drafts
+and require explicit Create; no job was created during the preview check.
+
+## Assistant Job Values — 2026-10-24
+
+Reviewed assistant job creation/update uses the existing canonical operations.
+Jobs now persist currency alongside integer cents. Legacy/manual default is USD;
+assistant accepts explicit USD/NGN/GBP/EUR/CAD and the jobs table displays the
+saved currency. No automatic exchange or currency reinterpretation occurs.

@@ -29,6 +29,18 @@ Updated on 2026-06-11 so explicit manual email sends are queued through Trigger.
   deleted on worker shutdown.
 
 ## Safety Rule
+2026-10-18: Explicit manual email logging rejects a missing Trigger key, and
+rejects a development Trigger key in production, before writing sent state or
+audit records. This prevents a configuration failure from appearing as a
+successful contact. The production rollout found a development key in the
+existing production source. The correct production key and existing worker
+have since been verified through the authenticated Trigger CLI and configured
+in the API/dashboard. Production Trigger rejects even a no-recipient task
+because the organization has run out of credits; delivery remains unverified.
+Queue rejection now returns `BAD_GATEWAY` before sent-state writes. Regression
+tests cover both rejection without writes and sent state after queue acceptance.
+Phone contact logging remains provider-free.
+
 No automatic customer outbound messaging is sent in MVP. Real email is limited to explicit manual-send paths, queued through jobs, and dev/local mode must route recipients through `TEST_EMAIL` when it is set.
 2026-06-18: The daily combined analytics review is an internal owner report sent directly from `packages/jobs` to `TEST_EMAIL`. It does not use `packages/notifications`, does not create customer-facing `MessageLog` records, and does not change customer notification delivery behavior.
 

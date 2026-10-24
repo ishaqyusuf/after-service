@@ -3,7 +3,7 @@
   "compilerOptions": {
     "baseUrl": ".",
     "noEmit": true,
-    "types": ["node"]
+    "types": ["bun", "node"]
   },
   "include": ["src/**/*.ts"],
   "exclude": ["node_modules"]

@@ -35,6 +35,9 @@ export function LandingPricing({ initialPricing }: LandingPricingProps) {
           automation, reporting, and support. Beta users get founder-rate
           pricing when paid plans launch.
         </p>
+        <p className="mt-4 text-sm text-muted-foreground">
+          Prices shown in {pricing.currency}.
+        </p>
         {pricing.note && (
           <p className="mt-6 text-xs text-muted-foreground">{pricing.note}</p>
         )}

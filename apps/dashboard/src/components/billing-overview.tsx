@@ -14,7 +14,12 @@ import {
   Progress,
   Skeleton,
 } from "@afterservice/ui";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import {
+  isServer,
+  useMutation,
+  useQuery,
+  useSuspenseQuery,
+} from "@tanstack/react-query";
 import { ArrowUpRight, CreditCard } from "lucide-react";
 import { useRouter } from "next/navigation";
 import type { ReactNode } from "react";
@@ -50,12 +55,11 @@ type BillingOverviewProps = {
 export function BillingOverview({ initialPricing }: BillingOverviewProps) {
   const trpc = useTRPC();
   const pricing = initialPricing;
-  const { data, isLoading } = useQuery(
-    trpc.billing.getCurrentPlan.queryOptions(),
-  );
-  const { data: portalData } = useQuery(
-    trpc.billing.getPortalUrl.queryOptions(),
-  );
+  const { data } = useSuspenseQuery(trpc.billing.getCurrentPlan.queryOptions());
+  const { data: portalData } = useQuery({
+    ...trpc.billing.getPortalUrl.queryOptions(),
+    enabled: !isServer,
+  });
   const router = useRouter();
 
   const checkoutMutation = useMutation(
@@ -65,10 +69,6 @@ export function BillingOverview({ initialPricing }: BillingOverviewProps) {
       },
     }),
   );
-
-  if (isLoading) {
-    return <BillingOverviewSkeleton />;
-  }
 
   if (!data?.item) {
     return <BillingOverviewEmptyState onRetry={() => router.refresh()} />;
@@ -217,8 +217,8 @@ export function BillingOverview({ initialPricing }: BillingOverviewProps) {
                 Planned paid pricing
               </CardTitle>
               <p className="text-sm text-muted-foreground">
-                Preview paid-plan prices in the regional currency resolved from
-                the current location and locale.
+                Preview paid-plan prices in the currency for your country.
+                Unsupported or unknown locations use USD.
               </p>
             </div>
           </div>

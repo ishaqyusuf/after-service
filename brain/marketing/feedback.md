@@ -4,6 +4,10 @@
 This file records market feedback, operator replies, objections, workflow notes, and marketing learnings for afterservice.
 
 ## Feedback Inbox
+- Beta collection process: `brain/product/beta/feedback-process.md`. Use the
+  founder's confirmed onboarding reply conversation and record dated,
+  redacted observations here. No real beta feedback has been added by the
+  preparation task on 2026-10-18.
 - TODO: Add dated replies, DMs, calls, and observations from prelaunch marketing.
 
 ## Workflow Notes

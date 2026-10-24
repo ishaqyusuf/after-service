@@ -1,9 +1,9 @@
 "use client";
 
 import type { AppRouter } from "@afterservice/api/router";
-import { Button } from "@afterservice/ui";
-import { Badge } from "@afterservice/ui";
 import {
+  Badge,
+  Button,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
@@ -14,6 +14,7 @@ import type { ColumnDef } from "@tanstack/react-table";
 import type { inferRouterOutputs } from "@trpc/server";
 import { format } from "date-fns";
 import { MoreHorizontal } from "lucide-react";
+import { AskAssistantButton } from "@/components/assistant/assistant-launcher";
 import {
   serviceJobStatusLabels,
   toServiceJobStatus,
@@ -38,7 +39,16 @@ export const columns: ColumnDef<ServiceJob>[] = [
       className:
         "w-[250px] min-w-[200px] md:sticky md:left-0 bg-background group-hover:bg-[#F2F1EF] group-hover:dark:bg-[#0f0f0f] z-20",
     },
-    cell: ({ row }) => <span className="font-medium">{row.original.title}</span>,
+    cell: ({ row }) => (
+      <div className="flex items-center gap-2">
+        <span className="font-medium">{row.original.title}</span>
+        <AskAssistantButton
+          kind="jobs"
+          id={row.original.id}
+          label={row.original.title}
+        />
+      </div>
+    ),
   },
   {
     id: "customer",
@@ -109,7 +119,10 @@ export const columns: ColumnDef<ServiceJob>[] = [
     cell: ({ row }) => {
       const amount = row.original.amountCents;
       if (amount == null) return "-";
-      return `$${(amount / 100).toFixed(2)}`;
+      return new Intl.NumberFormat(undefined, {
+        style: "currency",
+        currency: row.original.currency,
+      }).format(amount / 100);
     },
   },
   {

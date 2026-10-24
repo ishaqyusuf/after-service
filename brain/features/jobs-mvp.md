@@ -2,6 +2,8 @@
 
 ## Status
 Implemented dry-run foundation on 2026-05-30.
+2026-10-18: Daily Vercel schedule implemented for production overdue-state
+processing without Trigger credits. See ADR 0014 and the latest rollout report.
 
 ## Scope
 - Find due follow-ups.
@@ -12,9 +14,21 @@ Implemented dry-run foundation on 2026-05-30.
 
 ## Architecture
 - Package owner: `packages/jobs/src/index.ts`.
-- API endpoint owner: `apps/api/src/index.ts` at `POST /api/jobs/follow-ups/dry-run`.
+- API endpoint owner: `apps/api/src/rest/routers/follow-up-jobs.ts`, mounted by
+  `apps/api/src/index.ts`. POST `/dry-run` retains scoped/manual processing;
+  GET `/mark-missed` is the fixed server-clock scheduler entrypoint.
 - Database access comes from `@afterservice/db`.
 - The endpoint is internal-only and requires `CRON_SECRET`.
+- `apps/api/vercel.json` schedules `0 7 * * *` (08:00 Africa/Lagos). The current
+  Hobby plan permits daily execution with a possible one-hour timing window.
+  Secret provisioning is production API only; no local dotenv edit is needed.
+- Vercel owns overdue processing. The Trigger overdue task stays callable but
+  has no declarative clock; deactivate its previous production schedule at
+  cutover. This does not change notification or analytics-report scheduling.
+- Scheduled calls reject query overrides, disable caching, and log aggregate
+  counts. Repeated calls only update still-open/scheduled overdue records.
+  Investigate failures in Vercel logs and manually rerun if needed; Vercel does
+  not automatically retry failed cron invocations.
 - Scheduled Trigger.dev owner-report task: `packages/jobs/src/tasks/analytics-review.ts` at `08:00 Africa/Lagos`.
 - The analytics review queries the project-filtered Logly events API with a scoped
   read key and aggregates platform-wide Prisma counts for jobs, customers,

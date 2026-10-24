@@ -72,21 +72,42 @@ export function FollowUpWorkForm({ followUp }: Props) {
 
   const rescheduleMutation = useMutation(
     trpc.followUps.reschedule.mutationOptions({
+      onError: (error) => {
+        rescheduleForm.setError("dueAt", {
+          type: "manual",
+          message: error.message,
+        });
+      },
       onSuccess: handleSuccess,
     }),
   );
   const markSentMutation = useMutation(
     trpc.followUps.markSent.mutationOptions({
+      onError: (error) => {
+        sendForm.setError("recipient", {
+          type: "manual",
+          message: error.message,
+        });
+      },
       onSuccess: handleSuccess,
     }),
   );
   const markRepliedMutation = useMutation(
     trpc.followUps.markReplied.mutationOptions({
+      onError: (error) => {
+        repliedForm.setError("notes", {
+          type: "manual",
+          message: error.message,
+        });
+      },
       onSuccess: handleSuccess,
     }),
   );
   const closeMutation = useMutation(
     trpc.followUps.close.mutationOptions({
+      onError: (error) => {
+        closeForm.setError("notes", { type: "manual", message: error.message });
+      },
       onSuccess: handleSuccess,
     }),
   );

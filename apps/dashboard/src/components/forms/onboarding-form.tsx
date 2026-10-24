@@ -27,11 +27,22 @@ import {
   FormLabel,
   FormMessage,
 } from "@afterservice/ui/form";
+import { useMutation } from "@tanstack/react-query";
 import { Info } from "lucide-react";
-import { useMemo, useState } from "react";
-import type { z } from "zod";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { QuickFill } from "@/components/quick-fill";
 import { useZodForm } from "@/hooks/use-zod-form";
+import {
+  clearOnboardingDraft,
+  type OnboardingDraftStorage,
+  readOnboardingDraft,
+  saveOnboardingDraft,
+} from "@/lib/onboarding-draft";
+import {
+  type OnboardingValues,
+  onboardingFailureMessage,
+  submitOnboarding,
+} from "@/lib/onboarding-request";
 import {
   BUSINESS_TYPE_SUGGESTIONS,
   DEFAULT_SERVICE_CATEGORY_SUGGESTIONS,
@@ -55,55 +66,88 @@ const onboardingSkeletonFields = [
   "follow-up-delay",
 ] as const;
 
-export function OnboardingForm() {
+const defaultValues = {
+  businessName: "",
+  businessType: "",
+  serviceCategory: "",
+  defaultFollowUpDelayDays: 7,
+};
+
+export function OnboardingForm({ userId }: { userId: string }) {
   const [error, setError] = useState<string | null>(null);
+  const [needsSignIn, setNeedsSignIn] = useState(false);
+  const [draftSaved, setDraftSaved] = useState(false);
+  const [draftRestored, setDraftRestored] = useState(false);
+  const [draftReady, setDraftReady] = useState(false);
+  const storage = useRef<OnboardingDraftStorage | null>(null);
   const track = useTrack();
 
   const form = useZodForm({
     schema: onboardingSchema,
-    defaultValues: {
-      businessName: "",
-      businessType: "",
-      serviceCategory: "",
-      defaultFollowUpDelayDays: 7,
-    },
+    defaultValues,
   });
 
-  async function onSubmit(data: z.infer<typeof onboardingSchema>) {
+  useEffect(() => {
+    try {
+      storage.current = window.sessionStorage;
+    } catch {
+      storage.current = null;
+    }
+    const draft = readOnboardingDraft(storage.current, userId);
+    form.reset(draft ?? defaultValues);
+    setDraftRestored(Boolean(draft));
+    const subscription = form.watch((values) => {
+      saveOnboardingDraft(storage.current, userId, values);
+    });
+    setDraftReady(true);
+    return () => subscription.unsubscribe();
+  }, [form, userId]);
+
+  const mutation = useMutation({
+    mutationFn: (values: OnboardingValues) => submitOnboarding(values),
+    retry: false,
+    onSuccess: (result) => {
+      if (result.status === "unauthorized") {
+        const saved = saveOnboardingDraft(
+          storage.current,
+          userId,
+          form.getValues(),
+        );
+        setDraftSaved(saved);
+        setNeedsSignIn(true);
+        setError(
+          saved
+            ? "Your session expired. Sign in again to continue. Your business details will be restored in this tab."
+            : "Your session expired. Sign in in a new tab, then return here and try again. Keep this page open to retain your business details.",
+        );
+        return;
+      }
+      if (result.status === "error") {
+        setError(result.message);
+        return;
+      }
+      clearOnboardingDraft(storage.current, userId);
+      try {
+        track({
+          event: LogEvents.WorkspaceCreated.name,
+          channel: LogEvents.WorkspaceCreated.channel,
+        });
+      } catch {
+        // Optional analytics must not interrupt completed setup.
+      }
+      window.location.href = "/";
+    },
+    onError: () => setError(onboardingFailureMessage),
+  });
+
+  function onSubmit(values: OnboardingValues) {
     setError(null);
-
-    const response = await fetch("/api/onboarding", {
-      body: JSON.stringify(data),
-      credentials: "include",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      method: "POST",
-    });
-
-    if (response.status === 401) {
-      window.location.href = "/sign-in";
-      return;
-    }
-
-    if (!response.ok) {
-      const payload = (await response.json().catch(() => null)) as {
-        error?: string;
-      } | null;
-
-      setError(payload?.error ?? "Workspace setup failed.");
-      return;
-    }
-
-    track({
-      event: LogEvents.WorkspaceCreated.name,
-      channel: LogEvents.WorkspaceCreated.channel,
-    });
-
-    window.location.href = "/";
+    setNeedsSignIn(false);
+    saveOnboardingDraft(storage.current, userId, values);
+    mutation.mutate(values);
   }
 
-  const isPending = form.formState.isSubmitting;
+  const isPending = mutation.isPending;
   const businessType = form.watch("businessType");
   const serviceCategory = form.watch("serviceCategory");
   const businessTypeId = getBusinessTypeId(businessType);
@@ -159,115 +203,143 @@ export function OnboardingForm() {
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-        <div className="flex justify-end">
-          <QuickFill name="onboarding" />
-        </div>
-        <div className="space-y-4">
-          <FormField
-            control={form.control}
-            name="businessName"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Business name</FormLabel>
-                <FormControl>
-                  <Input {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="businessType"
-            render={() => (
-              <FormItem>
-                <FormLabel>Business type</FormLabel>
-                <ComboboxDropdown
-                  items={[...BUSINESS_TYPE_SUGGESTIONS]}
-                  selectedItem={selectedBusinessType}
-                  onSelect={setBusinessType}
-                  onCreate={createBusinessType}
-                  placeholder="Select or create a business type"
-                  searchPlaceholder="Repair shop, clinic, salon..."
-                  renderOnCreate={(value) => `Use "${value}"`}
-                  triggerClassName="h-9 bg-transparent"
-                />
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="serviceCategory"
-            render={() => (
-              <FormItem>
-                <FormLabel>Service category</FormLabel>
-                <ComboboxDropdown
-                  items={serviceCategorySuggestions}
-                  selectedItem={selectedServiceCategory}
-                  onSelect={setServiceCategory}
-                  onCreate={createServiceCategory}
-                  placeholder="Select or create a service category"
-                  searchPlaceholder="Appliance repair, maintenance..."
-                  renderOnCreate={(value) => `Use "${value}"`}
-                  triggerClassName="h-9 bg-transparent"
-                />
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="defaultFollowUpDelayDays"
-            render={({ field }) => (
-              <FormItem>
-                <TooltipProvider delayDuration={150}>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <FormLabel className="inline-flex w-fit items-center gap-1.5">
-                        Default follow-up delay
-                        <Info
-                          aria-hidden="true"
-                          className="size-3.5 text-muted-foreground"
-                        />
-                      </FormLabel>
-                    </TooltipTrigger>
-                    <TooltipContent className="max-w-64 text-balance">
-                      How many days after a completed job afterservice uses as
-                      the starting due date for new follow-ups. You can change
-                      individual follow-ups later.
-                    </TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
-                <Select
-                  onValueChange={(value) => field.onChange(Number(value))}
-                  value={String(field.value)}
-                >
-                  <FormControl>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select delay" />
-                    </SelectTrigger>
-                  </FormControl>
-                  <SelectContent>
-                    {followUpDelayOptions.map((option) => (
-                      <SelectItem key={option.value} value={option.value}>
-                        {option.label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        </div>
-        {error ? (
-          <p className="text-[0.8rem] font-medium text-destructive">{error}</p>
+      <form
+        onSubmit={form.handleSubmit(onSubmit)}
+        className="space-y-6"
+        aria-busy={isPending}
+      >
+        {draftRestored ? (
+          <p role="status" className="text-sm text-muted-foreground">
+            Your business details have been restored. Continue where you left
+            off.
+          </p>
         ) : null}
-        <Button disabled={isPending} type="submit" className="w-full">
-          {isPending ? "Creating workspace..." : "Create workspace"}
-        </Button>
+        <fieldset disabled={isPending || !draftReady} className="space-y-6">
+          <div className="flex justify-end">
+            <QuickFill name="onboarding" />
+          </div>
+          <div className="space-y-4">
+            <FormField
+              control={form.control}
+              name="businessName"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Business name</FormLabel>
+                  <FormControl>
+                    <Input {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="businessType"
+              render={() => (
+                <FormItem>
+                  <FormLabel>Business type (optional)</FormLabel>
+                  <ComboboxDropdown
+                    items={[...BUSINESS_TYPE_SUGGESTIONS]}
+                    selectedItem={selectedBusinessType}
+                    onSelect={setBusinessType}
+                    onCreate={createBusinessType}
+                    placeholder="Select or create a business type"
+                    searchPlaceholder="Repair shop, clinic, salon..."
+                    renderOnCreate={(value) => `Use "${value}"`}
+                    triggerClassName="h-9 bg-transparent"
+                  />
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="serviceCategory"
+              render={() => (
+                <FormItem>
+                  <FormLabel>Service category (optional)</FormLabel>
+                  <ComboboxDropdown
+                    key={businessType}
+                    items={serviceCategorySuggestions}
+                    selectedItem={selectedServiceCategory}
+                    onSelect={setServiceCategory}
+                    onCreate={createServiceCategory}
+                    placeholder="Select or create a service category"
+                    searchPlaceholder="Appliance repair, maintenance..."
+                    renderOnCreate={(value) => `Use "${value}"`}
+                    triggerClassName="h-9 bg-transparent"
+                  />
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="defaultFollowUpDelayDays"
+              render={({ field }) => (
+                <FormItem>
+                  <TooltipProvider delayDuration={150}>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <FormLabel className="inline-flex w-fit items-center gap-1.5">
+                          Default follow-up delay
+                          <Info
+                            aria-hidden="true"
+                            className="size-3.5 text-muted-foreground"
+                          />
+                        </FormLabel>
+                      </TooltipTrigger>
+                      <TooltipContent className="max-w-64 text-balance">
+                        How many days after a completed job afterservice uses as
+                        the starting due date for new follow-ups. You can change
+                        individual follow-ups later.
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+                  <Select
+                    onValueChange={(value) => field.onChange(Number(value))}
+                    value={String(field.value)}
+                  >
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select delay" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {followUpDelayOptions.map((option) => (
+                        <SelectItem key={option.value} value={option.value}>
+                          {option.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
+          {error ? (
+            <div
+              role="alert"
+              className="space-y-2 text-sm font-medium text-destructive"
+            >
+              <p>{error}</p>
+              {needsSignIn ? (
+                <a
+                  href="/sign-in?return_to=%2Fonboarding"
+                  target={draftSaved ? undefined : "_blank"}
+                  rel={draftSaved ? undefined : "noopener noreferrer"}
+                  className="inline-block underline underline-offset-4"
+                >
+                  {draftSaved ? "Sign in to continue" : "Sign in in a new tab"}
+                </a>
+              ) : null}
+            </div>
+          ) : null}
+          <Button disabled={isPending} type="submit" className="w-full">
+            {isPending ? "Creating workspace..." : "Create workspace"}
+          </Button>
+        </fieldset>
       </form>
     </Form>
   );

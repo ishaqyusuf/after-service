@@ -1,5 +1,7 @@
 "use client";
 
+import { LogEvents } from "@afterservice/events";
+import { useTrack } from "@afterservice/events/client";
 import { Button, Icons, Input } from "@afterservice/ui";
 import {
   Form,
@@ -21,6 +23,7 @@ type Props = {
 };
 
 export function SignInForm({ onSignIn, returnTo }: Props) {
+  const track = useTrack();
   const [error, setError] = useState<string | null>(null);
   const [isGooglePending, setIsGooglePending] = useState(false);
   const form = useZodForm({
@@ -169,6 +172,14 @@ export function SignInForm({ onSignIn, returnTo }: Props) {
             disabled={isPending || isGooglePending}
             type="submit"
             className="h-11 w-full"
+            onClick={() =>
+              track({
+                event: LogEvents.ContinueWithEmail.name,
+                channel: LogEvents.ContinueWithEmail.channel,
+                location: "dashboard_sign_in",
+                method: "email",
+              })
+            }
           >
             {isPending ? "Signing in..." : "Sign in"}
           </Button>

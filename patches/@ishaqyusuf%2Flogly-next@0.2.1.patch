@@ -1,0 +1,30 @@
+diff --git a/dist/route.d.ts b/dist/route.d.ts
+index 0776595299173416ee89e17c651ec380eb2033a2..37c62dd6b9557ac76f77a0586dacb339a9265bdd 100644
+--- a/dist/route.d.ts
++++ b/dist/route.d.ts
+@@ -3,6 +3,8 @@ type RouteOptions = {
+     collectorUrl?: string;
+     projectKey?: string;
+     serverKey?: string;
++    /** Trust Cloudflare visitor headers supplied by the product deployment. */
++    trustCloudflareCountry?: boolean;
+     onBatch?: (batch: AnalyticsBatch, request: Request) => Promise<void>;
+ };
+ export declare function createAnalyticsRoute(options: RouteOptions): (request: Request) => Promise<Response>;
+diff --git a/dist/route.js b/dist/route.js
+index 89c58af91522eb4480901366e0231fdadcaf31e2..a70a61d241059119b632043395ebb24b2887de0f 100644
+--- a/dist/route.js
++++ b/dist/route.js
+@@ -14,8 +14,11 @@ export function createAnalyticsRoute(options) {
+         }
+         const origin = request.headers.get("origin");
+         // Read location only at the product edge, never at the remote collector.
++        const cloudflareCountry = request.headers.get("cf-ipcountry");
++        const usesCloudflare = options.trustCloudflareCountry &&
++            (cloudflareCountry !== null || request.headers.has("cf-ray"));
+         const country = process.env.VERCEL === "1"
+-            ? request.headers.get("x-vercel-ip-country")
++            ? (usesCloudflare ? cloudflareCountry : request.headers.get("x-vercel-ip-country"))?.trim().toUpperCase()
+             : null;
+         const response = await fetch(`${options.collectorUrl.replace(/\/$/, "")}/v1/events`, {
+             method: "POST",

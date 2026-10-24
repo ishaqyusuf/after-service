@@ -11,6 +11,7 @@ import {
   toFollowUpChannel,
 } from "@/hooks/use-follow-up-filter-params";
 import { useFollowUpParams } from "@/hooks/use-follow-up-params";
+import { useTimeZone } from "@/hooks/use-time-zone";
 import { resolveTemplate } from "@/lib/dashboard-format";
 import { useTRPC } from "@/trpc/client";
 
@@ -24,7 +25,10 @@ const boardCardSkeletons = ["first", "second", "third"];
 
 export function FollowUpsBoard() {
   const trpc = useTRPC();
-  const { data } = useSuspenseQuery(trpc.followUps.listBoard.queryOptions());
+  const timeZone = useTimeZone();
+  const { data } = useSuspenseQuery(
+    trpc.followUps.listBoard.queryOptions({ timeZone }),
+  );
   const { columns } = data;
 
   if (!columns) return null;

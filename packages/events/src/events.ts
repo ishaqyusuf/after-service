@@ -43,6 +43,10 @@ export const LogEvents = {
     name: "user_signed_in",
     channel: "login",
   },
+  ContinueWithEmail: {
+    name: "continue_with_email_clicked",
+    channel: "login",
+  },
   SignOut: {
     name: "user_signed_out",
     channel: "login",

@@ -1,0 +1,13 @@
+diff --git a/dist/event-store.js b/dist/event-store.js
+index fc0e151a0380f690e45efd54c7b46c58ab8a1177..09d75ce6d56788617b0c41ebac09b171ffb59220 100644
+--- a/dist/event-store.js
++++ b/dist/event-store.js
+@@ -283,7 +283,7 @@ export function createIndexedDbEventStore(factory = indexedDB) {
+             const request = transaction
+                 .objectStore(EVENT_STORE)
+                 .index(PROJECT_ENQUEUED_INDEX)
+-                .openKeyCursor(projectRange(project));
++                .openCursor(projectRange(project));
+             await new Promise((resolve, reject) => {
+                 request.onerror = () => reject(request.error ?? new Error("Unable to clear analytics events"));
+                 request.onsuccess = () => {
