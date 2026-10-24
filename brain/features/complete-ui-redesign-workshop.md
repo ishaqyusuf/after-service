@@ -1,7 +1,7 @@
 # Complete UI redesign workshop
 
 Date: 2026-10-24
-Status: Wall planner implemented and reviewed; isolated production release is in progress.
+Status: deployed and live verified on desktop and 320/390px mobile viewports; PR #3.
 
 ## Requested outcome
 
@@ -202,9 +202,8 @@ Codex inspected their source changes, repaired integration issues and ran all QA
 - Existing unused legacy presentation files with concurrent changes were retained;
   they are not imported into the new overview/homepage compositions.
 - The implementation is committed as `80a2079` and `ea0aa45` on the isolated
-  `codex/wall-planner-redesign` release branch, which is pushed to origin. No PR
-  exists and deployment remains in progress; this record does not claim a live
-  release.
+  `codex/wall-planner-redesign` release branch. Final application source
+  `7f51ea0` is live on both domains; PR #3 records the release.
   Firefox, WebKit, production-scale data-volume benchmarking and physical-device installation were not rerun in this slice.
 
 Screenshots: task visualization directory contains
@@ -215,3 +214,14 @@ Workshop implementation receipts: marketing
 `6da342ba-9a03-4758-a385-52eb11eb5637`; dashboard
 `d90c1bf2-baa7-4d62-b78e-2047b09ad2e7`. Both catalog records are implemented
 against the exact selected revision IDs. The shared viewer remains available.
+
+## Production release, 2026-10-24
+
+Wall planner is deployed on both canonical domains and passes live desktop and
+320/390px viewport acceptance. Application source `7f51ea0`; PR #3. The pending
+password-recovery rollout is excluded and retained locally. See
+[release evidence](../handoffs/2026-10-24-wall-planner-production.md).
+
+Production Workshop receipt (marketing): `5b147198-6ea0-4bc8-bfc0-aebadd557a85`.
+
+Production Workshop receipt (dashboard): `8ae658c4-9059-4c83-85a3-b04dac0f54bf`.

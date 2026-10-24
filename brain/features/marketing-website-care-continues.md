@@ -33,3 +33,10 @@ The PWA cache update prevents stale local development chunks.
 
 See `complete-ui-redesign-workshop.md` and the Wall planner migration contract for
 implementation details, tests and limits. The local redesign is not deployed.
+
+## Production release, 2026-10-24
+
+Wall planner is deployed on both canonical domains and passes live desktop and
+320/390px viewport acceptance. Application source `7f51ea0`; PR #3. The pending
+password-recovery rollout is excluded and retained locally. See
+[release evidence](../handoffs/2026-10-24-wall-planner-production.md).

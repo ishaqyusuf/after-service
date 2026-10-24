@@ -38,3 +38,10 @@ Claude `claude-opus-5-5` implements three disjoint slices; Codex reviews integra
 and verifies desktop/mobile. No deployment or commit is implied by this decision.
 See `brain/plans/2026-10-24-wall-planner-migration.md` for the execution contract
 and final conformance audit.
+
+## Production release, 2026-10-24
+
+Wall planner is deployed on both canonical domains and passes live desktop and
+320/390px viewport acceptance. Application source `7f51ea0`; PR #3. The pending
+password-recovery rollout is excluded and retained locally. See
+[release evidence](../handoffs/2026-10-24-wall-planner-production.md).

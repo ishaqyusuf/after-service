@@ -179,7 +179,8 @@ of accepted assistant business behavior or removal of unrelated legacy files.
 The older preview's disabled paid action is superseded by current source-owned
 Free/Business checkout. Implementation is on the isolated
 `codex/wall-planner-redesign` branch in commits `80a2079` and `ea0aa45`, pushed
-to origin. No PR exists and deployment remains in progress.
+to origin. Final application source `7f51ea0` is deployed and verified on both
+canonical domains; PR #3 records the release.
 
 Brain impact: updated this contract, the Workshop feature record, marketing
 history, ADR 0026 and task state. Root PRODUCT.md/DESIGN.md capture the accepted
@@ -190,3 +191,10 @@ Workshop receipts: marketing `6da342ba-9a03-4758-a385-52eb11eb5637`;
 dashboard `d90c1bf2-baa7-4d62-b78e-2047b09ad2e7`. Both exact selected revisions
 are recorded as implemented in the isolated release branch; no live release is
 claimed.
+
+## Production release, 2026-10-24
+
+Wall planner is deployed on both canonical domains and passes live desktop and
+320/390px viewport acceptance. Application source `7f51ea0`; PR #3. The pending
+password-recovery rollout is excluded and retained locally. See
+[release evidence](../handoffs/2026-10-24-wall-planner-production.md).
