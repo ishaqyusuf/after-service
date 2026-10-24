@@ -2,6 +2,7 @@
 
 import { Sheet } from "@afterservice/ui";
 import { useQuery } from "@tanstack/react-query";
+import { AskAssistantButton } from "@/components/assistant/assistant-launcher";
 import { FollowUpWorkForm } from "@/components/forms/follow-up-work-form";
 import { useFollowUpParams } from "@/hooks/use-follow-up-params";
 import { useTRPC } from "@/trpc/client";
@@ -35,7 +36,15 @@ export function FollowUpCardSheet() {
         {isLoading ? (
           <SheetFormSkeleton fields={6} />
         ) : followUpData?.item ? (
-          <FollowUpWorkForm followUp={followUpData.item} />
+          <>
+            <AskAssistantButton
+              kind="followUps"
+              id={followUpData.item.id}
+              label={followUpData.item.customerName}
+              onOpen={() => setParams(null)}
+            />
+            <FollowUpWorkForm followUp={followUpData.item} />
+          </>
         ) : (
           <SheetMissingState
             title="Follow-up not found"

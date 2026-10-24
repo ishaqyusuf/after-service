@@ -6,6 +6,18 @@ This file records completed work.
 
 ## Completed
 
+### Operations Assistant Local Implementation — 2026-10-24
+
+- Implemented all basic operator capabilities from the approved integration plan
+  in the attached worktree, branch `codex/operations-assistant`.
+- Added persistent chat, actor-private history, typed reads, 19 reviewed actions,
+  editable message drafts, receipts, exact time/money handling and usage gates.
+- Configured the owner-authorized dedicated DeepSeek key in ignored local config.
+- Verified 19 assistant checks, 107 unit regressions, 45 MVP/QA integrations, eight
+  desktop/mobile browser cases, seven real-model scenarios, typechecks and builds.
+- Hosted activation and direct customer dispatch remain separate gates.
+- Full evidence and Brain impact: [assistant verification](../engineering/assistant-verification.md).
+
 ### Country-Based Marketing Pricing — 2026-10-24
 
 - Fixed the shared pricing resolver so Cloudflare visitor country wins over

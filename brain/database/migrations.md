@@ -67,3 +67,10 @@ and using `afterservice_preview_qa` only in Vercel Preview. Runtime grants cover
 existing tables/sequences and exclude CREATE/TRUNCATE/admin capabilities. Future
 schema maintenance requires an authorized owner connection and refreshing
 object grants. See ADR 0016 and the preview acceptance handoff.
+
+## 20261024010000_operations_assistant
+
+Additive migration creates six assistant tables, their unique/index/foreign-key
+constraints and `ServiceJob.currency` with default USD. Generated from the copied
+baseline Prisma schema. Applied and tested only in the separate local
+`afterservice_assistant` database; not applied to hosted databases by this task.

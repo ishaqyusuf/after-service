@@ -41,3 +41,13 @@ enables the accelerator. They are absent from production route artifacts.
   keyed non-secret fixture seed for pre-session and authenticated Quick Fill.
 - `qaAccelerator.fixtureContext`: authenticated tRPC query exposing only the
   selected QA domain and deterministic non-secret fixture seed.
+
+## Operations Assistant — 2026-10-24
+
+`POST /api/assistant/chat` is an authenticated, exact-origin, size-bounded NDJSON
+stream. Dashboard uses the existing same-origin shared Hono handler.
+`assistant` tRPC router: availability, allowance, read, conversations, conversation,
+createConversation, renameConversation, deleteConversation, draft, edit, cancel,
+confirm. Mutation origin is checked when request context exists. Draft tools are
+read-only with respect to business records; confirmation is a separate endpoint.
+Canonical job create/update accepts optional currency (USD/NGN/GBP/EUR/CAD).

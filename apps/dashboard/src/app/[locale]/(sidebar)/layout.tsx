@@ -3,7 +3,9 @@ import { getDbClient, validateQaDerivedSession } from "@afterservice/db";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import type { ReactNode } from "react";
+import { AssistantProvider } from "@/components/assistant/assistant-provider";
 import { Header } from "@/components/header";
+import { GlobalSheetsProvider } from "@/components/sheets/global-sheets-provider";
 import { Sidebar } from "@/components/sidebar";
 
 export default async function SidebarLayout({
@@ -51,12 +53,15 @@ export default async function SidebarLayout({
   }
 
   return (
-    <div className="relative">
-      <Sidebar />
-      <div className="md:ml-[70px] pb-4">
-        <Header />
-        <div className="px-4 md:px-8">{children}</div>
+    <AssistantProvider key={`${session.user.id}:${membership.workspace.id}`}>
+      <GlobalSheetsProvider />
+      <div className="relative">
+        <Sidebar />
+        <div className="md:ml-[70px] pb-4">
+          <Header />
+          <div className="px-4 md:px-8">{children}</div>
+        </div>
       </div>
-    </div>
+    </AssistantProvider>
   );
 }

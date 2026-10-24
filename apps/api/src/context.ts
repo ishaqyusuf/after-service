@@ -2,6 +2,7 @@ import { auth } from "@afterservice/auth";
 import {
   getDbClient,
   type MembershipRole,
+  type Prisma,
   validateQaDerivedSession,
 } from "@afterservice/db";
 
@@ -16,6 +17,10 @@ export type ApiWorkspaceContext = {
 } | null;
 
 export type ApiContext = {
+  db?: Prisma.TransactionClient;
+  recordOnly?: boolean;
+  afterCommit?: (() => Promise<void>)[];
+  request?: { origin: string | null; method: string };
   requestId: string;
   session: BetterAuthSession | null;
   user: BetterAuthSession["user"] | null;
@@ -63,6 +68,9 @@ export async function createContext(request?: Request): Promise<ApiContext> {
     : [null, null];
 
   return {
+    request: request
+      ? { origin: request.headers.get("origin"), method: request.method }
+      : undefined,
     session: effectiveSession,
     requestId: crypto.randomUUID(),
     user: effectiveSession?.user ?? null,

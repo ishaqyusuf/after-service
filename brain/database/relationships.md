@@ -55,3 +55,11 @@ This file documents intended entity relationships.
 - The QA marker belongs to the workspace aggregate root and covers memberships,
   customers, jobs, follow-ups, templates, messages, and subscriptions.
 - `QaPurgeRun` has no workspace relation so the counts-only receipt survives.
+
+## Assistant Relationships — 2026-10-24
+
+Actor/workspace own private conversations. Conversation deletion cascades messages,
+runs and proposals; saved business receipts remain separate and retain only
+record references/action/revision/actor/workspace/time. Workspace deletion cascades
+all assistant tables. Usage is workspace/month scoped. QA cleanup previews count
+assistant roots, and workspace cascade removes their descendants.

@@ -39,13 +39,16 @@
     "test:integration": "bun --env-file=/dev/null ../../local-infra-kit/bin/with-env.ts --profile afterservice --mode local -- bun test ./tests/integration/mvp.integration.ts ./tests/integration/qa-access.integration.ts",
     "test:typecheck": "tsc --noEmit -p tests/tsconfig.json",
     "test:unit": "bun --env-file=/dev/null test apps packages scripts tests/support",
-    "typecheck": "turbo typecheck"
+    "typecheck": "turbo typecheck",
+    "test:assistant": "bun test ./packages/assistant/src/contracts.test.ts ./tests/integration/assistant.integration.ts",
+    "test:assistant:e2e": "playwright test --config playwright.assistant.config.ts"
   },
   "devDependencies": {
     "@biomejs/biome": "^2.3.0",
     "@playwright/test": "^1.64.1",
     "turbo": "^2.5.0",
-    "typescript": "^5.9.0"
+    "typescript": "^5.9.0",
+    "@ai-sdk/provider": "3.0.8"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",

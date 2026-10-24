@@ -111,3 +111,13 @@ Require active membership:
 - Only users whose global `platformRole` is `platform_admin` may discover,
   adopt, preview, start, or poll QA purge runs.
 - Workspace owner/admin roles do not grant platform maintenance authority.
+
+## Assistant Access — 2026-10-24
+
+Every private assistant operation revalidates membership and actor/workspace
+conversation ownership. Owner/admin settings rules remain canonical and current
+roles are reread inside confirmation transactions. Staff operational access
+matches existing workspace-scoped domain policy; assignment-only visibility is
+not implemented or claimed. Feature/workspace/capability rollout never expands
+authority. Exact-origin guards protect browser mutations and streaming. No model
+receives billing writes, team-role changes, platform maintenance or secrets.

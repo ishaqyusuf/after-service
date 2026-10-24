@@ -94,3 +94,12 @@ As of 2026-07-05, `apps/website` owns its own tRPC client/server stack under `ap
 - Shared effect policy executes before notification or Polar provider calls.
 - Production route extensions and Turbopack aliases remove QA server/client
   capability from production artifacts.
+
+## Operations Assistant — 2026-10-24
+
+`packages/assistant` owns contracts/capabilities; `packages/ai` owns server-only
+provider setup; API assistant modules own authenticated streaming/orchestration;
+DB query modules own persistence and deterministic reads. Dashboard shell owns
+one assistant provider with actor/workspace identity, and global record sheets
+live inside it. Canonical form operations accept server-owned transactional
+context for reviewed commands. See ADR 0018 and assistant verification.

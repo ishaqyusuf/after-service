@@ -8,7 +8,7 @@ import {
   test,
 } from "bun:test";
 import { createHmac, randomUUID } from "node:crypto";
-import { tasks } from "../../apps/api/node_modules/@trigger.dev/sdk/dist/esm/v3/index.js";
+import { tasks } from "@trigger.dev/sdk/v3";
 import type { ApiContext } from "../../apps/api/src/context";
 import { localTestDb } from "../support/local-db";
 

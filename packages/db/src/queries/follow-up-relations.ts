@@ -1,4 +1,4 @@
-import type { PrismaClient } from "../../generated/prisma/client";
+import type { Prisma } from "../../generated/prisma/client";
 
 export type FollowUpRelationsInput = {
   workspaceId: string;
@@ -9,7 +9,7 @@ export type FollowUpRelationsInput = {
 };
 
 export async function hasValidFollowUpRelations(
-  db: PrismaClient,
+  db: Prisma.TransactionClient,
   input: FollowUpRelationsInput,
 ) {
   const [job, template, assignee] = await Promise.all([

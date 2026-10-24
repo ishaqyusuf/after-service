@@ -84,3 +84,20 @@ zone uses UTC. The dashboard explicitly requests its browser timezone after
 hydration and includes it in the query cache key. This changes presentation
 calendar boundaries only; saved due instants and cron's absolute clock remain
 unchanged. Board stages are mutually exclusive; sent items remain Waiting.
+
+## Assistant Reviewed Actions — 2026-10-24
+
+Confirmation binds proposal ID/revision/digest and expected target versions,
+rechecks current scope/role/limits/rollout, and atomically saves the canonical
+business command plus unique receipt. Repeated confirmation returns the same
+receipt; stale/canceled/expired drafts refuse execution. Model tools cannot
+confirm. Server-only operation context supplies a transaction, record-only mode
+and after-commit analytics; client input cannot set those fields. Scheduling
+through assistant emits no outbound notification. Email is a form handoff.
+Amounts convert exactly to integer cents and retain an explicit per-job currency.
+
+The model-only `draftAction` tool accepts `{ proposal: AssistantAction }` to meet
+the provider's object-root schema requirement. Public tRPC draft/edit inputs keep
+the typed action contract. Runs persist prompt version; proposal capability
+version must still match on confirmation. Provider error bodies and SDK request
+objects are never logged.

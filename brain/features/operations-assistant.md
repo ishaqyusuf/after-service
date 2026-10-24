@@ -1,7 +1,7 @@
 # Feature: Operations Assistant
 
 Date: 2026-10-24
-Status: proposed; implementation not started
+Status: implemented and verified in isolated worktree; hosted activation separate
 Phase: post-MVP operator workflow improvement
 Owner: product/engineering
 
@@ -13,7 +13,7 @@ changes, review them and save through afterservice's normal domain operations.
 Canonical scope, references, proposed architecture, delivery sequence and tests:
 [Operations assistant integration plan](../plans/2026-10-24-feature-operations-assistant.md).
 
-## Proposed First Release
+## First-Release Implementation
 
 - Persistent dashboard chat and dedicated assistant page, including mobile fit.
 - Actor-private saved conversations, streaming, stop/retry and run recovery.
@@ -47,13 +47,13 @@ introduced by copying the Ewatrade interaction pattern.
 
 ## Acceptance
 
-- [ ] Every first-release capability has a canonical operation and role policy.
-- [ ] Actor/workspace isolation and permission revalidation pass.
-- [ ] Draft/edit/cancel/confirm/receipt/reload flows pass without duplicate writes.
-- [ ] Complete customer/job/follow-up workflow agrees with the ordinary dashboard.
-- [ ] Desktop/mobile viewport, accessibility, failure and quota states pass.
-- [ ] Provider-free and controlled real-model evaluations pass.
-- [ ] Brain API/database/architecture/testing documents reflect implemented scope.
+- [x] Every first-release capability has a canonical operation and role policy.
+- [x] Actor/workspace isolation and permission revalidation pass.
+- [x] Draft/edit/cancel/confirm/receipt/reload flows pass without duplicate writes.
+- [x] Complete customer/job/follow-up workflow agrees with the ordinary dashboard.
+- [x] Desktop/mobile viewport, accessibility, failure and quota states pass.
+- [x] Provider-free and controlled real-model evaluations pass.
+- [x] Brain API/database/architecture/testing documents reflect implemented scope.
 
-No assistant code, provider configuration, schema migration or activation is
-part of this planning deliverable.
+Implementation and verification evidence: [Assistant verification](../engineering/assistant-verification.md).
+Hosted activation and real email dispatch remain separate release gates.

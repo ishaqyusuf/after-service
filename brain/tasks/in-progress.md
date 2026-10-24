@@ -135,3 +135,10 @@ Next Step:
   acceptance passed. Canary delivery and the first reviewed purge require
   Trigger credits; the read-only purge preview still blocks the synthetic paid
   workspace. No purge was started.
+
+## Operations Assistant Handoff
+
+Core implementation and isolated verification are complete in
+`codex/operations-assistant`. See the done entry and
+[verification record](../engineering/assistant-verification.md). Hosted pilot
+activation is a separate pending rollout; no deployment was performed.

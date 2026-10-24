@@ -21,16 +21,27 @@ import {
   resolveQaExternalEffectPolicy,
 } from "@afterservice/utils";
 import { tasks } from "@trigger.dev/sdk/v3";
-import { initTRPC, TRPCError } from "@trpc/server";
-import superjson from "superjson";
+import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 import type { ApiContext } from "../context";
+import { protectedProcedure, t } from "../trpc";
 import { assertFollowUpRelations } from "../utils/follow-up-relations";
 import { polarApi } from "../utils/polar";
+import { createAssistantRouter } from "./assistant";
 
-const t = initTRPC.context<ApiContext>().create({
-  transformer: superjson,
-});
+async function operationAnalytics(ctx: ApiContext) {
+  if (!ctx.afterCommit) return setupAnalytics();
+  const afterCommit = ctx.afterCommit;
+  return {
+    track: (
+      event: Parameters<Awaited<ReturnType<typeof setupAnalytics>>["track"]>[0],
+    ) => {
+      afterCommit.push(async () => {
+        (await setupAnalytics()).track(event);
+      });
+    },
+  };
+}
 
 const calendarInput = z
   .object({
@@ -248,26 +259,6 @@ function requireOwnerOrAdmin(ctx: ApiContext) {
   }
 }
 
-const protectedProcedure = t.procedure.use(({ ctx, next }) => {
-  if (!ctx.user) {
-    throw new TRPCError({ code: "UNAUTHORIZED" });
-  }
-
-  if (!ctx.workspace) {
-    throw new TRPCError({
-      code: "FORBIDDEN",
-      message: "Workspace onboarding is required.",
-    });
-  }
-
-  return next({
-    ctx: {
-      ...ctx,
-      workspace: ctx.workspace,
-    },
-  });
-});
-
 const platformAdminProcedure = t.procedure.use(({ ctx, next }) => {
   if (!ctx.user) throw new TRPCError({ code: "UNAUTHORIZED" });
   if (ctx.platformRole !== "platform_admin") {
@@ -311,7 +302,10 @@ function validateQaPreview(token: string, fingerprint: string) {
   );
 }
 
-async function getWorkspaceForLimits(workspaceId: string) {
+async function getWorkspaceForLimits(
+  workspaceId: string,
+  db: Prisma.TransactionClient = getDbClient(),
+) {
   const workspace = await db.workspace.findUniqueOrThrow({
     select: {
       businessType: true,
@@ -334,8 +328,9 @@ async function getWorkspaceForLimits(workspaceId: string) {
 async function assertUnderLimit(
   workspaceId: string,
   key: keyof (typeof planLimits)["starter"],
+  db: Prisma.TransactionClient = getDbClient(),
 ) {
-  const workspace = await getWorkspaceForLimits(workspaceId);
+  const workspace = await getWorkspaceForLimits(workspaceId, db);
   const count =
     key === "customers"
       ? await db.customer.count({ where: { archivedAt: null, workspaceId } })
@@ -452,6 +447,7 @@ const customersRouter = t.router({
   archive: protectedProcedure
     .input(z.object({ id: z.string().min(1) }))
     .mutation(async ({ ctx, input }) => {
+      const db = ctx.db ?? getDbClient();
       await assertQaExternalEffectAllowed({
         effect: "destructive",
         workspaceId: ctx.workspace.id,
@@ -475,7 +471,8 @@ const customersRouter = t.router({
       }),
     )
     .mutation(async ({ ctx, input }) => {
-      await assertUnderLimit(ctx.workspace.id, "customers");
+      const db = ctx.db ?? getDbClient();
+      await assertUnderLimit(ctx.workspace.id, "customers", db);
 
       const item = await db.customer.create({
         data: {
@@ -494,7 +491,7 @@ const customersRouter = t.router({
         },
       });
 
-      const analytics = await setupAnalytics();
+      const analytics = await operationAnalytics(ctx);
       analytics.track({
         event: LogEvents.CustomerCreated.name,
         channel: LogEvents.CustomerCreated.channel,
@@ -507,6 +504,7 @@ const customersRouter = t.router({
   get: protectedProcedure
     .input(z.object({ id: z.string().min(1) }))
     .query(async ({ ctx, input }) => {
+      const db = ctx.db ?? getDbClient();
       const item = await db.customer.findFirstOrThrow({
         include: {
           followUps: {
@@ -551,6 +549,7 @@ const customersRouter = t.router({
         .default({ includeArchived: false, limit: 50 }),
     )
     .query(async ({ ctx, input }) => {
+      const db = ctx.db ?? getDbClient();
       const items = await db.customer.findMany({
         include: {
           followUps: {
@@ -584,6 +583,7 @@ const customersRouter = t.router({
       return { items: items.map(customerDto), nextCursor: null };
     }),
   tags: protectedProcedure.query(async ({ ctx }) => {
+    const db = ctx.db ?? getDbClient();
     const customers = await db.customer.findMany({
       select: { tags: true },
       where: { workspaceId: ctx.workspace.id },
@@ -617,6 +617,7 @@ const customersRouter = t.router({
       }),
     )
     .mutation(async ({ ctx, input }) => {
+      const db = ctx.db ?? getDbClient();
       const item = await db.customer.update({
         data: {
           companyName: input.companyName || null,
@@ -643,6 +644,7 @@ const serviceJobsRouter = t.router({
     .input(
       z.object({
         amountCents: z.coerce.number().int().nonnegative().optional(),
+        currency: z.enum(["USD", "NGN", "GBP", "EUR", "CAD"]).optional(),
         completedAt: z.coerce.date(),
         customerId: z.string().min(1),
         nextFollowUpAt: z.coerce.date().optional(),
@@ -652,12 +654,14 @@ const serviceJobsRouter = t.router({
       }),
     )
     .mutation(async ({ ctx, input }) => {
+      const db = ctx.db ?? getDbClient();
       const customer = await db.customer.findFirstOrThrow({
         where: { id: input.customerId, workspaceId: ctx.workspace.id },
       });
       const item = await db.serviceJob.create({
         data: {
           amountCents: input.amountCents ?? null,
+          currency: input.currency,
           completedAt: input.completedAt,
           customerId: customer.id,
           nextFollowUpAt: input.nextFollowUpAt ?? null,
@@ -673,7 +677,7 @@ const serviceJobsRouter = t.router({
         where: { id: customer.id },
       });
 
-      const analytics = await setupAnalytics();
+      const analytics = await operationAnalytics(ctx);
       analytics.track({
         event: LogEvents.ServiceJobCreated.name,
         channel: LogEvents.ServiceJobCreated.channel,
@@ -694,7 +698,8 @@ const serviceJobsRouter = t.router({
       }),
     )
     .mutation(async ({ ctx, input }) => {
-      await assertUnderLimit(ctx.workspace.id, "followUps");
+      const db = ctx.db ?? getDbClient();
+      await assertUnderLimit(ctx.workspace.id, "followUps", db);
 
       const job = await db.serviceJob.findFirstOrThrow({
         include: { workspace: true },
@@ -747,6 +752,7 @@ const serviceJobsRouter = t.router({
   get: protectedProcedure
     .input(z.object({ id: z.string().min(1) }))
     .query(async ({ ctx, input }) => {
+      const db = ctx.db ?? getDbClient();
       const item = await db.serviceJob.findFirstOrThrow({
         include: { customer: true, followUps: true },
         where: { id: input.id, workspaceId: ctx.workspace.id },
@@ -772,6 +778,7 @@ const serviceJobsRouter = t.router({
         .default({ limit: 50 }),
     )
     .query(async ({ ctx, input }) => {
+      const db = ctx.db ?? getDbClient();
       const searchTerm = input.q ?? input.search;
 
       const completedAtFilter: Record<string, Date> = {};
@@ -819,6 +826,7 @@ const serviceJobsRouter = t.router({
   markCompleted: protectedProcedure
     .input(z.object({ id: z.string().min(1) }))
     .mutation(async ({ ctx, input }) => {
+      const db = ctx.db ?? getDbClient();
       const current = await db.serviceJob.findFirstOrThrow({
         select: { customerId: true },
         where: { id: input.id, workspaceId: ctx.workspace.id },
@@ -838,7 +846,7 @@ const serviceJobsRouter = t.router({
         where: { id: input.id, workspaceId: ctx.workspace.id },
       });
 
-      const analytics = await setupAnalytics();
+      const analytics = await operationAnalytics(ctx);
       analytics.track({
         event: LogEvents.ServiceJobStatusUpdated.name,
         channel: LogEvents.ServiceJobStatusUpdated.channel,
@@ -847,7 +855,7 @@ const serviceJobsRouter = t.router({
       });
 
       // Async dispatch notification
-      if (notificationDispatch.send) {
+      if (!ctx.recordOnly && notificationDispatch.send) {
         notifications
           .send(
             "job_completed_checkin",
@@ -876,6 +884,7 @@ const serviceJobsRouter = t.router({
     .input(
       z.object({
         amountCents: z.coerce.number().int().nonnegative().optional(),
+        currency: z.enum(["USD", "NGN", "GBP", "EUR", "CAD"]).optional(),
         completedAt: z.coerce.date(),
         id: z.string().min(1),
         nextFollowUpAt: z.coerce.date().optional(),
@@ -886,9 +895,11 @@ const serviceJobsRouter = t.router({
       }),
     )
     .mutation(async ({ ctx, input }) => {
+      const db = ctx.db ?? getDbClient();
       const item = await db.serviceJob.update({
         data: {
           amountCents: input.amountCents ?? null,
+          currency: input.currency,
           completedAt: input.completedAt,
           nextFollowUpAt: input.nextFollowUpAt ?? null,
           notes: input.notes || null,
@@ -907,6 +918,7 @@ const followUpsRouter = t.router({
   get: protectedProcedure
     .input(z.object({ id: z.string().min(1) }))
     .query(async ({ ctx, input }) => {
+      const db = ctx.db ?? getDbClient();
       const item = await db.followUp.findFirstOrThrow({
         include: {
           customer: true,
@@ -925,6 +937,7 @@ const followUpsRouter = t.router({
       z.object({ assigneeId: z.string().min(1).nullable(), id: z.string() }),
     )
     .mutation(async ({ ctx, input }) => {
+      const db = ctx.db ?? getDbClient();
       await assertFollowUpRelations(db, {
         workspaceId: ctx.workspace.id,
         assigneeId: input.assigneeId,
@@ -956,6 +969,7 @@ const followUpsRouter = t.router({
   close: protectedProcedure
     .input(z.object({ id: z.string().min(1), notes: z.string().optional() }))
     .mutation(async ({ ctx, input }) => {
+      const db = ctx.db ?? getDbClient();
       const item = await db.followUp.update({
         data: {
           closedAt: new Date(),
@@ -980,7 +994,7 @@ const followUpsRouter = t.router({
         where: { id: input.id, workspaceId: ctx.workspace.id },
       });
 
-      const analytics = await setupAnalytics();
+      const analytics = await operationAnalytics(ctx);
       analytics.track({
         event: LogEvents.FollowUpStatusUpdated.name,
         channel: LogEvents.FollowUpStatusUpdated.channel,
@@ -1002,7 +1016,8 @@ const followUpsRouter = t.router({
       }),
     )
     .mutation(async ({ ctx, input }) => {
-      await assertUnderLimit(ctx.workspace.id, "followUps");
+      const db = ctx.db ?? getDbClient();
+      await assertUnderLimit(ctx.workspace.id, "followUps", db);
 
       const customer = await db.customer.findFirstOrThrow({
         where: { id: input.customerId, workspaceId: ctx.workspace.id },
@@ -1046,7 +1061,7 @@ const followUpsRouter = t.router({
         },
       });
 
-      const analytics = await setupAnalytics();
+      const analytics = await operationAnalytics(ctx);
       analytics.track({
         event: LogEvents.FollowUpCreated.name,
         channel: LogEvents.FollowUpCreated.channel,
@@ -1054,7 +1069,7 @@ const followUpsRouter = t.router({
         workspaceId: ctx.workspace.id,
       });
 
-      if (notificationDispatch.send) {
+      if (!ctx.recordOnly && notificationDispatch.send) {
         notifications
           .send(
             "followup_scheduled",
@@ -1084,6 +1099,7 @@ const followUpsRouter = t.router({
   listBoard: protectedProcedure
     .input(calendarInput)
     .query(async ({ ctx, input }) => {
+      const db = ctx.db ?? getDbClient();
       const items = await db.followUp.findMany({
         include: {
           customer: true,
@@ -1128,6 +1144,7 @@ const followUpsRouter = t.router({
         .default({ limit: 50 }),
     )
     .query(async ({ ctx, input }) => {
+      const db = ctx.db ?? getDbClient();
       const dueAtFilter: Record<string, Date> = {};
       if (input.start) dueAtFilter.gte = new Date(input.start);
       if (input.end) {
@@ -1161,6 +1178,7 @@ const followUpsRouter = t.router({
   markReplied: protectedProcedure
     .input(z.object({ id: z.string().min(1), notes: z.string().optional() }))
     .mutation(async ({ ctx, input }) => {
+      const db = ctx.db ?? getDbClient();
       const item = await db.followUp.update({
         data: {
           notes: input.notes,
@@ -1184,7 +1202,7 @@ const followUpsRouter = t.router({
         where: { id: input.id, workspaceId: ctx.workspace.id },
       });
 
-      const analytics = await setupAnalytics();
+      const analytics = await operationAnalytics(ctx);
       analytics.track({
         event: LogEvents.FollowUpStatusUpdated.name,
         channel: LogEvents.FollowUpStatusUpdated.channel,
@@ -1204,6 +1222,7 @@ const followUpsRouter = t.router({
       }),
     )
     .mutation(async ({ ctx, input }) => {
+      const db = ctx.db ?? getDbClient();
       const followUp = await db.followUp.findFirstOrThrow({
         include: { customer: true },
         where: { id: input.id, workspaceId: ctx.workspace.id },
@@ -1262,7 +1281,7 @@ const followUpsRouter = t.router({
             template: true,
           },
         });
-        const analytics = await setupAnalytics();
+        const analytics = await operationAnalytics(ctx);
         for (const event of [
           LogEvents.MessageSent,
           LogEvents.FollowUpStatusUpdated,
@@ -1322,7 +1341,7 @@ const followUpsRouter = t.router({
         where: { id: input.id, workspaceId: ctx.workspace.id },
       });
 
-      const analytics = await setupAnalytics();
+      const analytics = await operationAnalytics(ctx);
       analytics.track({
         event: LogEvents.MessageSent.name,
         channel: LogEvents.MessageSent.channel,
@@ -1352,6 +1371,7 @@ const followUpsRouter = t.router({
   reschedule: protectedProcedure
     .input(z.object({ dueAt: z.coerce.date(), id: z.string().min(1) }))
     .mutation(async ({ ctx, input }) => {
+      const db = ctx.db ?? getDbClient();
       const item = await db.followUp.update({
         data: {
           dueAt: input.dueAt,
@@ -1389,6 +1409,7 @@ const followUpsRouter = t.router({
       }),
     )
     .mutation(async ({ ctx, input }) => {
+      const db = ctx.db ?? getDbClient();
       await assertFollowUpRelations(db, {
         workspaceId: ctx.workspace.id,
         templateId: input.templateId,
@@ -1419,6 +1440,7 @@ const templatesRouter = t.router({
   get: protectedProcedure
     .input(z.object({ id: z.string().min(1) }))
     .query(async ({ ctx, input }) => {
+      const db = ctx.db ?? getDbClient();
       const item = await db.followUpTemplate.findFirstOrThrow({
         where: { id: input.id, workspaceId: ctx.workspace.id },
       });
@@ -1427,6 +1449,7 @@ const templatesRouter = t.router({
   archive: protectedProcedure
     .input(z.object({ id: z.string().min(1) }))
     .mutation(async ({ ctx, input }) => {
+      const db = ctx.db ?? getDbClient();
       await assertQaExternalEffectAllowed({
         effect: "destructive",
         workspaceId: ctx.workspace.id,
@@ -1447,7 +1470,8 @@ const templatesRouter = t.router({
       }),
     )
     .mutation(async ({ ctx, input }) => {
-      await assertUnderLimit(ctx.workspace.id, "templates");
+      const db = ctx.db ?? getDbClient();
+      await assertUnderLimit(ctx.workspace.id, "templates", db);
       const item = await db.followUpTemplate.create({
         data: { ...input, workspaceId: ctx.workspace.id },
       });
@@ -1466,6 +1490,7 @@ const templatesRouter = t.router({
         .default({ limit: 50 }),
     )
     .query(async ({ ctx, input }) => {
+      const db = ctx.db ?? getDbClient();
       const items = await db.followUpTemplate.findMany({
         orderBy: resolveSort(input.sort, templateSorts, [
           { sortOrder: "asc" },
@@ -1509,6 +1534,7 @@ const templatesRouter = t.router({
   setDefault: protectedProcedure
     .input(z.object({ id: z.string().min(1) }))
     .mutation(async ({ ctx, input }) => {
+      const db = ctx.db ?? getDbClient();
       const template = await db.followUpTemplate.findFirstOrThrow({
         where: { id: input.id, workspaceId: ctx.workspace.id },
       });
@@ -1535,6 +1561,7 @@ const templatesRouter = t.router({
       }),
     )
     .mutation(async ({ ctx, input }) => {
+      const db = ctx.db ?? getDbClient();
       const item = await db.followUpTemplate.update({
         data: {
           body: input.body,
@@ -1552,7 +1579,8 @@ const templatesRouter = t.router({
 
 const workspaceRouter = t.router({
   getCurrent: protectedProcedure.query(async ({ ctx }) => {
-    const workspace = await getWorkspaceForLimits(ctx.workspace.id);
+    const db = ctx.db ?? getDbClient();
+    const workspace = await getWorkspaceForLimits(ctx.workspace.id, db);
     const usage = {
       customers: await db.customer.count({
         where: { archivedAt: null, workspaceId: ctx.workspace.id },
@@ -1580,6 +1608,7 @@ const workspaceRouter = t.router({
       }),
     )
     .mutation(async ({ ctx, input }) => {
+      const db = ctx.db ?? getDbClient();
       requireOwnerOrAdmin(ctx);
       const item = await db.workspace.update({
         data: {
@@ -1597,6 +1626,7 @@ const workspaceRouter = t.router({
 
 const billingRouter = t.router({
   createCheckout: protectedProcedure.mutation(async ({ ctx }) => {
+    const db = ctx.db ?? getDbClient();
     requireOwnerOrAdmin(ctx);
     await assertQaExternalEffectAllowed({
       effect: "payment",
@@ -1609,7 +1639,7 @@ const billingRouter = t.router({
 
     try {
       // Determine product ID based on plan
-      const workspace = await getWorkspaceForLimits(ctx.workspace.id);
+      const workspace = await getWorkspaceForLimits(ctx.workspace.id, db);
       const isGrowth = workspace.plan === "growth";
       const isPro = workspace.plan === "pro";
 
@@ -1654,7 +1684,8 @@ const billingRouter = t.router({
     }
   }),
   getCurrentPlan: protectedProcedure.query(async ({ ctx }) => {
-    const workspace = await getWorkspaceForLimits(ctx.workspace.id);
+    const db = ctx.db ?? getDbClient();
+    const workspace = await getWorkspaceForLimits(ctx.workspace.id, db);
     const subscription = await db.subscription.findFirst({
       orderBy: { updatedAt: "desc" },
       where: { workspaceId: ctx.workspace.id },
@@ -1688,6 +1719,7 @@ const billingRouter = t.router({
     };
   }),
   getPortalUrl: protectedProcedure.query(async ({ ctx }) => {
+    const db = ctx.db ?? getDbClient();
     requireOwnerOrAdmin(ctx);
     await assertQaExternalEffectAllowed({
       effect: "subscription",
@@ -1721,12 +1753,18 @@ const dashboardRouter = t.router({
   overview: protectedProcedure
     .input(calendarInput)
     .query(async ({ ctx, input }) => {
-      return getDashboardOverview(db, ctx.workspace.id, input?.timeZone);
+      const db = ctx.db ?? getDbClient();
+      return getDashboardOverview(
+        getDbClient(),
+        ctx.workspace.id,
+        input?.timeZone,
+      );
     }),
 });
 
 const qaAcceleratorRouter = t.router({
   fixtureContext: protectedProcedure.query(async ({ ctx }) => {
+    const db = ctx.db ?? getDbClient();
     const authorizationId = ctx.session?.session.qaAuthorizationId;
     if (!authorizationId) {
       return { enabled: false as const, qaDomain: null, seed: null };
@@ -1765,7 +1803,7 @@ const qaMaintenanceRouter = t.router({
     .input(z.object({ workspaceIds: z.array(z.string().min(1)).min(1) }))
     .mutation(({ input }) => adoptQaWorkspaces(input.workspaceIds, db)),
   preview: platformAdminProcedure.query(async () => {
-    const preview = await previewQaWorkspacePurge(db);
+    const preview = await previewQaWorkspacePurge(getDbClient());
     const expiresAt = Date.now() + 10 * 60_000;
     return {
       ...preview,
@@ -1781,7 +1819,8 @@ const qaMaintenanceRouter = t.router({
       }),
     )
     .mutation(async ({ ctx, input }) => {
-      const preview = await previewQaWorkspacePurge(db);
+      const db = ctx.db ?? getDbClient();
+      const preview = await previewQaWorkspacePurge(getDbClient());
       if (!validateQaPreview(input.previewToken, preview.fingerprint)) {
         throw new TRPCError({
           code: "CONFLICT",
@@ -1805,7 +1844,7 @@ const qaMaintenanceRouter = t.router({
     ),
 });
 
-export const appRouter = t.router({
+export const domainRouter = t.router({
   billing: billingRouter,
   customers: customersRouter,
   dashboard: dashboardRouter,
@@ -1821,4 +1860,11 @@ export const appRouter = t.router({
   workspace: workspaceRouter,
 });
 
+export type DomainRouter = typeof domainRouter;
+export const appRouter = t.mergeRouters(
+  domainRouter,
+  t.router({
+    assistant: createAssistantRouter((ctx) => domainRouter.createCaller(ctx)),
+  }),
+);
 export type AppRouter = typeof appRouter;

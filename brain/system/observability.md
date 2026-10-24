@@ -106,3 +106,17 @@ This file captures the MVP observability baseline for afterservice production re
 - Standalone API deployment checks: `bun run smoke:api`.
 - Local Afterservice-to-Logly route: `bun run smoke:logly:local` while both
   shared local-infra profiles are running.
+
+## Operations Assistant — 2026-10-24
+
+Inspect workspace/actor-scoped `AssistantRun` rows for state, provider/model,
+prompt version, start/finish/expiry timestamps, measured tokens and bounded error
+codes. `AssistantUsage` reconciles reservations with measured monthly usage.
+Proposals record capability versions; unique receipts prove committed actions.
+Streaming errors are bounded recovery messages. Provider errors log only
+provider/model labels; no raw SDK error, request body, chat or customer data is
+sent to analytics. Canonical operation analytics are queued until transaction
+commit and do not determine whether the business change succeeds.
+
+See [assistant verification](../engineering/assistant-verification.md) for
+retention, quotas, controlled live-model evidence and deployment prerequisites.

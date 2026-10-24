@@ -171,3 +171,13 @@ coverage remains 40/40; this pass does not claim a new full cross-browser Previe
 matrix. Provider delivery, reviewed purge, physical Android installation, and
 real beta activation remain unverified. New source fixes were deployed only to
 Preview. See `brain/handoffs/2026-10-19-preview-qa-acceptance.md`.
+
+## Operations Assistant — 2026-10-24
+
+Use `bun run test:assistant` with a loopback isolated PostgreSQL database for the
+19 assistant contract/database checks. `bun run test:assistant:e2e` refuses any
+database except `afterservice_assistant`, starts a local Portless dashboard and
+uses a synthetic model adapter through the real streaming/tools/auth path.
+Real-model acceptance is an explicit separate opt-in and uses disposable
+synthetic records only. See [the verification record](assistant-verification.md)
+for configuration, measured provider results and the final browser evidence.

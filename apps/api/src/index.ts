@@ -8,7 +8,10 @@ import {
 import { getDevAppUrlStrings } from "@afterservice/utils";
 import { fetchRequestHandler } from "@trpc/server/adapters/fetch";
 import { type Context, Hono } from "hono";
+import { bodyLimit } from "hono/body-limit";
 import { cors } from "hono/cors";
+import { assistantApiError } from "./assistant/access";
+import { assistantChatResponse } from "./assistant/chat";
 import { createContext } from "./context";
 import followUpJobs from "./rest/routers/follow-up-jobs";
 import oversight from "./rest/routers/oversight";
@@ -29,6 +32,35 @@ app.use(
     },
   }),
 );
+
+app.use("/api/assistant/*", bodyLimit({ maxSize: 16000 }));
+app.post("/api/assistant/chat", async (c) => {
+  if (!trustedOrigins.includes(c.req.header("origin") ?? ""))
+    return c.json({ error: "Untrusted request origin." }, 403);
+  try {
+    return await assistantChatResponse(
+      c.req.raw,
+      await createContext(c.req.raw),
+    );
+  } catch (error) {
+    const failure = assistantApiError(error);
+    const status =
+      failure.code === "UNAUTHORIZED"
+        ? 401
+        : failure.code === "FORBIDDEN"
+          ? 403
+          : failure.code === "NOT_FOUND"
+            ? 404
+            : failure.code === "TOO_MANY_REQUESTS"
+              ? 429
+              : failure.code === "CONFLICT"
+                ? 409
+                : failure.code === "BAD_REQUEST"
+                  ? 400
+                  : 503;
+    return c.json({ error: failure.message }, status);
+  }
+});
 
 function slugify(value: string) {
   return (

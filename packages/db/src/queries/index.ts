@@ -1,3 +1,6 @@
+export * from "./assistant-reads";
+export * from "./assistant-store";
+export * from "./assistant-usage";
 export * from "./dashboard-overview";
 export * from "./follow-up-calendar";
 export * from "./follow-up-relations";

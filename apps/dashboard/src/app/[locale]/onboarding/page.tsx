@@ -2,6 +2,7 @@ import { Badge } from "@afterservice/ui";
 import type { Metadata } from "next";
 import { Suspense } from "react";
 import { SignupCompletionTracker } from "@/components/analytics/signup-completion-tracker";
+import { OnboardingHelp } from "@/components/assistant/onboarding-help";
 import { ErrorBoundary } from "@/components/error-boundary";
 import { ErrorFallback } from "@/components/error-fallback";
 import {
@@ -21,6 +22,7 @@ export default async function OnboardingPage() {
         <SignupCompletionTracker />
       </Suspense>
       <div className="space-y-8 max-w-2xl mx-auto py-12">
+        <OnboardingHelp />
         <header className="space-y-2">
           <Badge
             variant="outline"

@@ -206,3 +206,14 @@ Tasks:
 - [x] Add deployment commands.
 - [x] Add observability notes.
 - [x] Verify production build.
+
+## Post-MVP: Operations Assistant
+
+- [x] Dashboard chat, persistence, scoped reads and basic workflow coverage.
+- [x] Typed editable proposals, explicit revision confirmation and saved receipts.
+- [x] Token allowance, rollout controls and isolation/permission verification.
+- [x] Desktop/mobile and real DeepSeek synthetic acceptance.
+- [ ] Hosted pilot activation with migration and server configuration.
+- [ ] Separately scoped voice, files, linked WhatsApp and approved automation.
+
+See [assistant verification](../engineering/assistant-verification.md).

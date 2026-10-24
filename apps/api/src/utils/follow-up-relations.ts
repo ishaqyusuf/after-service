@@ -1,13 +1,13 @@
 import {
   type FollowUpRelationsInput,
   hasValidFollowUpRelations,
-  type PrismaClient,
+  type Prisma,
 } from "@afterservice/db";
 import { TRPCError } from "@trpc/server";
 
 /** Validate optional relations before a follow-up can expose their data. */
 export async function assertFollowUpRelations(
-  db: PrismaClient,
+  db: Prisma.TransactionClient,
   input: FollowUpRelationsInput,
 ) {
   if (!(await hasValidFollowUpRelations(db, input))) {

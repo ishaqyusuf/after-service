@@ -74,3 +74,19 @@ This file documents the implemented Prisma/Postgres schema in `packages/db`.
   purge-start timestamp.
 - `QaPurgeRun` is global and stores only actor, timestamps, status, aggregate
   counts, and error category.
+
+## Operations Assistant — 2026-10-24
+
+Additive implementation in the assistant worktree adds `AssistantConversation`,
+`AssistantMessage`, `AssistantRun`, `AssistantProposal`, `AssistantActionReceipt`
+and `AssistantUsage` (six models). Conversations own messages/runs/proposals;
+receipts are minimal workspace/actor records with a unique proposal ID. Usage is
+unique by workspace/UTC month. `ServiceJob.currency` defaults legacy records to
+USD; new canonical API values support USD/NGN/GBP/EUR/CAD. Model usage, drafts and
+confirmation metadata never grant access. See ADR 0018 and assistant verification.
+
+Assistant runs persist prompt version `operations-v1`; proposals persist the
+capability contract version. Version mismatch refuses confirmation. Drafts expire
+after 30 minutes and running turns recover after three minutes. Chat deletion
+removes content/proposals/runs, while minimal receipts retain business evidence.
+See the verification record for the explicit retention policy.

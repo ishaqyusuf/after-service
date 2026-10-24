@@ -1,7 +1,7 @@
 # Operations Assistant Integration Plan
 
 Date: 2026-10-24
-Status: proposed; planning complete, implementation not started
+Status: implemented and verified in `codex/operations-assistant`; hosted activation separate
 Scope: Ewatrade-style assistance for the existing afterservice operator workflows
 Feature: [Operations assistant](../features/operations-assistant.md)
 
@@ -15,7 +15,7 @@ summaries, settings assistance, and billing explanations/navigation.
 Build dashboard text chat first. Voice, files, linked WhatsApp chat, public
 website assistance, and autonomous messaging are separate extensions. Responsive
 dashboard support is part of the first release; a native mobile app is not.
-This document proposes implementation, not activation or a product release.
+This plan is implemented and verified locally; it does not activate hosted environments.
 
 ## Evidence And Reference Choice
 
@@ -301,5 +301,19 @@ and observability for runtime ownership; affected feature docs and testing for
 behavior/acceptance; task records and roadmap for actual progress. Record final
 architecture and rollout decisions in an ADR when adopted.
 
-Planning changes only the plan, feature proposal, backlog and Project Index.
-Existing runtime/API/schema docs remain descriptions of the current product.
+Implementation updated the matching runtime, API, database, architecture and task
+documents. The verification record contains the complete Brain impact manifest.
+
+## Implementation Checkpoint — 2026-10-24
+
+Core contracts, six persisted assistant models, scoped read/draft tools, exact
+review/confirmation, canonical transactional operations, saved receipts, usage
+reservations and dashboard integration are implemented in the isolated worktree.
+Unit/integration, eight desktop/mobile browser cases, typechecks, builds and
+seven controlled real DeepSeek scenarios pass. See
+[verification and configuration](../engineering/assistant-verification.md) and
+[ADR 0018](../decisions/0018-add-reviewed-operations-assistant.md).
+
+The monetary implementation uses per-job currency rather than a new workspace
+currency setting. Legacy records remain USD; no conversion or reinterpretation.
+Onboarding help remains curated, and signup/workspace creation stay in forms.
