@@ -1,6 +1,5 @@
 "use client";
 
-import type { AppRouter } from "@afterservice/api/router";
 import {
   Button,
   Calendar,
@@ -9,6 +8,10 @@ import {
   Popover,
   PopoverContent,
   PopoverTrigger,
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
   Textarea,
 } from "@afterservice/ui";
 import { cn } from "@afterservice/ui/cn";
@@ -21,49 +24,59 @@ import {
   FormMessage,
 } from "@afterservice/ui/form";
 import { useMutation } from "@tanstack/react-query";
-import type { inferRouterOutputs } from "@trpc/server";
 import { format } from "date-fns";
-import { useEffect } from "react";
-import { z } from "zod";
+import { CalendarClock, Check, Reply, Send } from "lucide-react";
+import { type ReactNode, useState } from "react";
+import {
+  type FollowUp,
+  useFollowUpFormContext,
+} from "@/components/follow-up/form-context";
+import { followUpChannelLabel } from "@/components/follow-up-channel";
+import { toFollowUpStage } from "@/components/follow-up-stage";
 import { QuickFill } from "@/components/quick-fill";
 import { useDashboardInvalidations } from "@/hooks/use-dashboard-invalidations";
 import { useFollowUpParams } from "@/hooks/use-follow-up-params";
-import { useZodForm } from "@/hooks/use-zod-form";
-import { resolveTemplate } from "@/lib/dashboard-format";
+import { useTimeZone } from "@/hooks/use-time-zone";
 import { useTRPC } from "@/trpc/client";
-
-type FollowUp = inferRouterOutputs<AppRouter>["followUps"]["get"]["item"];
+import { calendarDay } from "@/utils/follow-up-dates";
 
 type Props = {
   followUp: FollowUp;
 };
 
-const rescheduleSchema = z.object({
-  id: z.string().min(1),
-  dueAt: z.coerce.date(),
-});
+type WorkAction = "contact" | "reply" | "reschedule" | "close";
 
-const manualSendSchema = z.object({
-  id: z.string().min(1),
-  recipient: z.string().min(1),
-  subject: z.string().min(1),
-  body: z.string().min(1),
-});
+const submitClassName = "h-11 w-full gap-2 md:h-9";
 
-const markRepliedSchema = z.object({
-  id: z.string().min(1),
-  notes: z.string().optional(),
-});
-
-const closeSchema = z.object({
-  id: z.string().min(1),
-  notes: z.string().optional(),
-});
+function defaultAction(followUp: FollowUp, timeZone: string): WorkAction {
+  const today = calendarDay(new Date(), timeZone);
+  const stage = toFollowUpStage(
+    followUp.status,
+    calendarDay(followUp.dueAt, timeZone),
+    today,
+  );
+  if (stage === "waiting") return "reply";
+  if (stage === "replied") return "close";
+  if (stage === "closed") return "reschedule";
+  return "contact";
+}
 
 export function FollowUpWorkForm({ followUp }: Props) {
   const trpc = useTRPC();
+  const timeZone = useTimeZone();
   const { setParams } = useFollowUpParams();
   const invalidate = useDashboardInvalidations();
+  const { forms } = useFollowUpFormContext();
+  const {
+    close: closeForm,
+    replied: repliedForm,
+    reschedule: rescheduleForm,
+    send: sendForm,
+  } = forms;
+  const [action, setAction] = useState<WorkAction>(() =>
+    defaultAction(followUp, timeZone),
+  );
+  const isPhone = followUp.channel === "phone";
 
   const handleSuccess = () => {
     invalidate.followUps(followUp.id);
@@ -112,254 +125,283 @@ export function FollowUpWorkForm({ followUp }: Props) {
     }),
   );
 
-  const rescheduleForm = useZodForm({
-    schema: rescheduleSchema,
-    defaultValues: {
-      id: followUp.id,
-      dueAt: new Date(followUp.dueAt),
-    },
-  });
-  const sendForm = useZodForm({
-    schema: manualSendSchema,
-    defaultValues: getSendDefaultValues(followUp),
-  });
-  const repliedForm = useZodForm({
-    schema: markRepliedSchema,
-    defaultValues: { id: followUp.id, notes: "" },
-  });
-  const closeForm = useZodForm({
-    schema: closeSchema,
-    defaultValues: { id: followUp.id, notes: "" },
-  });
-
-  useEffect(() => {
-    rescheduleForm.reset({
-      id: followUp.id,
-      dueAt: new Date(followUp.dueAt),
-    });
-    sendForm.reset(getSendDefaultValues(followUp));
-    repliedForm.reset({ id: followUp.id, notes: "" });
-    closeForm.reset({ id: followUp.id, notes: "" });
-  }, [followUp, rescheduleForm, sendForm, repliedForm, closeForm]);
-
   return (
-    <div className="mt-6 space-y-8">
-      <section>
-        <h3 className="mb-3 text-sm font-medium">Reschedule</h3>
-        <Form {...rescheduleForm}>
-          <form
-            onSubmit={rescheduleForm.handleSubmit((data) =>
-              rescheduleMutation.mutate(data),
-            )}
-            className="space-y-3"
+    <section
+      aria-label="Record what happened"
+      className="rounded-[14px] border border-border p-3"
+    >
+      {followUp.status === "closed" ? (
+        <p className="mb-3 rounded-[10px] border-[1.5px] border-dashed border-border px-3 py-2.5 text-[13px] text-muted-foreground">
+          This follow-up is closed. Reschedule it, or plan another if the
+          customer needs one.
+        </p>
+      ) : null}
+      <Tabs
+        value={action}
+        onValueChange={(value) => setAction(value as WorkAction)}
+      >
+        <TabsList
+          aria-label="What happened?"
+          className="mb-3.5 grid h-auto w-full grid-cols-2 gap-1 rounded-xl bg-background p-1 sm:flex sm:flex-wrap"
+        >
+          <WorkTab value="contact" icon={<Send className="size-[15px]" />}>
+            {isPhone ? "Log call" : "Contact"}
+          </WorkTab>
+          <WorkTab value="reply" icon={<Reply className="size-[15px]" />}>
+            Log reply
+          </WorkTab>
+          <WorkTab
+            value="reschedule"
+            icon={<CalendarClock className="size-[15px]" />}
           >
-            <div className="flex justify-end">
-              <QuickFill name="scheduleFollowUp" />
-            </div>
-            <FormField
-              control={rescheduleForm.control}
-              name="dueAt"
-              render={({ field }) => (
-                <FormItem className="flex flex-col">
-                  <FormLabel>Due date</FormLabel>
-                  <Popover>
-                    <PopoverTrigger asChild>
-                      <FormControl>
-                        <Button
-                          variant="outline"
-                          className={cn(
-                            "justify-start text-left font-normal",
-                            !field.value && "text-muted-foreground",
-                          )}
-                        >
-                          {field.value instanceof Date
-                            ? format(field.value, "PPP")
-                            : "Pick a date"}
-                          <Icons.CalendarMonth className="ml-auto size-4 opacity-50" />
-                        </Button>
-                      </FormControl>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-auto p-0" align="start">
-                      <Calendar
-                        mode="single"
-                        selected={
-                          field.value instanceof Date ? field.value : undefined
-                        }
-                        onSelect={field.onChange}
-                        initialFocus
-                      />
-                    </PopoverContent>
-                  </Popover>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <Button
-              size="sm"
-              type="submit"
-              variant="secondary"
-              className="w-full"
-              disabled={rescheduleMutation.isPending}
-            >
-              {rescheduleMutation.isPending ? "Rescheduling..." : "Reschedule"}
-            </Button>
-          </form>
-        </Form>
-      </section>
+            Reschedule
+          </WorkTab>
+          <WorkTab value="close" icon={<Check className="size-[15px]" />}>
+            Close
+          </WorkTab>
+        </TabsList>
 
-      <section>
-        <h3 className="mb-3 text-sm font-medium">Log manual send</h3>
-        <Form {...sendForm}>
-          <form
-            onSubmit={sendForm.handleSubmit((data) =>
-              markSentMutation.mutate(data),
-            )}
-            className="space-y-3"
-          >
-            <div className="flex justify-end">
-              <QuickFill name="messageDraft" />
-            </div>
-            <FormField
-              control={sendForm.control}
-              name="recipient"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Recipient</FormLabel>
-                  <FormControl>
-                    <Input {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
+        <TabsContent value="contact" className="mt-0">
+          <WorkHint>
+            {isPhone
+              ? "Call the customer yourself, then record the call here."
+              : `Submitting sends this message by ${followUpChannelLabel(followUp.channel)} to the recipient below.`}
+          </WorkHint>
+          <Form {...sendForm}>
+            <form
+              onSubmit={sendForm.handleSubmit((data) =>
+                markSentMutation.mutate(data),
               )}
-            />
-            <FormField
-              control={sendForm.control}
-              name="subject"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Subject</FormLabel>
-                  <FormControl>
-                    <Input {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={sendForm.control}
-              name="body"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Body</FormLabel>
-                  <FormControl>
-                    <Textarea className="h-24" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <Button
-              size="sm"
-              type="submit"
-              className="w-full"
-              disabled={markSentMutation.isPending}
+              className="space-y-3"
             >
-              {markSentMutation.isPending ? "Logging..." : "Log manual send"}
-            </Button>
-          </form>
-        </Form>
-      </section>
+              <div className="flex justify-end">
+                <QuickFill name="messageDraft" />
+              </div>
+              <FormField
+                control={sendForm.control}
+                name="recipient"
+                render={({ field }) => (
+                  <FormItem className={isPhone ? "hidden" : undefined}>
+                    <FormLabel>Recipient</FormLabel>
+                    <FormControl>
+                      <Input {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={sendForm.control}
+                name="subject"
+                render={({ field }) => (
+                  <FormItem className={isPhone ? "hidden" : undefined}>
+                    <FormLabel>Subject</FormLabel>
+                    <FormControl>
+                      <Input {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={sendForm.control}
+                name="body"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{isPhone ? "Call notes" : "Message"}</FormLabel>
+                    <FormControl>
+                      <Textarea className="h-24" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <Button
+                type="submit"
+                className={submitClassName}
+                disabled={markSentMutation.isPending}
+              >
+                <Send aria-hidden="true" className="size-4" />
+                {markSentMutation.isPending
+                  ? isPhone
+                    ? "Logging..."
+                    : "Sending..."
+                  : isPhone
+                    ? "Log call"
+                    : "Send message"}
+              </Button>
+            </form>
+          </Form>
+        </TabsContent>
 
-      <section>
-        <h3 className="mb-3 text-sm font-medium">Mark replied</h3>
-        <Form {...repliedForm}>
-          <form
-            onSubmit={repliedForm.handleSubmit((data) =>
-              markRepliedMutation.mutate(data),
-            )}
-            className="space-y-3"
-          >
-            <div className="flex justify-end">
-              <QuickFill name="workNote" />
-            </div>
-            <FormField
-              control={repliedForm.control}
-              name="notes"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Reply summary</FormLabel>
-                  <FormControl>
-                    <Input {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
+        <TabsContent value="reply" className="mt-0">
+          <WorkHint>Use the customer's words where it matters.</WorkHint>
+          <Form {...repliedForm}>
+            <form
+              onSubmit={repliedForm.handleSubmit((data) =>
+                markRepliedMutation.mutate(data),
               )}
-            />
-            <Button
-              size="sm"
-              type="submit"
-              variant="secondary"
-              className="w-full"
-              disabled={markRepliedMutation.isPending}
+              className="space-y-3"
             >
-              {markRepliedMutation.isPending ? "Marking..." : "Mark replied"}
-            </Button>
-          </form>
-        </Form>
-      </section>
+              <div className="flex justify-end">
+                <QuickFill name="workNote" />
+              </div>
+              <FormField
+                control={repliedForm.control}
+                name="notes"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Reply summary</FormLabel>
+                    <FormControl>
+                      <Input {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <Button
+                type="submit"
+                className={submitClassName}
+                disabled={markRepliedMutation.isPending}
+              >
+                <Reply aria-hidden="true" className="size-4" />
+                {markRepliedMutation.isPending ? "Saving..." : "Log reply"}
+              </Button>
+            </form>
+          </Form>
+        </TabsContent>
 
-      <section className="border-t border-border pt-4">
-        <Form {...closeForm}>
-          <form
-            onSubmit={closeForm.handleSubmit((data) =>
-              closeMutation.mutate(data),
-            )}
-            className="flex items-end gap-2"
-          >
-            <FormField
-              control={closeForm.control}
-              name="notes"
-              render={({ field }) => (
-                <FormItem className="flex-1">
-                  <FormLabel>Closure note</FormLabel>
-                  <FormControl>
-                    <Input {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
+        <TabsContent value="reschedule" className="mt-0">
+          <Form {...rescheduleForm}>
+            <form
+              onSubmit={rescheduleForm.handleSubmit((data) =>
+                rescheduleMutation.mutate(data),
               )}
-            />
-            <Button
-              size="sm"
-              type="submit"
-              variant="destructive"
-              disabled={closeMutation.isPending}
+              className="space-y-3"
             >
-              {closeMutation.isPending ? "Closing..." : "Close"}
-            </Button>
-          </form>
-        </Form>
-      </section>
-    </div>
+              <div className="flex justify-end">
+                <QuickFill name="scheduleFollowUp" />
+              </div>
+              <FormField
+                control={rescheduleForm.control}
+                name="dueAt"
+                render={({ field }) => (
+                  <FormItem className="flex flex-col">
+                    <FormLabel>New due date</FormLabel>
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <FormControl>
+                          <Button
+                            variant="outline"
+                            className={cn(
+                              "h-11 justify-start text-left font-normal md:h-9",
+                              !field.value && "text-muted-foreground",
+                            )}
+                          >
+                            {field.value instanceof Date
+                              ? format(field.value, "PPP")
+                              : "Pick a date"}
+                            <Icons.CalendarMonth className="ml-auto size-4 opacity-50" />
+                          </Button>
+                        </FormControl>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-auto p-0" align="start">
+                        <Calendar
+                          mode="single"
+                          selected={
+                            field.value instanceof Date
+                              ? field.value
+                              : undefined
+                          }
+                          onSelect={field.onChange}
+                          initialFocus
+                        />
+                      </PopoverContent>
+                    </Popover>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <Button
+                type="submit"
+                variant="secondary"
+                className={submitClassName}
+                disabled={rescheduleMutation.isPending}
+              >
+                <CalendarClock aria-hidden="true" className="size-4" />
+                {rescheduleMutation.isPending
+                  ? "Rescheduling..."
+                  : "Reschedule"}
+              </Button>
+            </form>
+          </Form>
+        </TabsContent>
+
+        <TabsContent value="close" className="mt-0">
+          <WorkHint>
+            Leave a closing note so the next person knows how it ended.
+          </WorkHint>
+          <Form {...closeForm}>
+            <form
+              onSubmit={closeForm.handleSubmit((data) =>
+                closeMutation.mutate(data),
+              )}
+              className="space-y-3"
+            >
+              <FormField
+                control={closeForm.control}
+                name="notes"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Closure note</FormLabel>
+                    <FormControl>
+                      <Input {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <Button
+                type="submit"
+                variant="destructive"
+                className={submitClassName}
+                disabled={closeMutation.isPending}
+              >
+                <Check aria-hidden="true" className="size-4" />
+                {closeMutation.isPending ? "Closing..." : "Close follow-up"}
+              </Button>
+            </form>
+          </Form>
+        </TabsContent>
+      </Tabs>
+    </section>
   );
 }
 
-function getSendDefaultValues(followUp: FollowUp) {
-  const recipient =
-    followUp.channel === "email" ? "customer@example.com" : "manual";
-  const body = resolveTemplate(
-    followUp.notes ?? "Checking in after your service.",
-    {
-      businessName: "afterservice",
-      customerName: followUp.customerName,
-      serviceName: followUp.serviceTitle,
-    },
+function WorkTab({
+  children,
+  icon,
+  value,
+}: {
+  children: string;
+  icon: ReactNode;
+  value: WorkAction;
+}) {
+  return (
+    <TabsTrigger
+      value={value}
+      className="min-h-10 flex-[1_1_auto] gap-1.5 rounded-[9px] px-3 text-[13px] font-semibold text-muted-foreground focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring data-[state=active]:bg-card data-[state=active]:text-foreground data-[state=active]:shadow-[0_1px_2px_rgb(0_0_0/0.1),0_0_0_1px_hsl(var(--border))] md:min-h-9"
+    >
+      <span aria-hidden="true">{icon}</span>
+      {children}
+    </TabsTrigger>
   );
+}
 
-  return {
-    id: followUp.id,
-    recipient,
-    subject: "Checking in after your service",
-    body,
-  };
+function WorkHint({ children }: { children: ReactNode }) {
+  return (
+    <p className="mb-3 rounded-[10px] bg-[var(--wp-teal-soft,#e1f1ef)] px-3 py-2 text-[13px] text-foreground dark:bg-[var(--wp-teal-soft,#11302d)]">
+      {children}
+    </p>
+  );
 }

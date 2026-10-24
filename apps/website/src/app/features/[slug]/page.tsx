@@ -1,7 +1,17 @@
+import { Check } from "lucide-react";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { JsonLd } from "../../../components/json-ld";
+import { getFeatureSpec } from "../../../components/landing/feature-catalog";
+import { NumberedSteps } from "../../../components/landing/numbered-steps";
+import { PageHero } from "../../../components/landing/page-hero";
+import { RuledColumns } from "../../../components/landing/ruled-columns";
+import { SecondaryLink } from "../../../components/landing/secondary-link";
+import { SectionHeading } from "../../../components/landing/section-heading";
+import { ClosingSection } from "../../../components/landing/sections/closing-section";
+import { StartFreeLink } from "../../../components/landing/start-free-link";
 import { SeoFaq } from "../../../components/seo-faq";
+import { pageTitle } from "../../../lib/page-title";
 import {
   breadcrumbJsonLd,
   createPageMetadata,
@@ -48,8 +58,10 @@ export default async function FeatureDetailPage({ params }: FeaturePageProps) {
     notFound();
   }
 
+  const Spec = getFeatureSpec(page.path);
+
   return (
-    <main className="bg-background text-foreground">
+    <main>
       <JsonLd
         data={[
           breadcrumbJsonLd([
@@ -60,96 +72,98 @@ export default async function FeatureDetailPage({ params }: FeaturePageProps) {
           faqJsonLd(page.faqs),
         ]}
       />
-      <section className="mx-auto max-w-4xl px-6 py-16 sm:px-8 lg:py-24">
-        <p className="text-sm font-semibold uppercase tracking-[0.18em] text-[#009b98]">
-          Feature
-        </p>
-        <h1 className="mt-5 text-4xl font-semibold leading-tight text-[#18211c] dark:text-white sm:text-5xl">
-          {page.title.replace(" | afterservice", "")}
-        </h1>
-        <p className="mt-6 text-lg leading-8 text-muted-foreground">
-          {page.description}
-        </p>
-        <div className="mt-10 grid gap-4">
-          {page.highlights.map((highlight) => (
-            <div
-              className="rounded-lg border border-border bg-card p-5 leading-7 text-muted-foreground"
-              key={highlight}
-            >
-              {highlight}
-            </div>
-          ))}
-        </div>
-        <div className="mt-10 flex flex-col gap-3 sm:flex-row">
-          <a
-            href="/signup"
-            className="inline-flex h-11 items-center justify-center rounded-md bg-[#009b98] px-5 text-sm font-semibold text-white transition-colors hover:bg-[#007f7c]"
-          >
-            Start free
-          </a>
-          <a
-            href="/guides/post-job-follow-up"
-            className="inline-flex h-11 items-center justify-center rounded-md border border-border px-5 text-sm font-semibold text-foreground transition-colors hover:bg-muted"
-          >
+      <PageHero
+        crumbs={[{ href: "/features", label: "Features" }]}
+        title={pageTitle(page.title)}
+        body={page.description}
+      >
+        <div className="flex flex-wrap gap-3">
+          <StartFreeLink location={`feature_${page.slug}_hero`} />
+          <SecondaryLink href="/guides/post-job-follow-up">
             Read the checklist
-          </a>
+          </SecondaryLink>
         </div>
-      </section>
+      </PageHero>
 
-      <section className="border-y border-border bg-muted/30">
-        <div className="mx-auto max-w-5xl px-6 py-16 sm:px-8">
-          <h2 className="text-2xl font-semibold text-[#18211c] dark:text-white">
-            How the workflow works
-          </h2>
-          <ol className="mt-8 grid gap-6 md:grid-cols-2">
-            {page.workflow.map((step, index) => (
-              <li className="flex gap-4" key={step}>
-                <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#009b98] text-sm font-semibold text-white">
-                  {index + 1}
-                </span>
-                <p className="pt-1 leading-7 text-muted-foreground">{step}</p>
-              </li>
-            ))}
-          </ol>
-        </div>
-      </section>
-
-      <section className="mx-auto max-w-5xl px-6 py-16 sm:px-8">
-        <h2 className="text-2xl font-semibold text-[#18211c] dark:text-white">
-          Practical operating notes
-        </h2>
-        <div className="mt-8 grid gap-8 md:grid-cols-3">
-          {page.practicalNotes.map((note) => (
-            <div key={note.title}>
-              <h3 className="font-semibold text-foreground">{note.title}</h3>
-              <p className="mt-3 leading-7 text-muted-foreground">
-                {note.body}
-              </p>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      <SeoFaq items={page.faqs} />
-
-      <section className="border-t border-border bg-muted/30">
-        <div className="mx-auto max-w-5xl px-6 py-14 sm:px-8">
-          <h2 className="text-2xl font-semibold text-[#18211c] dark:text-white">
-            Common service teams
-          </h2>
-          <div className="mt-6 grid gap-4 md:grid-cols-4">
-            {solutionPages.map((solution) => (
-              <a
-                className="rounded-lg border border-border bg-background p-4 text-sm font-semibold transition-colors hover:bg-muted"
-                href={solution.path}
-                key={solution.path}
-              >
-                {solution.audience}
-              </a>
-            ))}
+      <section
+        aria-labelledby="highlights-title"
+        className="py-[clamp(56px,8vw,104px)]"
+      >
+        <div className="wp-wrap grid items-center gap-x-12 gap-y-8 min-[961px]:grid-cols-2">
+          <div>
+            <SectionHeading id="highlights-title">
+              What it keeps in view
+            </SectionHeading>
+            <ul className="mt-6 grid gap-3">
+              {page.highlights.map((highlight) => (
+                <li
+                  className="flex items-start gap-2.5 text-[16.5px]"
+                  key={highlight}
+                >
+                  <Check
+                    className="mt-1 size-[18px] flex-none text-accent-foreground"
+                    aria-hidden="true"
+                  />
+                  {highlight}
+                </li>
+              ))}
+            </ul>
           </div>
+          {Spec ? <Spec /> : null}
         </div>
       </section>
+
+      <section
+        aria-labelledby="workflow-title"
+        className="border-y border-border bg-secondary py-[clamp(56px,8vw,104px)]"
+      >
+        <div className="wp-wrap">
+          <SectionHeading id="workflow-title">
+            How the workflow works
+          </SectionHeading>
+          <NumberedSteps className="mt-8" steps={page.workflow} />
+        </div>
+      </section>
+
+      <section
+        aria-labelledby="notes-title"
+        className="py-[clamp(56px,8vw,104px)]"
+      >
+        <div className="wp-wrap">
+          <SectionHeading id="notes-title">
+            Practical operating notes
+          </SectionHeading>
+          <RuledColumns
+            className="mt-8"
+            items={page.practicalNotes.map((note) => ({
+              body: note.body,
+              title: note.title,
+            }))}
+          />
+        </div>
+      </section>
+
+      <SeoFaq items={page.faqs} className="pt-0" />
+
+      <section
+        aria-labelledby="teams-title"
+        className="border-t border-border bg-secondary py-[clamp(48px,6vw,80px)]"
+      >
+        <div className="wp-wrap">
+          <SectionHeading id="teams-title">Common service teams</SectionHeading>
+          <RuledColumns
+            className="mt-8"
+            columns={2}
+            surface="secondary"
+            items={solutionPages.map((solution) => ({
+              href: solution.path,
+              title: solution.audience,
+            }))}
+          />
+        </div>
+      </section>
+
+      <ClosingSection location={`feature_${page.slug}_bottom`} />
     </main>
   );
 }

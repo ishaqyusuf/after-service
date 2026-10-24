@@ -7,8 +7,14 @@ export function useDashboardInvalidations() {
   const trpc = useTRPC();
   const queryClient = useQueryClient();
 
+  const invalidateOverview = () =>
+    queryClient.invalidateQueries({
+      queryKey: trpc.dashboard.overview.queryKey(),
+    });
+
   return {
     customers: (id?: string) => {
+      invalidateOverview();
       invalidateProcedure(queryClient, ["customers", "list"]);
       invalidateProcedure(queryClient, ["customers", "tags"]);
       queryClient.invalidateQueries({
@@ -18,6 +24,7 @@ export function useDashboardInvalidations() {
       });
     },
     followUps: (id?: string) => {
+      invalidateOverview();
       invalidateProcedure(queryClient, ["followUps", "listBoard"]);
       invalidateProcedure(queryClient, ["followUps", "listTable"]);
       queryClient.invalidateQueries({
@@ -27,6 +34,7 @@ export function useDashboardInvalidations() {
       });
     },
     serviceJobs: (id?: string) => {
+      invalidateOverview();
       invalidateProcedure(queryClient, ["serviceJobs", "list"]);
       queryClient.invalidateQueries({
         queryKey: id
@@ -35,6 +43,7 @@ export function useDashboardInvalidations() {
       });
     },
     templates: (id?: string) => {
+      invalidateOverview();
       invalidateProcedure(queryClient, ["templates", "list"]);
       queryClient.invalidateQueries({
         queryKey: id

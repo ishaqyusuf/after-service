@@ -18,7 +18,10 @@ export function EditCustomerSheet() {
   const { data: customerData, isLoading } = useQuery(
     trpc.customers.get.queryOptions(
       { id: customerQueryId },
-      { enabled: !!customerId },
+      {
+        enabled: !!customerId,
+        placeholderData: (previous) => (customerId ? undefined : previous),
+      },
     ),
   );
 
@@ -29,7 +32,7 @@ export function EditCustomerSheet() {
   return (
     <Sheet open={!!customerId} onOpenChange={handleOpenChange}>
       <DashboardSheetContent
-        bodyClassName=""
+        bodyClassName="pt-5"
         title="Edit customer"
         description="Update customer details or archive this record."
       >

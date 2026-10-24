@@ -14,7 +14,7 @@ import {
   useMemo,
   useRef,
 } from "react";
-import { VirtualRow } from "@/components/tables/core";
+import { TableFrame, VirtualRow } from "@/components/tables/core";
 import { useDashboardInvalidations } from "@/hooks/use-dashboard-invalidations";
 import {
   toFollowUpChannel,
@@ -205,9 +205,14 @@ export function DataTable({ initialSettings }: Props) {
   const virtualItems = rowVirtualizer.getVirtualItems();
 
   return (
-    <div className="relative">
+    <TableFrame>
       <div className="w-full">
+        {/* biome-ignore lint/a11y/useSemanticElements: the shared table scrolling hooks require a div viewport ref; this named region is keyboard scrollable. */}
         <div
+          role="region"
+          aria-label="Follow-up history"
+          // biome-ignore lint/a11y/noNoninteractiveTabindex: scrollable region must be keyboard-reachable.
+          tabIndex={0}
           ref={(el) => {
             if (parentRef) {
               (
@@ -220,10 +225,7 @@ export function DataTable({ initialSettings }: Props) {
               ).current = el;
             }
           }}
-          className="overflow-auto overscroll-contain border-l border-r border-b border-border scrollbar-hide"
-          style={{
-            height: "calc(100vh - 350px + var(--header-offset, 0px))",
-          }}
+          className="wp-table-viewport overflow-auto overscroll-contain rounded-b-[13px]"
         >
           <DndContext
             id="follow-ups-table-dnd"
@@ -282,6 +284,6 @@ export function DataTable({ initialSettings }: Props) {
           />
         </div>
       </div>
-    </div>
+    </TableFrame>
   );
 }

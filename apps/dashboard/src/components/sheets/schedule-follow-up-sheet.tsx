@@ -15,7 +15,13 @@ export function ScheduleFollowUpSheet() {
   const jobQueryId = jobId ?? "";
 
   const { data: jobData, isLoading: isLoadingJob } = useQuery(
-    trpc.serviceJobs.get.queryOptions({ id: jobQueryId }, { enabled: !!jobId }),
+    trpc.serviceJobs.get.queryOptions(
+      { id: jobQueryId },
+      {
+        enabled: !!jobId,
+        placeholderData: (previous) => (jobId ? undefined : previous),
+      },
+    ),
   );
 
   const { data: templatesData, isLoading: isLoadingTemplates } = useQuery(

@@ -2,13 +2,10 @@
 
 import { Sheet } from "@afterservice/ui";
 import { useQuery } from "@tanstack/react-query";
-import { AskAssistantButton } from "@/components/assistant/assistant-launcher";
-import { FollowUpWorkForm } from "@/components/forms/follow-up-work-form";
+import { FormContext } from "@/components/follow-up/form-context";
+import { FollowUpContent } from "@/components/follow-up-content";
 import { useFollowUpParams } from "@/hooks/use-follow-up-params";
 import { useTRPC } from "@/trpc/client";
-import { DashboardSheetContent } from "./dashboard-sheet-content";
-import { SheetFormSkeleton } from "./sheet-form-skeleton";
-import { SheetMissingState } from "./sheet-missing-state";
 
 export function FollowUpCardSheet() {
   const trpc = useTRPC();
@@ -18,7 +15,10 @@ export function FollowUpCardSheet() {
   const { data: followUpData, isLoading } = useQuery(
     trpc.followUps.get.queryOptions(
       { id: followUpQueryId },
-      { enabled: !!followUpId },
+      {
+        enabled: !!followUpId,
+        placeholderData: (previous) => (followUpId ? undefined : previous),
+      },
     ),
   );
 
@@ -28,31 +28,9 @@ export function FollowUpCardSheet() {
 
   return (
     <Sheet open={!!followUpId} onOpenChange={handleOpenChange}>
-      <DashboardSheetContent
-        bodyClassName=""
-        title="Work follow-up"
-        description="Update the state of this follow-up."
-      >
-        {isLoading ? (
-          <SheetFormSkeleton fields={6} />
-        ) : followUpData?.item ? (
-          <>
-            <AskAssistantButton
-              kind="followUps"
-              id={followUpData.item.id}
-              label={followUpData.item.customerName}
-              onOpen={() => setParams(null)}
-            />
-            <FollowUpWorkForm followUp={followUpData.item} />
-          </>
-        ) : (
-          <SheetMissingState
-            title="Follow-up not found"
-            description="This follow-up may have been completed, archived, or removed."
-            onClose={() => setParams(null)}
-          />
-        )}
-      </DashboardSheetContent>
+      <FormContext data={followUpData?.item}>
+        <FollowUpContent isLoading={isLoading} />
+      </FormContext>
     </Sheet>
   );
 }

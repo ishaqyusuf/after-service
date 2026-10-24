@@ -1,4 +1,4 @@
-const CACHE_NAME = "afterservice-shell-v3";
+const CACHE_NAME = "afterservice-shell-v4";
 const START_URL = "/";
 const OFFLINE_DOCUMENT = `<!doctype html>
 <html lang="en">
@@ -112,6 +112,16 @@ self.addEventListener("activate", (event) => {
 
 self.addEventListener("fetch", (event) => {
   if (event.request.method !== "GET") {
+    return;
+  }
+
+  const url = new URL(event.request.url);
+  const isLocal =
+    self.location.hostname === "localhost" ||
+    self.location.hostname.endsWith(".localhost");
+  // Development chunk URLs are reused after edits. Caching them can combine
+  // new HTML with an old stylesheet or client module.
+  if (isLocal && url.pathname.startsWith("/_next/")) {
     return;
   }
 

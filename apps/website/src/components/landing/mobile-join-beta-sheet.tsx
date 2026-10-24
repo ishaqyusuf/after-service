@@ -57,7 +57,7 @@ export function MobileJoinBetaSheet({
     <div
       className={[
         "mobile-beta-sheet md:hidden fixed inset-x-3 bottom-[calc(0.75rem+env(safe-area-inset-bottom))] z-40",
-        "rounded-[18px] bg-[#0a0a0a]/95 px-4 py-3 text-white shadow-[0_12px_40px_-8px_rgba(0,0,0,0.45),0_2px_8px_-2px_rgba(0,0,0,0.3)] backdrop-blur-md",
+        "wp-on-primary rounded-[14px] bg-primary px-4 py-3 text-primary-foreground shadow-[0_12px_40px_-8px_rgba(0,0,0,0.45),0_2px_8px_-2px_rgba(0,0,0,0.3)]",
         "flex min-h-[69px] items-center justify-between gap-4",
         "transition-[opacity,transform] duration-300 ease-out motion-reduce:transition-none",
         isSuppressed && "hidden",
@@ -70,10 +70,8 @@ export function MobileJoinBetaSheet({
       aria-hidden={!isVisible || isSuppressed}
     >
       <div className="min-w-0">
-        <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-white/55">
-          Free
-        </p>
-        <p className="mt-0.5 text-sm font-semibold leading-tight text-white">
+        <p className="text-sm font-semibold leading-tight">Free plan</p>
+        <p className="mt-0.5 text-[13px] leading-tight">
           No credit card required
         </p>
       </div>
@@ -87,7 +85,7 @@ export function MobileJoinBetaSheet({
             location: "mobile_sticky_beta_sheet",
           })
         }
-        className="inline-flex h-11 shrink-0 items-center justify-center gap-1.5 rounded-full bg-white px-5 text-sm font-bold text-[#0a0a0a] shadow-sm transition-colors hover:bg-[#eef8f0] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0a0a0a]"
+        className="inline-flex h-11 shrink-0 items-center justify-center gap-1.5 rounded-[10px] bg-primary-foreground px-5 text-sm font-semibold text-accent-foreground transition-colors hover:bg-primary-foreground/90"
       >
         Start free
         <ArrowRight className="h-4 w-4" />

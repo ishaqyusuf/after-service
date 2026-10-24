@@ -139,7 +139,9 @@ export function BillingOverview({ initialPricing }: BillingOverviewProps) {
             <Badge variant="outline">{planLabel}</Badge>
           </div>
           <div className="space-y-1">
-            <h1 className="text-3xl font-semibold tracking-tight">Billing</h1>
+            <h1 className="font-[family-name:var(--font-display)] text-[26px] leading-[1.1] tracking-[-0.01em] md:text-[30px]">
+              Billing
+            </h1>
             <p className="text-muted-foreground">
               You are on {planDisplayName}. Manage your plan, usage and payment
               details here.
@@ -208,7 +210,7 @@ export function BillingOverview({ initialPricing }: BillingOverviewProps) {
       </section>
 
       <section className="grid gap-4 lg:grid-cols-[1fr_0.9fr]">
-        <Card>
+        <Card className="rounded-[14px]">
           <CardHeader className="border-b pb-5">
             <CardTitle className="mb-1 text-base">Usage</CardTitle>
             <p className="text-sm text-muted-foreground">
@@ -222,7 +224,7 @@ export function BillingOverview({ initialPricing }: BillingOverviewProps) {
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="rounded-[14px]">
           <CardHeader className="border-b pb-5">
             <CardTitle className="mb-1 text-base">Subscription</CardTitle>
             <p className="text-sm text-muted-foreground">
@@ -248,7 +250,7 @@ export function BillingOverview({ initialPricing }: BillingOverviewProps) {
         </Card>
       </section>
 
-      <Card>
+      <Card className="rounded-[14px]">
         <CardHeader className="border-b pb-5">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
             <div>
@@ -272,10 +274,12 @@ export function BillingOverview({ initialPricing }: BillingOverviewProps) {
             return (
               <div
                 key={paidPlan.id}
-                className="rounded-md border border-border bg-muted/20 p-4"
+                className="rounded-xl border border-border p-4"
               >
-                <p className="text-sm font-medium">{paidPlan.name}</p>
-                <p className="mt-2 text-2xl font-semibold">
+                <p className="font-[family-name:var(--font-display)] text-xl leading-[1.1]">
+                  {paidPlan.name}
+                </p>
+                <p className="mt-2.5 font-[family-name:var(--font-display)] text-[32px] leading-[1.2] tracking-[-0.02em] tabular-nums sm:text-[36px]">
                   {price.formattedMonthly}
                 </p>
                 <p className="text-xs text-muted-foreground">
@@ -343,7 +347,7 @@ export function BillingOverviewSkeleton() {
 
       <section className="grid gap-3 md:grid-cols-2 lg:grid-cols-4">
         {billingMetricSkeletons.map((item) => (
-          <Card key={item}>
+          <Card key={item} className="rounded-[14px]">
             <CardContent className="space-y-3 p-5">
               <Skeleton className="h-4 w-20" />
               <Skeleton className="h-8 w-28" />
@@ -354,7 +358,7 @@ export function BillingOverviewSkeleton() {
       </section>
 
       <section className="grid gap-4 lg:grid-cols-[1fr_0.9fr]">
-        <Card>
+        <Card className="rounded-[14px]">
           <CardHeader className="border-b pb-5">
             <Skeleton className="h-5 w-24" />
             <Skeleton className="h-4 w-64" />
@@ -372,7 +376,7 @@ export function BillingOverviewSkeleton() {
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="rounded-[14px]">
           <CardHeader className="border-b pb-5">
             <Skeleton className="h-5 w-28" />
             <Skeleton className="h-4 w-56" />
@@ -396,14 +400,16 @@ function BillingOverviewEmptyState({ onRetry }: { onRetry: () => void }) {
     <div className="max-w-[900px] space-y-8 py-6">
       <header className="border-b border-border pb-8">
         <div className="max-w-2xl space-y-2">
-          <h1 className="text-3xl font-semibold tracking-tight">Billing</h1>
+          <h1 className="font-[family-name:var(--font-display)] text-[26px] leading-[1.1] tracking-[-0.01em] md:text-[30px]">
+            Billing
+          </h1>
           <p className="text-muted-foreground">
             Billing details are not available for this workspace yet.
           </p>
         </div>
       </header>
 
-      <Card>
+      <Card className="rounded-[14px]">
         <CardContent className="flex flex-col items-start gap-4 p-6">
           <div className="space-y-1">
             <p className="text-sm font-medium">No billing profile found</p>
@@ -431,10 +437,12 @@ function PlanMetric({
   value: string;
 }) {
   return (
-    <Card>
+    <Card className="rounded-[14px]">
       <CardContent className="p-5">
         <p className="text-xs font-medium text-muted-foreground">{label}</p>
-        <p className="mt-3 text-2xl font-semibold">{value}</p>
+        <p className="mt-3 font-[family-name:var(--font-display)] text-2xl leading-none tabular-nums">
+          {value}
+        </p>
         <p className="mt-1 text-xs text-muted-foreground">{detail}</p>
       </CardContent>
     </Card>

@@ -13,10 +13,13 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@afterservice/ui";
-import { LogOut, Settings, User } from "lucide-react";
-import { useState } from "react";
-import { signOut } from "@/lib/auth-client";
+import { LogOut, Settings } from "lucide-react";
+import Link from "next/link";
+import { useState, useSyncExternalStore } from "react";
+import { signOut, useSession } from "@/lib/auth-client";
 import { ThemeSwitch } from "./theme-switch";
+
+const subscribeHydration = () => () => {};
 
 export function UserMenu({
   isExpanded,
@@ -26,6 +29,15 @@ export function UserMenu({
   onOpenChange?: (open: boolean) => void;
 }) {
   const [isPending, setIsPending] = useState(false);
+  const { data: session } = useSession();
+  const hydrated = useSyncExternalStore(
+    subscribeHydration,
+    () => true,
+    () => false,
+  );
+  const user = hydrated ? session?.user : undefined;
+  const displayName = user?.name || "Your account";
+  const initial = user?.name?.charAt(0).toUpperCase() || "U";
   const clearIdentity = useClearIdentity();
   const track = useTrack();
 
@@ -55,21 +67,24 @@ export function UserMenu({
       <DropdownMenuTrigger asChild>
         <button
           type="button"
-          className={`flex w-full px-4 py-3 items-center hover:bg-accent hover:text-accent-foreground transition-colors outline-none focus-visible:ring-2 focus-visible:ring-ring ${
+          aria-label="Open account menu"
+          className={`flex min-h-11 w-full rounded-xl px-3 py-2 items-center hover:bg-accent hover:text-accent-foreground transition-colors outline-none focus-visible:ring-2 focus-visible:ring-ring ${
             isExpanded ? "justify-start" : "justify-center"
           }`}
         >
           <Avatar className="h-8 w-8">
             <AvatarImage src="" />
             <AvatarFallback className="bg-primary/10 text-primary font-medium text-xs">
-              U
+              {initial}
             </AvatarFallback>
           </Avatar>
           {isExpanded && (
             <div className="ml-3 flex flex-col items-start overflow-hidden">
-              <span className="text-sm font-medium leading-none">Workspace</span>
+              <span className="max-w-full truncate text-sm font-medium leading-none">
+                {displayName}
+              </span>
               <span className="text-xs text-muted-foreground mt-1 truncate max-w-full">
-                user@example.com
+                {user?.email}
               </span>
             </div>
           )}
@@ -81,15 +96,15 @@ export function UserMenu({
         className="w-56"
         sideOffset={16}
       >
-        <DropdownMenuLabel>My Account</DropdownMenuLabel>
+        <DropdownMenuLabel className="truncate">
+          {displayName}
+        </DropdownMenuLabel>
         <DropdownMenuSeparator />
-        <DropdownMenuItem>
-          <User className="mr-2 h-4 w-4" />
-          <span>Profile</span>
-        </DropdownMenuItem>
-        <DropdownMenuItem>
-          <Settings className="mr-2 h-4 w-4" />
-          <span>Settings</span>
+        <DropdownMenuItem asChild>
+          <Link href="/settings">
+            <Settings className="mr-2 h-4 w-4" />
+            <span>Settings</span>
+          </Link>
         </DropdownMenuItem>
         <DropdownMenuSeparator />
         <div className="flex flex-row items-center justify-between px-2 py-1.5">

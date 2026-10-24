@@ -17,7 +17,10 @@ export function TemplateSheet() {
   const { data: templateData, isLoading } = useQuery(
     trpc.templates.get.queryOptions(
       { id: templateQueryId },
-      { enabled: !!templateId },
+      {
+        enabled: !!templateId,
+        placeholderData: (previous) => (templateId ? undefined : previous),
+      },
     ),
   );
 

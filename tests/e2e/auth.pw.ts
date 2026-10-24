@@ -42,10 +42,10 @@ test("signup, onboarding, session persistence, sign-in and safe return path", as
   await expect(page).not.toHaveURL(/\/onboarding/);
   await page.waitForLoadState("networkidle");
   await page.goto("/customers");
-  await expect(page.getByPlaceholder("Search customers...")).toBeVisible();
+  await expect(page.getByPlaceholder(/^Search customers/)).toBeVisible();
   await page.waitForLoadState("networkidle");
   await page.reload();
-  await expect(page.getByPlaceholder("Search customers...")).toBeVisible();
+  await expect(page.getByPlaceholder(/^Search customers/)).toBeVisible();
   await signOut(page);
   await page.goto("/customers");
   await expect(page).toHaveURL(/\/sign-in\?return_to=/);
@@ -89,7 +89,7 @@ test("cookie presence alone cannot authorize a protected page", async ({
   ]);
   await page.goto("/customers");
   await expect(page).toHaveURL(/\/sign-in/);
-  await expect(page.getByPlaceholder("Search customers...")).toHaveCount(0);
+  await expect(page.getByPlaceholder(/^Search customers/)).toHaveCount(0);
 });
 
 test("authenticated auth-page redirects accept only safe local destinations", async ({

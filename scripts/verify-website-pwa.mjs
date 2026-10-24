@@ -277,8 +277,8 @@ async function verifyChromeInstallability() {
           serviceWorkerScope: registration?.scope ?? null,
           serviceWorkerController: Boolean(navigator.serviceWorker?.controller),
           hasMobileMetadata: Boolean(document.querySelector("meta[name=mobile-web-app-capable]")),
-          hasSignupCta: document.body.innerText.includes("Join Free Beta"),
-          hasLandingCopy: document.body.innerText.includes("One board for every"),
+          hasSignupCta: !!document.querySelector('a[href^="/signup"]'),
+          hasLandingCopy: document.querySelector("h1")?.innerText.includes("Every finished job gets a check-in."),
         };
       })()`,
       returnByValue: true,

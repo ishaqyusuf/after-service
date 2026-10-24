@@ -9,9 +9,8 @@ export function FollowUpsTableSkeleton() {
     <TableSkeleton
       columns={columns}
       rowCount={12}
-      stickyColumnIds={STICKY_COLUMNS["follow-ups"].map(
-        (column) => column.id,
-      )}
+      label="Loading follow-ups"
+      stickyColumnIds={STICKY_COLUMNS["follow-ups"].map((column) => column.id)}
     />
   );
 }

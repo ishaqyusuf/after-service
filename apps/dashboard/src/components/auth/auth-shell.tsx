@@ -16,13 +16,13 @@ export function AuthShell({
   title,
 }: AuthShellProps) {
   return (
-    <main className="flex min-h-screen w-full items-center justify-center bg-background px-4 py-10">
-      <div className="w-full max-w-sm">
+    <main className="flex min-h-screen w-full items-center justify-center bg-[var(--wp-ground)] px-4 py-10">
+      <div className="w-full max-w-[440px] rounded-[14px] border border-border bg-card px-5 py-8 sm:px-7">
         <div className="mb-8 flex justify-center">
           <BrandLogo name={appMetadata.name} />
         </div>
         <header className="mb-8 space-y-2 text-center">
-          <h1 className="text-3xl font-semibold tracking-tight text-foreground">
+          <h1 className="wp-display text-3xl leading-tight text-foreground">
             {title}
           </h1>
           <p className="text-sm leading-6 text-muted-foreground">
@@ -38,8 +38,6 @@ export function AuthShell({
 
 export function AuthFooter({ children }: { children: ReactNode }) {
   return (
-    <div className="text-center text-sm text-muted-foreground">
-      {children}
-    </div>
+    <div className="text-center text-sm text-muted-foreground">{children}</div>
   );
 }

@@ -39,7 +39,9 @@ export default async function OnboardingPage() {
           >
             Workspace setup
           </Badge>
-          <h1 className="text-3xl font-bold tracking-tight">Onboarding</h1>
+          <h1 className="wp-display text-3xl leading-tight">
+            Set up your business
+          </h1>
           <p className="text-muted-foreground">
             Set up your business to start tracking customers and follow-ups.
             Only your business name is required.

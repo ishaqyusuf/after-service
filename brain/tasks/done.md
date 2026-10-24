@@ -6,6 +6,27 @@ This file records completed work.
 
 ## Completed
 
+### Wall Planner Marketing And Dashboard Redesign — 2026-10-24
+
+Implemented both exact owner-selected Workshop revisions locally with three
+Claude `claude-opus-5-5` workers and Codex integration review. Preserved existing
+architecture/components, real typed data, country pricing, Assistant and auth/
+onboarding recovery. Midday-aligned sheets and short confirmation modals,
+responsive navigation/tables and the real week planner pass conformance audit.
+
+Verification: 15-package typecheck, test typecheck, scoped Biome, 180 unit tests,
+both optimized builds, static PWA checks, zero Impeccable findings; all 20
+Chromium/Pixel cases covered after targeted reruns. Manual desktop light/dark and
+320/390px acceptance passes. Both exact local QA fixtures cleaned. Workshop
+implementation receipts: marketing `6da342ba-9a03-4758-a385-52eb11eb5637`;
+dashboard `d90c1bf2-baa7-4d62-b78e-2047b09ad2e7`.
+
+No commit, push or deployment. See
+[feature and verification record](../features/complete-ui-redesign-workshop.md),
+[migration audit](../plans/2026-10-24-wall-planner-migration.md) and ADR 0026.
+
+
+
 ### Apply Follow-through Logo Across Product Surfaces — 2026-10-24
 
 - Recorded the user's selection of workshop option 01 v2 before implementation.

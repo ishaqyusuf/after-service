@@ -1,7 +1,20 @@
+import { Check } from "lucide-react";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { JsonLd } from "../../../components/json-ld";
+import { CadenceTimeline } from "../../../components/landing/cadence-timeline";
+import { NumberedSteps } from "../../../components/landing/numbered-steps";
+import { PageHero } from "../../../components/landing/page-hero";
+import { RuledColumns } from "../../../components/landing/ruled-columns";
+import { SecondaryLink } from "../../../components/landing/secondary-link";
+import {
+  SectionHeading,
+  SectionLede,
+} from "../../../components/landing/section-heading";
+import { ClosingSection } from "../../../components/landing/sections/closing-section";
+import { StartFreeLink } from "../../../components/landing/start-free-link";
 import { SeoFaq } from "../../../components/seo-faq";
+import { pageTitle } from "../../../lib/page-title";
 import {
   breadcrumbJsonLd,
   createPageMetadata,
@@ -49,7 +62,7 @@ export default async function SolutionPage({ params }: SolutionPageProps) {
   }
 
   return (
-    <main className="bg-background text-foreground">
+    <main>
       <JsonLd
         data={[
           breadcrumbJsonLd([
@@ -60,112 +73,91 @@ export default async function SolutionPage({ params }: SolutionPageProps) {
           faqJsonLd(page.faqs),
         ]}
       />
-      <section className="mx-auto max-w-5xl px-6 py-16 sm:px-8 lg:py-24">
-        <p className="text-sm font-semibold uppercase tracking-[0.18em] text-[#009b98]">
-          {page.audience}
-        </p>
-        <h1 className="mt-5 max-w-4xl text-4xl font-semibold leading-tight text-[#18211c] dark:text-white sm:text-5xl">
-          {page.hero}
-        </h1>
-        <p className="mt-6 max-w-3xl text-lg leading-8 text-muted-foreground">
-          {page.description}
-        </p>
-        <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-          <a
-            href="/signup"
-            className="inline-flex h-11 items-center justify-center rounded-md bg-[#009b98] px-5 text-sm font-semibold text-white transition-colors hover:bg-[#007f7c]"
-          >
-            Start free
-          </a>
-          <a
-            href="/guides/post-job-follow-up"
-            className="inline-flex h-11 items-center justify-center rounded-md border border-border px-5 text-sm font-semibold text-foreground transition-colors hover:bg-muted"
-          >
+      <PageHero
+        crumbs={[{ href: "/features", label: "Features" }]}
+        title={page.hero}
+        body={page.description}
+      >
+        <div className="flex flex-wrap gap-3">
+          <StartFreeLink location={`solution_${page.slug}_hero`} />
+          <SecondaryLink href="/guides/post-job-follow-up">
             Read the follow-up checklist
-          </a>
+          </SecondaryLink>
         </div>
-      </section>
+      </PageHero>
 
-      <section className="border-y border-border bg-muted/30">
-        <div className="mx-auto grid max-w-5xl gap-10 px-6 py-14 sm:px-8 lg:grid-cols-[0.9fr_1.1fr]">
+      <section
+        aria-labelledby="pain-title"
+        className="py-[clamp(56px,8vw,104px)]"
+      >
+        <div className="wp-wrap grid items-end gap-x-16 gap-y-8 min-[901px]:grid-cols-[minmax(0,1.25fr)_minmax(0,1fr)]">
           <div>
-            <h2 className="text-2xl font-semibold text-[#18211c] dark:text-white">
+            <SectionHeading id="pain-title">
               Why follow-up breaks
-            </h2>
-            <p className="mt-4 leading-7 text-muted-foreground">{page.pain}</p>
+            </SectionHeading>
+            <SectionLede>{page.pain}</SectionLede>
           </div>
-          <div className="grid gap-3">
+          <ul className="grid gap-3 rounded-[14px] border border-border bg-card p-5">
             {page.outcomes.map((outcome) => (
-              <div
-                className="rounded-lg border border-border bg-background p-4 text-sm leading-6 text-foreground"
+              <li
+                className="flex items-start gap-2.5 text-[15.5px]"
                 key={outcome}
               >
+                <Check
+                  className="mt-1 size-[18px] flex-none text-accent-foreground"
+                  aria-hidden="true"
+                />
                 {outcome}
-              </div>
+              </li>
             ))}
-          </div>
+          </ul>
         </div>
       </section>
 
-      <section className="mx-auto max-w-5xl px-6 py-16 sm:px-8">
-        <h2 className="text-2xl font-semibold text-[#18211c] dark:text-white">
-          A manual-first workflow your team can repeat
-        </h2>
-        <div className="mt-8 grid gap-4 md:grid-cols-2">
-          {page.workflows.map((workflow, index) => (
-            <div
-              className="rounded-lg border border-border bg-card p-5"
-              key={workflow}
-            >
-              <span className="text-sm font-semibold text-[#009b98]">
-                Step {index + 1}
-              </span>
-              <p className="mt-3 leading-7 text-muted-foreground">{workflow}</p>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      <section className="border-y border-border bg-muted/30">
-        <div className="mx-auto max-w-5xl px-6 py-16 sm:px-8">
-          <h2 className="text-2xl font-semibold text-[#18211c] dark:text-white">
+      <section
+        aria-labelledby="cadence-title"
+        className="border-y border-border bg-secondary py-[clamp(56px,8vw,104px)]"
+      >
+        <div className="wp-wrap">
+          <SectionHeading id="cadence-title">
             A practical follow-up cadence
-          </h2>
-          <div className="mt-8 divide-y divide-border border-y border-border">
-            {page.cadence.map((item) => (
-              <div
-                className="grid gap-3 py-6 md:grid-cols-[14rem_1fr] md:gap-8"
-                key={item.timing}
-              >
-                <h3 className="font-semibold text-foreground">{item.timing}</h3>
-                <p className="leading-7 text-muted-foreground">{item.action}</p>
-              </div>
-            ))}
-          </div>
+          </SectionHeading>
+          <CadenceTimeline className="mt-8" items={page.cadence} />
         </div>
       </section>
 
-      <SeoFaq items={page.faqs} />
-
-      <section className="mx-auto max-w-5xl px-6 pb-20 sm:px-8">
-        <h2 className="text-2xl font-semibold text-[#18211c] dark:text-white">
-          Related guides
-        </h2>
-        <div className="mt-6 grid gap-4 md:grid-cols-3">
-          {guidePages.map((guide) => (
-            <a
-              className="rounded-lg border border-border p-5 transition-colors hover:bg-muted"
-              href={guide.path}
-              key={guide.path}
-            >
-              <h3 className="font-semibold text-foreground">{guide.title}</h3>
-              <p className="mt-3 text-sm leading-6 text-muted-foreground">
-                {guide.description}
-              </p>
-            </a>
-          ))}
+      <section
+        aria-labelledby="workflow-title"
+        className="py-[clamp(56px,8vw,104px)]"
+      >
+        <div className="wp-wrap">
+          <SectionHeading id="workflow-title">
+            A manual-first workflow your team can repeat
+          </SectionHeading>
+          <NumberedSteps className="mt-8" steps={page.workflows} />
         </div>
       </section>
+
+      <SeoFaq items={page.faqs} className="pt-0" />
+
+      <section
+        aria-labelledby="guides-title"
+        className="border-t border-border py-[clamp(48px,6vw,80px)]"
+      >
+        <div className="wp-wrap">
+          <SectionHeading id="guides-title">Related guides</SectionHeading>
+          <RuledColumns
+            className="mt-8"
+            items={guidePages.map((guide) => ({
+              body: guide.description,
+              href: guide.path,
+              title: pageTitle(guide.title),
+            }))}
+          />
+        </div>
+      </section>
+
+      <ClosingSection location={`solution_${page.slug}_bottom`} />
     </main>
   );
 }

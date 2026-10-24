@@ -1,76 +1,111 @@
 "use client";
 
-import {
-  Badge,
-  Button,
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@afterservice/ui";
-import { Send } from "lucide-react";
+import { Button } from "@afterservice/ui";
+import { cn } from "@afterservice/ui/cn";
+import { CalendarClock } from "lucide-react";
 import Link from "next/link";
+import { useQueryState } from "nuqs";
 import {
   serviceJobStatusLabels,
   toServiceJobStatus,
 } from "@/hooks/use-job-filter-params";
-import { formatDate } from "@/lib/dashboard-format";
+import { calendarDay, formatDayShort } from "@/utils/follow-up-dates";
 import type { DashboardOverviewData } from "./overview-types";
-
-export function RecentJobs({ data }: { data: DashboardOverviewData }) {
-  return (
-    <Card>
-      <CardHeader className="border-b pb-5">
-        <CardTitle className="mb-1 text-base">Recent jobs</CardTitle>
-        <p className="text-sm text-muted-foreground">
-          Latest completed work feeding the follow-up loop.
-        </p>
-      </CardHeader>
-      <CardContent className="p-0">
-        {data.recentJobs.length > 0 ? (
-          <div className="divide-y">
-            {data.recentJobs.map((job) => (
-              <RecentJobLink key={job.id} job={job} />
-            ))}
-          </div>
-        ) : (
-          <div className="flex min-h-[220px] flex-col items-center justify-center gap-3 p-6 text-center">
-            <Send className="size-6 text-muted-foreground" />
-            <div>
-              <p className="text-sm font-medium">No jobs logged yet</p>
-              <p className="mt-1 text-sm text-muted-foreground">
-                Log completed work to create reliable follow-up moments.
-              </p>
-            </div>
-            <Button asChild size="sm" variant="outline">
-              <Link href="/jobs">Open jobs</Link>
-            </Button>
-          </div>
-        )}
-      </CardContent>
-    </Card>
-  );
-}
+import {
+  PlannerPanel,
+  plannerLinkClassName,
+  QuietEmpty,
+} from "./planner-panel";
 
 type RecentJob = DashboardOverviewData["recentJobs"][number];
 
-function RecentJobLink({ job }: { job: RecentJob }) {
+const statusClassNames: Record<string, string> = {
+  needs_follow_up:
+    "border-transparent bg-[var(--wp-upcoming-soft,#fff3d1)] text-[var(--wp-upcoming-ink,#7f5600)] dark:bg-[var(--wp-upcoming-soft,#33280e)] dark:text-[var(--wp-upcoming-ink,#f0c869)]",
+  resolved:
+    "border-transparent bg-[var(--wp-replied-soft,#e2f4e9)] text-[#136238] dark:bg-[var(--wp-replied-soft,#10301f)] dark:text-[var(--wp-replied,#4cc681)]",
+};
+
+export function RecentJobs({
+  className,
+  data,
+  timeZone,
+}: {
+  className?: string;
+  data: DashboardOverviewData;
+  timeZone: string;
+}) {
+  const [, setScheduleJobId] = useQueryState("schedule_follow_up");
+
+  return (
+    <PlannerPanel
+      title="Recent jobs"
+      className={className}
+      action={
+        <Link href="/jobs" className={plannerLinkClassName}>
+          All jobs
+        </Link>
+      }
+    >
+      {data.recentJobs.length > 0 ? (
+        <ul className="grid">
+          {data.recentJobs.map((job) => (
+            <RecentJobRow
+              key={job.id}
+              job={job}
+              onSchedule={() => setScheduleJobId(job.id)}
+              timeZone={timeZone}
+            />
+          ))}
+        </ul>
+      ) : (
+        <QuietEmpty>
+          No jobs logged yet. Log completed work to plan its first check-in.
+        </QuietEmpty>
+      )}
+    </PlannerPanel>
+  );
+}
+
+function RecentJobRow({
+  job,
+  onSchedule,
+  timeZone,
+}: {
+  job: RecentJob;
+  onSchedule: () => void;
+  timeZone: string;
+}) {
   const status = toServiceJobStatus(job.status);
 
   return (
-    <Link
-      className="flex items-start justify-between gap-4 p-4 transition-colors hover:bg-muted/40"
-      href="/jobs"
-    >
-      <div className="min-w-0 space-y-1">
-        <p className="truncate text-sm font-medium">{job.title}</p>
-        <p className="truncate text-xs text-muted-foreground">
-          {job.customerName} · {formatDate(job.completedAt)}
-        </p>
+    <li className="flex flex-wrap items-center gap-x-3 gap-y-2 border-t border-border py-2.5 first:border-t-0 first:pt-0.5 sm:flex-nowrap">
+      <div className="grid min-w-0 flex-1">
+        <span className="truncate font-semibold">{job.title}</span>
+        <span className="truncate text-[12.5px] text-muted-foreground">
+          {job.customerName} · completed{" "}
+          {formatDayShort(calendarDay(job.completedAt, timeZone))}
+        </span>
       </div>
-      <Badge variant="outline">
+      <span
+        className={cn(
+          "inline-flex h-[22px] items-center whitespace-nowrap rounded-full border border-border bg-background px-2 text-xs font-semibold text-muted-foreground",
+          statusClassNames[job.status],
+        )}
+      >
         {status ? serviceJobStatusLabels[status] : job.status}
-      </Badge>
-    </Link>
+      </span>
+      <Button
+        type="button"
+        size="sm"
+        variant="ghost"
+        className="h-10 gap-1.5 px-2.5 sm:h-8"
+        onClick={onSchedule}
+      >
+        <CalendarClock aria-hidden="true" className="size-4" />
+        Plan check-in
+        <span className="sr-only"> for {job.title}</span>
+      </Button>
+    </li>
   );
 }

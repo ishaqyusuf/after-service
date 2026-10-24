@@ -243,7 +243,7 @@ export const solutionPages: SolutionPage[] = [
     workflows: [
       "Capture the completed service visit and follow-up owner.",
       "Schedule customer check-ins around your team's real service rhythm.",
-      "Use the board to see what is open, scheduled, sent, replied, or closed.",
+      "Use the board to see what is due today, upcoming, waiting for a reply, replied, or closed.",
       "Keep message logs and notes available for future customer context.",
     ],
   },
@@ -477,7 +477,7 @@ export const guidePages: GuidePage[] = [
 export const featurePages: FeaturePage[] = [
   {
     description:
-      "A manual-first follow-up board for open, scheduled, sent, replied, missed, and closed customer follow-ups after service work is complete.",
+      "A manual-first follow-up board with Due today, Upcoming, Waiting, Replied and Closed stages after service work is complete.",
     faqs: [
       {
         question: "What belongs on a post-job follow-up board?",
@@ -503,7 +503,7 @@ export const featurePages: FeaturePage[] = [
       },
       {
         title: "Statuses that describe customer work",
-        body: "Open, scheduled, sent, replied, missed, and closed states make the next action visible without requiring staff to read every note.",
+        body: "Due today, Upcoming, Waiting, Replied and Closed stages make the next action visible without requiring staff to read every note.",
       },
       {
         title: "Manual before automated",

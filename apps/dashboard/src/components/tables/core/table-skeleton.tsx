@@ -1,8 +1,8 @@
 "use client";
 
-import { cn } from "@afterservice/ui";
-import { Skeleton } from "@afterservice/ui";
 import {
+  cn,
+  Skeleton,
   Table,
   TableBody,
   TableCell,
@@ -18,7 +18,14 @@ import type {
 import { useMemo } from "react";
 import { useStickyColumns } from "@/hooks/use-sticky-columns";
 import { SkeletonCell } from "./skeleton-cell";
-import { getColumnId, getHeaderLabel, type TableColumnMeta } from "./types";
+import {
+  ACTIONS_STICKY_HEADER_CLASS,
+  getColumnId,
+  getHeaderLabel,
+  TABLE_HEAD_CELL_CLASS,
+  TABLE_HEADER_CLASS,
+  type TableColumnMeta,
+} from "./types";
 
 interface TableSkeletonProps<TData> {
   /** Column definitions with skeleton config in meta */
@@ -39,6 +46,8 @@ interface TableSkeletonProps<TData> {
   isEmpty?: boolean;
   /** Additional className for the container */
   className?: string;
+  /** Announced to assistive tech while the table loads */
+  label?: string;
 }
 
 /**
@@ -55,6 +64,7 @@ export function TableSkeleton<TData>({
   actionsColumnId = "actions",
   isEmpty = false,
   className,
+  label = "Loading table",
 }: TableSkeletonProps<TData>) {
   // Generate row data for skeleton
   const rows = useMemo(
@@ -97,24 +107,25 @@ export function TableSkeleton<TData>({
   const isSticky = (columnId: string) => stickyColumnIds.includes(columnId);
 
   return (
-    <div className={cn("w-full", className)}>
-      <div
-        className={cn(
-          "overflow-auto overscroll-x-none scrollbar-hide",
-          !isEmpty && "md:border-l md:border-r md:border-b md:border-border",
-        )}
-      >
+    <div
+      className={cn("w-full", !isEmpty && "wp-table-frame", className)}
+      aria-busy={!isEmpty || undefined}
+    >
+      {!isEmpty && (
+        <p className="sr-only" role="status">
+          {label}
+        </p>
+      )}
+      <div className="overflow-hidden" aria-hidden>
         <Table
           className={cn(isEmpty && "opacity-20 pointer-events-none blur-[7px]")}
         >
-          <TableHeader className="border-0 block sticky top-0 z-20 bg-background">
+          <TableHeader className={TABLE_HEADER_CLASS}>
             <TableRow className="h-[45px] hover:bg-transparent flex items-center !border-b-0">
               {visibleColumns.map((col) => {
                 const columnId = getColumnId(col);
-                const meta = col.meta as TableColumnMeta | undefined;
                 const sticky = isSticky(columnId);
                 const isActions = columnId === actionsColumnId;
-                const isStatus = columnId === "status";
 
                 // Match TanStack Table's getSize() behavior
                 const width = columnSizing[columnId] ?? col.size ?? 150;
@@ -123,12 +134,12 @@ export function TableSkeleton<TData>({
 
                 const stickyClass = getStickyClassName(
                   columnId,
-                  "group/header relative h-full px-4 border-t border-border flex items-center",
+                  TABLE_HEAD_CELL_CLASS,
                 );
                 const headerClassName = isActions
-                  ? "group/header relative h-full px-4 border-t border-border flex items-center justify-center md:sticky md:right-0 bg-background z-10"
+                  ? ACTIONS_STICKY_HEADER_CLASS
                   : sticky
-                    ? `${stickyClass} bg-background z-10`
+                    ? `${stickyClass} z-10 md:shadow-[1px_0_0_hsl(var(--border))]`
                     : stickyClass;
 
                 return (
@@ -140,32 +151,12 @@ export function TableSkeleton<TData>({
                       minWidth,
                       maxWidth,
                       ...getStickyStyle(columnId),
-                      ...(!isActions &&
-                        !isStatus && {
-                          borderRight: "1px solid hsl(var(--border))",
-                        }),
-                      ...(isActions && {
-                        borderLeft: "1px solid hsl(var(--border))",
-                        borderTop: "1px solid hsl(var(--border))",
-                      }),
                     }}
                   >
                     {columnId === "select" ? (
                       <Skeleton className="h-4 w-4" />
-                    ) : meta?.skeleton?.type === "text" &&
-                      columnId === "description" ? (
-                      // Special case for description column to match actual header structure
-                      <div className="flex items-center justify-between w-full overflow-hidden">
-                        <div className="min-w-0 overflow-hidden">
-                          <span className="text-muted-foreground">
-                            {getHeaderLabel(col)}
-                          </span>
-                        </div>
-                      </div>
                     ) : (
-                      <span className="text-muted-foreground">
-                        {getHeaderLabel(col)}
-                      </span>
+                      <span className="truncate">{getHeaderLabel(col)}</span>
                     )}
                   </TableHead>
                 );
@@ -191,10 +182,9 @@ export function TableSkeleton<TData>({
                   const maxWidth = sticky ? width : (col.maxSize ?? width);
 
                   const cellClassName = cn(
-                    "h-full flex items-center",
+                    "h-full flex items-center border-r-0",
                     getStickyClassName(columnId, meta?.className),
-                    isActions &&
-                      "md:sticky md:right-0 bg-background z-10 justify-center",
+                    isActions && "justify-center",
                   );
 
                   return (
@@ -206,10 +196,6 @@ export function TableSkeleton<TData>({
                         minWidth,
                         maxWidth,
                         ...getStickyStyle(columnId),
-                        ...(isActions && {
-                          borderLeft: "1px solid hsl(var(--border))",
-                          borderBottom: "1px solid hsl(var(--border))",
-                        }),
                       }}
                     >
                       {meta?.skeleton ? (

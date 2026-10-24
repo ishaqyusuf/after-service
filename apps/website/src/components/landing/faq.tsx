@@ -8,24 +8,24 @@ import type { SeoFaqItem } from "../seo-faq";
 
 export const landingFaqs: SeoFaqItem[] = [
   {
-    question: "How does afterservice integrate with my existing workflow?",
+    question: "Does afterservice message my customers for me?",
     answer:
-      "With afterservice, you can log jobs directly in the operator dashboard. CSV import, Zapier/webhook intake, and job-source integrations are planned for paid plans once the core workflow is proven.",
+      "Your team initiates every contact. Log calls and messages from your usual channels, or send email when delivery is enabled for your workspace. Automatic outreach and connected SMS and WhatsApp delivery are planned.",
   },
   {
-    question: "Can my field staff use this on the go?",
+    question: "Can my staff use it on their phones?",
     answer:
-      "Yes. The dashboard is built to work on mobile and desktop so owners, office admins, and staff can add customers, log completed jobs, and schedule follow-ups.",
+      "Yes. The dashboard works on phones and desktops, so owners, office staff and technicians can add customers, log jobs and record replies.",
   },
   {
-    question: "How do review requests work safely?",
+    question: "How does it fit with what we already use?",
     answer:
-      "afterservice is designed around honest feedback for every customer. Public review requests should not be gated by sentiment; issue recovery is tracked as a separate follow-up workflow.",
+      "Today you log jobs directly in the dashboard. CSV import and job-source integrations are planned.",
   },
   {
-    question: "What channels are supported for follow-ups?",
+    question: "How do review requests work?",
     answer:
-      "The core workflow covers planning, templates and manual contact logging. The AI assistant and connected WhatsApp operations are coming soon. Customer-message delivery is separate when available.",
+      "afterservice is built around asking every customer for honest feedback. Issue recovery is a separate follow-up, so nobody is filtered out by how happy they seem.",
   },
   {
     question: "How do Free and Business compare?",

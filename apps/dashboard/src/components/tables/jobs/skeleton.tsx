@@ -9,6 +9,7 @@ export function JobsTableSkeleton() {
     <TableSkeleton
       columns={columns}
       rowCount={12}
+      label="Loading jobs"
       stickyColumnIds={STICKY_COLUMNS.jobs.map((column) => column.id)}
     />
   );

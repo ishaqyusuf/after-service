@@ -127,7 +127,7 @@ const regionPricing: Record<PricingRegion, RegionPricing> = {
     currency: "USD",
     label: "Other / USD",
     locale: "en-US",
-    note: "Local pricing is not set for this region yet; planned checkout falls back to USD.",
+    note: "Local pricing is not set for this region yet; prices are shown in USD.",
   },
 };
 

@@ -95,25 +95,50 @@ export function getHeaderLabel<T>(col: ColumnDef<T>): string {
 }
 
 /**
- * Actions column class when it should be full width (no sticky, no left border)
+ * Shared Wall planner header cell look: ground band, ruled bottom, no column dividers.
  */
-export const ACTIONS_FULL_WIDTH_HEADER_CLASS =
-  "group/header relative h-full px-4 !border-t border-border flex items-center justify-center bg-background z-10";
+export const TABLE_HEAD_CELL_CLASS =
+  "group/header relative h-full px-4 flex items-center border-r-0 border-b border-border bg-[color:var(--wp-ground)] text-[12.5px] font-semibold text-[color:var(--wp-ink-2)] whitespace-nowrap";
 
 /**
- * Actions column class when sticky to the right
+ * Sortable header label button
  */
-export const ACTIONS_STICKY_HEADER_CLASS =
-  "group/header relative h-full px-4 !border-t !border-l !border-border flex items-center justify-center md:sticky md:right-0 bg-background z-10";
+export const SORT_BUTTON_CLASS =
+  "h-8 min-w-0 max-w-full gap-1.5 rounded-md px-0 text-[12.5px] font-semibold text-[color:var(--wp-ink-2)] hover:bg-transparent hover:text-foreground";
+
+/**
+ * Header row band (sticky at the top of the scroll viewport)
+ */
+export const TABLE_HEADER_CLASS =
+  "border-0 block sticky top-0 z-20 bg-[color:var(--wp-ground)] w-full";
+
+/**
+ * Actions column class when it should be full width (no sticky, no left border)
+ */
+export const ACTIONS_FULL_WIDTH_HEADER_CLASS = `${TABLE_HEAD_CELL_CLASS} justify-center z-10`;
+
+/**
+ * Actions column class when sticky to the right. Sticky at every width so the
+ * header stays aligned with the always-sticky actions cells on phones.
+ */
+export const ACTIONS_STICKY_HEADER_CLASS = `${TABLE_HEAD_CELL_CLASS} justify-center sticky right-0 z-10 shadow-[-1px_0_0_hsl(var(--border))]`;
+
+/**
+ * Sticky identity column body cell (left) and actions body cell (right)
+ */
+export const IDENTITY_CELL_CLASS =
+  "md:sticky md:left-0 bg-background group-hover:bg-[color:var(--wp-hover)] z-20 md:shadow-[1px_0_0_hsl(var(--border))]";
+export const ACTIONS_CELL_CLASS =
+  "sticky right-0 justify-center text-center bg-background group-hover:bg-[color:var(--wp-hover)] z-30 shadow-[-1px_0_0_hsl(var(--border))]";
 
 /**
  * Actions cell class when it should be full width
  */
 export const ACTIONS_FULL_WIDTH_CELL_CLASS =
-  "bg-background group-hover:bg-[#F2F1EF] group-hover:dark:bg-[#0f0f0f]";
+  "bg-background group-hover:bg-[color:var(--wp-hover)]";
 
-declare module '@tanstack/react-table' {
-  interface TableMeta<TData extends import('@tanstack/react-table').RowData> {
+declare module "@tanstack/react-table" {
+  interface TableMeta<TData extends import("@tanstack/react-table").RowData> {
     archiveCustomer?: (id: string) => void;
     archiveTemplate?: (id: string) => void;
     closeFollowUp?: (id: string) => void;

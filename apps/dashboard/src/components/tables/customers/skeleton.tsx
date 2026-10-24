@@ -9,6 +9,7 @@ export function CustomersTableSkeleton() {
     <TableSkeleton
       columns={columns}
       rowCount={12}
+      label="Loading customers"
       stickyColumnIds={STICKY_COLUMNS.customers.map((column) => column.id)}
     />
   );

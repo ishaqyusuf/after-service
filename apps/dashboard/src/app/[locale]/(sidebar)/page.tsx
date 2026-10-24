@@ -5,7 +5,7 @@ import { ErrorFallback } from "@/components/error-fallback";
 import { ScrollableContent } from "@/components/scrollable-content";
 import { OverviewView } from "@/components/widgets";
 import { OverviewSkeleton } from "@/components/widgets/overview-skeleton";
-import { HydrateClient, prefetch, trpc } from "@/trpc/server";
+import { batchPrefetch, HydrateClient, trpc } from "@/trpc/server";
 
 export const metadata: Metadata = {
   title: "Dashboard overview | afterservice",
@@ -13,7 +13,10 @@ export const metadata: Metadata = {
 };
 
 export default async function DashboardPage() {
-  await prefetch(trpc.dashboard.overview.queryOptions({ timeZone: "UTC" }));
+  batchPrefetch([
+    trpc.dashboard.overview.queryOptions({ timeZone: "UTC" }),
+    trpc.followUps.listBoard.queryOptions({ timeZone: "UTC" }),
+  ]);
 
   return (
     <HydrateClient>

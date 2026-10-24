@@ -48,10 +48,7 @@ export const ROW_HEIGHTS: Record<TableId, number> = {
   "follow-ups": 57,
 };
 
-export const SUMMARY_GRID_HEIGHTS: Partial<Record<TableId, number>> = {
-  customers: 180,
-  jobs: 180,
-};
+export const SUMMARY_GRID_HEIGHTS: Partial<Record<TableId, number>> = {};
 
 export const TABLE_CONFIGS: Record<TableId, TableConfig> = {
   customers: {

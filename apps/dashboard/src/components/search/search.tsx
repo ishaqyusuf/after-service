@@ -18,7 +18,12 @@ import { useHotkeys } from "react-hotkeys-hook";
 import { useDebounceValue } from "usehooks-ts";
 import { useSearchStore } from "@/store/search";
 
-type SearchItemType = "shortcut" | "customer" | "job" | "follow_up" | "template";
+type SearchItemType =
+  | "shortcut"
+  | "customer"
+  | "job"
+  | "follow_up"
+  | "template";
 
 type SearchResultData = {
   name?: string;
@@ -32,6 +37,8 @@ interface SearchItem {
   data?: SearchResultData;
   action?: () => void;
 }
+
+const emptySearchResults: SearchItem[] = [];
 
 const formatGroupName = (name: string): string | null => {
   switch (name) {
@@ -59,7 +66,9 @@ const SearchResultItemDisplay = ({ item }: { item: SearchItem }) => {
   } else {
     switch (item.type) {
       case "customer":
-        icon = <Icons.Customers className="size-4 dark:text-[#666] text-primary" />;
+        icon = (
+          <Icons.Customers className="size-4 dark:text-[#666] text-primary" />
+        );
         resultDisplay = (
           <div className="flex items-center w-full">
             <div className="flex-grow truncate flex gap-2 items-center">
@@ -69,7 +78,9 @@ const SearchResultItemDisplay = ({ item }: { item: SearchItem }) => {
         );
         break;
       case "job":
-        icon = <Icons.Invoice className="size-4 dark:text-[#666] text-primary" />;
+        icon = (
+          <Icons.Invoice className="size-4 dark:text-[#666] text-primary" />
+        );
         resultDisplay = (
           <div className="flex items-center w-full">
             <div className="flex-grow truncate flex gap-2 items-center">
@@ -79,7 +90,9 @@ const SearchResultItemDisplay = ({ item }: { item: SearchItem }) => {
         );
         break;
       default:
-        icon = <Icons.Search className="size-4 dark:text-[#666] text-primary" />;
+        icon = (
+          <Icons.Search className="size-4 dark:text-[#666] text-primary" />
+        );
         break;
     }
   }
@@ -141,13 +154,9 @@ export function Search() {
   // Stubbed until the global search endpoint is built in the backend.
   const isLoading = false;
   const isFetching = false;
-  const searchResults: SearchItem[] = [];
-
-  const combinedData = useMemo(() => [...searchResults], [searchResults]);
-
   const groupedData = useMemo(() => {
     const groups: Record<string, SearchItem[]> = {};
-    for (const item of combinedData) {
+    for (const item of emptySearchResults) {
       const groupKey = item.type || "other";
       if (!groups[groupKey]) {
         groups[groupKey] = [];
@@ -170,7 +179,7 @@ export function Search() {
     }
 
     return groups;
-  }, [combinedData, debouncedSearch, sectionActions]);
+  }, [debouncedSearch, sectionActions]);
 
   return (
     <div className="flex flex-col h-full bg-background relative" id="search">
@@ -197,6 +206,7 @@ export function Search() {
           {debouncedSearch && (
             <button
               type="button"
+              aria-label="Clear search"
               onClick={() => {
                 setDebouncedSearch("");
                 if (searchInputRef.current) {
@@ -204,7 +214,7 @@ export function Search() {
                   searchInputRef.current.focus();
                 }
               }}
-              className="absolute right-4 top-1/2 -translate-y-1/2 p-1 hover:bg-secondary rounded-md"
+              className="absolute right-2 top-1/2 flex size-11 -translate-y-1/2 items-center justify-center rounded-lg hover:bg-secondary"
             >
               <Icons.Close className="size-4 text-muted-foreground" />
             </button>

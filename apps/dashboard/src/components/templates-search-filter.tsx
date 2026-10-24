@@ -22,7 +22,16 @@ import {
   toTemplateChannel,
   useTemplateFilterParams,
 } from "@/hooks/use-template-filter-params";
-import { FilterList } from "./filter-list";
+import {
+  FILTER_MENU_CLASS,
+  FILTER_TRIGGER_ACTIVE_CLASS,
+  FILTER_TRIGGER_CLASS,
+  FilterList,
+  SEARCH_FORM_CLASS,
+  SEARCH_ICON_CLASS,
+  SEARCH_INPUT_CLASS,
+  SEARCH_ROW_CLASS,
+} from "./filter-list";
 
 export function TemplatesSearchFilter() {
   const { filter, setFilter } = useTemplateFilterParams();
@@ -77,41 +86,44 @@ export function TemplatesSearchFilter() {
 
   return (
     <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
-      <div className="flex w-full flex-col items-start space-y-4 sm:flex-row sm:items-center sm:space-x-4 sm:space-y-0">
-        <form
-          className="relative w-full sm:w-auto"
-          onSubmit={(evt) => {
-            evt.preventDefault();
-            handleSubmit();
-          }}
-        >
-          <Icons.Search className="pointer-events-none absolute left-3 top-[11px]" />
-          <Input
-            ref={inputRef}
-            placeholder="Search templates..."
-            className="w-full pl-9 pr-8 sm:w-[350px]"
-            value={input}
-            onChange={handleSearch}
-            autoComplete="off"
-            autoCapitalize="none"
-            autoCorrect="off"
-            spellCheck="false"
-          />
+      <div className={SEARCH_ROW_CLASS}>
+        <search className={SEARCH_FORM_CLASS}>
+          <form
+            className="relative"
+            onSubmit={(evt) => {
+              evt.preventDefault();
+              handleSubmit();
+            }}
+          >
+            <Icons.Search className={SEARCH_ICON_CLASS} />
+            <Input
+              ref={inputRef}
+              aria-label="Search templates by name"
+              placeholder="Search templates"
+              className={SEARCH_INPUT_CLASS}
+              value={input}
+              onChange={handleSearch}
+              autoComplete="off"
+              autoCapitalize="none"
+              autoCorrect="off"
+              spellCheck="false"
+            />
 
-          <DropdownMenuTrigger asChild>
-            <button
-              onClick={() => setIsOpen((prev) => !prev)}
-              type="button"
-              className={cn(
-                "absolute right-3 top-[10px] z-10 opacity-50 transition-opacity duration-300 hover:opacity-100",
-                hasValidFilters && "opacity-100",
-                isOpen && "opacity-100",
-              )}
-            >
-              <Icons.Filter />
-            </button>
-          </DropdownMenuTrigger>
-        </form>
+            <DropdownMenuTrigger asChild>
+              <button
+                onClick={() => setIsOpen((prev) => !prev)}
+                type="button"
+                aria-label="Filter templates"
+                className={cn(
+                  FILTER_TRIGGER_CLASS,
+                  (hasValidFilters || isOpen) && FILTER_TRIGGER_ACTIVE_CLASS,
+                )}
+              >
+                <Icons.Filter />
+              </button>
+            </DropdownMenuTrigger>
+          </form>
+        </search>
 
         <FilterList
           filters={validFilters}
@@ -121,7 +133,7 @@ export function TemplatesSearchFilter() {
       </div>
 
       <DropdownMenuContent
-        className="w-[350px]"
+        className={FILTER_MENU_CLASS}
         sideOffset={19}
         alignOffset={-11}
         side="bottom"

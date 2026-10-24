@@ -11,12 +11,16 @@ export function OpenSearchButton() {
     <Button
       variant="outline"
       data-track="Search Opened"
-      className="relative min-w-[250px] w-full justify-start text-sm text-muted-foreground sm:pr-12 md:w-40 lg:w-64 border-0 p-0 hover:bg-transparent font-normal no-drag hidden md:flex"
+      aria-label="Search or jump to a page"
+      aria-keyshortcuts="Meta+K"
+      className="no-drag relative size-11 shrink-0 rounded-[10px] border-transparent bg-transparent p-0 font-normal text-[color:var(--wp-ink-2)] hover:bg-[color:var(--wp-hover)] hover:text-foreground md:h-10 md:w-full md:max-w-[340px] md:justify-start md:gap-2 md:border-[color:var(--wp-line-2)] md:bg-[color:var(--wp-paper)] md:px-3 md:text-muted-foreground md:hover:border-[color:var(--wp-ink-3)] md:hover:bg-[color:var(--wp-paper)]"
       onClick={() => setOpen()}
     >
-      <Icons.Search size={18} className="mr-2" />
-      <span>Search pages...</span>
-      <kbd className="pointer-events-none absolute opacity-0 hover:opacity-100 right-1.5 top-1.5 hidden h-5 select-none items-center gap-1 border bg-accent px-1.5 text-[10px] font-medium sm:flex">
+      <Icons.Search size={18} className="shrink-0" />
+      <span className="hidden truncate text-sm md:inline">
+        Search or jump to…
+      </span>
+      <kbd className="pointer-events-none ml-auto hidden h-5 select-none items-center gap-0.5 rounded-md border border-[color:var(--wp-line)] bg-[color:var(--wp-ground)] px-1.5 text-[11px] font-medium text-[color:var(--wp-ink-3)] lg:inline-flex">
         <span className="text-xs">⌘</span>K
       </kbd>
     </Button>

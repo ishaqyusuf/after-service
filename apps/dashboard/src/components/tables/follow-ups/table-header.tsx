@@ -1,11 +1,11 @@
 "use client";
 
+import { Button } from "@afterservice/ui/button";
+import { TableHead, TableHeader, TableRow } from "@afterservice/ui/table";
 import {
   horizontalListSortingStrategy,
   SortableContext,
 } from "@dnd-kit/sortable";
-import { Button } from "@afterservice/ui/button";
-import { TableHead, TableHeader, TableRow } from "@afterservice/ui/table";
 import type { Header, Table } from "@tanstack/react-table";
 import { ArrowDown, ArrowUp } from "lucide-react";
 import { useMemo } from "react";
@@ -13,6 +13,9 @@ import { HorizontalPagination } from "@/components/horizontal-pagination";
 import {
   ACTIONS_FULL_WIDTH_HEADER_CLASS,
   ACTIONS_STICKY_HEADER_CLASS,
+  SORT_BUTTON_CLASS,
+  TABLE_HEAD_CELL_CLASS,
+  TABLE_HEADER_CLASS,
   type TableScrollState,
 } from "@/components/tables/core";
 import { DraggableHeader } from "@/components/tables/draggable-header";
@@ -59,7 +62,7 @@ export function DataTableHeader<TData>({
   const headerGroups = table.getHeaderGroups();
 
   return (
-    <TableHeader className="border-0 block sticky top-0 z-20 bg-background w-full">
+    <TableHeader className={TABLE_HEADER_CLASS}>
       {headerGroups.map((headerGroup) => (
         <TableRow
           key={headerGroup.id}
@@ -119,13 +122,13 @@ export function DataTableHeader<TData>({
               if (!canReorder) {
                 const stickyClass = getStickyClassName(
                   columnId,
-                  "group/header relative h-full px-4 border-t border-border flex items-center",
+                  TABLE_HEAD_CELL_CLASS,
                 );
                 const finalClassName = isActions
                   ? actionsFullWidth
                     ? ACTIONS_FULL_WIDTH_HEADER_CLASS
                     : ACTIONS_STICKY_HEADER_CLASS
-                  : `${stickyClass} bg-background z-10`;
+                  : `${stickyClass} z-10 md:shadow-[1px_0_0_hsl(var(--border))]`;
 
                 return (
                   <TableHead
@@ -191,19 +194,11 @@ function renderHeaderContent<TData>(
     );
   }
 
-  // Name column - special case with horizontal pagination
-  if (columnId === "name") {
+  // Customer identity column - not sortable server-side, carries horizontal pagination
+  if (columnId === "customer") {
     return (
       <div className="flex items-center justify-between w-full overflow-hidden">
-        <div className="min-w-0 overflow-hidden">
-          <SortButton
-            label="Name"
-            sortField="name"
-            currentSortColumn={sortColumn}
-            currentSortValue={sortValue}
-            onSort={createSortQuery}
-          />
-        </div>
+        <span className="min-w-0 truncate">{getHeaderLabel(columnId)}</span>
         {tableScroll?.isScrollable && (
           <HorizontalPagination
             canScrollLeft={tableScroll.canScrollLeft}
@@ -254,7 +249,7 @@ function SortButton({
 }) {
   return (
     <Button
-      className="p-0 hover:bg-transparent space-x-2 min-w-0 max-w-full"
+      className={SORT_BUTTON_CLASS}
       variant="ghost"
       onClick={(e) => {
         e.stopPropagation(); // Prevent drag when clicking sort
@@ -263,10 +258,16 @@ function SortButton({
     >
       <span className="truncate">{label}</span>
       {sortField === currentSortColumn && currentSortValue === "asc" && (
-        <ArrowDown size={16} />
+        <>
+          <ArrowDown size={14} aria-hidden />
+          <span className="sr-only">, sorted ascending</span>
+        </>
       )}
       {sortField === currentSortColumn && currentSortValue === "desc" && (
-        <ArrowUp size={16} />
+        <>
+          <ArrowUp size={14} aria-hidden />
+          <span className="sr-only">, sorted descending</span>
+        </>
       )}
     </Button>
   );

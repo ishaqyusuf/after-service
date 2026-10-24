@@ -25,6 +25,7 @@ import {
 import { useMutation } from "@tanstack/react-query";
 import type { inferRouterOutputs } from "@trpc/server";
 import { useEffect } from "react";
+import { ConfirmActionDialog } from "@/components/confirm-action-dialog";
 import { QuickFill } from "@/components/quick-fill";
 import { useDashboardInvalidations } from "@/hooks/use-dashboard-invalidations";
 import {
@@ -199,22 +200,28 @@ export function TemplateEditForm({ template }: Props) {
         </form>
       </Form>
 
-      <form
-        onSubmit={(event) => {
-          event.preventDefault();
-          archiveMutation.mutate({ id: template.id });
-        }}
-        className="border-t border-border pt-4"
-      >
-        <Button
-          type="submit"
-          variant="destructive"
-          className="w-full"
-          disabled={archiveMutation.isPending}
+      <div className="space-y-2 border-t border-border pt-4">
+        <ConfirmActionDialog
+          title="Remove this template?"
+          description={`“${template.name}” will be removed permanently. This can't be undone.`}
+          confirmLabel="Remove template"
+          onConfirm={() => archiveMutation.mutate({ id: template.id })}
         >
-          {archiveMutation.isPending ? "Archiving..." : "Archive template"}
-        </Button>
-      </form>
+          <Button
+            type="button"
+            variant="destructive"
+            className="w-full"
+            disabled={archiveMutation.isPending}
+          >
+            {archiveMutation.isPending ? "Archiving..." : "Archive template"}
+          </Button>
+        </ConfirmActionDialog>
+        {archiveMutation.error ? (
+          <p role="alert" className="text-sm text-destructive">
+            {archiveMutation.error.message}
+          </p>
+        ) : null}
+      </div>
     </div>
   );
 }

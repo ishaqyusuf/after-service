@@ -12,9 +12,9 @@ export function EmptyState() {
 
   return (
     <TableEmptyState
-      title="No jobs"
-      description="Log completed work to trigger the right customer follow-up."
-      actionLabel="Create job"
+      title="No jobs recorded"
+      description="Record work as it wraps up, then plan the customer check-in that follows."
+      actionLabel="Add job"
       onAction={() => setParams({ createJob: true })}
     />
   );

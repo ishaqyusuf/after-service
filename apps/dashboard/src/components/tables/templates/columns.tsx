@@ -1,12 +1,6 @@
 "use client";
 
 import type { AppRouter } from "@afterservice/api/router";
-import { Badge } from "@afterservice/ui";
-import { format } from "date-fns";
-import type { ColumnDef } from "@tanstack/react-table";
-import type { inferRouterOutputs } from "@trpc/server";
-import { MoreHorizontal } from "lucide-react";
-import { Button } from "@afterservice/ui";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -14,6 +8,18 @@ import {
   DropdownMenuLabel,
   DropdownMenuTrigger,
 } from "@afterservice/ui";
+import type { ColumnDef } from "@tanstack/react-table";
+import type { inferRouterOutputs } from "@trpc/server";
+import { format } from "date-fns";
+import { ConfirmActionDialog } from "@/components/confirm-action-dialog";
+import {
+  ACTIONS_CELL_CLASS,
+  ChannelLabel,
+  EmptyCell,
+  IDENTITY_CELL_CLASS,
+  IdentityCell,
+  RowActionsTrigger,
+} from "@/components/tables/core";
 import {
   templateChannelLabels,
   toTemplateChannel,
@@ -35,10 +41,11 @@ export const columns: ColumnDef<Template>[] = [
       sticky: true,
       skeleton: { type: "text", width: "w-32" },
       headerLabel: "Name",
-      className:
-        "w-[250px] min-w-[200px] md:sticky md:left-0 bg-background group-hover:bg-[#F2F1EF] group-hover:dark:bg-[#0f0f0f] z-20",
+      className: `w-[250px] min-w-[200px] ${IDENTITY_CELL_CLASS}`,
     },
-    cell: ({ row }) => <span className="font-medium">{row.original.name}</span>,
+    cell: ({ row }) => (
+      <IdentityCell label={row.original.name}>{row.original.name}</IdentityCell>
+    ),
   },
   {
     id: "channel",
@@ -57,9 +64,12 @@ export const columns: ColumnDef<Template>[] = [
       const channel = toTemplateChannel(row.original.channel);
 
       return (
-        <Badge variant="outline">
-          {channel ? templateChannelLabels[channel] : row.original.channel}
-        </Badge>
+        <ChannelLabel
+          channel={row.original.channel}
+          label={
+            channel ? templateChannelLabels[channel] : row.original.channel
+          }
+        />
       );
     },
   },
@@ -76,7 +86,12 @@ export const columns: ColumnDef<Template>[] = [
       headerLabel: "Subject",
       className: "w-[250px] min-w-[200px]",
     },
-    cell: ({ row }) => <span className="truncate block w-full">{row.original.subject ?? "-"}</span>,
+    cell: ({ row }) =>
+      row.original.subject ? (
+        <span className="block w-full truncate">{row.original.subject}</span>
+      ) : (
+        <EmptyCell />
+      ),
   },
   {
     id: "body",
@@ -91,7 +106,14 @@ export const columns: ColumnDef<Template>[] = [
       headerLabel: "Body",
       className: "w-[300px] min-w-[200px]",
     },
-    cell: ({ row }) => <span className="truncate block w-full">{row.original.body}</span>,
+    cell: ({ row }) => (
+      <span
+        className="block w-full truncate text-[color:var(--wp-ink-2)]"
+        title={row.original.body}
+      >
+        {row.original.body}
+      </span>
+    ),
   },
   {
     id: "isDefault",
@@ -106,9 +128,14 @@ export const columns: ColumnDef<Template>[] = [
       headerLabel: "Default",
       className: "w-[100px] min-w-[80px]",
     },
-    cell: ({ row }) => (
-      row.original.isDefault ? <Badge variant="secondary">Yes</Badge> : "-"
-    ),
+    cell: ({ row }) =>
+      row.original.isDefault ? (
+        <span className="inline-flex h-[22px] items-center whitespace-nowrap rounded-full bg-[color:var(--wp-teal-soft)] px-2 text-xs font-semibold text-[color:var(--wp-teal-ink)]">
+          Default
+        </span>
+      ) : (
+        <EmptyCell />
+      ),
   },
   {
     id: "createdAt",
@@ -125,8 +152,12 @@ export const columns: ColumnDef<Template>[] = [
     },
     cell: ({ row }) => {
       const date = row.original.createdAt;
-      if (!date) return "-";
-      return format(new Date(date), "MMM d, yyyy");
+      if (!date) return <EmptyCell />;
+      return (
+        <span className="wp-numerals whitespace-nowrap">
+          {format(new Date(date), "MMM d, yyyy")}
+        </span>
+      );
     },
   },
   {
@@ -142,28 +173,34 @@ export const columns: ColumnDef<Template>[] = [
       sticky: true,
       skeleton: { type: "icon" },
       headerLabel: "Actions",
-      className:
-        "text-right sticky right-0 bg-background group-hover:bg-[#F2F1EF] group-hover:dark:bg-[#0f0f0f] z-30 justify-center !border-l !border-border",
+      className: ACTIONS_CELL_CLASS,
     },
     cell: ({ row, table }) => {
       return (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="h-8 w-8 p-0">
-              <span className="sr-only">Open menu</span>
-              <MoreHorizontal className="h-4 w-4" />
-            </Button>
+            <RowActionsTrigger label={`Actions for ${row.original.name}`} />
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuLabel>Actions</DropdownMenuLabel>
-            <DropdownMenuItem
-              onClick={(e) => {
-                e.stopPropagation();
-                table.options.meta?.archiveTemplate?.(row.original.id);
-              }}
+          <DropdownMenuContent align="end" className="min-w-[200px] rounded-xl">
+            <DropdownMenuLabel className="truncate text-xs text-muted-foreground">
+              {row.original.name}
+            </DropdownMenuLabel>
+            <ConfirmActionDialog
+              title="Remove this template?"
+              description={`${row.original.name} will be removed permanently. This cannot be undone.`}
+              confirmLabel="Archive template"
+              onConfirm={() =>
+                table.options.meta?.archiveTemplate?.(row.original.id)
+              }
             >
-              Archive template
-            </DropdownMenuItem>
+              <DropdownMenuItem
+                className="min-h-11 text-[color:var(--wp-due-ink)] focus:text-[color:var(--wp-due-ink)]"
+                onSelect={(event) => event.preventDefault()}
+                onClick={(event) => event.stopPropagation()}
+              >
+                Archive template
+              </DropdownMenuItem>
+            </ConfirmActionDialog>
           </DropdownMenuContent>
         </DropdownMenu>
       );

@@ -1,20 +1,27 @@
 "use client";
 
 import type { AppRouter } from "@afterservice/api/router";
-import { Badge } from "@afterservice/ui";
-import { format } from "date-fns";
-import type { ColumnDef } from "@tanstack/react-table";
-import type { inferRouterOutputs } from "@trpc/server";
-import { MoreHorizontal } from "lucide-react";
-import { Button } from "@afterservice/ui";
 import {
+  cn,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuTrigger,
 } from "@afterservice/ui";
+import type { ColumnDef } from "@tanstack/react-table";
+import type { inferRouterOutputs } from "@trpc/server";
+import { format } from "date-fns";
 import {
+  ACTIONS_CELL_CLASS,
+  ChannelLabel,
+  EmptyCell,
+  IDENTITY_CELL_CLASS,
+  IdentityCell,
+  RowActionsTrigger,
+} from "@/components/tables/core";
+import {
+  type FollowUpStatus,
   followUpChannelLabels,
   followUpStatusLabels,
   toFollowUpChannel,
@@ -24,6 +31,17 @@ import {
 type FollowUpsListPage =
   inferRouterOutputs<AppRouter>["followUps"]["listTable"];
 type FollowUp = FollowUpsListPage["items"][number];
+
+// Sticker shape per stored status. The text label always carries the meaning;
+// board stages (Due today, Upcoming, ...) are derived separately on the board.
+const followUpStatusStage: Record<FollowUpStatus, string> = {
+  closed: "wp-stage-closed",
+  missed: "wp-stage-due",
+  open: "wp-stage-upcoming",
+  replied: "wp-stage-replied",
+  scheduled: "wp-stage-upcoming",
+  sent: "wp-stage-waiting",
+};
 
 export const columns: ColumnDef<FollowUp>[] = [
   {
@@ -38,11 +56,12 @@ export const columns: ColumnDef<FollowUp>[] = [
       sticky: true,
       skeleton: { type: "text", width: "w-32" },
       headerLabel: "Customer",
-      className:
-        "w-[250px] min-w-[200px] md:sticky md:left-0 bg-background group-hover:bg-[#F2F1EF] group-hover:dark:bg-[#0f0f0f] z-20",
+      className: `w-[250px] min-w-[200px] ${IDENTITY_CELL_CLASS}`,
     },
     cell: ({ row }) => (
-      <span className="font-medium">{row.original.customerName}</span>
+      <IdentityCell label={row.original.customerName}>
+        {row.original.customerName}
+      </IdentityCell>
     ),
   },
   {
@@ -62,15 +81,15 @@ export const columns: ColumnDef<FollowUp>[] = [
       const status = toFollowUpStatus(row.original.status);
 
       return (
-        <Badge
-          variant={
-            status === "closed" || status === "replied"
-              ? "secondary"
-              : "default"
-          }
+        <span
+          className={cn(
+            "wp-stage",
+            status ? followUpStatusStage[status] : "wp-stage-closed",
+          )}
         >
+          <span className="wp-stage-dot" aria-hidden />
           {status ? followUpStatusLabels[status] : row.original.status}
-        </Badge>
+        </span>
       );
     },
   },
@@ -91,9 +110,12 @@ export const columns: ColumnDef<FollowUp>[] = [
       const channel = toFollowUpChannel(row.original.channel);
 
       return (
-        <Badge variant="outline">
-          {channel ? followUpChannelLabels[channel] : row.original.channel}
-        </Badge>
+        <ChannelLabel
+          channel={row.original.channel}
+          label={
+            channel ? followUpChannelLabels[channel] : row.original.channel
+          }
+        />
       );
     },
   },
@@ -112,8 +134,12 @@ export const columns: ColumnDef<FollowUp>[] = [
     },
     cell: ({ row }) => {
       const date = row.original.dueAt;
-      if (!date) return "-";
-      return format(new Date(date), "MMM d, yyyy");
+      if (!date) return <EmptyCell />;
+      return (
+        <span className="wp-numerals whitespace-nowrap">
+          {format(new Date(date), "MMM d, yyyy")}
+        </span>
+      );
     },
   },
   {
@@ -129,11 +155,14 @@ export const columns: ColumnDef<FollowUp>[] = [
       headerLabel: "Job",
       className: "w-[200px] min-w-[150px]",
     },
-    cell: ({ row }) => (
-      <span className="truncate block w-full">
-        {row.original.serviceTitle ?? "-"}
-      </span>
-    ),
+    cell: ({ row }) =>
+      row.original.serviceTitle ? (
+        <span className="block w-full truncate">
+          {row.original.serviceTitle}
+        </span>
+      ) : (
+        <EmptyCell />
+      ),
   },
   {
     id: "notes",
@@ -148,7 +177,17 @@ export const columns: ColumnDef<FollowUp>[] = [
       headerLabel: "Notes",
       className: "w-[300px] min-w-[200px]",
     },
-    cell: ({ row }) => <span className="truncate block w-full">{row.original.notes ?? "-"}</span>,
+    cell: ({ row }) =>
+      row.original.notes ? (
+        <span
+          className="block w-full truncate text-[color:var(--wp-ink-2)]"
+          title={row.original.notes}
+        >
+          {row.original.notes}
+        </span>
+      ) : (
+        <EmptyCell />
+      ),
   },
   {
     id: "actions",
@@ -163,21 +202,22 @@ export const columns: ColumnDef<FollowUp>[] = [
       sticky: true,
       skeleton: { type: "icon" },
       headerLabel: "Actions",
-      className:
-        "text-right sticky right-0 bg-background group-hover:bg-[#F2F1EF] group-hover:dark:bg-[#0f0f0f] z-30 justify-center !border-l !border-border",
+      className: ACTIONS_CELL_CLASS,
     },
     cell: ({ row, table }) => {
       return (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="h-8 w-8 p-0">
-              <span className="sr-only">Open menu</span>
-              <MoreHorizontal className="h-4 w-4" />
-            </Button>
+            <RowActionsTrigger
+              label={`Actions for ${row.original.customerName}`}
+            />
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuLabel>Actions</DropdownMenuLabel>
+          <DropdownMenuContent align="end" className="min-w-[200px] rounded-xl">
+            <DropdownMenuLabel className="truncate text-xs text-muted-foreground">
+              {row.original.customerName}
+            </DropdownMenuLabel>
             <DropdownMenuItem
+              className="min-h-10"
               onClick={(e) => {
                 e.stopPropagation();
                 table.options.meta?.closeFollowUp?.(row.original.id);

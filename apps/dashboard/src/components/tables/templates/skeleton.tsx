@@ -9,6 +9,7 @@ export function TemplatesTableSkeleton() {
     <TableSkeleton
       columns={columns}
       rowCount={12}
+      label="Loading templates"
       stickyColumnIds={STICKY_COLUMNS.templates.map((column) => column.id)}
     />
   );

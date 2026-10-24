@@ -12,9 +12,9 @@ export function EmptyState() {
 
   return (
     <TableEmptyState
-      title="No templates"
-      description="Create reusable follow-up copy for common service moments."
-      actionLabel="Create template"
+      title="No templates yet"
+      description="Save wording you use often for check-ins, so staff start from a good message."
+      actionLabel="Add template"
       onAction={() => setParams({ createTemplate: true })}
     />
   );

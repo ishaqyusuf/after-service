@@ -1,12 +1,13 @@
 import { auth } from "@afterservice/auth";
 import { getDbClient, validateQaDerivedSession } from "@afterservice/db";
-import { headers } from "next/headers";
+import { cookies, headers } from "next/headers";
 import { redirect } from "next/navigation";
 import type { ReactNode } from "react";
 import { AssistantProvider } from "@/components/assistant/assistant-provider";
+import { DashboardShell } from "@/components/dashboard-shell";
 import { Header } from "@/components/header";
 import { GlobalSheetsProvider } from "@/components/sheets/global-sheets-provider";
-import { Sidebar } from "@/components/sidebar";
+import { parseSidebarState, SIDEBAR_COOKIE } from "@/lib/sidebar-state";
 
 export default async function SidebarLayout({
   children,
@@ -52,16 +53,20 @@ export default async function SidebarLayout({
     redirect("/onboarding");
   }
 
+  const cookieStore = await cookies();
+  const sidebarState = parseSidebarState(
+    cookieStore.get(SIDEBAR_COOKIE)?.value,
+  );
+
   return (
     <AssistantProvider key={`${session.user.id}:${membership.workspace.id}`}>
       <GlobalSheetsProvider />
-      <div className="relative">
-        <Sidebar />
-        <div className="md:ml-[70px] pb-4">
-          <Header />
-          <div className="px-4 md:px-8">{children}</div>
-        </div>
-      </div>
+      <DashboardShell initialSidebarState={sidebarState}>
+        <Header />
+        <main id="main-content" tabIndex={-1} className="px-3 sm:px-4 md:px-8">
+          {children}
+        </main>
+      </DashboardShell>
     </AssistantProvider>
   );
 }

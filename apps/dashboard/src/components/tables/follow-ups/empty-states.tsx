@@ -13,8 +13,8 @@ export function EmptyState() {
   return (
     <TableEmptyState
       title="No follow-ups"
-      description="Create a follow-up to keep the next customer check-in visible."
-      actionLabel="Create follow-up"
+      description="Plan a follow-up to keep the next customer check-in visible."
+      actionLabel="Plan follow-up"
       onAction={() => setParams({ createFollowUp: true })}
     />
   );

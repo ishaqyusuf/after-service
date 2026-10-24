@@ -1,7 +1,7 @@
 "use client";
 
 import { Button } from "@afterservice/ui";
-import { motion } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
 import type { ReactNode } from "react";
 import { Portal } from "@/components/portal";
 
@@ -23,40 +23,40 @@ export function BottomBar({
   onDeselect,
   children,
 }: BottomBarProps) {
+  const reduceMotion = useReducedMotion();
+
   return (
     <Portal>
       <motion.div
-        className="h-12 fixed bottom-6 left-0 right-0 pointer-events-none flex justify-center z-50"
-        initial={{ y: 100 }}
+        className="pointer-events-none fixed inset-x-3 bottom-[max(1rem,env(safe-area-inset-bottom))] z-50 flex justify-center md:bottom-6"
+        initial={reduceMotion ? false : { y: 100 }}
         animate={{ y: 0 }}
-        exit={{ y: 100 }}
-        transition={{ duration: 0.2, ease: "easeOut" }}
+        exit={reduceMotion ? undefined : { y: 100 }}
+        transition={{ duration: 0.2, ease: [0.2, 0.8, 0.2, 1] }}
       >
-        <div className="relative pointer-events-auto min-w-[400px] h-12">
-          {/* Blur layer fades in separately to avoid backdrop-filter animation issues */}
-          <motion.div
-            className="absolute inset-0 backdrop-filter backdrop-blur-lg bg-[rgba(247,247,247,0.85)] dark:bg-[rgba(19,19,19,0.7)]"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.15 }}
-          />
-          <div className="relative h-12 justify-between items-center flex pl-4 pr-2">
-            <span className="text-sm">{selectedCount} selected</span>
+        <section
+          aria-label="Selected rows"
+          className="pointer-events-auto flex min-h-12 w-full max-w-[560px] flex-wrap items-center justify-between gap-2 rounded-[14px] border border-[color:var(--wp-line)] bg-[color:var(--wp-paper)] py-1.5 pl-4 pr-1.5 shadow-[var(--wp-shadow-pop)] sm:w-auto sm:min-w-[400px]"
+        >
+          <span
+            className="wp-numerals text-sm font-semibold"
+            aria-live="polite"
+          >
+            {selectedCount} selected
+          </span>
 
-            <div className="flex items-center space-x-2">
-              <Button
-                variant="ghost"
-                className="text-muted-foreground"
-                onClick={onDeselect}
-              >
-                <span>Deselect all</span>
-              </Button>
+          <div className="flex items-center gap-2">
+            <Button
+              variant="ghost"
+              className="h-10 rounded-[10px] text-[color:var(--wp-ink-2)] hover:bg-[color:var(--wp-hover)] hover:text-foreground"
+              onClick={onDeselect}
+            >
+              <span>Deselect all</span>
+            </Button>
 
-              {children}
-            </div>
+            {children}
           </div>
-        </div>
+        </section>
       </motion.div>
     </Portal>
   );

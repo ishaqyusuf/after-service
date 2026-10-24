@@ -19,7 +19,17 @@ import { useMemo, useRef, useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
 import { useCustomerFilterParams } from "@/hooks/use-customer-filter-params";
 import { useTRPC } from "@/trpc/client";
-import { FilterList, FilterMenuEmptyState } from "./filter-list";
+import {
+  FILTER_MENU_CLASS,
+  FILTER_TRIGGER_ACTIVE_CLASS,
+  FILTER_TRIGGER_CLASS,
+  FilterList,
+  FilterMenuEmptyState,
+  SEARCH_FORM_CLASS,
+  SEARCH_ICON_CLASS,
+  SEARCH_INPUT_CLASS,
+  SEARCH_ROW_CLASS,
+} from "./filter-list";
 
 export function CustomersSearchFilter() {
   const trpc = useTRPC();
@@ -89,47 +99,50 @@ export function CustomersSearchFilter() {
 
   return (
     <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
-      <div className="flex w-full flex-col items-start space-y-4 sm:flex-row sm:items-center sm:space-x-4 sm:space-y-0">
-        <form
-          className="relative w-full sm:w-auto"
-          onSubmit={(evt) => {
-            evt.preventDefault();
-            handleSubmit();
-          }}
-        >
-          <Icons.Search className="pointer-events-none absolute left-3 top-[11px]" />
-          <Input
-            ref={inputRef}
-            placeholder="Search customers..."
-            className="w-full pl-9 pr-8 sm:w-[350px]"
-            value={input}
-            onChange={handleSearch}
-            autoComplete="off"
-            autoCapitalize="none"
-            autoCorrect="off"
-            spellCheck="false"
-          />
+      <div className={SEARCH_ROW_CLASS}>
+        <search className={SEARCH_FORM_CLASS}>
+          <form
+            className="relative"
+            onSubmit={(evt) => {
+              evt.preventDefault();
+              handleSubmit();
+            }}
+          >
+            <Icons.Search className={SEARCH_ICON_CLASS} />
+            <Input
+              ref={inputRef}
+              aria-label="Search customers by name, company, email, phone or tag"
+              placeholder="Search customers"
+              className={SEARCH_INPUT_CLASS}
+              value={input}
+              onChange={handleSearch}
+              autoComplete="off"
+              autoCapitalize="none"
+              autoCorrect="off"
+              spellCheck="false"
+            />
 
-          <DropdownMenuTrigger asChild>
-            <button
-              onClick={() => setIsOpen((prev) => !prev)}
-              type="button"
-              className={cn(
-                "absolute right-3 top-[10px] z-10 opacity-50 transition-opacity duration-300 hover:opacity-100",
-                hasValidFilters && "opacity-100",
-                isOpen && "opacity-100",
-              )}
-            >
-              <Icons.Filter />
-            </button>
-          </DropdownMenuTrigger>
-        </form>
+            <DropdownMenuTrigger asChild>
+              <button
+                onClick={() => setIsOpen((prev) => !prev)}
+                type="button"
+                aria-label="Filter customers"
+                className={cn(
+                  FILTER_TRIGGER_CLASS,
+                  (hasValidFilters || isOpen) && FILTER_TRIGGER_ACTIVE_CLASS,
+                )}
+              >
+                <Icons.Filter />
+              </button>
+            </DropdownMenuTrigger>
+          </form>
+        </search>
 
         <FilterList filters={validFilters} onRemove={setFilter} />
       </div>
 
       <DropdownMenuContent
-        className="w-[350px]"
+        className={FILTER_MENU_CLASS}
         sideOffset={19}
         alignOffset={-11}
         side="bottom"

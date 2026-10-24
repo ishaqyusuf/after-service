@@ -18,7 +18,15 @@ export default async function SettingsPage() {
     <HydrateClient>
       <ScrollableContent>
         <ErrorBoundary fallback={<ErrorFallback />}>
-          <div className="max-w-[800px] space-y-12">
+          <div className="max-w-[800px] space-y-6">
+            <header className="space-y-1.5">
+              <h1 className="wp-display text-[26px] leading-tight md:text-[30px]">
+                Settings
+              </h1>
+              <p className="text-sm text-muted-foreground">
+                Your business details, follow-up defaults and appearance.
+              </p>
+            </header>
             <UpdateWorkspaceForm />
             <ChangeTheme />
           </div>

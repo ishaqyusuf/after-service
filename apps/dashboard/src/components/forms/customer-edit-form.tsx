@@ -12,10 +12,11 @@ import {
   FormMessage,
 } from "@afterservice/ui/form";
 import { useMutation } from "@tanstack/react-query";
-import { QuickFill } from "@/components/quick-fill";
 import type { inferRouterOutputs } from "@trpc/server";
 import { useEffect } from "react";
+import { ConfirmActionDialog } from "@/components/confirm-action-dialog";
 import { CustomerTagsInput } from "@/components/forms/customer-tags-input";
+import { QuickFill } from "@/components/quick-fill";
 import { useCustomerParams } from "@/hooks/use-customer-params";
 import { useDashboardInvalidations } from "@/hooks/use-dashboard-invalidations";
 import { useZodForm } from "@/hooks/use-zod-form";
@@ -176,15 +177,27 @@ export function CustomerEditForm({ customer }: Props) {
         </form>
       </Form>
 
-      <div className="border-t border-border pt-4">
-        <Button
-          variant="destructive"
-          className="w-full"
-          disabled={archiveCustomer.isPending}
-          onClick={() => archiveCustomer.mutate({ id: customer.id })}
+      <div className="space-y-2 border-t border-border pt-4">
+        <ConfirmActionDialog
+          title="Archive this customer?"
+          description={`${customer.name} will be hidden from customer lists. Their jobs and follow-up history stay in the workspace.`}
+          confirmLabel="Archive customer"
+          onConfirm={() => archiveCustomer.mutate({ id: customer.id })}
         >
-          {archiveCustomer.isPending ? "Archiving..." : "Archive customer"}
-        </Button>
+          <Button
+            type="button"
+            variant="destructive"
+            className="w-full"
+            disabled={archiveCustomer.isPending}
+          >
+            {archiveCustomer.isPending ? "Archiving..." : "Archive customer"}
+          </Button>
+        </ConfirmActionDialog>
+        {archiveCustomer.error ? (
+          <p role="alert" className="text-sm text-destructive">
+            {archiveCustomer.error.message}
+          </p>
+        ) : null}
       </div>
     </div>
   );
