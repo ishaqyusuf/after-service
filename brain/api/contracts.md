@@ -1,3 +1,14 @@
+# Password recovery contract
+
+Password recovery (2026-10-24): the typed client uses
+`requestPasswordReset({email, redirectTo})` with the current dashboard origin;
+reset uses `resetPassword({newPassword, token})`. Public recovery replies remain
+generic, including email callback failures. Provider acceptance and actual
+delivery require separate verification. Tokens expire after one hour, are
+single-use, and successful reset revokes existing sessions. Missing, expired or
+reused tokens fail without changing credentials.
+
+
 # QA purge contract
 
 - Start requires a fresh signed preview and exact `PURGE ALL QA DATA`

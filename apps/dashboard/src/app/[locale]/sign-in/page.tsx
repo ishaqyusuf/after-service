@@ -24,8 +24,18 @@ const AUTH_DEBUG =
   (process.env.AFTERSERVICE_AUTH_DEBUG === "true" ||
     process.env.AUTH_DEBUG === "true");
 
-export default async function SignInPage() {
-  return <SignInView dbAccountDebug={await getDbAccountDebug()} />;
+export default async function SignInPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ password_reset?: string }>;
+}) {
+  const query = await searchParams;
+  return (
+    <SignInView
+      dbAccountDebug={await getDbAccountDebug()}
+      passwordResetComplete={query.password_reset === "success"}
+    />
+  );
 }
 
 async function getDbAccountDebug(): Promise<DbAccountDebug | undefined> {

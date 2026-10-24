@@ -5,15 +5,27 @@ import { ResetPasswordForm } from "@/components/auth/reset-password-form";
 export const metadata: Metadata = {
   title: "Reset password | afterservice",
   description: "Set a new password for your afterservice dashboard account.",
+  robots: { index: false, follow: false },
+  referrer: "no-referrer",
 };
 
-export default function ResetPasswordPage() {
+export default async function ResetPasswordPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ token?: string; error?: string }>;
+}) {
+  const { token, error } = await searchParams;
+  const validLink = typeof token === "string" && token.length > 0 && !error;
   return (
     <AuthShell
-      description="Please enter your new password below."
-      title="Set new password"
+      description={
+        validLink
+          ? "Please enter your new password below."
+          : "Request a fresh link to recover your account."
+      }
+      title={validLink ? "Set new password" : "Reset your password"}
     >
-      <ResetPasswordForm />
+      <ResetPasswordForm token={validLink ? token : undefined} />
     </AuthShell>
   );
 }

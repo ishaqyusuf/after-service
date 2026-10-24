@@ -5,6 +5,10 @@ This file tracks unstarted work outside the active phase checklist.
 
 ## Current Backlog
 - Customer self-onboarding job flow.
+- High: deploy the locally verified password-recovery repair and finish
+  production acceptance. The human reset succeeded locally; recovery, delivery
+  and token regressions pass. See `../features/password-recovery.md` for the
+  remaining success-navigation/sign-in acceptance and rollout boundary.
 
 ## Customer Self-Onboarding Job Flow
 Status: backlog

@@ -1,3 +1,12 @@
+# Password recovery
+
+Password recovery stays on the dashboard's same-origin auth handler:
+`POST /api/auth/request-password-reset` requests email;
+`GET /api/auth/reset-password/:token?callbackURL=...` validates the link and
+redirects to the reset page; `POST /api/auth/reset-password` accepts
+`{newPassword, token}`. See `brain/features/password-recovery.md`.
+
+
 # Platform QA maintenance
 
 - `qaMaintenance.candidates`, `adopt`, `preview`, `start`, and `run` are

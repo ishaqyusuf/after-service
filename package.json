@@ -34,6 +34,7 @@
     "start:dashboard:prod": "bun --cwd apps/dashboard ../../scripts/with-workspace-env.mjs --mode production -- bun run next start -p 4101",
     "start:website:prod": "bun --cwd apps/website ../../scripts/with-workspace-env.mjs --mode production -- bun run next start -p 4100",
     "terminal": "bun scripts/terminal.mjs",
+    "test:password-recovery": "bun --env-file=/dev/null test apps/dashboard/src/proxy.test.ts packages/auth/src/password-reset-email.test.ts && bun --env-file=/dev/null ../../local-infra-kit/bin/with-env.ts --profile afterservice --mode local -- bun test ./tests/integration/password-recovery.integration.ts",
     "typecheck": "turbo typecheck"
   },
   "devDependencies": {

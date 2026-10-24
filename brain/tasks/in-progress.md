@@ -5,6 +5,21 @@ This file tracks active work.
 
 ## Current
 
+### Password Recovery Repair
+- Started Date: 2026-10-24
+- Status: Local Repair And Human Reset Verified; Production Rollout Pending
+- Scope: Anonymous recovery routes, current Better Auth request endpoint,
+  reset token submission, invalid-link UX, delivery errors and session revocation.
+- Verification: Proxy/email regression tests, real local auth/DB recovery loop,
+  full typechecks, 167 unit tests and optimized dashboard build pass.
+- Current Notes: User confirmed native password suggestions work in Chrome and
+  requested no further autofill fixes. Temporary probes and the unproven direct
+  input-event workaround were removed.
+- Next Step: Remaining acceptance is corrected success navigation,
+  new-password browser sign-in, fixture cleanup, and scoped production rollout.
+- Feature: `brain/features/password-recovery.md`.
+
+
 ### Replace OpenPanel With Logly
 - Priority: High
 - Description: Install the thin Logly SDK packages and use the standalone,
