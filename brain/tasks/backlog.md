@@ -9,10 +9,6 @@ This file tracks unstarted work outside the active phase checklist.
   production acceptance. The human reset succeeded locally; recovery, delivery
   and token regressions pass. See `../features/password-recovery.md` for the
   remaining success-navigation/sign-in acceptance and rollout boundary.
-- High: replace publicly visible privacy/terms placeholders with reviewed
-  product-specific content and confirm beta support/feedback ownership.
-- High: reconcile internal production workspaces with explicit QA classification
-  before treating Oversight counts or Logly events as real beta activation.
 - Feature candidates after observed beta friction: CSV customer import,
   recurring maintenance/follow-up sequences, and lightweight weekly activation
   reporting. Selection remains pending actual operator evidence.

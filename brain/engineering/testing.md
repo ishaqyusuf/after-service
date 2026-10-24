@@ -1,6 +1,26 @@
 # MVP Verification
 
-Updated: 2026-10-19
+Updated: 2026-10-24
+
+## Oversight Integration — 2026-10-24
+
+The default `bun run test:integration` now also includes
+`tests/integration/oversight.integration.ts`. Latest complete result: 47 tests,
+215 assertions, zero failures. The added cases exercise the actual HTTP router
+through a separately configured read-only client; all three directories;
+7/30/90-day UTC summaries; QA/purging exclusion; search isolation; 50-row
+pagination; nullable currency/amount; and rejection of database writes. Synthetic
+fixtures are removed by exact IDs. Route unit tests cover disabled/weak/missing
+credentials, pre-DB validation and sanitized 503 responses.
+
+Full monorepo and harness typechecks, touched-file Biome, whitespace checks and
+the ordinary production API smoke pass. Initial full unit result was 102 tests;
+concurrent pricing/billing work subsequently changed unrelated tests/source.
+Oversight's full typecheck, 8 tests and optimized production build pass. Local
+synthetic and live production in-app desktop/mobile acceptance verify the new
+snapshot, directories and service labels. No real customer/provider mutation
+is part of these checks. Release provenance and production limits are in
+`brain/features/oversight-integration.md`.
 
 ## Latest Results
 

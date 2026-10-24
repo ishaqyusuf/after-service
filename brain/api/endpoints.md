@@ -12,7 +12,7 @@ Base URL: `https://api.afterservice.app`.
 
 - `GET /health`: service health and configured public app URLs.
 - `GET /api/oversight/v1/summary|businesses|users|records`: explicitly enabled,
-  independent bearer-key-protected private portfolio reads (ADR 0017).
+  independent bearer-key-protected private portfolio reads (ADR 0019).
 - `GET|POST /trpc/*` and `/api/trpc/*`: shared typed business router.
 - `GET|POST /api/auth/*`: Better Auth handlers; browser OAuth remains on the dashboard origin.
 - `POST /api/onboarding`: authenticated workspace onboarding.

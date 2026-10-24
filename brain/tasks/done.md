@@ -2780,3 +2780,47 @@ Files changed:
   dashboard visits show Nigeria (NG). See
   `brain/handoffs/2026-10-24-country-tracking-release.md`.
 - Details: `brain/features/visit-country-tracking.md`; ADR 0018.
+
+## 2026-10-24: Reconcile internal/test adoption reporting
+
+- Founder confirmed all four workspaces are internal/test. Exact-ID reporting
+  exclusions are deployed independently of QA classification/purge eligibility.
+- Live Oversight summary and all three directories verified: zero external
+  businesses/jobs/customers/follow-ups; three registrations without businesses.
+- API/dashboard source overlays preserve the newest verified parallel releases;
+  production builds, isolated typechecks, regression/integration and compiled
+  smoke pass. No workspace data, authentication or read grants changed.
+- Historic anonymous Logly traffic remains traffic and cannot be relabelled as
+  verified adoption. Feature: `brain/features/adoption-data-reconciliation.md`.
+
+## 2026-10-24: Replace blocked Trigger project and verify delivery
+
+- Created afterservice in Zeroes & One, deployed six tasks as `20261024.2`,
+  protected DB/Resend as non-revealable secrets, and updated both production
+  dispatch keys through exact-source API/dashboard rebuilds.
+- Production no-recipient probe completed with no writes/messages. One explicit
+  dashboard follow-up then completed and arrived in the founder Gmail inbox.
+  The internal follow-up is closed; reporting exclusions remain in place.
+- Worker typecheck, nine routing tests and production build/alias checks pass.
+  Old project/history is retained. No purchase. With explicit founder approval,
+  the two Trigger assignments in `.env` and `.env.production` were aligned;
+  all other settings were preserved.
+- Feature: `brain/features/trigger-project-migration.md`; ADR 0025.
+
+## 2026-10-24: Complete ordered adoption, email and legal/support priorities
+
+- Reporting-only exclusion removes all four founder-confirmed internal/test
+  workspaces from adoption without altering product access or purgeability.
+  Oversight shows zero external businesses and three incomplete registrations.
+- Replacement Trigger project in Zeroes & One, production app cutover and one
+  actual inbox-delivered follow-up verified. Approved local dev/prod connection
+  assignments are aligned; old project/history retained.
+- Founder confirmed Zeroes and One Hi-Tech (Nigeria) and monitored support at
+  hello@afterservice.app. Privacy/terms placeholders replaced and published.
+  Website production `dpl_DUhi4yXDmJjw1xWsy1C1zRUcmbjU` preserves prior pricing.
+- Website typechecks, scoped Biome, production build and in-app desktop checks
+  pass. Public page navigation, support targets, canonical metadata and existing
+  NGN pricing verified; no captured page errors. No API/database changes.
+- Details: `brain/features/legal-and-support-readiness.md`,
+  `brain/features/trigger-project-migration.md` and
+  `brain/features/adoption-data-reconciliation.md`.

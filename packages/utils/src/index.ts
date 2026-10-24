@@ -1,3 +1,4 @@
+export * from "./adoption-reporting";
 export * from "./app-urls";
 export * from "./email";
 export * from "./env";

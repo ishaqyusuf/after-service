@@ -2,13 +2,16 @@
 
 ## Status
 Implemented manual-send foundation on 2026-05-30.
-Updated on 2026-06-11 so explicit manual email sends are queued through Trigger.dev jobs and delivered with Resend, with `TEST_EMAIL` overriding recipients outside production.
+Updated on 2026-06-11 so explicit manual email sends are queued through Trigger.dev jobs and delivered with Resend. As of 2026-10-24, ordinary non-production mail
+defaults to console and exact `EMAIL_QA_DOMAIN_ROUTES` provide explicit QA routing.
 
 ## Scope
 - `packages/notifications` defines message payload/provider contracts.
 - Manual-only provider remains the default safe implementation.
 - Resend-backed email delivery runs through the `notification` Trigger.dev task and is available only when callers pass `sendEmail: true`.
-- `TEST_EMAIL` redirects all outbound email recipients in dev/local mode so the first connected email test cannot accidentally reach a customer.
+- Ordinary local/development/preview email defaults to console. Exact QA-domain
+  routes may target an approved inbox; unmapped `.test` recipients fail closed.
+  `TEST_EMAIL` is used by the internal analytics report, not notification routing.
 - Follow-up `markSent` logs a `MessageLog` and `FollowUpEvent`.
 
 ## Architecture
@@ -21,8 +24,13 @@ Updated on 2026-06-11 so explicit manual email sends are queued through Trigger.
 - Local website/dashboard development should include the jobs runner: `bun run dev -f website dashboard jobs` runs `@afterservice/jobs` alongside the public website and dashboard.
 - Jobs deploy mirrors GND's Prisma packaging step: `packages/jobs/prisma.ts` refreshes `packages/jobs/src/schema.prisma` from the shared DB schema before `trigger deploy`, and `trigger.config.ts` points Trigger's Prisma build extension at that task-local schema.
 - Jobs deploy pins the Trigger.dev runtime to `node-22` because Prisma 7 requires Node `20.19+`, `22.12+`, or `24.0+`; Trigger.dev 4.0.1's default `node` runtime image uses Node 21 and fails during remote image dependency installation.
-- Jobs deploy syncs the production runtime variables required by the worker (`DATABASE_URL`, `RESEND_API_KEY`, `EMAIL_FROM_ADDRESS`, `TEST_EMAIL`, and `AFTERSERVICE_ENV_MODE`) through Trigger.dev's `syncEnvVars` build extension so deployed tasks use the same production database and email provider configuration as the deploy environment.
-- Trigger.dev project selection is env-driven: `TRIGGER_PROJECT_ID` supplies the project ref, and `TRIGGER_PROFILE` optionally selects the CLI login profile for jobs `dev`/`deploy`. `scripts/with-trigger-profile.mjs` validates `TRIGGER_PROJECT_ID` before local `trigger dev`/`trigger deploy`; `trigger.config.ts` must remain importable without that env var because Trigger's remote deployment indexer imports the config inside the built image.
+- Jobs deploy syncs non-secret runtime configuration. Production database/provider
+  credentials are separately provisioned as non-revealable Trigger secrets; older
+  CLI sync defaults to revealable values and must not overwrite those secrets.
+- `packages/jobs/trigger-project.json` is the canonical non-secret project binding.
+  Config and CLI wrapper use it; explicit `--project-ref` can override deliberately.
+  `TRIGGER_PROFILE` selects the existing CLI login profile. Stale project IDs in
+  shared dotenv profiles no longer select deployment targets.
 - Local `trigger dev` also receives an ephemeral `0600` env file containing the
   allowlisted values from the active local-infra profile. This intentionally
   overrides Trigger.dev's remote project variables for the local worker and is
@@ -49,3 +57,36 @@ No automatic customer outbound messaging is sent in MVP. Real email is limited t
 `bun run smoke:mvp` uses reserved `.invalid` recipient addresses so local
 console delivery cannot accidentally contact a customer. It polls for the
 asynchronous `MessageLog` and now passes through the real Trigger.dev task.
+
+## Original credit blocker — 2026-10-24 (resolved by replacement below)
+
+The configured project `proj_hquxdnfjtrqbkznhiapz` resolves to AfterService in
+the School Clerk Trigger organization. In-app browser inspection confirms
+its monthly $5 free credits are exhausted: new runs are blocked until
+2026-11-01 or an upgrade. The displayed lowest paid plan is Hobby at $10/month.
+The founder was handed the billing page; no purchase, upgrade, new task run or
+email was submitted. At that point, actual follow-up delivery was unverified.
+
+The existing production worker's non-secret `AFTERSERVICE_ENV_MODE` is
+`production`; it was inspected in isolation and concealed again. Its database
+and provider credentials were not revealed. The shared deploy profile instead
+uses `prod` and has no explicit `EMAIL_DELIVERY_MODE`, so a future source deploy
+would incorrectly select console delivery. The helper now recognizes both
+production aliases. A regression first failed for `prod`, then all nine routing
+tests and utils typecheck passed. Explicit console and local/preview behavior
+remain covered. This source fix is now included in the replacement worker below.
+
+The subsequent replacement acceptance used one explicit follow-up in an already excluded
+internal workspace. Avoid the existing smoke task's creation of a fresh normal
+workspace, which would contaminate adoption totals again. Verify queue acceptance,
+provider acceptance and actual inbox arrival separately. Do not run a general
+local worker against production or contact any other recipient.
+
+## Zeroes & One replacement — 2026-10-24
+
+The founder chose a replacement project in Zeroes & One. It is created and
+worker `20261024.2` passes its production no-recipient probe. DB/Resend are
+non-revealable secrets. Production app key rollout and delivered-email acceptance are complete; this
+supersedes the pending upgrade choice. One dashboard-dispatched follow-up
+completed in the new project and arrived in the approved founder inbox. See
+`trigger-project-migration.md` and ADR 0025.

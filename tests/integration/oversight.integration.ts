@@ -12,6 +12,89 @@ import { localTestDb } from "../support/local-db";
 
 const db = localTestDb();
 
+test("reviewed internal exclusions affect every directory and summary without making data purgeable", async () => {
+  const marker = `internal-reporting-${randomUUID()}`;
+  const original = process.env.ADOPTION_EXCLUDED_WORKSPACE_IDS;
+  const now = new Date("2038-04-03T12:00:00Z");
+  const operator = await db.user.create({
+    data: {
+      name: marker,
+      email: `${marker}@afterservice.invalid`,
+      createdAt: now,
+    },
+  });
+  let workspaceId: string | undefined;
+  try {
+    const workspace = await db.workspace.create({
+      data: {
+        name: marker,
+        slug: marker,
+        createdAt: now,
+        memberships: { create: { role: "owner", userId: operator.id } },
+        customers: { create: { name: marker } },
+      },
+    });
+    workspaceId = workspace.id;
+    const customer = await db.customer.findFirstOrThrow({
+      where: { workspaceId: workspace.id },
+    });
+    await db.serviceJob.create({
+      data: {
+        workspaceId: workspace.id,
+        customerId: customer.id,
+        title: marker,
+        createdAt: now,
+        completedAt: now,
+      },
+    });
+    const before = await getOversightSummary(db, 7, now);
+    process.env.ADOPTION_EXCLUDED_WORKSPACE_IDS = [original, workspace.id]
+      .filter(Boolean)
+      .join(",");
+    const after = await getOversightSummary(db, 7, now);
+    expect(after.totals.businesses).toBe(before.totals.businesses - 1);
+    expect(after.totals.users).toBe(before.totals.users - 1);
+    expect(after.totals.customers).toBe(before.totals.customers - 1);
+    expect(after.totals.orders).toBe(before.totals.orders - 1);
+    expect(after.series.at(-1)?.users).toBe(0);
+    expect(after.series.at(-1)?.orders).toBe(0);
+    expect(
+      (await getOversightBusinesses(db, { search: marker })).items,
+    ).toHaveLength(0);
+    expect(
+      (await getOversightUsers(db, { search: marker })).items,
+    ).toHaveLength(0);
+    expect(
+      (await getOversightRecords(db, { search: marker })).items,
+    ).toHaveLength(0);
+    expect(
+      (await getOversightBusinesses(db, { search: marker, cursor: "a" })).items,
+    ).toHaveLength(0);
+    expect(
+      (await getOversightRecords(db, { search: marker, cursor: "a" })).items,
+    ).toHaveLength(0);
+    const retained = await db.workspace.findUniqueOrThrow({
+      where: { id: workspace.id },
+      select: {
+        dataClassification: true,
+        qaMarkedAt: true,
+        qaPurgeStartedAt: true,
+      },
+    });
+    expect(retained).toEqual({
+      dataClassification: "normal",
+      qaMarkedAt: null,
+      qaPurgeStartedAt: null,
+    });
+  } finally {
+    if (original === undefined)
+      delete process.env.ADOPTION_EXCLUDED_WORKSPACE_IDS;
+    else process.env.ADOPTION_EXCLUDED_WORKSPACE_IDS = original;
+    if (workspaceId) await db.workspace.delete({ where: { id: workspaceId } });
+    await db.user.delete({ where: { id: operator.id } });
+  }
+});
+
 test("authenticated HTTP reads use the separate read-only client and reject writes", async () => {
   const original = {
     OVERSIGHT_ENABLED: process.env.OVERSIGHT_ENABLED,

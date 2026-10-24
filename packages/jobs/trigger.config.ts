@@ -1,24 +1,19 @@
 import { syncEnvVars } from "@trigger.dev/build/extensions/core";
 import { prismaExtension } from "@trigger.dev/build/extensions/prisma";
 import { defineConfig } from "@trigger.dev/sdk/v3";
+import triggerProject from "./trigger-project.json";
 
 const syncedProductionEnvVars = [
   "AFTERSERVICE_ENV_MODE",
-  "DATABASE_URL",
   "EMAIL_FROM_ADDRESS",
   "LOGLY_COLLECTOR_URL",
   "LOGLY_PROJECT",
-  "LOGLY_READ_KEY",
-  "RESEND_API_KEY",
   "EMAIL_DELIVERY_MODE",
   "EMAIL_QA_DOMAIN_ROUTES",
-  "QA_MAINTENANCE_SECRET",
-  "POLAR_ACCESS_TOKEN",
 ] as const;
 
-function getTriggerProjectId() {
-  return process.env.TRIGGER_PROJECT_ID?.trim() || "remote-indexer-project-ref";
-}
+// Credentials are provisioned as Trigger secrets. The older CLI sync API
+// defaults to revealable values, so routine deploys must not overwrite them.
 
 function getSyncedProductionEnv() {
   return Object.fromEntries(
@@ -30,7 +25,7 @@ function getSyncedProductionEnv() {
 }
 
 export default defineConfig({
-  project: getTriggerProjectId(),
+  project: triggerProject.projectId,
   runtime: "node-22",
   logLevel: "log",
   maxDuration: 60,

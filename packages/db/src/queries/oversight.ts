@@ -1,15 +1,21 @@
+import { getAdoptionExcludedWorkspaceIds } from "@afterservice/utils";
 import type { Prisma, PrismaClient } from "../index";
 
-const live = {
-  dataClassification: "normal",
-  qaPurgeStartedAt: null,
-} satisfies Prisma.WorkspaceWhereInput;
-const accounts = {
-  OR: [
-    { memberships: { none: {} } },
-    { memberships: { some: { workspace: live } } },
-  ],
-} satisfies Prisma.UserWhereInput;
+function reportingPopulation() {
+  const excludedWorkspaceIds = getAdoptionExcludedWorkspaceIds(process.env);
+  const live = {
+    dataClassification: "normal",
+    qaPurgeStartedAt: null,
+    AND: [{ id: { notIn: excludedWorkspaceIds } }],
+  } satisfies Prisma.WorkspaceWhereInput;
+  const accounts = {
+    OR: [
+      { memberships: { none: {} } },
+      { memberships: { some: { workspace: live } } },
+    ],
+  } satisfies Prisma.UserWhereInput;
+  return { accounts, excludedWorkspaceIds, live };
+}
 
 export type OversightDirectoryInput = { search: string; cursor?: string };
 
@@ -25,6 +31,7 @@ export async function getOversightSummary(
   days: 7 | 30 | 90,
   to = new Date(),
 ) {
+  const { accounts, excludedWorkspaceIds, live } = reportingPopulation();
   const from = new Date(
     Date.UTC(to.getUTCFullYear(), to.getUTCMonth(), to.getUTCDate() - days + 1),
   );
@@ -66,7 +73,8 @@ export async function getOversightSummary(
           AND (NOT EXISTS (SELECT 1 FROM "Membership" m WHERE m."userId" = u.id)
             OR EXISTS (SELECT 1 FROM "Membership" m JOIN "Workspace" w
               ON w.id = m."workspaceId" WHERE m."userId" = u.id
-              AND w."dataClassification" = 'normal' AND w."qaPurgeStartedAt" IS NULL))
+              AND w."dataClassification" = 'normal' AND w."qaPurgeStartedAt" IS NULL
+              AND NOT (w.id = ANY(${excludedWorkspaceIds}::text[]))))
         GROUP BY 1`,
         tx.$queryRaw<{ date: string; count: number }[]>`
         SELECT to_char(j."createdAt" AT TIME ZONE 'UTC', 'YYYY-MM-DD') AS date,
@@ -74,6 +82,7 @@ export async function getOversightSummary(
           ON w.id = j."workspaceId"
         WHERE j."createdAt" >= ${from} AND j."createdAt" <= ${to}
           AND w."dataClassification" = 'normal' AND w."qaPurgeStartedAt" IS NULL
+          AND NOT (w.id = ANY(${excludedWorkspaceIds}::text[]))
         GROUP BY 1`,
       ]);
       const userCounts = new Map(userDays.map((row) => [row.date, row.count]));
@@ -115,6 +124,7 @@ export async function getOversightBusinesses(
   db: PrismaClient,
   input: OversightDirectoryInput,
 ) {
+  const { live } = reportingPopulation();
   const rows = await db.workspace.findMany({
     where: {
       ...live,
@@ -163,6 +173,7 @@ export async function getOversightUsers(
   db: PrismaClient,
   input: OversightDirectoryInput,
 ) {
+  const { accounts, live } = reportingPopulation();
   const rows = await db.user.findMany({
     where: {
       AND: [
@@ -215,6 +226,7 @@ export async function getOversightRecords(
   db: PrismaClient,
   input: OversightDirectoryInput,
 ) {
+  const { live } = reportingPopulation();
   const rows = await db.serviceJob.findMany({
     where: {
       workspace: live,
