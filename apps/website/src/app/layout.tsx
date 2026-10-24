@@ -24,7 +24,7 @@ const calSans = localFont({
 export const metadata: Metadata = {
   ...createPageMetadata({
     description:
-      "Free beta for local service operators who need one board for post-job customer follow-up.",
+      "Free plan for local service operators who need one board for post-job customer follow-up.",
     path: "/",
     title: "afterservice | Post-job follow-up board for service shops",
   }),

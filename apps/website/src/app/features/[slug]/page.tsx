@@ -85,7 +85,7 @@ export default async function FeatureDetailPage({ params }: FeaturePageProps) {
             href="/signup"
             className="inline-flex h-11 items-center justify-center rounded-md bg-[#009b98] px-5 text-sm font-semibold text-white transition-colors hover:bg-[#007f7c]"
           >
-            Join Free Beta
+            Start free
           </a>
           <a
             href="/guides/post-job-follow-up"

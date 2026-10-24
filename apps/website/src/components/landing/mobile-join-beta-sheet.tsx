@@ -71,7 +71,7 @@ export function MobileJoinBetaSheet({
     >
       <div className="min-w-0">
         <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-white/55">
-          Free Beta
+          Free
         </p>
         <p className="mt-0.5 text-sm font-semibold leading-tight text-white">
           No credit card required
@@ -89,7 +89,7 @@ export function MobileJoinBetaSheet({
         }
         className="inline-flex h-11 shrink-0 items-center justify-center gap-1.5 rounded-full bg-white px-5 text-sm font-bold text-[#0a0a0a] shadow-sm transition-colors hover:bg-[#eef8f0] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0a0a0a]"
       >
-        Join Beta
+        Start free
         <ArrowRight className="h-4 w-4" />
       </a>
     </div>

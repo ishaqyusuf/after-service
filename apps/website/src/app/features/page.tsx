@@ -37,7 +37,7 @@ export default async function FeaturesPage() {
           href="/signup"
           className="mt-8 inline-flex h-11 items-center justify-center rounded-md bg-[#009b98] px-5 text-sm font-semibold text-white transition-colors hover:bg-[#007f7c]"
         >
-          Join Free Beta
+          Start free
         </a>
       </section>
 

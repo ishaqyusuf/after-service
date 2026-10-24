@@ -15,6 +15,7 @@ import { assistantChatResponse } from "./assistant/chat";
 import { createContext } from "./context";
 import followUpJobs from "./rest/routers/follow-up-jobs";
 import oversight from "./rest/routers/oversight";
+import polarWebhook from "./rest/routers/polar-webhook";
 import { appRouter } from "./routers/_app";
 import { lemonWebhookSchema, onboardingSchema } from "./schemas";
 
@@ -198,6 +199,7 @@ app.post("/api/onboarding", async (c) => {
 
 app.route("/api/jobs/follow-ups", followUpJobs);
 app.route("/api/oversight/v1", oversight);
+app.route("/webhooks/polar", polarWebhook);
 
 app.post("/webhooks/lemon-squeezy", async (c) => {
   const body = await c.req.text();

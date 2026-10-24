@@ -11,7 +11,7 @@ export async function generateMetadata(): Promise<Metadata> {
   return createPageMetadata({
     title: "Pricing | afterservice",
     description:
-      "Free early access now, with simple paid plans planned for service teams.",
+      "Choose Free or affordable Business pricing, with an AI assistant and WhatsApp operations coming soon.",
     path: "/pricing",
   });
 }
@@ -26,8 +26,8 @@ export default async function PricingPage({ searchParams }: PricingPageProps) {
           <p className="care-eyebrow">A straightforward start</p>
           <h1>Good care starts here.</h1>
           <p>
-            Start with the free beta. See what is available now and what is
-            planned for later.
+            One free plan. One affordable Business plan. Choose the room your
+            business needs.
           </p>
         </div>
       </div>

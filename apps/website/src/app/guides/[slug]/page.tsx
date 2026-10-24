@@ -114,14 +114,14 @@ export default async function GuidePage({ params }: GuidePageProps) {
             Put the checklist into a board
           </h2>
           <p className="mt-3 leading-7 text-muted-foreground">
-            afterservice is in free beta for local service operators who want a
+            afterservice is in free plan for local service operators who want a
             simple, manual-first way to manage post-job follow-up.
           </p>
           <a
             href="/signup"
             className="mt-5 inline-flex h-11 items-center justify-center rounded-md bg-[#009b98] px-5 text-sm font-semibold text-white transition-colors hover:bg-[#007f7c]"
           >
-            Join Free Beta
+            Start free
           </a>
         </div>
       </article>

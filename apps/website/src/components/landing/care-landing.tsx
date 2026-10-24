@@ -414,8 +414,8 @@ export function CareLanding({
               A check-in remembered. A reply kept in context. Give good service
               a little more follow-through.
             </p>
-            <BetaLink location="landing_hero">Join the free beta</BetaLink>
-            <small>Free beta · Mobile & desktop</small>
+            <BetaLink location="landing_hero">Start free</BetaLink>
+            <small>Free plan · Mobile & desktop</small>
           </div>
         </div>
         <HeroJourney />
@@ -461,7 +461,7 @@ export function CareLanding({
             </div>
           </div>
           <p className="care-beta-boundary">
-            During beta, your team sends messages and records contact manually.
+            With afterservice, your team sends messages and records contact manually.
             Automated sending is planned for later.
           </p>
         </div>
@@ -502,8 +502,8 @@ export function CareLanding({
           <em>a little follow-through.</em>
         </h2>
         <p>One place for the care that comes after the job.</p>
-        <BetaLink location="landing_bottom">Join the free beta</BetaLink>
-        <small>Free beta · Built for mobile & desktop</small>
+        <BetaLink location="landing_bottom">Start free</BetaLink>
+        <small>Free plan · Built for mobile & desktop</small>
       </section>
     </main>
   );

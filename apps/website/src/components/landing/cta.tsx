@@ -15,7 +15,7 @@ export function LandingCTA() {
           board.
         </h2>
         <p className="text-muted-foreground max-w-xl mx-auto mb-8 text-base">
-          Join the free beta, no credit card required. Use the core workflow
+          Start free, no credit card required. Use the core workflow
           while paid plans and integrations are shaped around real operators.
         </p>
         <a
@@ -33,7 +33,7 @@ export function LandingCTA() {
             size="lg"
             className="h-14 px-8 text-base font-bold shadow-lg shadow-[#009b98]/20"
           >
-            Join Free Beta
+            Start free
           </Button>
         </a>
       </div>

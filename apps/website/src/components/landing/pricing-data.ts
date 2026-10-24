@@ -1,120 +1,78 @@
-import { type PublicPlanId, planPricingUsd } from "@afterservice/plans";
+import type { PublicPlanId } from "@afterservice/plans";
 
-export type PublicPlan = {
+type PlanFeature = {
+  name: string;
+  description?: string;
+  comingSoon?: boolean;
+};
+
+type PublicPlan = {
   billingNote: string;
   buyer: string;
   cta: string;
-  current?: boolean;
+  current: boolean;
   description: string;
-  features: string[];
+  features: PlanFeature[];
   id: PublicPlanId;
   limits: string[];
   name: string;
-  planned?: boolean;
-  price: {
-    monthlyUsd: number;
-    yearlyUsd: number | null;
-  };
   priceNote: string;
 };
 
-export const publicPlans = [
+export const publicPlans: PublicPlan[] = [
   {
     billingNote: "No credit card required.",
-    buyer: "Early service operators",
-    cta: "Join free beta",
+    buyer: "Getting started",
+    cta: "Start free",
     current: true,
     description:
-      "Use the core follow-up board while afterservice is in early access.",
+      "Keep your customers, completed jobs and follow-ups in one place.",
     features: [
-      "Customers and completed jobs",
-      "Follow-up board",
-      "Basic templates",
-      "Manual send logging",
+      { name: "Customers and completed jobs" },
+      { name: "Follow-up board" },
+      { name: "Basic templates" },
+      { name: "Manual contact logging and history" },
     ],
-    limits: ["1 owner/admin", "100 customers", "200 follow-ups", "5 templates"],
+    limits: [
+      "1 user",
+      "100 stored customers",
+      "200 stored follow-ups",
+      "5 templates",
+    ],
     id: "free_beta",
-    name: "Free Beta",
-    price: {
-      monthlyUsd: planPricingUsd.free_beta.monthly,
-      yearlyUsd: planPricingUsd.free_beta.yearly,
-    },
-    priceNote: "during early access",
+    name: "Free",
+    priceNote: "per month",
   },
   {
-    billingNote: "Planned after beta.",
-    buyer: "Solo owner/operator",
-    cta: "Planned after beta",
-    description:
-      "A simple paid plan for shops that want the core workflow with more room.",
-    features: [
-      "Core board and templates",
-      "CSV import",
-      "Manual email/SMS logging",
-      "Basic reports",
-    ],
-    limits: ["1 user", "250 customers", "750 follow-ups", "10 templates"],
-    id: "starter",
-    name: "Starter",
-    planned: true,
-    price: {
-      monthlyUsd: planPricingUsd.starter.monthly,
-      yearlyUsd: planPricingUsd.starter.yearly,
-    },
-    priceNote: "per month planned",
-  },
-  {
-    billingNote: "Planned after beta.",
+    billingNote: "Billed monthly. Cancel from your billing portal.",
     buyer: "Small service team",
-    cta: "Planned after beta",
+    cta: "Choose Business",
+    current: false,
     description:
-      "For shops with an office/admin workflow and multiple people touching follow-up.",
+      "More room for your business, with AI assistance and WhatsApp operations on the way.",
     features: [
-      "Team assignment",
-      "Saved follow-up sequences",
-      "Provider integrations",
-      "Recurring maintenance reminders",
+      { name: "Everything in Free" },
+      {
+        name: "AI operations assistant",
+        description:
+          "Find customers, record jobs, manage follow-ups and draft messages in chat.",
+        comingSoon: true,
+      },
+      {
+        name: "Run your business from WhatsApp",
+        description:
+          "Connect your WhatsApp to afterservice, then review and confirm supported operations directly in chat.",
+        comingSoon: true,
+      },
     ],
     limits: [
-      "Up to 5 users",
-      "2,000 customers",
-      "7,500 follow-ups",
-      "50 templates",
+      "Up to 3 users",
+      "1,000 stored customers",
+      "3,000 stored follow-ups",
+      "25 templates",
     ],
-    id: "shop",
-    name: "Shop",
-    planned: true,
-    price: {
-      monthlyUsd: planPricingUsd.shop.monthly,
-      yearlyUsd: planPricingUsd.shop.yearly,
-    },
-    priceNote: "per month planned",
+    id: "business",
+    name: "Business",
+    priceNote: "per business / month",
   },
-  {
-    billingNote: "Planned after beta.",
-    buyer: "Growing local operator",
-    cta: "Planned after beta",
-    description:
-      "For higher-volume operators that need automations, imports, and reporting.",
-    features: [
-      "Automation rules",
-      "Zapier/webhook import",
-      "QuickBooks/job-source helpers",
-      "Priority support",
-    ],
-    limits: [
-      "Up to 15 users",
-      "10,000 customers",
-      "30,000 follow-ups",
-      "150 templates",
-    ],
-    id: "growth",
-    name: "Growth",
-    planned: true,
-    price: {
-      monthlyUsd: planPricingUsd.growth.monthly,
-      yearlyUsd: planPricingUsd.growth.yearly,
-    },
-    priceNote: "per month planned",
-  },
-] satisfies PublicPlan[];
+];

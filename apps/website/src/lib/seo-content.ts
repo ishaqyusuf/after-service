@@ -77,7 +77,7 @@ export const solutionPages: SolutionPage[] = [
       {
         question: "Does afterservice send repair follow-ups automatically?",
         answer:
-          "The free beta is manual-first. Teams plan due follow-ups, use saved drafts, and record outreach. Provider-powered automation is only planned after the workflow and customer consent requirements are proven.",
+          "The core workflow is manual-first. Teams plan due follow-ups, use saved drafts, and record outreach. Provider-powered automation is only planned after the workflow and customer consent requirements are proven.",
       },
     ],
     hero: "Keep every repair customer visible after the job leaves the shop.",
@@ -386,7 +386,7 @@ export const guidePages: GuidePage[] = [
         title: "4. Set a restrained reminder rule",
         body: [
           "A customer may miss the first request, but repeated reminders can quickly feel intrusive. Decide in advance whether one reminder is appropriate, how long to wait, and which outcomes should stop the sequence.",
-          "Stop reminders after a reply, review completion, opt-out, complaint, or issue-recovery action. Keep a manual approval step during beta until the team understands its real response patterns.",
+          "Stop reminders after a reply, review completion, opt-out, complaint, or issue-recovery action. Keep a manual approval step during setup until the team understands its real response patterns.",
         ],
       },
       {
@@ -487,7 +487,7 @@ export const featurePages: FeaturePage[] = [
       {
         question: "Is the follow-up board automated?",
         answer:
-          "The free beta is manual-first. It helps teams prove timing, ownership, message, and exception rules before provider-powered sending or automation is introduced.",
+          "The core workflow is manual-first. It helps teams prove timing, ownership, message, and exception rules before provider-powered sending or automation is introduced.",
       },
     ],
     highlights: [
@@ -532,7 +532,7 @@ export const featurePages: FeaturePage[] = [
       {
         question: "Can staff edit a template before sending it?",
         answer:
-          "Yes. The beta treats templates as reusable drafts so staff can add job-specific context, check accuracy, and choose the appropriate channel before manually sending.",
+          "Yes. afterservice treats templates as reusable drafts so staff can add job-specific context, check accuracy, and choose the appropriate channel before manually sending.",
       },
     ],
     highlights: [

@@ -5,6 +5,7 @@ import {
   type Prisma,
   validateQaDerivedSession,
 } from "@afterservice/db";
+import { getBillingRequestContext } from "./utils/billing-request";
 
 type BetterAuthSession = NonNullable<
   Awaited<ReturnType<typeof auth.api.getSession>>
@@ -17,6 +18,7 @@ export type ApiWorkspaceContext = {
 } | null;
 
 export type ApiContext = {
+  billing?: ReturnType<typeof getBillingRequestContext>;
   db?: Prisma.TransactionClient;
   recordOnly?: boolean;
   afterCommit?: (() => Promise<void>)[];
@@ -68,6 +70,7 @@ export async function createContext(request?: Request): Promise<ApiContext> {
     : [null, null];
 
   return {
+    billing: getBillingRequestContext(request?.headers ?? new Headers()),
     request: request
       ? { origin: request.headers.get("origin"), method: request.method }
       : undefined,

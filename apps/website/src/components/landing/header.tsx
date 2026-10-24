@@ -68,7 +68,7 @@ export function LandingHeader() {
               });
             }}
           >
-            Join the free beta <ArrowUpRight size={17} />
+            Start free <ArrowUpRight size={17} />
           </Link>
         </nav>
         <div className="care-header-actions">
@@ -83,7 +83,7 @@ export function LandingHeader() {
               })
             }
           >
-            Join the free beta <ArrowUpRight size={17} />
+            Start free <ArrowUpRight size={17} />
           </Link>
           <button
             type="button"

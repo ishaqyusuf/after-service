@@ -10,7 +10,7 @@ export const landingFaqs: SeoFaqItem[] = [
   {
     question: "How does afterservice integrate with my existing workflow?",
     answer:
-      "During beta, you can log jobs directly in the operator dashboard. CSV import, Zapier/webhook intake, and job-source integrations are planned for paid plans once the core workflow is proven.",
+      "With afterservice, you can log jobs directly in the operator dashboard. CSV import, Zapier/webhook intake, and job-source integrations are planned for paid plans once the core workflow is proven.",
   },
   {
     question: "Can my field staff use this on the go?",
@@ -25,12 +25,12 @@ export const landingFaqs: SeoFaqItem[] = [
   {
     question: "What channels are supported for follow-ups?",
     answer:
-      "The beta focuses on planning, templates, and manual send logging. Provider-powered email, SMS, WhatsApp, and automation rules are planned after beta for teams that need scale.",
+      "The core workflow covers planning, templates and manual contact logging. The AI assistant and connected WhatsApp operations are coming soon. Customer-message delivery is separate when available.",
   },
   {
-    question: "When will paid plans launch?",
+    question: "How do Free and Business compare?",
     answer:
-      "Paid plans launch after the beta proves weekly usage and paid intent. Beta users can use the core board for free and will keep founder-rate pricing when paid plans launch.",
+      "Free includes the core board for one user. Business adds room for up to 3 users, 1,000 customers, 3,000 stored follow-ups and 25 templates for one monthly price. AI assistant and WhatsApp operations are coming soon.",
   },
 ];
 

@@ -1,7 +1,4 @@
-import {
-  getHeaderPricingHints,
-  resolvePricingRegion,
-} from "@afterservice/plans";
+import { resolveRequestPricing } from "@afterservice/plans/checkout";
 import type { Metadata } from "next";
 import { headers } from "next/headers";
 import { Suspense } from "react";
@@ -21,9 +18,7 @@ export const metadata: Metadata = {
 
 export default async function BillingPage() {
   const headerList = await headers();
-  const initialPricing = resolvePricingRegion(
-    getHeaderPricingHints(headerList),
-  );
+  const initialPricing = resolveRequestPricing(headerList);
 
   batchPrefetch([trpc.billing.getCurrentPlan.queryOptions()]);
 

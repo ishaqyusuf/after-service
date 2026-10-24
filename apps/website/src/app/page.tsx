@@ -18,7 +18,7 @@ export async function generateMetadata(): Promise<Metadata> {
   return createPageMetadata({
     title: "afterservice | Post-job follow-up board for service shops",
     description:
-      "Join the free beta for a manual-first follow-up board built for repair shops, installers, contractors, and local service teams.",
+      "Start free for a manual-first follow-up board built for repair shops, installers, contractors, and local service teams.",
     path: "/",
   });
 }
