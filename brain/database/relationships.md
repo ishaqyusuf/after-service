@@ -36,6 +36,12 @@ This file documents intended entity relationships.
 ## Invariants
 - Business objects cannot cross workspaces.
 - Follow-up ownership is optional at first but must reference a membership when assigned.
+- Application-side follow-up relation validation resolves templates and
+  memberships within the active workspace and jobs within both that workspace
+  and the selected customer. Individual foreign keys alone do not establish
+  these workspace/customer invariants.
+- Manual phone contact uses one nested write for follow-up sent status, its
+  message log, and its audit event.
 - Provider event IDs must be unique for idempotency.
 - One `QaTesterGrant` has many `QaClientAuthorization` records and audit events.
 - One `QaClientAuthorization` has many profile selections, derived sessions,

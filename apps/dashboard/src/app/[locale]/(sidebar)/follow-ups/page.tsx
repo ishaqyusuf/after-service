@@ -50,7 +50,7 @@ export default async function FollowUpsPage(props: Props) {
         getNextPageParam: (lastPage) => lastPage.nextCursor,
       },
     ),
-    trpc.followUps.listBoard.queryOptions(),
+    trpc.followUps.listBoard.queryOptions({ timeZone: "UTC" }),
   ]);
 
   return (

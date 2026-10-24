@@ -1,10 +1,13 @@
 import { createHmac, timingSafeEqual } from "node:crypto";
 import {
   adoptQaWorkspaces,
+  calendarDay,
   createQaWorkspacePurgeRun,
   discoverQaWorkspaceCandidates,
+  followUpStage,
   getDashboardOverview,
   getDbClient,
+  isTimeZone,
   type Prisma,
   previewQaWorkspacePurge,
   type WorkspacePlan,
@@ -13,20 +16,31 @@ import { LogEvents } from "@afterservice/events";
 import { setupAnalytics } from "@afterservice/events/server";
 import { Notifications } from "@afterservice/notifications";
 import {
+  type QaExternalEffect,
   resolveEmailRecipients,
   resolveQaExternalEffectPolicy,
-  type QaExternalEffect,
 } from "@afterservice/utils";
 import { tasks } from "@trigger.dev/sdk/v3";
 import { initTRPC, TRPCError } from "@trpc/server";
 import superjson from "superjson";
 import { z } from "zod";
 import type { ApiContext } from "../context";
+import { assertFollowUpRelations } from "../utils/follow-up-relations";
 import { polarApi } from "../utils/polar";
 
 const t = initTRPC.context<ApiContext>().create({
   transformer: superjson,
 });
+
+const calendarInput = z
+  .object({
+    timeZone: z
+      .string()
+      .max(100)
+      .refine(isTimeZone, "Invalid timezone")
+      .default("UTC"),
+  })
+  .optional();
 
 const db = getDbClient();
 const notifications = new Notifications(db);
@@ -686,6 +700,10 @@ const serviceJobsRouter = t.router({
         include: { workspace: true },
         where: { id: input.jobId, workspaceId: ctx.workspace.id },
       });
+      await assertFollowUpRelations(db, {
+        workspaceId: ctx.workspace.id,
+        templateId: input.templateId,
+      });
       const dueAt =
         input.dueAt ??
         new Date(
@@ -907,6 +925,10 @@ const followUpsRouter = t.router({
       z.object({ assigneeId: z.string().min(1).nullable(), id: z.string() }),
     )
     .mutation(async ({ ctx, input }) => {
+      await assertFollowUpRelations(db, {
+        workspaceId: ctx.workspace.id,
+        assigneeId: input.assigneeId,
+      });
       const item = await db.followUp.update({
         data: {
           assigneeId: input.assigneeId,
@@ -990,6 +1012,13 @@ const followUpsRouter = t.router({
         workspaceId: ctx.workspace.id,
       });
 
+      await assertFollowUpRelations(db, {
+        workspaceId: ctx.workspace.id,
+        customerId: customer.id,
+        jobId: input.jobId,
+        templateId: input.templateId,
+      });
+
       const item = await db.followUp.create({
         data: {
           channel: input.channel,
@@ -1052,42 +1081,37 @@ const followUpsRouter = t.router({
 
       return { item: followUpDto(item) };
     }),
-  listBoard: protectedProcedure.query(async ({ ctx }) => {
-    const items = await db.followUp.findMany({
-      include: {
-        customer: true,
-        events: { orderBy: { createdAt: "desc" }, take: 5 },
-        job: true,
-        messageLogs: { orderBy: { createdAt: "desc" }, take: 3 },
-        template: true,
-      },
-      orderBy: { dueAt: "asc" },
-      where: { workspaceId: ctx.workspace.id },
-    });
-    const todayEnd = new Date();
-    todayEnd.setHours(23, 59, 59, 999);
-    const serialized = items.map(followUpDto);
-
-    return {
-      columns: {
-        closed: serialized.filter((item) => item.status === "closed"),
-        dueToday: serialized.filter(
-          (item) =>
-            item.status !== "closed" &&
-            item.status !== "replied" &&
-            new Date(item.dueAt) <= todayEnd,
-        ),
-        replied: serialized.filter((item) => item.status === "replied"),
-        upcoming: serialized.filter(
-          (item) =>
-            item.status === "scheduled" && new Date(item.dueAt) > todayEnd,
-        ),
-        waiting: serialized.filter(
-          (item) => item.status === "sent" || item.status === "open",
-        ),
-      },
-    };
-  }),
+  listBoard: protectedProcedure
+    .input(calendarInput)
+    .query(async ({ ctx, input }) => {
+      const items = await db.followUp.findMany({
+        include: {
+          customer: true,
+          events: { orderBy: { createdAt: "desc" }, take: 5 },
+          job: true,
+          messageLogs: { orderBy: { createdAt: "desc" }, take: 3 },
+          template: true,
+        },
+        orderBy: { dueAt: "asc" },
+        where: { workspaceId: ctx.workspace.id },
+      });
+      const timeZone = input?.timeZone ?? "UTC";
+      const today = calendarDay(new Date(), timeZone);
+      const serialized = items.map(followUpDto);
+      const inStage = (stage: ReturnType<typeof followUpStage>) =>
+        serialized.filter(
+          (item) => followUpStage(item, today, timeZone) === stage,
+        );
+      return {
+        columns: {
+          closed: inStage("closed"),
+          dueToday: inStage("dueToday"),
+          replied: inStage("replied"),
+          upcoming: inStage("upcoming"),
+          waiting: inStage("waiting"),
+        },
+      };
+    }),
   listTable: protectedProcedure
     .input(
       z
@@ -1181,6 +1205,7 @@ const followUpsRouter = t.router({
     )
     .mutation(async ({ ctx, input }) => {
       const followUp = await db.followUp.findFirstOrThrow({
+        include: { customer: true },
         where: { id: input.id, workspaceId: ctx.workspace.id },
       });
       await assertQaExternalEffectAllowed({
@@ -1188,18 +1213,112 @@ const followUpsRouter = t.router({
         recipient: input.recipient,
         workspaceId: ctx.workspace.id,
       });
-      const item = await db.followUp.update({
-        data: {
-          sentAt: new Date(),
-          status: "sent",
-        },
-        include: {
-          customer: true,
-          events: true,
-          job: true,
-          messageLogs: true,
-          template: true,
-        },
+      if (followUp.channel === "email") {
+        const key = process.env.TRIGGER_SECRET_KEY?.trim();
+        const production =
+          process.env.AFTERSERVICE_ENV_MODE === "production" ||
+          process.env.VERCEL_ENV === "production" ||
+          process.env.NODE_ENV === "production";
+        if (!key || (production && key.startsWith("tr_dev_"))) {
+          throw new TRPCError({
+            code: "PRECONDITION_FAILED",
+            message: "Email delivery is not configured for this environment.",
+          });
+        }
+      }
+      // Phone contact is an operator-recorded action, with no provider dispatch.
+      if (followUp.channel === "phone") {
+        const item = await db.followUp.update({
+          where: { id: input.id, workspaceId: ctx.workspace.id },
+          data: {
+            sentAt: new Date(),
+            status: "sent",
+            messageLogs: {
+              create: {
+                workspaceId: ctx.workspace.id,
+                customerId: followUp.customerId,
+                channel: "phone",
+                recipient: input.recipient,
+                subject: input.subject || null,
+                body: input.body,
+                status: "sent",
+                sentAt: new Date(),
+              },
+            },
+            events: {
+              create: {
+                workspaceId: ctx.workspace.id,
+                actorId: ctx.user?.id,
+                type: "followup_message_sent",
+                metadata: { channel: "phone", recipient: input.recipient },
+              },
+            },
+          },
+          include: {
+            customer: true,
+            events: true,
+            job: true,
+            messageLogs: true,
+            template: true,
+          },
+        });
+        const analytics = await setupAnalytics();
+        for (const event of [
+          LogEvents.MessageSent,
+          LogEvents.FollowUpStatusUpdated,
+        ]) {
+          analytics.track({
+            event: event.name,
+            channel: event.channel,
+            profileId: ctx.user?.id,
+            workspaceId: ctx.workspace.id,
+          });
+        }
+        return { item: followUpDto(item) };
+      }
+      const notificationPayload = {
+        users: [
+          {
+            id: followUp.customer.id,
+            email: followUp.customer.email || "",
+            phone: followUp.customer.phone || undefined,
+            workspace_id: ctx.workspace.id,
+          },
+        ],
+        followUpId: followUp.id,
+        customerId: followUp.customerId,
+        body: input.body,
+        channel: followUp.channel,
+        recipient: input.recipient,
+      };
+
+      if (followUp.channel === "email") {
+        try {
+          await tasks.trigger("notification", {
+            channels: ["email"],
+            payload: notificationPayload,
+            sendEmail: true,
+            type: "followup_message_sent",
+            workspaceId: ctx.workspace.id,
+          });
+        } catch (cause) {
+          throw new TRPCError({
+            code: "BAD_GATEWAY",
+            message: "Email could not be queued. Please try again later.",
+            cause,
+          });
+        }
+      } else {
+        await notifications.send(
+          "followup_message_sent",
+          ctx.workspace.id,
+          notificationPayload,
+          { channels: [followUp.channel] },
+        );
+      }
+
+      await db.followUp.update({
+        data: { sentAt: new Date(), status: "sent" },
         where: { id: input.id, workspaceId: ctx.workspace.id },
       });
 
@@ -1210,40 +1329,6 @@ const followUpsRouter = t.router({
         profileId: ctx.user?.id,
         workspaceId: ctx.workspace.id,
       });
-
-      const notificationPayload = {
-        users: [
-          {
-            id: item.customer.id,
-            email: item.customer.email || "",
-            phone: item.customer.phone || undefined,
-            workspace_id: ctx.workspace.id,
-          },
-        ],
-        followUpId: item.id,
-        customerId: item.customerId,
-        body: input.body,
-        channel: followUp.channel,
-        recipient: input.recipient,
-      };
-
-      if (followUp.channel === "email") {
-        await tasks.trigger("notification", {
-          channels: ["email"],
-          payload: notificationPayload,
-          sendEmail: true,
-          type: "followup_message_sent",
-          workspaceId: ctx.workspace.id,
-        });
-      } else {
-        await notifications.send(
-          "followup_message_sent",
-          ctx.workspace.id,
-          notificationPayload,
-          { channels: [followUp.channel] },
-        );
-      }
-
       analytics.track({
         event: LogEvents.FollowUpStatusUpdated.name,
         channel: LogEvents.FollowUpStatusUpdated.channel,
@@ -1304,6 +1389,10 @@ const followUpsRouter = t.router({
       }),
     )
     .mutation(async ({ ctx, input }) => {
+      await assertFollowUpRelations(db, {
+        workspaceId: ctx.workspace.id,
+        templateId: input.templateId,
+      });
       const item = await db.followUp.update({
         data: {
           channel: input.channel,
@@ -1629,9 +1718,11 @@ const billingRouter = t.router({
 });
 
 const dashboardRouter = t.router({
-  overview: protectedProcedure.query(async ({ ctx }) => {
-    return getDashboardOverview(db, ctx.workspace.id);
-  }),
+  overview: protectedProcedure
+    .input(calendarInput)
+    .query(async ({ ctx, input }) => {
+      return getDashboardOverview(db, ctx.workspace.id, input?.timeZone);
+    }),
 });
 
 const qaAcceleratorRouter = t.router({

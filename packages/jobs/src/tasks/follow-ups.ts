@@ -6,10 +6,7 @@ const DRY_RUN_DUE_FOLLOW_UPS_TASK_ID = "dry-run-due-follow-ups" as const;
 
 export const markMissedFollowUpsSchedule = schedules.task({
   id: MARK_MISSED_FOLLOW_UPS_TASK_ID,
-  cron: {
-    pattern: "0 * * * *",
-    timezone: "UTC",
-  },
+  // Vercel Cron owns the daily production schedule; this task stays callable.
   maxDuration: 60,
   queue: {
     concurrencyLimit: 1,

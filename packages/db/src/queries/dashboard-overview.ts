@@ -1,4 +1,5 @@
 import type { PrismaClient } from "../../generated/prisma/client";
+import { calendarDay, shiftCalendarDay } from "./follow-up-calendar";
 
 const followUpStatuses = [
   "open",
@@ -81,6 +82,7 @@ function followUpDto(followUp: {
 export async function getDashboardOverview(
   db: PrismaClient,
   workspaceId: string,
+  timeZone = "UTC",
 ) {
   const workspace = await db.workspace.findUniqueOrThrow({
     select: {
@@ -118,38 +120,42 @@ export async function getDashboardOverview(
   });
 
   const now = new Date();
-  const todayStart = new Date(now);
-  todayStart.setHours(0, 0, 0, 0);
-  const todayEnd = new Date();
-  todayEnd.setHours(23, 59, 59, 999);
-  const nextWeekEnd = new Date(todayEnd);
-  nextWeekEnd.setDate(nextWeekEnd.getDate() + 7);
-  const sevenDaysAgo = new Date(todayStart);
-  sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 6);
+  const today = calendarDay(now, timeZone);
+  const nextWeek = shiftCalendarDay(today, 7);
+  const weekStart = shiftCalendarDay(today, -6);
 
-  const activeFollowUps = followUps.filter(
-    (item) => item.status !== "closed" && item.status !== "replied",
+  const activeFollowUps = followUps.filter((item) =>
+    ["open", "scheduled", "missed"].includes(item.status),
   );
   const dueToday = activeFollowUps.filter(
-    (item) => item.dueAt >= todayStart && item.dueAt <= todayEnd,
+    (item) => calendarDay(item.dueAt, timeZone) === today,
   ).length;
   const openFollowUps = followUps.filter(
     (item) => item.status !== "closed",
   ).length;
   const overdueFollowUps = activeFollowUps.filter(
-    (item) => item.dueAt < todayStart,
+    (item) => calendarDay(item.dueAt, timeZone) < today,
   ).length;
   const upcomingFollowUps = activeFollowUps.filter(
-    (item) => item.dueAt > todayEnd && item.dueAt <= nextWeekEnd,
+    (item) =>
+      calendarDay(item.dueAt, timeZone) > today &&
+      calendarDay(item.dueAt, timeZone) <= nextWeek,
   ).length;
-  const completedThisWeek = await db.serviceJob.count({
+  const completedJobs = await db.serviceJob.findMany({
+    select: { completedAt: true },
+    // Read a one-day margin, then apply the exact local calendar boundary.
     where: {
-      completedAt: { gte: sevenDaysAgo },
       workspaceId,
+      completedAt: {
+        gte: new Date(`${shiftCalendarDay(weekStart, -1)}T00:00:00.000Z`),
+      },
     },
   });
+  const completedThisWeek = completedJobs.filter(
+    (job) => calendarDay(job.completedAt, timeZone) >= weekStart,
+  ).length;
   const sentThisWeek = followUps.filter(
-    (item) => item.sentAt && item.sentAt >= sevenDaysAgo,
+    (item) => item.sentAt && calendarDay(item.sentAt, timeZone) >= weekStart,
   ).length;
   const resolvedFollowUps = followUps.filter(
     (item) => item.status === "closed" || item.status === "replied",

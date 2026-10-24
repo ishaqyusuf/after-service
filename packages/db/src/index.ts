@@ -14,6 +14,7 @@ export {
   WorkspacePlan,
   WorkspacePlanStatus,
 } from "../generated/prisma/enums";
+export { getOversightDbClient } from "./oversight-client";
 export * from "./queries";
 export {
   buildWorkspaceTemplateSeed,

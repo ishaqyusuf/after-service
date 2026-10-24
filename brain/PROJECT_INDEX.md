@@ -48,6 +48,10 @@ Use this file to quickly locate the right project brain document.
 - `tasks/in-progress.md`: current work.
 - `tasks/done.md`: completed work.
 
+## Proposed Features And Plans
+- `features/operations-assistant.md`: proposed Ewatrade-style operator assistant scope.
+- `plans/2026-10-24-feature-operations-assistant.md`: capability coverage, architecture, rollout and acceptance plan; implementation not started.
+
 ## Templates
 - `templates/feature.md`: feature doc template.
 - `templates/adr.md`: architecture decision template.

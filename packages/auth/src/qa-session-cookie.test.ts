@@ -36,8 +36,26 @@ describe("QA-derived Better Auth session cookies", () => {
     expect(cacheCookie).toContain("Max-Age=0");
   });
 
+  test("local QA cookies match normal auth despite a production public URL", () => {
+    const headers = clearBetterAuthSessionCookieHeaders({
+      NODE_ENV: "development",
+      AFTERSERVICE_ENV_MODE: "local",
+      NEXT_PUBLIC_DASHBOARD_URL: "https://dash.afterservice.app",
+    });
+    expect(headers[0]).toStartWith("better-auth.session_token=");
+    expect(headers.every((header) => !header.includes("; Secure"))).toBe(true);
+    const secure = clearBetterAuthSessionCookieHeaders({
+      NODE_ENV: "development",
+      AFTERSERVICE_ENV_MODE: "local",
+      BETTER_AUTH_LOCAL_URL: "https://app-afterservice.localhost",
+    });
+    expect(secure[0]).toStartWith("__Secure-better-auth.session_token=");
+  });
+
   test("clears both secure session token and cookie cache", () => {
     const headers = clearBetterAuthSessionCookieHeaders({
+      NODE_ENV: "production",
+      AFTERSERVICE_ENV_MODE: "preview",
       BETTER_AUTH_URL: "https://preview.afterservice.app",
     });
 

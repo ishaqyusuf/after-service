@@ -26,3 +26,5 @@ packages/db/generated
 /output/
 /outputs/
 /artifacts/
+/playwright-report/
+/test-results/

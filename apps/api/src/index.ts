@@ -5,36 +5,30 @@ import {
   getDbClient,
   getQaWorkspaceClassification,
 } from "@afterservice/db";
-import { markMissedFollowUps, runDueFollowUpsDryRun } from "@afterservice/jobs";
 import { getDevAppUrlStrings } from "@afterservice/utils";
 import { fetchRequestHandler } from "@trpc/server/adapters/fetch";
 import { type Context, Hono } from "hono";
 import { cors } from "hono/cors";
-import { z } from "zod";
 import { createContext } from "./context";
+import followUpJobs from "./rest/routers/follow-up-jobs";
+import oversight from "./rest/routers/oversight";
 import { appRouter } from "./routers/_app";
-import { onboardingSchema } from "./schemas";
+import { lemonWebhookSchema, onboardingSchema } from "./schemas";
 
 const app = new Hono();
 const trustedOrigins = getTrustedOrigins();
 
 app.use(
-  "/api/*",
+  "*",
   cors({
     allowHeaders: ["Content-Type", "Authorization"],
     allowMethods: ["GET", "POST", "OPTIONS"],
     credentials: true,
     origin: (origin) => {
-      return trustedOrigins.includes(origin) ? origin : trustedOrigins[0];
+      return trustedOrigins.includes(origin) ? origin : undefined;
     },
   }),
 );
-
-const followUpJobSchema = z.object({
-  markMissed: z.boolean().default(false),
-  now: z.iso.datetime().optional(),
-  workspaceId: z.string().trim().min(1).optional(),
-});
 
 function slugify(value: string) {
   return (
@@ -170,42 +164,8 @@ app.post("/api/onboarding", async (c) => {
   });
 });
 
-app.post("/api/jobs/follow-ups/dry-run", async (c) => {
-  const configuredSecret = process.env.CRON_SECRET;
-  const providedSecret =
-    c.req.header("authorization")?.replace(/^Bearer\s+/i, "") ??
-    c.req.header("x-cron-secret");
-
-  if (!configuredSecret) {
-    return c.json({ error: "Cron secret is not configured" }, 503);
-  }
-
-  if (!isValidSharedSecret(providedSecret, configuredSecret)) {
-    return c.json({ error: "Unauthorized" }, 401);
-  }
-
-  const body = await readOptionalJson(c.req.raw);
-  const parsed = followUpJobSchema.safeParse(body);
-
-  if (!parsed.success) {
-    return c.json({ error: "Invalid follow-up job payload" }, 400);
-  }
-
-  const options = {
-    now: parsed.data.now ? new Date(parsed.data.now) : undefined,
-    workspaceId: parsed.data.workspaceId,
-  };
-  const result = parsed.data.markMissed
-    ? await markMissedFollowUps(options)
-    : await runDueFollowUpsDryRun(options);
-
-  return c.json({
-    mode: parsed.data.markMissed ? "mark-missed" : "dry-run",
-    ok: true,
-    result,
-    service: "afterservice-follow-up-jobs",
-  });
-});
+app.route("/api/jobs/follow-ups", followUpJobs);
+app.route("/api/oversight/v1", oversight);
 
 app.post("/webhooks/lemon-squeezy", async (c) => {
   const body = await c.req.text();
@@ -223,7 +183,11 @@ app.post("/webhooks/lemon-squeezy", async (c) => {
     return c.json({ error: "Invalid webhook signature" }, 401);
   }
 
-  const payload = JSON.parse(body) as LemonWebhookPayload;
+  const parsed = lemonWebhookSchema.safeParse(parseJson(body));
+  if (!parsed.success) {
+    return c.json({ error: "Invalid webhook payload" }, 400);
+  }
+  const payload = parsed.data;
   const providerId = String(
     payload.meta?.event_id ?? payload.data?.id ?? crypto.randomUUID(),
   );
@@ -313,24 +277,9 @@ app.post("/webhooks/lemon-squeezy", async (c) => {
   });
 });
 
-export default {
-  fetch: app.fetch,
-  port: Number(process.env.PORT ?? 4102),
-};
+export default app;
 
 export { app };
-
-type LemonWebhookPayload = {
-  data?: {
-    attributes?: Record<string, unknown>;
-    id?: string | number;
-  };
-  meta?: {
-    custom_data?: Record<string, string | null | undefined>;
-    event_id?: string | number;
-    event_name?: string;
-  };
-};
 
 function isValidLemonSignature(
   body: string,
@@ -347,24 +296,12 @@ function isValidLemonSignature(
   return timingSafeEqual(digestBuffer, signatureBuffer);
 }
 
-function isValidSharedSecret(provided: string | undefined, expected: string) {
-  if (!provided) return false;
-  const providedBuffer = Buffer.from(provided);
-  const expectedBuffer = Buffer.from(expected);
-
-  if (providedBuffer.length !== expectedBuffer.length) return false;
-
-  return timingSafeEqual(providedBuffer, expectedBuffer);
-}
-
-async function readOptionalJson(request: Request) {
-  const body = await request.text();
-
-  if (!body.trim()) {
-    return {};
+function parseJson(body: string): unknown {
+  try {
+    return JSON.parse(body);
+  } catch {
+    return null;
   }
-
-  return JSON.parse(body) as unknown;
 }
 
 function isSubscriptionEvent(eventName: string) {

@@ -2,9 +2,11 @@
 
 ## Status
 
-Implemented on 2026-08-30 from the shared Halaalvest/EwaTrade QA accelerator
-standard. Database rollout and deployed-preview acceptance remain operational
-release steps.
+Implemented on 2026-08-30. Isolated deployed-preview browser/HTTP acceptance
+passed on 2026-10-19 using a retained schema-only Neon branch and a dedicated
+restricted runtime login. Routed email and first reviewed purge remain blocked
+by Trigger credits. See ADR 0016 and
+`brain/handoffs/2026-10-19-preview-qa-acceptance.md`.
 
 ## Purpose
 
@@ -74,5 +76,10 @@ local ticket batch under `.scratch/web-dev-preview-qa-accelerator/issues/`.
   gating, exact domains, startup refusal, effect policy, deterministic fixtures,
   form coverage, purpose-separated token digests, opaque token shapes, and
   Better Auth cookie signing.
-- Deployed preview, provider canary, multi-browser, and first reviewed purge
-  evidence remain release-owner actions.
+- Deployed Chrome preview acceptance and 17 HTTP checks passed. Four-browser
+  manual-MVP coverage remains 40/40 locally; a separate full preview browser
+  matrix was not claimed. Provider canary and first reviewed purge remain.
+- Turbo must forward the server-owned QA mode, secret, origin and trusted-client
+  header variables during strict builds; omission produces production QA stubs.
+- Acceptance grants are revoked after the test window. The retained preview
+  database contains synthetic data only, and outbound providers are disabled.

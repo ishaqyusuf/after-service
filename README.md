@@ -176,6 +176,23 @@ bun run smoke:mvp
 
 `bun run smoke:mvp` expects the dashboard dev server at `http://localhost:4101` unless `SMOKE_DASHBOARD_URL` is set. It verifies the local MVP journey: sign-up, onboarding, authenticated dashboard access, workspace-scoped CRUD, follow-up status transitions, manual send logging, permission rejection, entitlement limits, cron job authorization, and billing webhook signature/idempotency behavior.
 
+Repeatable unit, API integration, and browser coverage:
+
+```bash
+bun run test:unit
+bun run dev:services
+bun run test:integration
+bunx playwright install chromium firefox webkit
+bun run test:e2e
+bun run test:typecheck
+```
+
+Playwright starts the local Portless website/dashboard stack and exercises the
+MVP in Chromium, Firefox, WebKit, and mobile Chromium. Tests use disposable local
+accounts and refuse production database/browser targets. The jobs worker is not
+started. See [MVP verification](brain/engineering/testing.md) for coverage,
+HTTP/HTTPS hostname overrides, cleanup, reports, and provider limitations.
+
 Website PWA checks:
 
 ```bash
@@ -203,13 +220,31 @@ Use `prod:dashboard` or `prod:website` when reproducing production-only page-loa
 Production surfaces:
 
 - Website: `https://afterservice.app`
-- Dashboard: `https://dashboard.afterservice.app`
-- Public API: `https://dashboard.afterservice.app/api`
+- Dashboard: `https://dash.afterservice.app`
+- Public API: `https://api.afterservice.app`
+
+The API follows Ewatrade's standalone Hono/Bun Vercel pattern. The
+`after-service-api` project uses `apps/api` as its root and includes workspace
+sources outside that directory. Its Vercel build generates Prisma, bundles the
+API with Bun without inlining environment variables, and exposes a thin Hono
+entrypoint. Local development serves the same app through `src/local.ts`.
+
+Run `bun run api:deploy` to deploy the API to its explicitly selected project
+and run the production checks. `bun run smoke:api` checks the public hostname
+without creating records or invoking providers. Deploy website/dashboard after
+changing their production `NEXT_PUBLIC_API_URL` values. All auth-aware apps must
+use the same production `BETTER_AUTH_SECRET`; Google OAuth remains on
+`https://dash.afterservice.app/api/auth/callback/google`.
 
 Operational endpoints and jobs:
 
-- Follow-up dry-run job: `POST https://dashboard.afterservice.app/api/jobs/follow-ups/dry-run` with `CRON_SECRET`
-- Billing webhook processing lives under the dashboard API surface.
+- API health: `GET https://api.afterservice.app/health`
+- Follow-up dry-run job: `POST https://api.afterservice.app/api/jobs/follow-ups/dry-run` with `CRON_SECRET`
+- Daily missed-state processing: `GET https://api.afterservice.app/api/jobs/follow-ups/mark-missed`
+  with `CRON_SECRET`. Vercel Cron on the API project targets 08:00 Africa/Lagos
+  (`0 7 * * *` UTC); Hobby timing may vary within that hour. This updates status
+  only and sends no messages. See `brain/decisions/0014-use-vercel-for-beta-follow-up-cron.md`.
+- Legacy Lemon Squeezy webhook: `POST https://api.afterservice.app/webhooks/lemon-squeezy`; signature verification remains required.
 - Observability should alert on API 5xxs, webhook failures, cron failures, and database connection saturation.
 
 ### Trigger.dev Jobs

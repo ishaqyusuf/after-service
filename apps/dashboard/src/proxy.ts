@@ -39,10 +39,6 @@ function isPublicPath(pathname: string): boolean {
   return PUBLIC_PREFIXES.some((prefix) => pathname.startsWith(prefix));
 }
 
-function isAuthPath(pathname: string): boolean {
-  return pathname === "/sign-in" || pathname === "/sign-up";
-}
-
 function isLogoutPath(pathname: string): boolean {
   return pathname === "/logout" || pathname === "/sign-out";
 }
@@ -54,12 +50,6 @@ function isLogoutRequest(request: NextRequest): boolean {
     isLogoutPath(pathnameWithoutLocale || "/") ||
     request.nextUrl.searchParams.get("logout") === "true"
   );
-}
-
-function getSafeReturnTo(request: NextRequest): string | null {
-  const returnTo = request.nextUrl.searchParams.get("return_to");
-  if (!returnTo?.startsWith("/")) return null;
-  return returnTo;
 }
 
 function redirectToSignInAfterLogout(request: NextRequest): NextResponse {
@@ -81,11 +71,6 @@ export default async function proxy(request: NextRequest) {
   if (authenticated) {
     if (isLogoutRequest(request)) {
       return redirectToSignInAfterLogout(request);
-    }
-
-    if (isAuthPath(normalizedPathname)) {
-      const returnTo = getSafeReturnTo(request);
-      return NextResponse.redirect(new URL(returnTo ?? "/", request.url));
     }
 
     return response;

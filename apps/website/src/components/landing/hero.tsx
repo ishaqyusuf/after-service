@@ -78,7 +78,7 @@ export function LandingHero() {
           <span className="w-3 h-3 rounded-full bg-yellow-500/80" />
           <span className="w-3 h-3 rounded-full bg-green-500/80" />
           <span className="ml-4 text-xs text-muted-foreground font-mono">
-            dashboard.afterservice.app
+            dash.afterservice.app
           </span>
         </div>
 

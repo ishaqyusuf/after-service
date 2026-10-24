@@ -1,6 +1,6 @@
 export type PublicPlanId = "free_beta" | "starter" | "shop" | "growth";
 export type PricingRegion = "US" | "CA" | "GB" | "EU" | "NG" | "OTHER";
-export type PricingRegionSource = "country" | "fallback" | "locale" | "query";
+export type PricingRegionSource = "country" | "fallback" | "query";
 
 export type PricingCurrency = "CAD" | "EUR" | "GBP" | "NGN" | "USD";
 
@@ -115,7 +115,13 @@ function normalize(value: string | null | undefined) {
 }
 
 function isPricingRegion(value: string): value is PricingRegion {
-  return value in regionPricing;
+  return Object.hasOwn(regionPricing, value);
+}
+
+function normalizeCountry(value: string | null | undefined) {
+  const country = normalize(value);
+  if (!/^[A-Z]{2}$/.test(country) || country === "XX") return null;
+  return country === "UK" ? "GB" : country;
 }
 
 function getRegionFromCurrency(value: string | null | undefined) {
@@ -147,56 +153,30 @@ function getRegionFromCountry(value: string | null | undefined) {
   return null;
 }
 
-function getRegionFromLocale(value: string | null | undefined) {
-  if (!value) return null;
-
-  for (const language of value.split(",")) {
-    const tag = language.split(";")[0]?.trim().replace(/_/g, "-");
-
-    if (!tag) continue;
-
-    const country = tag
-      .split("-")
-      .reverse()
-      .find((part) => /^[a-z]{2}$/i.test(part));
-    const region = getRegionFromCountry(country);
-
-    if (region) return region;
-  }
-
-  return null;
-}
-
 export function getHeaderPricingHints(headers: {
   get(name: string): string | null;
 }) {
+  // Behind Cloudflare, Vercel can geolocate the proxy rather than the visitor.
+  // Missing Cloudflare geolocation must not fall through to that proxy country.
+  const cloudflareCountry = headers.get("cf-ipcountry");
+  const country =
+    cloudflareCountry !== null || headers.get("cf-ray")
+      ? cloudflareCountry
+      : (headers.get("x-vercel-ip-country") ?? headers.get("x-user-country"));
+
   return {
-    acceptLanguage: headers.get("accept-language"),
-    continent:
-      headers.get("x-user-continent") ??
-      headers.get("x-vercel-ip-continent") ??
-      headers.get("cf-ipcontinent"),
-    country:
-      headers.get("x-user-country") ??
-      headers.get("x-vercel-ip-country") ??
-      headers.get("cf-ipcountry"),
+    country: normalizeCountry(country),
   };
 }
 
 export function resolvePricingRegion({
-  acceptLanguage,
-  continent,
   country,
   queryCurrency,
   queryRegion,
-  routeLocale,
 }: {
-  acceptLanguage?: string | null;
-  continent?: string | null;
   country?: string | null;
   queryCurrency?: string | null;
   queryRegion?: string | null;
-  routeLocale?: string | null;
 }): PricingResolution {
   const normalizedQueryRegion = normalize(queryRegion);
   const queryResolvedRegion = isPricingRegion(normalizedQueryRegion)
@@ -207,29 +187,16 @@ export function resolvePricingRegion({
     return toPricingResolution(queryResolvedRegion, "query");
   }
 
-  const countryResolvedRegion = getRegionFromCountry(country);
-
-  if (countryResolvedRegion) {
-    return toPricingResolution(countryResolvedRegion, "country", country);
+  const countryCode = normalizeCountry(country);
+  if (countryCode) {
+    return toPricingResolution(
+      getRegionFromCountry(countryCode) ?? "OTHER",
+      "country",
+      countryCode,
+    );
   }
 
-  if (normalize(continent) === "EU") {
-    return toPricingResolution("EU", "country", country);
-  }
-
-  const routeLocaleResolvedRegion = getRegionFromLocale(routeLocale);
-
-  if (routeLocaleResolvedRegion) {
-    return toPricingResolution(routeLocaleResolvedRegion, "locale");
-  }
-
-  const localeResolvedRegion = getRegionFromLocale(acceptLanguage);
-
-  if (localeResolvedRegion) {
-    return toPricingResolution(localeResolvedRegion, "locale");
-  }
-
-  return toPricingResolution("US", "fallback");
+  return toPricingResolution("OTHER", "fallback");
 }
 
 export function toPricingResolution(

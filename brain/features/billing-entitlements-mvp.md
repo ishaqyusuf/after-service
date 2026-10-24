@@ -3,6 +3,14 @@
 ## Status
 Implemented foundation for MVP on 2026-05-30.
 
+Updated on 2026-10-18: the required current-plan query uses Suspense within the
+existing billing error/loading boundaries. The optional owner/admin portal
+query runs after client mount and is not server-prefetched; permission/provider
+failures cannot hide staff-readable plan details or introduce a hydration
+mismatch. Browser tests cover Free Beta, settings, disabled paid checkout, and
+an injected portal denial. Real-database integration tests cover staff plan
+reads, plan limits, and signed webhook changes.
+
 Updated on 2026-06-09 with a fuller Midday-style billing page and structured loading skeleton.
 
 Updated on 2026-06-11 with a regional paid-pricing preview in the dashboard billing page. The preview uses the shared `@afterservice/plans` pricing catalog and automatically resolves the display currency from request region headers, then locale headers, matching the public website pricing behavior.
@@ -10,6 +18,13 @@ Updated on 2026-06-11 with a regional paid-pricing preview in the dashboard bill
 Updated on 2026-06-15 so planned paid prices are converted from canonical USD through the shared const currency conversion table in `@afterservice/plans`. The dashboard billing page now passes its Midday-style `[locale]` route param into pricing resolution as a pricing-only signal; no translated billing copy or language switcher was added.
 
 ## Scope
+Country-resolution correction on 2026-10-24: website and dashboard previews now
+prefer Cloudflare visitor country, otherwise Vercel/custom country hints.
+Language and continent no longer choose currency; missing or unsupported
+countries use a disclosed USD fallback. See ADR 0017 and the regional currency
+pricing plan. This changes price presentation only; the Polar integration,
+paid-checkout beta gate, and webhook entitlement behavior are unchanged.
+
 - Billing page displays plan, status, usage, limits, and checkout action.
 - `billing.getCurrentPlan`, `billing.createCheckout`, and `billing.getPortalUrl` tRPC procedures.
 - Lemon Squeezy webhook signature verification.

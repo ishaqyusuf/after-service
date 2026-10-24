@@ -6,6 +6,55 @@ This file is the canonical product and implementation roadmap for afterservice.
 
 ## Current MVP State
 
+As of 2026-10-19, core manual MVP browser/edge-case coverage is implemented and
+verified: 40 local browser cases across four configurations, 45 PostgreSQL
+integration tests, 71 unit tests, both typechecks, production web builds, and
+standalone API bundling pass. Live Chrome acceptance now includes desktop and
+mobile operator flows plus Google OAuth. See `brain/engineering/testing.md`. The API is independently
+deployed at `api.afterservice.app`; dashboard browser auth remains same-origin.
+
+### Remaining MVP Rollout And Acceptance Checks
+
+- Promote the newest Preview-verified auth/build/form fixes to Production and
+  smoke-test ordinary auth and follow-up forms. The isolated Preview QA pass did
+  not deploy Production.
+- Finish the approved queued email check once Trigger credits are available.
+  The correct production key and existing worker were verified through the
+  authenticated CLI and activated on API/dashboard. A no-recipient task is
+  rejected because the organization has run out of credits. Configuration and
+  queue failures preserve follow-up sent state. No local worker started.
+- Daily production overdue-state processing is configured and verified on
+  Vercel, independent of Trigger credits: `0 7 * * *`, target 08:00 Africa/Lagos
+  within the Hobby timing window. Secret protection, repeat-safe state changes,
+  and no messaging side effects passed. The old Trigger clock is inactive.
+- QA accelerator deployed-preview acceptance passed with a retained isolated
+  database and restricted runtime login. Complete the routed-email canary and
+  first reviewed purge after restoring Trigger credits and reviewing the exact
+  cleanup scope. The read-only purge preview correctly blocks a synthetic paid
+  fixture. Production schema alignment is complete; internal QA routes remain
+  absent in production.
+- Verify the native PWA install dialog on physical Android Chrome; mobile
+  viewport coverage does not prove installation.
+- Beta onboarding/invite/feedback materials and recruiting trackers are ready
+  under `brain/product/beta/`. Select and invite real prospects, confirm the
+  founder's reply conversation per operator, and observe onboarding/activation.
+  No outreach or real beta outcomes were recorded by preparation work.
+
+Latest continuation: `brain/handoffs/2026-10-19-preview-qa-acceptance.md`.
+Production acceptance: `brain/handoffs/2026-10-19-production-browser-acceptance.md`.
+Google callback registration and authenticated return passed. Logly exact-origin
+acceptance and persisted email-submit events from actual browser interaction
+also passed. The browser pass found a timezone boundary/duplicate-column bug;
+the API/dashboard calendar queries now use the operator timezone and exclusive
+board stages.
+
+Paid checkout/provider activation is a later paid-pilot gate, intentionally
+disabled during Free Beta. SMS/WhatsApp automation and customer self-onboarding
+are post-MVP work. Repository-wide lint cleanup is engineering debt; existing
+shared UI findings remain despite passing scoped checks.
+
+### Historical Milestones
+
 As of 2026-05-30, the local MVP implementation covers phases 1-17 and the core operator journey: sign up, onboard a workspace, manage customers, log jobs, create/work follow-ups, manage templates, view billing/limits, run manual-send messaging logs, and execute cron-protected follow-up job dry-runs. Remaining post-MVP work is deeper automated browser coverage, provider-specific production observability wiring, and production secret/domain configuration.
 
 As of 2026-06-03, the public website no longer uses an `IS_LAUNCHED` release flag or prelaunch homepage branch. The root marketing page renders the main afterservice landing experience directly.
@@ -502,8 +551,8 @@ Deliverables:
 Domains:
 
 - `afterservice.app`: website.
-- `dashboard.afterservice.app`: dashboard.
-- `dashboard.afterservice.app/api`: public API.
+- `dash.afterservice.app`: dashboard.
+- `api.afterservice.app`: public API (standalone deployment, ADR 0011).
 
 Acceptance:
 

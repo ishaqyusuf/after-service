@@ -41,8 +41,9 @@ This file records core technology choices.
 
 ## Domains
 - Website: `afterservice.app`
-- Dashboard: `dashboard.afterservice.app`
-- Public API base: `dashboard.afterservice.app/api`
+- Dashboard: `dash.afterservice.app`
+- Public API base: `api.afterservice.app`
+- API Vercel project: `after-service-api`, root `apps/api`, Bun Hono runtime.
 
 ## Build Script Note
 - Website and dashboard package-level build scripts intentionally stay simple as `bun next build --turbopack`; deploy/build runners must provide the required production environment directly.

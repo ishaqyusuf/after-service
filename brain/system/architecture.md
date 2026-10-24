@@ -24,6 +24,16 @@ The repo is a Bun/Turbo workspace with:
 
 `apps/api` is a Hono/tRPC API. It owns typed business operations, auth context, workspace permissions, billing webhooks, and future job endpoints.
 
+The API is deployed independently at `https://api.afterservice.app` through the
+`after-service-api` Vercel project, following Ewatrade's Hono/Bun deployment
+pattern. Vercel generates Prisma and bundles workspace sources with Bun before
+tracing a thin Hono entrypoint. `src/local.ts` owns the local Bun server; the
+shared Hono app remains importable by the dashboard's existing handlers.
+Production API URLs have no implicit `/api` base path. Both `/trpc/*` and
+`/api/trpc/*` remain available and apply the same exact-origin credentialed CORS
+policy. Browser OAuth and host-scoped session cookies remain on the dashboard;
+all auth-aware deployments use the same production signing secret.
+
 ## Shared Packages
 - `auth`: session resolution, auth routes, workspace membership helpers.
 - `db`: Prisma/Postgres schema, generated client, query helpers, domain types.
@@ -65,6 +75,10 @@ configuration.
 - UI never trusts client-provided workspace IDs without server-side membership checks.
 - Billing UI can start checkouts, but only webhooks update entitlements.
 - Jobs can read due follow-ups, but message sending must be behind provider configuration.
+- Daily overdue-state housekeeping runs directly through a secret-protected
+  standalone API route on Vercel Cron, independent of Trigger credits. Trigger
+  continues to own queued notification delivery and internal analytics reports.
+  ADR 0014 records scheduler ownership, daily beta cadence, and recovery.
 
 As of 2026-07-05, `apps/website` owns its own tRPC client/server stack under `apps/website/src/trpc`, matching the dashboard Midday-style tRPC pattern. The website exposes a same-origin `/api/trpc` route backed by the shared API router and wraps the app shell in `TRPCReactProvider` through `apps/website/src/app/providers.tsx`.
 

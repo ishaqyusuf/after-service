@@ -20,6 +20,7 @@ const apiBaseUrl =
     : (process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4102"));
 
 const nextConfig: NextConfig = {
+  allowedDevOrigins: ["app-afterservice.localhost"],
   pageExtensions: isInternalQaBuild()
     ? ["qa.ts", "tsx", "ts", "jsx", "js"]
     : ["tsx", "ts", "jsx", "js"],

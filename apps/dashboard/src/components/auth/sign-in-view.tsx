@@ -2,7 +2,7 @@
 
 import { Button } from "@afterservice/ui";
 import { Database, X } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { AuthFooter, AuthShell } from "@/components/auth/auth-shell";
 import {
   type SignInFieldValues,
@@ -23,15 +23,14 @@ type DbAccountDebug = {
 
 type SignInViewProps = {
   dbAccountDebug?: DbAccountDebug;
+  returnTo?: string;
 };
 
-export function SignInView({ dbAccountDebug }: SignInViewProps) {
+export function SignInView({
+  dbAccountDebug,
+  returnTo = "/",
+}: SignInViewProps) {
   const [accountDebugOpen, setAccountDebugOpen] = useState(false);
-  const [returnTo, setReturnTo] = useState("/");
-
-  useEffect(() => {
-    setReturnTo(getReturnTo());
-  }, []);
 
   async function handleSignIn(values: SignInValues) {
     const response = await fetch("/api/auth/sign-in/email", {
@@ -65,10 +64,7 @@ export function SignInView({ dbAccountDebug }: SignInViewProps) {
       }
       title="Sign in"
     >
-      <SignInForm
-        onSignIn={handleSignIn}
-        returnTo={returnTo}
-      />
+      <SignInForm onSignIn={handleSignIn} returnTo={returnTo} />
       {dbAccountDebug ? (
         <DbAccountDebugFab
           debug={dbAccountDebug}
@@ -155,12 +151,4 @@ function DbAccountDebugFab({
       </Button>
     </div>
   );
-}
-
-function getReturnTo() {
-  if (typeof window === "undefined") return "/";
-  const returnTo = new URLSearchParams(window.location.search).get("return_to");
-  if (!returnTo?.startsWith("/")) return "/";
-  if (returnTo.startsWith("//")) return "/";
-  return returnTo;
 }

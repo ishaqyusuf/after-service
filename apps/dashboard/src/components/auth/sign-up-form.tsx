@@ -201,6 +201,14 @@ export function SignUpForm({ onSignUp }: Props) {
             disabled={isPending || isGooglePending}
             type="submit"
             className="h-11 w-full"
+            onClick={() =>
+              track({
+                event: LogEvents.ContinueWithEmail.name,
+                channel: LogEvents.ContinueWithEmail.channel,
+                location: "dashboard_sign_up",
+                method: "email",
+              })
+            }
           >
             {isPending ? "Creating account..." : "Create account"}
           </Button>

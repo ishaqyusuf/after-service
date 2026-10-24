@@ -18,7 +18,9 @@ export default async function proxy(request: NextRequest) {
 
   if (dashboardPath) {
     const dashboardUrl = buildDashboardUrl({
-      currentUrl: request.url,
+      currentHost: request.headers.get("host") ?? request.nextUrl.host,
+      currentProtocol:
+        request.headers.get("x-forwarded-proto") ?? request.nextUrl.protocol,
       path: `${dashboardPath}${search}`,
     });
 

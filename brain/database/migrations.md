@@ -32,15 +32,38 @@ bun run db:migrate
 
 ## QA Accelerator Migration
 
+Production rollout on 2026-10-18 found missing nullable QA session columns
+causing `prisma.session.create()` to fail during signup. A read-only Prisma
+schema diff against the confirmed afterservice Neon target showed only the
+three nullable session columns, five QA tables, indexes, and foreign keys were
+missing. Existing production schema matched the rest of the current schema.
+The database had no recorded migration history despite its existing tables,
+so historical migrations were not replayed. The repository's confirmed-target
+`bun run db:push --prod` applied the additive delta without data-loss flags.
+The subsequent Prisma schema diff was empty and real signup/onboarding passed.
+Production migration baselining remains future maintenance work; this did not
+enable the internal QA routes, which continue to return 404 in production.
+
 - `20260830010000_qa_accelerator` adds the five authorization/audit models and
   QA-derived session scope fields, indexes, and cascade behavior.
 - Apply locally with `bun run db:migrate` after installing workspace
   dependencies. Apply to hosted environments only through the normal reviewed
   migration workflow.
-- Migration application was not performed during the source implementation
+- Migration application was not performed during the original source implementation
   because this checkout has no installed Prisma executable or dependencies.
 # QA cleanup schema
 
 - Adds global platform roles, workspace QA lifecycle fields, and purge receipts.
 - Apply the repository's existing migrate and production push workflow before
   enabling the maintenance API/job.
+
+
+## Retained Isolated Preview — 2026-10-19
+
+Created the schema-only `qa-preview-20261019` Neon branch without copying
+production rows; Prisma push reported the schema already in sync. No new
+business schema migration was required. The user approved retaining the branch
+and using `afterservice_preview_qa` only in Vercel Preview. Runtime grants cover
+existing tables/sequences and exclude CREATE/TRUNCATE/admin capabilities. Future
+schema maintenance requires an authorized owner connection and refreshing
+object grants. See ADR 0016 and the preview acceptance handoff.
