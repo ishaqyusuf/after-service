@@ -1,6 +1,9 @@
 {
   "$schema": "https://turborepo.org/schema.json",
-  "globalDependencies": ["**/.env", "**/.env.production"],
+  "globalDependencies": [
+    "**/.env",
+    "**/.env.production"
+  ],
   "globalEnv": [
     "ADOPTION_EXCLUDED_WORKSPACE_IDS",
     "AFTERSERVICE_ASSISTANT_CAPABILITIES",
@@ -9,7 +12,6 @@
     "AFTERSERVICE_ASSISTANT_WORKSPACES",
     "AFTERSERVICE_AUTH_DEBUG",
     "AFTERSERVICE_ENV_MODE",
-    "AFTERSERVICE_PAID_CHECKOUT_ENABLED",
     "API_PROXY_URL",
     "API_PUBLIC_URL",
     "ASSISTANT_AI_MODEL",
@@ -31,7 +33,6 @@
     "EMAIL_QA_DOMAIN_ROUTES",
     "GOOGLE_CLIENT_ID",
     "GOOGLE_CLIENT_SECRET",
-    "IS_LAUNCHED",
     "LOGLY_COLLECTOR_URL",
     "LOGLY_ENABLED",
     "LOGLY_PROJECT",
@@ -61,11 +62,19 @@
     "TEST_EMAIL",
     "TRIGGER_PROFILE",
     "TRIGGER_PROJECT_ID",
-    "TRIGGER_SECRET_KEY"
+    "TRIGGER_SECRET_KEY",
+    "POLAR_ENVIRONMENT",
+    "POLAR_BUSINESS_MONTHLY_PRODUCT_ID",
+    "POLAR_SANDBOX_ACCESS_TOKEN",
+    "POLAR_SANDBOX_ORGANIZATION_ID",
+    "POLAR_SANDBOX_WEBHOOK_SECRET",
+    "POLAR_SANDBOX_BUSINESS_MONTHLY_PRODUCT_ID"
   ],
   "tasks": {
     "build": {
-      "dependsOn": ["^build"],
+      "dependsOn": [
+        "^build"
+      ],
       "outputs": [
         ".next/**",
         "!.next/cache/**",
@@ -84,7 +93,9 @@
     },
     "db:generate": {
       "cache": false,
-      "outputs": ["generated/**"]
+      "outputs": [
+        "generated/**"
+      ]
     },
     "db:push": {
       "cache": false,
@@ -104,10 +115,14 @@
     },
     "format": {},
     "lint": {
-      "dependsOn": ["^lint"]
+      "dependsOn": [
+        "^lint"
+      ]
     },
     "typecheck": {
-      "dependsOn": ["^typecheck"],
+      "dependsOn": [
+        "^typecheck"
+      ],
       "outputs": []
     }
   },
