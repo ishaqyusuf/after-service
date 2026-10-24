@@ -157,3 +157,10 @@ outreach and team administration remain the separately documented extensions.
 - [Done](../tasks/done.md)
 - [Roadmap](../tasks/roadmap.md)
 - This verification/configuration record.
+
+## Production build environment contract
+
+Turbo explicitly hashes and passes the assistant rollout, allowance, provider,
+model and server-key variables. The first remote build exposed missing entries;
+they were corrected before production domain promotion. No provider key is
+embedded in client bundles. Runtime configuration remains server-selected.
