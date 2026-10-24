@@ -5,6 +5,7 @@ export * from "./components/animated-size-container";
 export * from "./components/avatar";
 export * from "./components/badge";
 export * from "./components/brand-logo";
+export * from "./components/brand-mark";
 export * from "./components/button";
 export * from "./components/calendar";
 export * from "./components/card";

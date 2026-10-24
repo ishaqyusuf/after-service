@@ -1,11 +1,1 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
-  <path
-    d="M50 51V29C50 18.5 41.5 10 31 10S12 18.5 12 29s8.5 19 19 19c5.1 0 9.8-2 13.2-5.3"
-    fill="none"
-    stroke="#17232b"
-    stroke-linecap="round"
-    stroke-linejoin="round"
-    stroke-width="13"
-  />
-  <circle cx="31" cy="29" r="6.5" fill="#009b98" />
-</svg>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none"><style>:root{color:#14231f}@media(prefers-color-scheme:dark){:root{color:#fafbf7}}</style><path d="M23 24 A12 12 0 1 0 35 36" stroke="currentColor" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/><path d="M35 24 V42 Q35 50 41 50" stroke="currentColor" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/><circle cx="53" cy="50" r="4" fill="#009b98"/></svg>

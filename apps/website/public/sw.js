@@ -1,4 +1,4 @@
-const CACHE_NAME = "afterservice-shell-v2";
+const CACHE_NAME = "afterservice-shell-v3";
 const START_URL = "/";
 const OFFLINE_DOCUMENT = `<!doctype html>
 <html lang="en">

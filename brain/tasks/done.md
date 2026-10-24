@@ -6,6 +6,33 @@ This file records completed work.
 
 ## Completed
 
+### Apply Follow-through Logo Across Product Surfaces — 2026-10-24
+
+- Recorded the user's selection of workshop option 01 v2 before implementation.
+- Updated shared lockups, compact dashboard/mobile/search marks, and social
+  artwork. Added repeatable SVG/ICO/Apple/PWA asset generation and refreshed the
+  website's service-worker cache version.
+- Full typecheck, website/dashboard builds, website/sign-in visual checks,
+  PWA runtime checks, icon metadata, dimensions, opacity, and maskable safe-area
+  validation pass.
+- After user approval, authenticated desktop/sidebar and mobile-menu checks
+  passed using the configured local QA origin. Revoked the temporary grant,
+  verified zero derived sessions, and removed the exact isolated test fixture.
+  Committed as a dedicated logo changeset; no production deployment or push.
+- Brain impact: ADR 0021, brand identity feature, logo workshop record, website
+  PWA feature, and this completed implementation record.
+
+### Logo Redesign Exploration — 2026-10-24
+
+- Generated three identity directions with Claude Opus 5.5 at high effort and
+  published them to the shared Workshop catalog with immutable revisions.
+- Rendered all three boards in the in-app browser and checked comparison
+  navigation, logo applications, and color/monochrome controls. Refined the
+  lowercase a geometry after visual review.
+- Exploration deliverable is complete. Production selection and implementation
+  remain open; no existing product logo or application code changed.
+- Brain record: `brain/marketing/logo-redesign-workshop.md`.
+
 ### Redesign marketing link preview image
 
 Completed: 2026-09-29

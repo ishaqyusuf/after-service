@@ -1,6 +1,7 @@
 import { ArchiveIcon } from "@radix-ui/react-icons";
 import { FiGithub } from "react-icons/fi";
 import type { IconType as BaseIconType } from "react-icons/lib";
+import type { SVGProps } from "react";
 import {
   MdArrowBack,
   MdArrowDownward,
@@ -108,6 +109,7 @@ import {
   MdTrendingUp,
 } from "react-icons/md";
 import { PiDiscordLogo } from "react-icons/pi";
+import { BrandMark } from "./brand-mark";
 
 type SVGIconProps = {
   size?: number;
@@ -152,43 +154,28 @@ const SVGIcon: React.FC<SVGIconProps> = ({
 };
 
 export const Icons = {
-  LogoSmall: (props: SVGIconProps) => (
-    <SVGIcon size={28} {...props} viewBox="0 0 64 64">
-      <path
-        d="M50 51V29C50 18.5 41.5 10 31 10S12 18.5 12 29s8.5 19 19 19c5.1 0 9.8-2 13.2-5.3"
-        stroke="currentColor"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        strokeWidth="13"
-        fill="none"
-      />
-      <circle cx="31" cy="29" r="6.5" fill="#009b98" />
-    </SVGIcon>
+  LogoSmall: ({ size = 28, ...props }: SVGIconProps) => (
+    <BrandMark width={size} height={size} {...props} />
   ),
-  Logo: (props: any) => (
+  Logo: (props: SVGProps<SVGSVGElement>) => (
     <svg
+      aria-label="afterservice"
+      role="img"
       xmlns="http://www.w3.org/2000/svg"
-      width={113}
+      width={146}
       height={32}
       fill="none"
       {...props}
     >
-      <path
-        d="M50 51V29C50 18.5 41.5 10 31 10S12 18.5 12 29s8.5 19 19 19c5.1 0 9.8-2 13.2-5.3"
-        stroke="currentColor"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        strokeWidth="12"
-        transform="translate(0,2) scale(0.24)"
-      />
-      <circle cx="8.44" cy="9.36" r="1.56" fill="#009b98" />
+      <BrandMark width={32} height={32} />
       <text
-        x="20"
+        x="36"
         y="22"
         fill="currentColor"
         fontFamily="system-ui, sans-serif"
         fontWeight="600"
-        fontSize="16"
+        fontSize="18"
+        letterSpacing="-0.02em"
       >
         afterservice
       </text>
