@@ -2,13 +2,10 @@ import { getDbClient } from "@afterservice/db";
 import {
   assertQaAcceleratorStartupSafety,
   getDevAppUrlStrings,
+  resolveEmailRecipients,
 } from "@afterservice/utils";
 import { prismaAdapter } from "@better-auth/prisma-adapter";
 import { betterAuth } from "better-auth";
-import { sendPasswordResetEmail } from "./password-reset-email";
-import { getAuthBaseUrl } from "./base-url";
-
-export { getAuthBaseUrl } from "./base-url";
 
 export {
   clearBetterAuthSessionCookieHeaders,
@@ -66,6 +63,23 @@ export function getTrustedOrigins() {
   );
 }
 
+export function getAuthBaseUrl() {
+  const isLocalRuntime =
+    process.env.AFTERSERVICE_ENV_MODE === "local" ||
+    process.env.NODE_ENV !== "production";
+  const devUrls = isLocalRuntime ? "http://localhost:4101" : undefined;
+
+  if (devUrls) {
+    return readNonEmptyEnv("BETTER_AUTH_LOCAL_URL") ?? devUrls;
+  }
+
+  return (
+    readNonEmptyEnv("BETTER_AUTH_URL") ??
+    readNonEmptyEnv("NEXT_PUBLIC_DASHBOARD_URL") ??
+    undefined
+  );
+}
+
 function getAuthSecret() {
   return (
     readNonEmptyEnv("BETTER_AUTH_SECRET") ??
@@ -80,7 +94,6 @@ function getAuthSecret() {
 }
 
 export const auth = betterAuth({
-  advanced: { disableOriginCheck: false },
   basePath: "/api/auth",
   baseURL: getAuthBaseUrl(),
   database: prismaAdapter(getDbClient(), {
@@ -89,9 +102,38 @@ export const auth = betterAuth({
   }),
   emailAndPassword: {
     enabled: true,
-    revokeSessionsOnPasswordReset: true,
     sendResetPassword: async ({ user, url }) => {
-      await sendPasswordResetEmail({ email: user.email, url });
+      const resendApiKey = readNonEmptyEnv("RESEND_API_KEY");
+      const recipientResolution = resolveEmailRecipients(user.email);
+      const [route] = recipientResolution.routes;
+      if (!route) throw new Error("At least one email recipient is required.");
+      if (route.transport === "console") {
+        console.log(`[PASSWORD RESET] Send this link to ${user.email}: ${url}`);
+        return;
+      }
+      if (!resendApiKey) {
+        throw new Error("RESEND_API_KEY is required for provider delivery.");
+      }
+
+      await fetch("https://api.resend.com/emails", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${resendApiKey}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          from:
+            readNonEmptyEnv("EMAIL_FROM_ADDRESS") ?? "noreply@afterservice.app",
+          to: [route.recipient],
+          subject: route.qaRouted
+            ? `[QA: ${route.originalRecipient}] Reset your password`
+            : "Reset your password",
+          headers: route.qaRouted
+            ? { "X-QA-Original-Recipient": route.originalRecipient }
+            : undefined,
+          html: `${route.qaRouted ? `<p><strong>QA routed for ${route.originalRecipient}</strong></p>` : ""}<p>Click <a href="${url}">here</a> to reset your password.</p>`,
+        }),
+      });
     },
   },
   session: {

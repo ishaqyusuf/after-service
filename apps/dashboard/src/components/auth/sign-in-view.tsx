@@ -22,14 +22,12 @@ type DbAccountDebug = {
 };
 
 type SignInViewProps = {
-  passwordResetComplete?: boolean;
   dbAccountDebug?: DbAccountDebug;
   returnTo?: string;
 };
 
 export function SignInView({
   dbAccountDebug,
-  passwordResetComplete = false,
   returnTo = "/",
 }: SignInViewProps) {
   const [accountDebugOpen, setAccountDebugOpen] = useState(false);
@@ -66,14 +64,6 @@ export function SignInView({
       }
       title="Sign in"
     >
-      {passwordResetComplete ? (
-        <p
-          role="status"
-          className="mb-6 rounded-md border border-border bg-muted/50 p-4 text-sm text-foreground"
-        >
-          Your password has been reset. Sign in with your new password.
-        </p>
-      ) : null}
       <SignInForm onSignIn={handleSignIn} returnTo={returnTo} />
       {dbAccountDebug ? (
         <DbAccountDebugFab

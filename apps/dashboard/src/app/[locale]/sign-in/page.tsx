@@ -29,15 +29,13 @@ const AUTH_DEBUG =
 export default async function SignInPage({
   searchParams,
 }: {
-  searchParams: Promise<{ password_reset?: string; return_to?: string }>;
+  searchParams: Promise<{ return_to?: string }>;
 }) {
-  const query = await searchParams;
-  const returnTo = getSafeReturnTo(query.return_to);
+  const returnTo = getSafeReturnTo((await searchParams).return_to);
   await redirectAuthenticatedUser(returnTo);
   return (
     <SignInView
       dbAccountDebug={await getDbAccountDebug()}
-      passwordResetComplete={query.password_reset === "success"}
       returnTo={returnTo}
     />
   );
