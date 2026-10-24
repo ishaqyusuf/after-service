@@ -1,9 +1,6 @@
 {
   "$schema": "https://turborepo.org/schema.json",
-  "globalDependencies": [
-    "**/.env",
-    "**/.env.production"
-  ],
+  "globalDependencies": ["**/.env", "**/.env.production"],
   "globalEnv": [
     "ADOPTION_EXCLUDED_WORKSPACE_IDS",
     "AFTERSERVICE_ASSISTANT_CAPABILITIES",
@@ -72,9 +69,7 @@
   ],
   "tasks": {
     "build": {
-      "dependsOn": [
-        "^build"
-      ],
+      "dependsOn": ["^build"],
       "outputs": [
         ".next/**",
         "!.next/cache/**",
@@ -93,9 +88,7 @@
     },
     "db:generate": {
       "cache": false,
-      "outputs": [
-        "generated/**"
-      ]
+      "outputs": ["generated/**"]
     },
     "db:push": {
       "cache": false,
@@ -115,14 +108,10 @@
     },
     "format": {},
     "lint": {
-      "dependsOn": [
-        "^lint"
-      ]
+      "dependsOn": ["^lint"]
     },
     "typecheck": {
-      "dependsOn": [
-        "^typecheck"
-      ],
+      "dependsOn": ["^typecheck"],
       "outputs": []
     }
   },
