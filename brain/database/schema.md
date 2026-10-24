@@ -83,7 +83,7 @@ and `AssistantUsage` (six models). Conversations own messages/runs/proposals;
 receipts are minimal workspace/actor records with a unique proposal ID. Usage is
 unique by workspace/UTC month. `ServiceJob.currency` defaults legacy records to
 USD; new canonical API values support USD/NGN/GBP/EUR/CAD. Model usage, drafts and
-confirmation metadata never grant access. See ADR 0018 and assistant verification.
+confirmation metadata never grant access. See ADR 0024 and assistant verification.
 
 Assistant runs persist prompt version `operations-v1`; proposals persist the
 capability contract version. Version mismatch refuses confirmation. Drafts expire

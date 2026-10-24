@@ -1,4 +1,4 @@
-# 0018. Add A Reviewed Operations Assistant
+# 0024. Add A Reviewed Operations Assistant
 
 Date: 2026-10-24
 Status: adopted for implementation; hosted activation remains separate

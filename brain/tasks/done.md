@@ -2733,3 +2733,14 @@ Files changed:
   activation and physical Android remain tracked in the canonical roadmap.
 - Evidence and Brain impact manifest:
   `brain/handoffs/2026-10-19-preview-qa-acceptance.md`.
+
+## Country visit metadata — 2026-10-24
+
+- Implemented and locally verified Afterservice edge forwarding plus Logly
+  Events country column/detail labels; existing Insights map/list reused.
+- 12 Afterservice analytics tests, full workspace typing, real local collector/DB
+  smoke, Logly SQL checks, 96 tests, full Logly typing/build and desktop/
+  mobile UI checks pass. Production rollout is complete: both fresh website and
+  dashboard visits show Nigeria (NG). See
+  `brain/handoffs/2026-10-24-country-tracking-release.md`.
+- Details: `brain/features/visit-country-tracking.md`; ADR 0018.

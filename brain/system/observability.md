@@ -34,8 +34,9 @@ This file captures the MVP observability baseline for afterservice production re
 - The public website measures one eligible visitor-day per browser per
   Africa/Lagos date plus explicit bounded product events. Logly discovers new
   valid event names automatically; no dashboard catalog setup is required. It does not capture
-  automatic pageviews, DOM attributes, outgoing links, sessions, country, or
-  detailed device data.
+  automatic pageviews, DOM attributes, outgoing links, sessions, or detailed
+  device data. Country forwarding was added on 2026-10-24; see
+  `brain/features/visit-country-tracking.md`.
 - Browser batches use a same-origin route and project-scoped `client-ingest`
   key. Trusted server events use `server-write`; report reads use `read`.
   Secrets are never exposed through `NEXT_PUBLIC_*` variables.
@@ -120,3 +121,20 @@ commit and do not determine whether the business change succeeds.
 
 See [assistant verification](../engineering/assistant-verification.md) for
 retention, quotas, controlled live-model evidence and deployment prerequisites.
+
+## Visit country forwarding — 2026-10-24
+
+The website and dashboard share `@afterservice/events/route`. It now uses Next
+adapter 0.2.1 plus a tracked Bun patch with explicit `trustCloudflareCountry`.
+On Vercel, Cloudflare `cf-ipcountry` takes precedence when Cloudflare signals
+are present; otherwise `x-vercel-ip-country` is used. Missing/invalid Cloudflare
+metadata does not fall back to the proxy location. The route forwards only a
+bounded country code as `x-logly-country`, never visitor IPs. Body country
+overrides and incoming `x-logly-country` are ignored.
+
+Logly already stores country and reports it in Insights. Its updated Events
+table and event details also show flag, country name/code, or Unknown.
+Historical visits remain unknown. Local integration, SQL, desktop/mobile UI
+checks pass. All three surfaces are now deployed; fresh production website
+and dashboard visits both recorded Nigeria (NG). Release evidence:
+`brain/handoffs/2026-10-24-country-tracking-release.md`.

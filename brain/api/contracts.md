@@ -101,3 +101,13 @@ the provider's object-root schema requirement. Public tRPC draft/edit inputs kee
 the typed action contract. Runs persist prompt version; proposal capability
 version must still match on confirmation. Provider error bodies and SDK request
 objects are never logged.
+
+## Analytics country forwarding — 2026-10-24
+
+`POST /api/analytics` on website/dashboard preserves the existing bounded batch,
+project key, origin checks and collector status. The server route now forwards
+country through `x-logly-country` using the trusted product-edge policy in
+`brain/features/visit-country-tracking.md`. Country is not accepted in the
+event body, derived from language, or inferred from the collector's network.
+Logly owns country normalization, persistence, deduplication and reads; no
+Afterservice database/API business contract changes are required.

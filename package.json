@@ -41,7 +41,8 @@
     "test:unit": "bun --env-file=/dev/null test apps packages scripts tests/support",
     "typecheck": "turbo typecheck",
     "test:assistant": "bun test ./packages/assistant/src/contracts.test.ts ./tests/integration/assistant.integration.ts",
-    "test:assistant:e2e": "playwright test --config playwright.assistant.config.ts"
+    "test:assistant:e2e": "playwright test --config playwright.assistant.config.ts",
+    "smoke:logly:country": "bun --env-file=/dev/null ../../local-infra-kit/bin/with-env.ts --profile afterservice --mode local -- bun scripts/smoke-logly-country.ts"
   },
   "devDependencies": {
     "@biomejs/biome": "^2.3.0",
@@ -58,6 +59,7 @@
     "framer-motion": "^12.40.0"
   },
   "patchedDependencies": {
-    "@ishaqyusuf/logly-core@0.2.0": "patches/@ishaqyusuf%2Flogly-core@0.2.0.patch"
+    "@ishaqyusuf/logly-core@0.2.0": "patches/@ishaqyusuf%2Flogly-core@0.2.0.patch",
+    "@ishaqyusuf/logly-next@0.2.1": "patches/@ishaqyusuf%2Flogly-next@0.2.1.patch"
   }
 }

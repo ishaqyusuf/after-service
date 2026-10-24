@@ -312,7 +312,7 @@ reservations and dashboard integration are implemented in the isolated worktree.
 Unit/integration, eight desktop/mobile browser cases, typechecks, builds and
 seven controlled real DeepSeek scenarios pass. See
 [verification and configuration](../engineering/assistant-verification.md) and
-[ADR 0018](../decisions/0018-add-reviewed-operations-assistant.md).
+[ADR 0024](../decisions/0024-add-reviewed-operations-assistant.md).
 
 The monetary implementation uses per-job currency rather than a new workspace
 currency setting. Legacy records remain USD; no conversion or reinterpretation.

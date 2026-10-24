@@ -141,7 +141,7 @@ outreach and team administration remain the separately documented extensions.
 - [Feature behavior](../features/operations-assistant.md)
 - [Service job currency](../features/service-jobs-mvp.md)
 - [Integration plan](../plans/2026-10-24-feature-operations-assistant.md)
-- [ADR 0018](../decisions/0018-add-reviewed-operations-assistant.md)
+- [ADR 0024](../decisions/0024-add-reviewed-operations-assistant.md)
 - [API endpoints](../api/endpoints.md)
 - [API contracts](../api/contracts.md)
 - [API permissions](../api/permissions.md)

@@ -102,4 +102,4 @@ provider setup; API assistant modules own authenticated streaming/orchestration;
 DB query modules own persistence and deterministic reads. Dashboard shell owns
 one assistant provider with actor/workspace identity, and global record sheets
 live inside it. Canonical form operations accept server-owned transactional
-context for reviewed commands. See ADR 0018 and assistant verification.
+context for reviewed commands. See ADR 0024 and assistant verification.

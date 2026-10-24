@@ -53,7 +53,7 @@ Use this file to quickly locate the right project brain document.
 - `plans/2026-10-24-feature-operations-assistant.md`: implemented capability coverage, architecture, rollout and acceptance plan.
 
 - `engineering/assistant-verification.md`: configuration, local/live acceptance and Brain impact manifest.
-- `decisions/0018-add-reviewed-operations-assistant.md`: adopted assistant architecture and provider contracts.
+- `decisions/0024-add-reviewed-operations-assistant.md`: adopted assistant architecture and provider contracts.
 
 ## Templates
 - `templates/feature.md`: feature doc template.
