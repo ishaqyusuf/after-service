@@ -20,6 +20,13 @@ The beta goal is not broad monetization yet. The beta goal is to prove that smal
 
 Status: current.
 
+2026-10-18: The working draft kit is prepared under
+`brain/product/beta/`: invite copy, a 20-minute onboarding script/operator quick
+start, feedback/triage process, and recruiting/activation trackers. The default
+feedback route is the founder's existing onboarding conversation, confirmed
+per operator. Actual outreach, monitored-mailbox confirmation, recruiting, and
+real-operator acceptance remain pending. No invites were sent by this work.
+
 Target: 1 week.
 
 Deliverables:

@@ -1,4 +1,5 @@
 import { createHmac } from "node:crypto";
+import { getAuthBaseUrl } from "./base-url";
 
 type CookieEnvironment = Record<string, string | undefined>;
 
@@ -12,16 +13,8 @@ function getAuthSecret(env: CookieEnvironment) {
   return "afterservice-local-development-secret";
 }
 
-function getAuthBaseUrl(env: CookieEnvironment) {
-  return (
-    env.BETTER_AUTH_URL?.trim() ??
-    env.NEXT_PUBLIC_DASHBOARD_URL?.trim() ??
-    "http://localhost:4101"
-  );
-}
-
 function getCookieNames(env: CookieEnvironment) {
-  const prefix = getAuthBaseUrl(env).startsWith("https://") ? "__Secure-" : "";
+  const prefix = getAuthBaseUrl(env)?.startsWith("https://") ? "__Secure-" : "";
   return {
     sessionData: `${prefix}better-auth.session_data`,
     sessionToken: `${prefix}better-auth.session_token`,

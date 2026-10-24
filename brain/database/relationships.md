@@ -36,6 +36,12 @@ This file documents intended entity relationships.
 ## Invariants
 - Business objects cannot cross workspaces.
 - Follow-up ownership is optional at first but must reference a membership when assigned.
+- Application-side follow-up relation validation resolves templates and
+  memberships within the active workspace and jobs within both that workspace
+  and the selected customer. Individual foreign keys alone do not establish
+  these workspace/customer invariants.
+- Manual phone contact uses one nested write for follow-up sent status, its
+  message log, and its audit event.
 - Provider event IDs must be unique for idempotency.
 - One `QaTesterGrant` has many `QaClientAuthorization` records and audit events.
 - One `QaClientAuthorization` has many profile selections, derived sessions,
@@ -49,3 +55,11 @@ This file documents intended entity relationships.
 - The QA marker belongs to the workspace aggregate root and covers memberships,
   customers, jobs, follow-ups, templates, messages, and subscriptions.
 - `QaPurgeRun` has no workspace relation so the counts-only receipt survives.
+
+## Assistant Relationships — 2026-10-24
+
+Actor/workspace own private conversations. Conversation deletion cascades messages,
+runs and proposals; saved business receipts remain separate and retain only
+record references/action/revision/actor/workspace/time. Workspace deletion cascades
+all assistant tables. Usage is workspace/month scoped. QA cleanup previews count
+assistant roots, and workspace cascade removes their descendants.

@@ -3,6 +3,7 @@
 import { Button, Card, CardContent } from "@afterservice/ui";
 import { useQuery } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
+import { useTimeZone } from "@/hooks/use-time-zone";
 import { useTRPC } from "@/trpc/client";
 import { ChannelCards } from "./channel-cards";
 import { FollowUpHealthCard } from "./follow-up-health-card";
@@ -42,7 +43,8 @@ function normalizeOverviewData(data: DashboardOverviewData) {
 
 export function OverviewView() {
   const trpc = useTRPC();
-  const { data, isLoading } = useQuery(trpc.dashboard.overview.queryOptions());
+  const timeZone = useTimeZone();
+  const { data, isLoading } = useQuery(trpc.dashboard.overview.queryOptions({ timeZone }));
   const router = useRouter();
 
   if (isLoading) {

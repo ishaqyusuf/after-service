@@ -6,7 +6,8 @@ Feature
 
 ## Status
 
-Implemented — rollout and deployed-preview acceptance pending
+Implemented — isolated deployed-preview acceptance passed; provider canary and
+reviewed purge pending Trigger credits
 
 ## Created Date
 
@@ -79,9 +80,12 @@ must expose no usable accelerator capability.
 
 ## External Release Evidence
 
-Deployed preview canaries, multi-browser acceptance, provider delivery, and the
-first operator-reviewed purge remain release-owner actions. They do not weaken
-the source-level production fail-closed boundary.
+Isolated deployed Chrome preview acceptance passed on 2026-10-19, with 17 HTTP
+checks and a revoked test grant. The retained branch and restricted runtime role
+are documented in ADR 0016. Existing local browser coverage spans four
+configurations; this pass did not repeat that full matrix on Preview. Routed
+provider delivery and the first operator-reviewed purge still require Trigger
+credits and their respective reviews. Production QA routes remain absent.
 
 ## Implementation Result
 
@@ -91,3 +95,13 @@ lifecycle, exact-domain workspace profiles, ordinary scoped Better Auth
 sessions, provider-effect guards, deterministic QA-bound Quick Fill recipes,
 and production route/module exclusion. Migration application and deployed
 acceptance are tracked as rollout work rather than source implementation gaps.
+
+
+## Deployed Preview Result — 2026-10-19
+
+The approved schema-only branch is retained for ongoing QA. The final Preview
+build uses the restricted runtime login. Browser/HTTP acceptance and no-implicit-
+write audits passed; the temporary tester grant and sessions were revoked.
+Turbo configuration propagation, shared auth cookie base resolution, Quick Fill
+Date values, and visible work-form errors were corrected. See
+`brain/handoffs/2026-10-19-preview-qa-acceptance.md` for evidence and limits.

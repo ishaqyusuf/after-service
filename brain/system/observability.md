@@ -4,6 +4,15 @@
 This file captures the MVP observability baseline for afterservice production readiness.
 
 ## MVP Logging
+- 2026-10-24: Private Oversight v1 read endpoints and the matching portfolio
+  adapter are implemented. Logly owns traffic; Oversight owns operational
+  summaries/directories. Initial live inspection found Afterservice registered
+  but not connected. Source verification and production activation are tracked
+  separately in `brain/features/oversight-integration.md`.
+- The daily Vercel follow-up cron emits `follow-up-cron` with aggregate
+  processed/missed counts and completion time. It records no recipients or
+  customer data. Check function errors/5xx responses; failed runs require
+  investigation and a manual rerun because Vercel does not retry cron failures.
 - API, dashboard, website, cron, and webhook runtime logs should be retained by the deployment platform.
 - `LOG_LEVEL=info` is the default production setting.
 - Billing webhooks persist every accepted provider event in `BillingEvent`.
@@ -11,6 +20,15 @@ This file captures the MVP observability baseline for afterservice production re
 - Manual outreach creates `MessageLog` records; automated outbound messaging remains disabled unless explicitly configured.
 
 ## Marketing Analytics
+- 2026-10-18: Email sign-in/signup submit buttons emit
+  `continue_with_email_clicked`, with only channel, method, and form location.
+  It measures button activation before validation, not successful auth. Existing
+  signup conversion events remain; see `brain/features/auth-email-analytics.md`.
+- 2026-10-18: Added only `https://dash.afterservice.app` to the enabled
+  Afterservice Logly project's production origin allowlist, preserving both
+  existing origins. Dashboard ingestion now returns 202 with one accepted
+  verification event; website ingestion also succeeds. No collector credential
+  was exported or rotated.
 - 2026-08-31: Logly replaces OpenPanel as the shared first-party analytics
   platform. Afterservice remains a thin product adapter and first pilot.
 - The public website measures one eligible visitor-day per browser per
@@ -59,6 +77,12 @@ This file captures the MVP observability baseline for afterservice production re
   available and the report records why traffic analytics is unavailable.
 
 ## Error Monitoring
+
+- 2026-10-18: A Bun patch for `@ishaqyusuf/logly-core@0.2.0` fixes IndexedDB
+  queue clearing on sign-out (`openCursor`, allowing record deletion). Browser
+  tests assert that sign-out produces no uncaught exception. Remove the patch
+  after adopting a release with the upstream fix; see
+  `brain/engineering/testing.md`.
 - Sentry follows the Midday dashboard pattern for `@afterservice/dashboard`.
 - `NEXT_PUBLIC_SENTRY_DSN` is documented in `.env.example` for browser, server, and edge SDK initialization.
 - 2026-06-11: `NEXT_PUBLIC_SENTRY_DSN`, `SENTRY_ORG`, `SENTRY_PROJECT`, and `SENTRY_AUTH_TOKEN` are configured in the local production env and Vercel production.
@@ -68,18 +92,35 @@ This file captures the MVP observability baseline for afterservice production re
 - A production deploy should configure Sentry alerts for API/dashboard exceptions before live customer data is collected.
 
 ## Alerts
-- Alert on repeated 5xx responses from `dashboard.afterservice.app/api`.
+- Alert on repeated 5xx responses from `api.afterservice.app` and the dashboard's same-origin handlers.
 - Alert on Lemon Squeezy webhook verification or processing failures.
 - Alert on failed cron/job endpoint runs.
 - Alert on failed `daily-analytics-review` Trigger.dev runs.
 - Alert on database connection saturation or migration failures.
 
 ## Health Checks
-- API health: `GET https://dashboard.afterservice.app/api/health`.
-- Cron dry-run: `POST https://dashboard.afterservice.app/api/jobs/follow-ups/dry-run` with `CRON_SECRET`.
-- Lemon webhook target: `POST https://dashboard.afterservice.app/api/webhooks/lemon-squeezy`.
+- API health: `GET https://api.afterservice.app/health`.
+- Cron dry-run: `POST https://api.afterservice.app/api/jobs/follow-ups/dry-run` with `CRON_SECRET`.
+- Scheduled state processing: `GET https://api.afterservice.app/api/jobs/follow-ups/mark-missed`
+  with the production API `CRON_SECRET`; daily 08:00 Africa/Lagos target window.
+- Lemon webhook target: `POST https://api.afterservice.app/webhooks/lemon-squeezy`.
+- Standalone API deployment checks: `bun run smoke:api`.
 - Local Afterservice-to-Logly route: `bun run smoke:logly:local` while both
   shared local-infra profiles are running.
+
+## Operations Assistant — 2026-10-24
+
+Inspect workspace/actor-scoped `AssistantRun` rows for state, provider/model,
+prompt version, start/finish/expiry timestamps, measured tokens and bounded error
+codes. `AssistantUsage` reconciles reservations with measured monthly usage.
+Proposals record capability versions; unique receipts prove committed actions.
+Streaming errors are bounded recovery messages. Provider errors log only
+provider/model labels; no raw SDK error, request body, chat or customer data is
+sent to analytics. Canonical operation analytics are queued until transaction
+commit and do not determine whether the business change succeeds.
+
+See [assistant verification](../engineering/assistant-verification.md) for
+retention, quotas, controlled live-model evidence and deployment prerequisites.
 
 ## Visit country forwarding — 2026-10-24
 

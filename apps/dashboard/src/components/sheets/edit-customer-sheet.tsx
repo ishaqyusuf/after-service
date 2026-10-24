@@ -2,6 +2,7 @@
 
 import { Sheet } from "@afterservice/ui";
 import { useQuery } from "@tanstack/react-query";
+import { AskAssistantButton } from "@/components/assistant/assistant-launcher";
 import { CustomerEditForm } from "@/components/forms/customer-edit-form";
 import { useCustomerParams } from "@/hooks/use-customer-params";
 import { useTRPC } from "@/trpc/client";
@@ -35,7 +36,15 @@ export function EditCustomerSheet() {
         {isLoading ? (
           <SheetFormSkeleton fields={6} />
         ) : customerData?.item ? (
-          <CustomerEditForm customer={customerData.item} />
+          <>
+            <AskAssistantButton
+              kind="customers"
+              id={customerData.item.id}
+              label={customerData.item.name}
+              onOpen={() => setParams(null)}
+            />
+            <CustomerEditForm customer={customerData.item} />
+          </>
         ) : (
           <SheetMissingState
             title="Customer not found"

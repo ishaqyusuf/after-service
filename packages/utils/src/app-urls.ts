@@ -5,8 +5,8 @@ import {
 } from "./runtime-url";
 
 export const siteRootDomain = "afterservice.app";
-export const dashboardRootDomain = "dashboard.afterservice.app";
-export const apiRootDomain = dashboardRootDomain;
+export const dashboardRootDomain = "dash.afterservice.app";
+export const apiRootDomain = "api.afterservice.app";
 const apiProductionBasePath = "/api";
 
 export const sitePortlessRootDomain = "afterservice.localhost";
@@ -216,10 +216,8 @@ function buildSiblingAppUrl(kind: AppUrlKind, options: BuildAppUrlOptions) {
       hostMatches(current.host, root),
     )
   ) {
-    const basePath = kind === "api" ? apiProductionBasePath : "";
-
     return appendPath(
-      `${current.protocol}://${resolveAppProductionRootDomain(kind)}${basePath}`,
+      `${current.protocol}://${resolveAppProductionRootDomain(kind)}`,
       options.path,
     );
   }
@@ -268,7 +266,7 @@ export function buildApiUrl(options: BuildAppUrlOptions = {}) {
 }
 
 export function buildAuthUrl(options: BuildAppUrlOptions = {}) {
-  return buildAppUrl("api", {
+  return buildAppUrl("dashboard", {
     ...options,
     path: options.path ?? "/api/auth",
   });

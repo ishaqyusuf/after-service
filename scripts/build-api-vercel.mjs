@@ -1,0 +1,39 @@
+import { spawnSync } from "node:child_process";
+import { readFileSync, writeFileSync } from "node:fs";
+import { dirname, resolve } from "node:path";
+import { fileURLToPath } from "node:url";
+
+// Vercel traces a thin Hono entrypoint after Bun bundles workspace packages.
+// Only rewrite sources inside Vercel's disposable build checkout.
+if (process.env.VERCEL !== "1") {
+  throw new Error("This build helper requires a disposable Vercel checkout.");
+}
+
+const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
+
+function run(args) {
+  const result = spawnSync("bun", args, { cwd: root, stdio: "inherit" });
+  if (result.error || result.status !== 0) {
+    throw new Error(`API build step failed: ${args[0]}`);
+  }
+}
+
+run(["run", "--cwd", "packages/db", "db:generate"]);
+run([
+  "build",
+  "--target=bun",
+  "--packages=bundle",
+  "--env=disable",
+  "--outfile=apps/api/src/bundle.js",
+  "apps/api/src/index.ts",
+]);
+
+const configPath = resolve(root, "apps/api/tsconfig.json");
+const config = JSON.parse(readFileSync(configPath, "utf8"));
+config.compilerOptions = { ...config.compilerOptions, noCheck: true };
+config.include = ["src/index.ts"];
+writeFileSync(configPath, `${JSON.stringify(config, null, 2)}\n`);
+writeFileSync(
+  resolve(root, "apps/api/src/index.ts"),
+  'import { Hono } from "hono";\nimport bundledApp from "./bundle.js";\nconst app = new Hono();\napp.all("*", (context) => bundledApp.fetch(context.req.raw));\nexport default app;\n',
+);

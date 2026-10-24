@@ -16,19 +16,14 @@ function firstSearchValue(value: string | string[] | undefined) {
 
 export async function getPricingResolution(
   searchParams?: SearchParams,
-  routeLocale?: string | null,
 ): Promise<PricingResolution> {
   const headerList = await headers();
   const resolvedSearchParams = searchParams ? await searchParams : {};
-  const { acceptLanguage, continent, country } =
-    getHeaderPricingHints(headerList);
+  const { country } = getHeaderPricingHints(headerList);
 
   return resolvePricingRegion({
-    acceptLanguage,
-    continent,
     country,
     queryCurrency: firstSearchValue(resolvedSearchParams.currency),
     queryRegion: firstSearchValue(resolvedSearchParams.region),
-    routeLocale,
   });
 }

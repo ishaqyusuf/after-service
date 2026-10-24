@@ -151,6 +151,9 @@ export async function previewQaWorkspacePurge(
           memberships: true,
           messageLogs: true,
           templates: true,
+          assistantConversations: true,
+          assistantReceipts: true,
+          assistantUsage: true,
         },
       },
     },
@@ -182,7 +185,10 @@ export async function previewQaWorkspacePurge(
         workspace._count.jobs +
         workspace._count.memberships +
         workspace._count.messageLogs +
-        workspace._count.templates;
+        workspace._count.templates +
+        workspace._count.assistantConversations +
+        workspace._count.assistantReceipts +
+        workspace._count.assistantUsage;
       return sum;
     },
     { files: 0, fileBytes: 0, records: 0, workspaces: 0 },
@@ -250,6 +256,9 @@ export async function deleteQaWorkspace(
           memberships: true,
           messageLogs: true,
           templates: true,
+          assistantConversations: true,
+          assistantReceipts: true,
+          assistantUsage: true,
         },
       },
     },

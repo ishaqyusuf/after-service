@@ -1,4 +1,5 @@
 import { describe, expect, test } from "bun:test";
+import { readFileSync } from "node:fs";
 import {
   afterserviceQaFormCoverage,
   afterserviceQaFormInventory,
@@ -12,6 +13,32 @@ import {
 } from "./qa-accelerator";
 
 describe("afterservice QA accelerator capability", () => {
+  test("preview capability survives Turbo strict build environment filtering", () => {
+    const turbo = JSON.parse(
+      readFileSync(new URL("../../../turbo.json", import.meta.url), "utf8"),
+    ) as { globalEnv: string[] };
+    const deploymentEnv = {
+      AFTERSERVICE_ENV_MODE: "preview",
+      EMAIL_QA_DOMAIN_ROUTES: '{"preview.qa.test":"sink@afterservice.invalid"}',
+      QA_ACCELERATOR_ENABLED: "true",
+      QA_ACCELERATOR_SECRET: "ephemeral-preview-build-contract-test-secret",
+      QA_ACCELERATOR_ALLOWED_ORIGINS: "https://preview.afterservice.app",
+    };
+    const filtered = Object.fromEntries(
+      Object.entries(deploymentEnv).filter(([key]) =>
+        turbo.globalEnv.includes(key),
+      ),
+    );
+    expect(
+      getQaAcceleratorAvailability({
+        env: { ...filtered, NODE_ENV: "production" },
+        clientContractVersion: 1,
+        origin: "https://preview.afterservice.app",
+        platform: "web",
+      }),
+    ).toMatchObject({ available: true, environment: "preview" });
+  });
+
   test("is server-owned, versioned, and unavailable in production", () => {
     expect(
       getQaAcceleratorAvailability({

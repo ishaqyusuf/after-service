@@ -6,6 +6,154 @@ This file records completed work.
 
 ## Completed
 
+### Operations Assistant Local Implementation — 2026-10-24
+
+- Implemented all basic operator capabilities from the approved integration plan
+  in the attached worktree, branch `codex/operations-assistant`.
+- Added persistent chat, actor-private history, typed reads, 19 reviewed actions,
+  editable message drafts, receipts, exact time/money handling and usage gates.
+- Configured the owner-authorized dedicated DeepSeek key in ignored local config.
+- Verified 19 assistant checks, 107 unit regressions, 45 MVP/QA integrations, eight
+  desktop/mobile browser cases, seven real-model scenarios, typechecks and builds.
+- Hosted activation and direct customer dispatch remain separate gates.
+- Full evidence and Brain impact: [assistant verification](../engineering/assistant-verification.md).
+
+### Country-Based Marketing Pricing — 2026-10-24
+
+- Fixed the shared pricing resolver so Cloudflare visitor country wins over
+  Vercel proxy geolocation and custom hints. Language and continent no longer
+  choose currency; missing/unsupported countries use a disclosed USD fallback.
+- Added a visible currency code to marketing pricing; dashboard previews share
+  the same resolution. Existing fixed conversions and beta gating remain.
+- Verified 28 pricing regression tests, 16 rendered HTTP scenarios across `/`
+  and `/pricing`, scoped Biome checks, and the full monorepo typecheck. In-app
+  browser confirmed the local Nigeria preview uses naira for all four cards.
+- Verified locally only; production deployment, Cloudflare geolocation setting
+  inspection, and Polar catalog/sandbox acceptance have not been performed.
+- Brain impact: ADR 0017, regional currency pricing plan, billing feature notes,
+  and this task record. No API, database, auth, or entitlement contract changes.
+
+### Production Cron, Beta Materials, And Email Intent Analytics
+
+Completed: 2026-10-18
+
+- Configured production API Vercel Cron for daily missed-state processing with
+  a Sensitive secret, server-clock/no-query handler, no-store responses, and
+  aggregate logging. The old production Trigger overdue schedule is inactive.
+- Verified the registered schedule, authenticated dry-run, generated overdue
+  fixture transition, repeat run, unchanged message logs, and fixture closure.
+- Prepared the beta invite, 20-minute onboarding/quick-start script, feedback
+  process, and recruiting/activation trackers. No messages or invites sent.
+- Deployed dedicated email submit-button analytics for sign-in and sign-up;
+  verified both synthetic events in Logly storage. Actual browser interaction
+  remains pending and is not claimed by this task.
+- Passed 35 integration tests, 60 unit tests, both typechecks, scoped Biome,
+  production builds, 13 API smoke probes, and beta kit link validation.
+- Evidence and full Brain impact manifest:
+  `brain/handoffs/2026-10-18-cron-beta-readiness.md`.
+
+### MVP Browser And Edge-Case Coverage
+
+Completed: 2026-10-18
+
+- Added repeatable browser, real PostgreSQL integration, and local-target
+  safety checks with exact-identity fixture cleanup.
+- Fixed cross-workspace follow-up relations, missing atomic phone contact
+  audit logs, stale-cookie auth loops, unsafe/racy return paths, HTTPS
+  Portless redirects, billing hydration, and Logly IndexedDB sign-out cleanup.
+- Passed 40 browser cases across Chromium/Firefox/WebKit/mobile Chromium,
+  31 integration tests, 58 unit tests, both typechecks, both production web
+  builds, standalone API bundling, scoped Biome checks, and diff whitespace
+  validation. No generated browser/integration fixtures remained after tests.
+- Existing shared UI lint failures remain outside this change. Live provider
+  delivery, Google OAuth, production scheduler configuration, physical PWA
+  installation, and deployed QA rollout remain separate acceptance checks.
+- The queued-email smoke was not rerun: automatic approval review rejected
+  worker startup because it can consume existing jobs and send email.
+- Full evidence and commands: `brain/engineering/testing.md`.
+
+Brain documentation updated for this task:
+
+- `brain/BRAIN.md`
+- `brain/engineering/testing.md`
+- `brain/api/contracts.md`, `brain/api/permissions.md`
+- `brain/database/relationships.md`
+- `brain/features/auth-session-loop-fix.md`
+- `brain/features/follow-up-board-mvp.md`
+- `brain/features/billing-entitlements-mvp.md`
+- `brain/system/observability.md`
+- `brain/decisions/0013-validate-follow-up-relations-before-mutation.md`
+- `brain/product/roadmap.md`
+- `brain/tasks/in-progress.md`, `brain/tasks/done.md`
+
+### Dashboard Hostname Source Update
+
+Completed: 2026-10-18
+
+- Changed the canonical dashboard hostname to `dash.afterservice.app` in shared
+  URL resolution, homepage preview, environment examples, API smoke fixtures,
+  and current product/auth documentation.
+- Updated local production hostname values without changing secrets.
+- Verification passed: three focused URL/auth/API tests, full monorepo
+  typecheck, changed-file Biome checks, and local Portless homepage rendering.
+- External rollout remains unverified; see
+  `brain/features/dashboard-hostname.md` and decision `0012`.
+
+### Standalone API Subdomain Deployment
+
+Completed: 2026-10-18
+
+- Deployed the Hono/Bun API independently at `https://api.afterservice.app`,
+  following Ewatrade's standalone entrypoint, local server, and bundling pattern.
+- Added explicit API deployment and reusable smoke commands. API URL helpers
+  now use the root API origin; browser OAuth stays on the dashboard.
+- Attached the API hostname to the new Vercel API project. Existing Cloudflare
+  DNS was already correct; Vercel attachment resolved the TLS failure.
+- With explicit user approval, configured API database/Google/email/Trigger
+  credentials and rotated the shared production auth signing secret across
+  API, dashboard, and marketing. Existing users must sign in again once.
+- Updated production API URL configuration and redeployed both web apps.
+
+Production deployments (all Ready; project ownership and aliases verified):
+
+- API: `dpl_2u35qgugWpuCs9RhYday2a5Czaub`.
+- Dashboard: `dpl_Db3T14NP2bbyXGKyRP94jbHPvVAL`.
+- Marketing: `dpl_HcaTtv3Pf4ZJc7LqDUuEnTN6gK1E`.
+
+Verification:
+
+- Full monorepo typecheck, 33 focused tests, changed-file Biome checks, and
+  `git diff --check` passed. The broader API lint still has pre-existing import
+  ordering and non-null-assertion findings in untouched router/Polar files.
+- All three production builds succeeded; the API generates Prisma and bundles
+  workspace sources without the sibling local-infra repository.
+- All 12 `bun run smoke:api` production probes passed: health, both tRPC mounts,
+  anonymous session, protected operations, CORS allow/deny, guarded jobs/webhooks,
+  and absence of the internal QA route.
+- Production SQL read-only connectivity and the deployed API's database-backed
+  invalid-credentials response passed. API and dashboard Google auth initiation
+  both preserved the dashboard callback URI.
+- Website/dashboard same-origin tRPC, anonymous dashboard session, protected-page
+  redirect, and website login redirect passed.
+- Chrome verified the redeployed marketing homepage, marketing-to-dashboard
+  sign-in navigation, dashboard form loading, and visible invalid-credentials
+  handling. No customer or account records were created.
+- Cron and legacy Lemon Squeezy secrets remain unconfigured; those endpoints
+  correctly return HTTP 503. This deployment does not enable those integrations.
+
+Brain documentation impact:
+
+- `brain/BRAIN.md`, `brain/AI_PROMPT_RULES.md`: canonical API hostname.
+- `brain/api/endpoints.md`, `brain/api/contracts.md`, `brain/api/permissions.md`:
+  routes, CORS, and auth boundaries.
+- `brain/system/architecture.md`, `brain/system/tech-stack.md`,
+  `brain/system/observability.md`: deployment architecture and operational URLs.
+- `brain/product/roadmap.md`: canonical production API domain.
+- `brain/features/standalone-api-deployment.md`: behavior and operator commands.
+- `brain/decisions/0011-deploy-standalone-api-on-vercel.md`: durable decision.
+- `brain/tasks/done.md`: rollout evidence and task completion.
+- No database schema, relationship, or migration changes were needed.
+
 ### Redesign marketing link preview image
 
 Completed: 2026-09-29
@@ -2553,6 +2701,38 @@ Files changed:
 - `apps/dashboard/src/components/sheets/template-create-sheet.tsx`
 - `apps/dashboard/src/components/sheets/template-sheet.tsx`
 - `brain`
+
+## Google Callback And Production Browser Acceptance — 2026-10-19
+
+- Restored browser access after Chrome/app restart; saved the exact dashboard
+  Google origin/callback and completed OAuth authentication twice, including the
+  final production deployment.
+- Verified the manual production workflow in desktop/mobile Chrome, password
+  sessions, public-site/auth redirects, and persisted real email-submit analytics.
+- Fixed/deployed operator-timezone calendar grouping and exclusive board stages;
+  production regressions passed. Unit tests 65/148 assertions, integration 36/126,
+  both typechecks, scoped lint, API smoke, and deployment builds passed.
+- Generated records were closed/archived appropriately; no real outreach occurred.
+- Trigger-credit email acceptance, physical Android installation, preview QA, and
+  real beta activation remain tracked separately.
+- Evidence/Brain impact manifest:
+  `brain/handoffs/2026-10-19-production-browser-acceptance.md`.
+
+
+## Isolated Preview QA Acceptance — 2026-10-19
+
+- Configured and retained a schema-only Neon branch through Vercel SSO, with an
+  approved restricted DML runtime login used only by Vercel Preview.
+- Fixed strict build QA configuration propagation, shared auth cookie base URL,
+  Quick Fill Date values and silent work-form mutation errors.
+- Passed 71 unit / 45 integration tests, both typechecks, scoped checks, final
+  preview build, 17 deployed HTTP checks and Chrome draft/session acceptance.
+- Verified production QA absence, no implicit draft writes, and revoked the test
+  grant plus all derived sessions. No email, worker, purge or outreach ran.
+- Production promotion of newest fixes, credit-dependent canary/purge, real beta
+  activation and physical Android remain tracked in the canonical roadmap.
+- Evidence and Brain impact manifest:
+  `brain/handoffs/2026-10-19-preview-qa-acceptance.md`.
 
 ## Country visit metadata — 2026-10-24
 

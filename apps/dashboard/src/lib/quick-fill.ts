@@ -123,10 +123,6 @@ function setQuickFillValue(form: QuickFillForm, name: string, value: unknown) {
   });
 }
 
-function toDateInputValue(date: Date) {
-  return date.toISOString().slice(0, 10);
-}
-
 function fillCustomer(
   form: QuickFillForm,
   _args: QuickFillArgs["customer"] | undefined,
@@ -171,13 +167,13 @@ function fillJob(
   }
   setQuickFillValue(form, "title", `${serviceCategory} for ${vehicle}`);
   setQuickFillValue(form, "serviceCategory", serviceCategory);
-  setQuickFillValue(form, "completedAt", toDateInputValue(completedAt));
+  setQuickFillValue(form, "completedAt", completedAt);
   setQuickFillValue(
     form,
     "amountDollars",
     75 + (hash % 876),
   );
-  setQuickFillValue(form, "nextFollowUpAt", toDateInputValue(nextFollowUpAt));
+  setQuickFillValue(form, "nextFollowUpAt", nextFollowUpAt);
   setQuickFillValue(
     form,
     "notes",

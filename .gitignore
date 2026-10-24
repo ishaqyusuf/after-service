@@ -13,3 +13,18 @@ packages/db/generated
 .gstack/
 .vercel
 .trigger/
+
+# Local project memory, design/review material, and agent state (matches ewatrade).
+# Keep .github/ and source config tracked.
+.brain/
+.design/
+.designs/
+.scratch/
+.claude/
+.codex/
+.agents/
+/output/
+/outputs/
+/artifacts/
+/playwright-report/
+/test-results/

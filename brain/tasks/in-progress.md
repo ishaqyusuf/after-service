@@ -5,6 +5,44 @@ This file tracks active work.
 
 ## Current
 
+### Traffic Review And Oversight Portfolio Integration
+- Started Date: 2026-10-24
+- Status: Source Verified; Production Activation In Progress
+- Current Notes: Live Logly traffic and authenticated Oversight checks completed
+  in the in-app browser. Afterservice is registered but unconnected. Implemented
+  independent-key, dedicated-read-DB portfolio endpoints and matching Oversight
+  contracts/service labels. 102 unit tests and 46 database integration tests
+  pass; API/DB and Oversight typechecks pass. Root typecheck has an unrelated
+  existing pricing-test type error.
+- Next Step: Activate the scoped production read connection and verify the
+  snapshot/directories in-app. Password recovery and public legal placeholders
+  are confirmed next fixes, not completed by this implementation.
+- Details: `brain/features/oversight-integration.md` and
+  `brain/handoffs/2026-10-24-traffic-mvp-review.md`.
+
+### Production Fix Deployment And Dashboard Hostname Rollout
+- Started Date: 2026-10-18
+- Status: Production Browser And Google Acceptance Complete; Email Credits Pending
+- Scope: Deploy the verified MVP fixes to API/dashboard/website, attach
+  `dash.afterservice.app`, align production URLs, and verify the deployed flow.
+- Current Notes: API/dashboard/website fixes and canonical hostname are deployed.
+  Browser access works after the Chrome/app restart. Google callback registration
+  and real Google authentication succeeded. Desktop/mobile production browser
+  checks passed for the manual operator journey, password sessions, and public
+  auth redirects. Logly recorded actual email-submit interactions at both auth
+  locations. Calendar day grouping was corrected for the operator timezone and
+  sent follow-ups no longer appear in two board columns.
+- Continuation: Daily Vercel cron remains configured and verified. Beta materials
+  now permit Google sign-in. Real recruitment remains pending. Trigger production
+  credentials are configured, but delivery acceptance remains blocked by credits;
+  no test email was sent and no worker started during browser acceptance.
+- Next Step: Complete the approved single-email check after credits are available;
+  recruit real beta operators. Physical Android PWA remains a separate check; isolated preview QA
+  acceptance passed on 2026-10-19. See
+  `brain/handoffs/2026-10-19-production-browser-acceptance.md`.
+- Safety: Bulk credential export was rejected and not performed. The user
+  approved only targeted Trigger configuration and one test-recipient email.
+
 ### Replace OpenPanel With Logly
 - Priority: High
 - Description: Install the thin Logly SDK packages and use the standalone,
@@ -49,7 +87,9 @@ This file tracks active work.
 
 ## Notes
 - MVP operator flows for customers, jobs, follow-ups, templates, billing, entitlements, notifications, cron-protected dry-run jobs, and public website legal/feature pages are implemented.
-- Remaining hardening is full Playwright coverage beyond the focused browser smoke, deeper edge-case integration tests, and production provider configuration.
+- Core browser and deeper API coverage passed on 2026-10-18; see
+  `brain/engineering/testing.md` and the completed task record. The remaining
+  MVP rollout/verification checklist is in `brain/product/roadmap.md`.
 
 ### Fix Mobile Chrome Install Not Working
 - Priority: High
@@ -66,12 +106,18 @@ This file tracks active work.
 - Priority: High
 - Description: Port the shared Halaalvest/EwaTrade QA standard and local-infrastructure workflow to afterservice.
 - Related Feature: Web development and preview QA accelerator
-- Status: Source Implemented - Pending Rollout Verification
-- Plan Status: Implemented - Rollout And Deployed-Preview Acceptance Pending
+- Status: Isolated Preview Acceptance Passed - Provider Checks Pending
+- Plan Status: Implemented - Provider Canary And Reviewed Purge Pending
 - Plan File: `brain/plans/2026-08-30-feature-web-dev-preview-qa-accelerator.md`
 - Created Date: 2026-08-30
-- Current Notes: Source implementation includes local infrastructure, credential exchange, exact-domain account selection, ordinary scoped sessions, deterministic Quick Fill with reset/regenerate, provider/destructive guards, production exclusions, migration, and focused contract tests.
-- Next Step: Install workspace dependencies in the rollout environment, generate/apply Prisma, run the focused typecheck/build, then execute local and deployed-preview browser acceptance plus the routed-email canary and first reviewed purge.
+- Current Notes: Retained schema-only Neon Preview branch and restricted runtime
+  login configured as approved. Deployed Chrome acceptance, 17 HTTP checks,
+  draft write audit and test-grant revocation passed. Latest source regressions
+  cover QA cookie resolution, strict build configuration, Quick Fill dates and
+  visible form errors. See `brain/handoffs/2026-10-19-preview-qa-acceptance.md`.
+- Next Step: Promote the newest verified source fixes to Production with a narrow
+  auth/work-form smoke. After Trigger credits are restored, complete the routed
+  email canary and separately reviewed purge; never bypass paid-fixture blockers.
 
 ## Template
 ```md
@@ -85,6 +131,14 @@ Next Step:
 ```
 # Cross-product QA email and cleanup
 
-- Product implementation is integrated. Schema rollout, secure route
-  propagation, canary delivery, and first reviewed purge remain deployment
-  work.
+- Schema alignment and secure route propagation are verified. Isolated preview
+  acceptance passed. Canary delivery and the first reviewed purge require
+  Trigger credits; the read-only purge preview still blocks the synthetic paid
+  workspace. No purge was started.
+
+## Operations Assistant Handoff
+
+Core implementation and isolated verification are complete in
+`codex/operations-assistant`. See the done entry and
+[verification record](../engineering/assistant-verification.md). Hosted pilot
+activation is a separate pending rollout; no deployment was performed.
