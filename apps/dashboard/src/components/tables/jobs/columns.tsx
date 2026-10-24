@@ -2,8 +2,7 @@
 
 import type { AppRouter } from "@afterservice/api/router";
 import {
-  Badge,
-  Button,
+  cn,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
@@ -13,15 +12,31 @@ import {
 import type { ColumnDef } from "@tanstack/react-table";
 import type { inferRouterOutputs } from "@trpc/server";
 import { format } from "date-fns";
-import { MoreHorizontal } from "lucide-react";
 import { AskAssistantButton } from "@/components/assistant/assistant-launcher";
 import {
+  ACTIONS_CELL_CLASS,
+  EmptyCell,
+  IDENTITY_CELL_CLASS,
+  IdentityCell,
+  RowActionsTrigger,
+  StopRowClick,
+} from "@/components/tables/core";
+import {
+  type ServiceJobStatus,
   serviceJobStatusLabels,
   toServiceJobStatus,
 } from "@/hooks/use-job-filter-params";
 
 type JobsListPage = inferRouterOutputs<AppRouter>["serviceJobs"]["list"];
 type ServiceJob = JobsListPage["items"][number];
+
+const jobStatusClassNames: Record<ServiceJobStatus, string> = {
+  completed: "bg-[color:var(--wp-teal-soft)] text-[color:var(--wp-teal-ink)]",
+  needs_follow_up:
+    "bg-[color:var(--wp-upcoming-soft)] text-[color:var(--wp-upcoming-ink)]",
+  resolved:
+    "bg-[color:var(--wp-replied-soft)] text-[color:var(--wp-replied-ink)]",
+};
 
 export const columns: ColumnDef<ServiceJob>[] = [
   {
@@ -36,17 +51,22 @@ export const columns: ColumnDef<ServiceJob>[] = [
       sticky: true,
       skeleton: { type: "text", width: "w-32" },
       headerLabel: "Title",
-      className:
-        "w-[250px] min-w-[200px] md:sticky md:left-0 bg-background group-hover:bg-[#F2F1EF] group-hover:dark:bg-[#0f0f0f] z-20",
+      className: `w-[250px] min-w-[200px] ${IDENTITY_CELL_CLASS}`,
     },
     cell: ({ row }) => (
-      <div className="flex items-center gap-2">
-        <span className="font-medium">{row.original.title}</span>
-        <AskAssistantButton
-          kind="jobs"
-          id={row.original.id}
-          label={row.original.title}
-        />
+      <div className="flex min-w-0 items-center gap-2">
+        <span className="min-w-0 flex-1">
+          <IdentityCell label={row.original.title}>
+            {row.original.title}
+          </IdentityCell>
+        </span>
+        <StopRowClick className="shrink-0">
+          <AskAssistantButton
+            kind="jobs"
+            id={row.original.id}
+            label={row.original.title}
+          />
+        </StopRowClick>
       </div>
     ),
   },
@@ -63,7 +83,12 @@ export const columns: ColumnDef<ServiceJob>[] = [
       headerLabel: "Customer",
       className: "w-[200px] min-w-[150px]",
     },
-    cell: ({ row }) => row.original.customer?.name ?? "-",
+    cell: ({ row }) =>
+      row.original.customer?.name ? (
+        <span className="truncate">{row.original.customer.name}</span>
+      ) : (
+        <EmptyCell />
+      ),
   },
   {
     id: "status",
@@ -82,9 +107,16 @@ export const columns: ColumnDef<ServiceJob>[] = [
       const status = toServiceJobStatus(row.original.status);
 
       return (
-        <Badge variant={status === "completed" ? "default" : "secondary"}>
+        <span
+          className={cn(
+            "inline-flex h-[22px] items-center whitespace-nowrap rounded-full px-2 text-xs font-semibold",
+            status
+              ? jobStatusClassNames[status]
+              : "bg-[color:var(--wp-rail)] text-[color:var(--wp-ink-2)]",
+          )}
+        >
           {status ? serviceJobStatusLabels[status] : row.original.status}
-        </Badge>
+        </span>
       );
     },
   },
@@ -101,7 +133,12 @@ export const columns: ColumnDef<ServiceJob>[] = [
       headerLabel: "Category",
       className: "w-[150px] min-w-[120px]",
     },
-    cell: ({ row }) => row.original.serviceCategory ?? "-",
+    cell: ({ row }) =>
+      row.original.serviceCategory ? (
+        <span className="truncate">{row.original.serviceCategory}</span>
+      ) : (
+        <EmptyCell />
+      ),
   },
   {
     id: "amountCents",
@@ -118,11 +155,15 @@ export const columns: ColumnDef<ServiceJob>[] = [
     },
     cell: ({ row }) => {
       const amount = row.original.amountCents;
-      if (amount == null) return "-";
-      return new Intl.NumberFormat(undefined, {
-        style: "currency",
-        currency: row.original.currency,
-      }).format(amount / 100);
+      if (amount == null) return <EmptyCell />;
+      return (
+        <span className="wp-numerals whitespace-nowrap">
+          {new Intl.NumberFormat(undefined, {
+            style: "currency",
+            currency: row.original.currency,
+          }).format(amount / 100)}
+        </span>
+      );
     },
   },
   {
@@ -140,8 +181,12 @@ export const columns: ColumnDef<ServiceJob>[] = [
     },
     cell: ({ row }) => {
       const date = row.original.completedAt;
-      if (!date) return "-";
-      return format(new Date(date), "MMM d, yyyy");
+      if (!date) return <EmptyCell />;
+      return (
+        <span className="wp-numerals whitespace-nowrap">
+          {format(new Date(date), "MMM d, yyyy")}
+        </span>
+      );
     },
   },
   {
@@ -157,9 +202,17 @@ export const columns: ColumnDef<ServiceJob>[] = [
       headerLabel: "Notes",
       className: "w-[250px] min-w-[150px]",
     },
-    cell: ({ row }) => (
-      <span className="truncate block w-full">{row.original.notes ?? "-"}</span>
-    ),
+    cell: ({ row }) =>
+      row.original.notes ? (
+        <span
+          className="block w-full truncate text-[color:var(--wp-ink-2)]"
+          title={row.original.notes}
+        >
+          {row.original.notes}
+        </span>
+      ) : (
+        <EmptyCell />
+      ),
   },
   {
     id: "actions",
@@ -174,21 +227,20 @@ export const columns: ColumnDef<ServiceJob>[] = [
       sticky: true,
       skeleton: { type: "icon" },
       headerLabel: "Actions",
-      className:
-        "text-right sticky right-0 bg-background group-hover:bg-[#F2F1EF] group-hover:dark:bg-[#0f0f0f] z-30 justify-center !border-l !border-border",
+      className: ACTIONS_CELL_CLASS,
     },
     cell: ({ row, table }) => {
       return (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="h-8 w-8 p-0">
-              <span className="sr-only">Open menu</span>
-              <MoreHorizontal className="h-4 w-4" />
-            </Button>
+            <RowActionsTrigger label={`Actions for ${row.original.title}`} />
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuLabel>Actions</DropdownMenuLabel>
+          <DropdownMenuContent align="end" className="min-w-[200px] rounded-xl">
+            <DropdownMenuLabel className="truncate text-xs text-muted-foreground">
+              {row.original.title}
+            </DropdownMenuLabel>
             <DropdownMenuItem
+              className="min-h-10"
               onClick={(e) => {
                 e.stopPropagation();
                 table.options.meta?.scheduleFollowUp?.(row.original.id);

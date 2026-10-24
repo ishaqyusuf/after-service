@@ -24,8 +24,9 @@ export function HorizontalPagination({
       <Button
         variant="outline"
         size="sm"
+        aria-label="Scroll to earlier columns"
         disabled={!canScrollLeft}
-        className="size-6 p-0"
+        className="size-6 rounded-md border-[color:var(--wp-line-2)] bg-[color:var(--wp-paper)] p-0"
         onClick={onScrollLeft}
       >
         <Icons.ArrowBack
@@ -35,8 +36,9 @@ export function HorizontalPagination({
       <Button
         variant="outline"
         size="sm"
+        aria-label="Scroll to later columns"
         disabled={!canScrollRight}
-        className="size-6 p-0"
+        className="size-6 rounded-md border-[color:var(--wp-line-2)] bg-[color:var(--wp-paper)] p-0"
         onClick={onScrollRight}
       >
         <Icons.ArrowForward

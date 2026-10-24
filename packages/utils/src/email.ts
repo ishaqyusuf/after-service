@@ -23,7 +23,7 @@ export function isDevelopmentEmailMode(
   const mode = readNonEmptyEnv(env, "AFTERSERVICE_ENV_MODE");
 
   if (mode) {
-    return mode !== "production";
+    return mode !== "production" && mode !== "prod";
   }
 
   return env.NODE_ENV !== "production";

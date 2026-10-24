@@ -1,7 +1,13 @@
+import { Check } from "lucide-react";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { JsonLd } from "../../../components/json-ld";
-import { SeoFaq } from "../../../components/seo-faq";
+import { PageHero } from "../../../components/landing/page-hero";
+import { RuledColumns } from "../../../components/landing/ruled-columns";
+import { SectionHeading } from "../../../components/landing/section-heading";
+import { StartFreeLink } from "../../../components/landing/start-free-link";
+import { SeoFaqList } from "../../../components/seo-faq";
+import { pageTitle } from "../../../lib/page-title";
 import {
   articleJsonLd,
   breadcrumbJsonLd,
@@ -41,6 +47,9 @@ export async function generateMetadata({
   });
 }
 
+const guideTitleClass =
+  "wp-display text-[clamp(24px,2.8vw,30px)] leading-[1.2] tracking-[-0.012em]";
+
 export default async function GuidePage({ params }: GuidePageProps) {
   const { slug } = await params;
   const page = getGuidePage(slug);
@@ -49,8 +58,16 @@ export default async function GuidePage({ params }: GuidePageProps) {
     notFound();
   }
 
+  const contents = [
+    ...page.sections.map((section, index) => ({
+      id: `section-${index + 1}`,
+      label: section.title.replace(/^\d+\.\s*/, ""),
+    })),
+    { id: "guide-questions", label: "Questions" },
+  ];
+
   return (
-    <main className="bg-background text-foreground">
+    <main>
       <JsonLd
         data={[
           articleJsonLd({
@@ -66,84 +83,115 @@ export default async function GuidePage({ params }: GuidePageProps) {
           faqJsonLd(page.faqs),
         ]}
       />
-      <article className="mx-auto max-w-3xl px-6 py-16 sm:px-8 lg:py-24">
-        <p className="text-sm font-semibold uppercase tracking-[0.18em] text-[#009b98]">
-          afterservice guide
-        </p>
-        <h1 className="mt-5 text-4xl font-semibold leading-tight text-[#18211c] dark:text-white sm:text-5xl">
-          {page.title.replace(" | afterservice", "")}
-        </h1>
-        <p className="mt-6 text-lg leading-8 text-muted-foreground">
-          {page.intro}
-        </p>
+      <PageHero
+        crumbs={[{ href: "/features", label: "Features" }]}
+        title={pageTitle(page.title)}
+        body={page.intro}
+      />
 
-        <div className="mt-12 space-y-10">
-          {page.sections.map((section) => (
-            <section key={section.title}>
-              <h2 className="text-2xl font-semibold text-[#18211c] dark:text-white">
+      <div className="wp-wrap grid items-start gap-7 py-[clamp(40px,6vw,72px)] min-[961px]:grid-cols-[240px_minmax(0,1fr)] min-[961px]:gap-14">
+        <nav
+          aria-labelledby="contents-title"
+          className="grid gap-2.5 rounded-[14px] border border-border p-4 min-[961px]:sticky min-[961px]:top-[calc(var(--wp-header-h)+24px)] min-[961px]:rounded-none min-[961px]:border-0 min-[961px]:p-0"
+        >
+          <h2 id="contents-title" className="wp-tertiary text-[13px] font-bold">
+            Contents
+          </h2>
+          <ol className="grid gap-0.5">
+            {contents.map((item) => (
+              <li key={item.id}>
+                <a
+                  href={`#${item.id}`}
+                  className="flex min-h-10 items-center rounded-lg px-2.5 py-1.5 text-[15px] leading-snug text-muted-foreground hover:bg-muted hover:text-foreground"
+                >
+                  {item.label}
+                </a>
+              </li>
+            ))}
+          </ol>
+        </nav>
+
+        <article
+          aria-label={pageTitle(page.title)}
+          className="grid max-w-[70ch] gap-11 text-[16.5px] leading-[1.7] sm:text-[17.5px]"
+        >
+          {page.sections.map((section, index) => (
+            <section
+              aria-labelledby={`section-${index + 1}`}
+              className="grid gap-3.5"
+              key={section.title}
+            >
+              <h2 id={`section-${index + 1}`} className={guideTitleClass}>
                 {section.title}
               </h2>
-              <div className="mt-4 space-y-4 leading-8 text-muted-foreground">
-                {section.body.map((paragraph) => (
-                  <p key={paragraph}>{paragraph}</p>
-                ))}
-              </div>
-              {section.checklist && (
-                <ul className="mt-5 list-disc space-y-2 pl-6 leading-7 text-muted-foreground">
+              {section.body.map((paragraph) => (
+                <p className="text-muted-foreground" key={paragraph}>
+                  {paragraph}
+                </p>
+              ))}
+              {section.checklist ? (
+                <ul className="grid gap-2 rounded-[14px] bg-muted px-[18px] py-4 text-[15.5px] leading-normal">
                   {section.checklist.map((item) => (
-                    <li key={item}>{item}</li>
+                    <li className="flex items-start gap-2.5" key={item}>
+                      <Check
+                        className="mt-[3px] size-[18px] flex-none text-accent-foreground"
+                        aria-hidden="true"
+                      />
+                      {item}
+                    </li>
                   ))}
                 </ul>
-              )}
-              {section.example && (
-                <div className="mt-5 border-l-2 border-[#009b98] bg-muted/40 px-5 py-4">
-                  <p className="text-sm font-semibold text-foreground">
-                    Example
+              ) : null}
+              {section.example ? (
+                <div className="grid max-w-[52ch] gap-1.5 rounded-[4px_16px_16px_16px] border border-border bg-muted px-[15px] py-3 leading-normal">
+                  <p className="wp-tertiary text-[12.5px] font-semibold">
+                    Example message
                   </p>
-                  <p className="mt-2 leading-7 text-muted-foreground">
+                  <p className="text-[15.5px] text-foreground">
                     {section.example}
                   </p>
                 </div>
-              )}
+              ) : null}
             </section>
           ))}
-        </div>
 
-        <div className="mt-12 rounded-lg border border-border bg-muted/40 p-6">
-          <h2 className="text-xl font-semibold text-[#18211c] dark:text-white">
-            Put the checklist into a board
-          </h2>
-          <p className="mt-3 leading-7 text-muted-foreground">
-            afterservice is in free beta for local service operators who want a
-            simple, manual-first way to manage post-job follow-up.
-          </p>
-          <a
-            href="/signup"
-            className="mt-5 inline-flex h-11 items-center justify-center rounded-md bg-[#009b98] px-5 text-sm font-semibold text-white transition-colors hover:bg-[#007f7c]"
-          >
-            Join Free Beta
-          </a>
-        </div>
-      </article>
+          <section aria-labelledby="guide-questions" className="grid gap-3.5">
+            <h2 id="guide-questions" className={guideTitleClass}>
+              Questions
+            </h2>
+            <div className="text-base leading-relaxed">
+              <SeoFaqList items={page.faqs} />
+            </div>
+          </section>
 
-      <SeoFaq items={page.faqs} />
-
-      <section className="border-t border-border bg-muted/30">
-        <div className="mx-auto max-w-5xl px-6 py-14 sm:px-8">
-          <h2 className="text-2xl font-semibold text-[#18211c] dark:text-white">
-            Built for service operators
-          </h2>
-          <div className="mt-6 grid gap-4 md:grid-cols-4">
-            {solutionPages.map((solution) => (
-              <a
-                className="rounded-lg border border-border bg-background p-4 text-sm font-semibold transition-colors hover:bg-muted"
-                href={solution.path}
-                key={solution.path}
-              >
-                {solution.audience}
-              </a>
-            ))}
+          <div className="grid justify-items-start gap-3 rounded-[14px] bg-muted p-7 text-base leading-relaxed">
+            <SectionHeading>Try the checklist in afterservice.</SectionHeading>
+            <p className="text-muted-foreground">
+              Record one finished job, give the check-in an owner and a date,
+              and log what the customer says.
+            </p>
+            <StartFreeLink location={`guide_${page.slug}_end`} />
           </div>
+        </article>
+      </div>
+
+      <section
+        aria-labelledby="operators-title"
+        className="border-t border-border bg-secondary py-[clamp(48px,6vw,80px)]"
+      >
+        <div className="wp-wrap">
+          <SectionHeading id="operators-title">
+            Built for service operators
+          </SectionHeading>
+          <RuledColumns
+            className="mt-8"
+            columns={2}
+            surface="secondary"
+            items={solutionPages.map((solution) => ({
+              href: solution.path,
+              title: solution.audience,
+            }))}
+          />
         </div>
       </section>
     </main>

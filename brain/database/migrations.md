@@ -30,6 +30,24 @@ bun run db:migrate
 - API and dashboard typecheck.
 - Brain schema docs updated.
 
+## Oversight Reader — 2026-10-24
+
+After explicit user approval of production activation and the exact six-table
+read scope, provisioned `afterservice_oversight_reader_20261024` on the confirmed
+Afterservice Neon target. No schema migration or business-data write occurred.
+The role has column-level SELECT only on the query-required fields of Workspace,
+User, Membership, Customer, ServiceJob and FollowUp; it has no application table
+write or public-schema CREATE privilege. Connection limit is three, default
+transactions are read-only and statement timeout is 15 seconds. The direct TLS
+Neon connection avoids pooler startup-option restrictions. Real summary reads
+for 7/30/90 days and all three directories passed under this role.
+
+The initial command was rejected before execution by automatic approval review;
+the user then explicitly approved this access scope, server configuration and
+API/Oversight deployment. Credentials remain server-side and are never placed
+in Brain, source, browser variables or a committed dotenv file. Future schema
+changes may require separately reviewed column grants.
+
 ## QA Accelerator Migration
 
 Production rollout on 2026-10-18 found missing nullable QA session columns

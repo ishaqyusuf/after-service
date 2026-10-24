@@ -5,9 +5,9 @@ import { createPageMetadata } from "../../lib/seo";
 
 export async function generateMetadata(): Promise<Metadata> {
   return createPageMetadata({
-    title: "Join Free Beta | afterservice",
+    title: "Start free | afterservice",
     description:
-      "Create a free beta afterservice workspace for post-job customer follow-up. No credit card required.",
+      "Create a free afterservice workspace for post-job customer follow-up. No credit card required.",
     noIndex: true,
     path: "/signup",
   });

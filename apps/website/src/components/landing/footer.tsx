@@ -1,104 +1,85 @@
 import { BrandLogo } from "@afterservice/ui";
 import { appMetadata } from "@afterservice/utils";
+import Link from "next/link";
+import { pageTitle } from "../../lib/page-title";
 import { featurePages, guidePages, solutionPages } from "../../lib/seo-content";
+
+const linkClass =
+  "inline-flex min-h-8 items-center text-muted-foreground hover:text-accent-foreground hover:underline";
+
+const columns = [
+  {
+    title: "Product",
+    links: [
+      { href: "/features", label: "Features" },
+      ...featurePages.map((page) => ({
+        href: page.path,
+        label: pageTitle(page.title),
+      })),
+      { href: "/pricing", label: "Pricing" },
+    ],
+  },
+  {
+    title: "Solutions",
+    links: solutionPages.map((page) => ({
+      href: page.path,
+      label: page.audience,
+    })),
+  },
+  {
+    title: "Guides",
+    links: guidePages.map((page) => ({
+      href: page.path,
+      label: pageTitle(page.title),
+    })),
+  },
+  {
+    title: "Company",
+    links: [
+      { href: "/privacy", label: "Privacy Policy" },
+      { href: "/terms", label: "Terms of Service" },
+      { href: "mailto:hello@afterservice.app", label: "Contact" },
+    ],
+  },
+];
 
 export function LandingFooter() {
   return (
-    <footer className="relative z-10 border-t border-border bg-background pb-[calc(8rem+env(safe-area-inset-bottom))] pt-16 transition-colors duration-300 md:py-16">
-      <div className="max-w-7xl mx-auto px-6 sm:px-8">
-        <div className="grid gap-10 md:grid-cols-[1.4fr_1fr_1fr_1fr_1fr]">
-          <div>
+    <footer className="border-t border-border bg-secondary pb-[calc(8rem+env(safe-area-inset-bottom))] pt-14 text-[15px] md:pb-7">
+      <div className="wp-wrap">
+        <div className="grid gap-8 sm:grid-cols-2 min-[961px]:grid-cols-[minmax(0,1.5fr)_repeat(4,minmax(0,1fr))]">
+          <div className="grid content-start gap-3.5 sm:col-span-2 min-[961px]:col-span-1">
             <BrandLogo name={appMetadata.name} />
-            <p className="mt-4 max-w-sm text-sm leading-6 text-muted-foreground">
-              One follow-up board for local service operators after the job is
-              done.
-            </p>
-            <p className="mt-4 text-xs text-muted-foreground">
-              © {new Date().getFullYear()} afterservice. All rights reserved.
+            <p className="max-w-[36ch] text-[14.5px] text-muted-foreground">
+              Today your team contacts customers and records what happened.
+              Connected SMS, WhatsApp delivery and automatic outreach are
+              planned.
             </p>
           </div>
-
-          <div>
-            <h2 className="text-sm font-semibold text-foreground">Solutions</h2>
-            <div className="mt-4 grid gap-3 text-sm text-muted-foreground">
-              {solutionPages.map((page) => (
-                <a
-                  href={page.path}
-                  className="transition-colors hover:text-[#18211c] dark:hover:text-white"
-                  key={page.path}
-                >
-                  {page.audience}
-                </a>
-              ))}
+          {columns.map((column) => (
+            <div key={column.title}>
+              <h2 className="mb-2.5 text-[13px] font-bold">{column.title}</h2>
+              <ul className="grid gap-0.5">
+                {column.links.map((link) => (
+                  <li key={link.href}>
+                    {link.href.startsWith("mailto:") ? (
+                      <a href={link.href} className={linkClass}>
+                        {link.label}
+                      </a>
+                    ) : (
+                      <Link href={link.href} className={linkClass}>
+                        {link.label}
+                      </Link>
+                    )}
+                  </li>
+                ))}
+              </ul>
             </div>
-          </div>
-
-          <div>
-            <h2 className="text-sm font-semibold text-foreground">Product</h2>
-            <div className="mt-4 grid gap-3 text-sm text-muted-foreground">
-              <a
-                href="/features"
-                className="transition-colors hover:text-[#18211c] dark:hover:text-white"
-              >
-                Features
-              </a>
-              {featurePages.map((page) => (
-                <a
-                  href={page.path}
-                  className="transition-colors hover:text-[#18211c] dark:hover:text-white"
-                  key={page.path}
-                >
-                  {page.title.replace(" | afterservice", "")}
-                </a>
-              ))}
-            </div>
-          </div>
-
-          <div>
-            <h2 className="text-sm font-semibold text-foreground">Guides</h2>
-            <div className="mt-4 grid gap-3 text-sm text-muted-foreground">
-              {guidePages.map((page) => (
-                <a
-                  href={page.path}
-                  className="transition-colors hover:text-[#18211c] dark:hover:text-white"
-                  key={page.path}
-                >
-                  {page.title.replace(" | afterservice", "")}
-                </a>
-              ))}
-            </div>
-          </div>
-
-          <div>
-            <h2 className="text-sm font-semibold text-foreground">Company</h2>
-            <div className="mt-4 grid gap-3 text-sm text-muted-foreground">
-              <a
-                href="/pricing"
-                className="transition-colors hover:text-[#18211c] dark:hover:text-white"
-              >
-                Pricing
-              </a>
-              <a
-                href="/privacy"
-                className="transition-colors hover:text-[#18211c] dark:hover:text-white"
-              >
-                Privacy Policy
-              </a>
-              <a
-                href="/terms"
-                className="transition-colors hover:text-[#18211c] dark:hover:text-white"
-              >
-                Terms of Service
-              </a>
-              <a
-                href="mailto:hello@afterservice.app"
-                className="transition-colors hover:text-[#18211c] dark:hover:text-white"
-              >
-                Contact
-              </a>
-            </div>
-          </div>
+          ))}
         </div>
+        <p className="wp-tertiary mt-10 border-t border-border pt-[18px] text-[13.5px]">
+          © {new Date().getFullYear()} afterservice. All rights reserved.
+        </p>
       </div>
     </footer>
   );

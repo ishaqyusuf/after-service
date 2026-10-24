@@ -1,18 +1,19 @@
 import { CustomersColumnVisibility } from "./customers-column-visibility";
-import { OpenCustomerSheet } from "./open-customer-sheet";
 import { CustomersSearchFilter } from "./customers-search-filter";
+import { OpenCustomerSheet } from "./open-customer-sheet";
+import { PageHeader, PageToolbar } from "./page-header";
 
 export async function CustomersHeader() {
   return (
-    <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-      <CustomersSearchFilter />
-
-      <div className="flex items-center gap-2 self-end sm:self-auto">
+    <PageHeader
+      title="Customers"
+      description="Everyone you've done work for, with their jobs, follow-ups and replies kept together."
+      actions={<OpenCustomerSheet />}
+    >
+      <PageToolbar>
+        <CustomersSearchFilter />
         <CustomersColumnVisibility />
-        <div className="hidden sm:block">
-          <OpenCustomerSheet />
-        </div>
-      </div>
-    </div>
+      </PageToolbar>
+    </PageHeader>
   );
 }

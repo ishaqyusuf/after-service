@@ -1,4 +1,9 @@
-export type PublicPlanId = "free_beta" | "starter" | "shop" | "growth";
+export type PublicPlanId =
+  | "free_beta"
+  | "business"
+  | "starter"
+  | "shop"
+  | "growth";
 export type PricingRegion = "US" | "CA" | "GB" | "EU" | "NG" | "OTHER";
 export type PricingRegionSource = "country" | "fallback" | "query";
 
@@ -29,10 +34,20 @@ export type PricingResolution = {
 
 export const planPricingUsd = {
   free_beta: { monthly: 0, yearly: null },
+  business: { monthly: 7, yearly: null },
   starter: { monthly: 29, yearly: 290 },
   shop: { monthly: 79, yearly: 790 },
   growth: { monthly: 149, yearly: 1490 },
 } satisfies Record<PublicPlanId, PlanPrice>;
+
+// Approved regional Business prices; these are not currency conversions.
+export const businessMonthlyPrices = {
+  CAD: 10,
+  EUR: 7,
+  GBP: 5,
+  NGN: 5000,
+  USD: planPricingUsd.business.monthly,
+} satisfies Record<PricingCurrency, number>;
 
 export const localCurrencyConversionFromUsd = {
   CAD: 1.35,
@@ -41,6 +56,12 @@ export const localCurrencyConversionFromUsd = {
   NGN: 1550,
   USD: 1,
 } satisfies Record<PricingCurrency, number>;
+
+// Polar sandbox/API limit verified on 2026-10-24. Do not advertise an annual
+// amount the provider cannot collect in the selected currency.
+const checkoutMaximumAmount: Partial<Record<PricingCurrency, number>> = {
+  NGN: 1_550_000,
+};
 
 const euCountryCodes = new Set([
   "AT",
@@ -106,7 +127,7 @@ const regionPricing: Record<PricingRegion, RegionPricing> = {
     currency: "USD",
     label: "Other / USD",
     locale: "en-US",
-    note: "Local pricing is not set for this region yet; planned checkout falls back to USD.",
+    note: "Local pricing is not set for this region yet; prices are shown in USD.",
   },
 };
 
@@ -223,14 +244,21 @@ export function getLocalizedPlanPrice(
 ) {
   const region = regionPricing[pricing.region];
   const sourcePrice = planPricingUsd[planId];
-  const monthly = convertUsdToLocalCurrency(
-    sourcePrice.monthly,
-    region.currency,
-  );
-  const yearly =
+  const monthly =
+    planId === "business"
+      ? businessMonthlyPrices[region.currency]
+      : convertUsdToLocalCurrency(sourcePrice.monthly, region.currency);
+  const convertedYearly =
     sourcePrice.yearly === null
       ? null
       : convertUsdToLocalCurrency(sourcePrice.yearly, region.currency);
+  const maximum = checkoutMaximumAmount[region.currency];
+  const yearly =
+    convertedYearly !== null &&
+    maximum !== undefined &&
+    convertedYearly > maximum
+      ? null
+      : convertedYearly;
 
   return {
     currency: region.currency,

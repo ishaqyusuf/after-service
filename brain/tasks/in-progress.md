@@ -5,24 +5,23 @@ This file tracks active work.
 
 ## Current
 
-### Traffic Review And Oversight Portfolio Integration
+### Password Recovery Repair
 - Started Date: 2026-10-24
-- Status: Source Verified; Production Activation In Progress
-- Current Notes: Live Logly traffic and authenticated Oversight checks completed
-  in the in-app browser. Afterservice is registered but unconnected. Implemented
-  independent-key, dedicated-read-DB portfolio endpoints and matching Oversight
-  contracts/service labels. 102 unit tests and 46 database integration tests
-  pass; API/DB and Oversight typechecks pass. Root typecheck has an unrelated
-  existing pricing-test type error.
-- Next Step: Activate the scoped production read connection and verify the
-  snapshot/directories in-app. Password recovery and public legal placeholders
-  are confirmed next fixes, not completed by this implementation.
-- Details: `brain/features/oversight-integration.md` and
-  `brain/handoffs/2026-10-24-traffic-mvp-review.md`.
+- Status: Local Repair And Human Reset Verified; Production Rollout Pending
+- Scope: Anonymous recovery routes, current Better Auth request endpoint,
+  reset token submission, invalid-link UX, delivery errors and session revocation.
+- Verification: Proxy/email regression tests, real local auth/DB recovery loop,
+  full typechecks, 167 unit tests and optimized dashboard build pass.
+- Current Notes: User confirmed native password suggestions work in Chrome and
+  requested no further autofill fixes. Temporary probes and the unproven direct
+  input-event workaround were removed.
+- Next Step: Remaining acceptance is corrected success navigation,
+  new-password browser sign-in, fixture cleanup, and scoped production rollout.
+- Feature: `brain/features/password-recovery.md`.
 
 ### Production Fix Deployment And Dashboard Hostname Rollout
 - Started Date: 2026-10-18
-- Status: Production Browser And Google Acceptance Complete; Email Credits Pending
+- Status: Production Browser And Queued Email Acceptance Complete
 - Scope: Deploy the verified MVP fixes to API/dashboard/website, attach
   `dash.afterservice.app`, align production URLs, and verify the deployed flow.
 - Current Notes: API/dashboard/website fixes and canonical hostname are deployed.
@@ -34,10 +33,9 @@ This file tracks active work.
   sent follow-ups no longer appear in two board columns.
 - Continuation: Daily Vercel cron remains configured and verified. Beta materials
   now permit Google sign-in. Real recruitment remains pending. Trigger production
-  credentials are configured, but delivery acceptance remains blocked by credits;
-  no test email was sent and no worker started during browser acceptance.
-- Next Step: Complete the approved single-email check after credits are available;
-  recruit real beta operators. Physical Android PWA remains a separate check; isolated preview QA
+  delivery is verified through the replacement Zeroes & One project. One
+  approved follow-up arrived in the founder inbox; old project/history retained.
+- Next Step: Recruit real beta operators. Physical Android PWA remains a separate check; isolated preview QA
   acceptance passed on 2026-10-19. See
   `brain/handoffs/2026-10-19-production-browser-acceptance.md`.
 - Safety: Bulk credential export was rejected and not performed. The user

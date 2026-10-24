@@ -399,9 +399,9 @@ describe("permissions and input validation", () => {
       await db.customer.count({ where: { workspaceId: own.item.id } }),
     ).toBe(1);
   });
-  test("free beta checkout does not change entitlements", async () => {
-    expect(await own.caller.billing.createCheckout()).toEqual({
-      checkoutUrl: "/billing?checkout=beta",
+  test("checkout without a plan does not change entitlements", async () => {
+    await expect(own.caller.billing.createCheckout()).rejects.toMatchObject({
+      code: "BAD_REQUEST",
     });
     expect(
       (await db.workspace.findUniqueOrThrow({ where: { id: own.item.id } }))

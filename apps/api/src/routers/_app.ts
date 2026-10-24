@@ -15,7 +15,10 @@ import {
 import { LogEvents } from "@afterservice/events";
 import { setupAnalytics } from "@afterservice/events/server";
 import { Notifications } from "@afterservice/notifications";
+import { resolvePricingRegion } from "@afterservice/plans";
+import { getCheckoutQuote } from "@afterservice/plans/checkout";
 import {
+  buildDashboardUrl,
   type QaExternalEffect,
   resolveEmailRecipients,
   resolveQaExternalEffectPolicy,
@@ -24,9 +27,15 @@ import { tasks } from "@trigger.dev/sdk/v3";
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 import type { ApiContext } from "../context";
-import { protectedProcedure, t } from "../trpc";
+import { createCheckoutSchema } from "../schemas/billing";
 import { assertFollowUpRelations } from "../utils/follow-up-relations";
-import { polarApi } from "../utils/polar";
+import {
+  getPolarBillingConfig,
+  getPolarClient,
+  isPolarBillingConfigured,
+} from "../utils/polar";
+import { createVerifiedPolarCheckout } from "../utils/polar-checkout";
+import { protectedProcedure, t } from "../trpc";
 import { createAssistantRouter } from "./assistant";
 
 async function operationAnalytics(ctx: ApiContext) {
@@ -153,10 +162,10 @@ const planLimits: Record<
   }
 > = {
   growth: {
-    customers: 2000,
-    followUps: 7500,
-    teamMembers: 5,
-    templates: 50,
+    customers: 1000,
+    followUps: 3000,
+    teamMembers: 3,
+    templates: 25,
   },
   pro: {
     customers: 10000,
@@ -173,14 +182,7 @@ const planLimits: Record<
 };
 
 function publicPlanName(plan: WorkspacePlan, planStatus?: string | null) {
-  if (plan === "starter") {
-    return planStatus === "active" ? "Starter" : "Free Beta";
-  }
-
-  if (plan === "growth") return "Shop";
-  if (plan === "pro") return "Growth";
-
-  return plan;
+  return plan !== "starter" && planStatus === "active" ? "Business" : "Free";
 }
 
 function iso(date: Date | null | undefined) {
@@ -315,13 +317,24 @@ async function getWorkspaceForLimits(
       plan: true,
       planStatus: true,
       serviceCategory: true,
+      subscriptions: {
+        where: { status: "active" },
+        orderBy: { currentPeriodEnd: "desc" },
+        take: 1,
+        select: { currentPeriodEnd: true },
+      },
     },
     where: { id: workspaceId },
   });
 
+  const hasBusinessAccess =
+    workspace.plan !== "starter" &&
+    workspace.planStatus === "active" &&
+    (workspace.subscriptions[0]?.currentPeriodEnd?.getTime() ?? 0) > Date.now();
   return {
     ...workspace,
-    limits: planLimits[workspace.plan],
+    hasBusinessAccess,
+    limits: hasBusinessAccess ? planLimits.growth : planLimits.starter,
   };
 }
 
@@ -1625,64 +1638,81 @@ const workspaceRouter = t.router({
 });
 
 const billingRouter = t.router({
-  createCheckout: protectedProcedure.mutation(async ({ ctx }) => {
-    const db = ctx.db ?? getDbClient();
-    requireOwnerOrAdmin(ctx);
-    await assertQaExternalEffectAllowed({
-      effect: "payment",
-      workspaceId: ctx.workspace.id,
-    });
-
-    if (process.env.AFTERSERVICE_PAID_CHECKOUT_ENABLED !== "true") {
-      return { checkoutUrl: "/billing?checkout=beta" };
-    }
-
-    try {
-      // Determine product ID based on plan
-      const workspace = await getWorkspaceForLimits(ctx.workspace.id, db);
-      const isGrowth = workspace.plan === "growth";
-      const isPro = workspace.plan === "pro";
-
-      // Resolve or create Polar customer
-      let polarCustomer: { id: string };
-      try {
-        polarCustomer = await polarApi.customers.getExternal({
-          externalId: ctx.workspace.id,
-        });
-      } catch {
-        polarCustomer = await polarApi.customers.create({
-          externalId: ctx.workspace.id,
-          email: ctx.user?.email ?? "",
-          name: workspace.name ?? undefined,
-        });
-      }
-
-      const productId = isPro
-        ? process.env.POLAR_GROWTH_VARIANT_ID
-        : isGrowth
-          ? process.env.POLAR_SHOP_VARIANT_ID
-          : process.env.POLAR_STARTER_VARIANT_ID;
-
-      if (!productId) {
-        return { checkoutUrl: "/billing?checkout=not-configured" };
-      }
-
-      const checkout = await polarApi.checkouts.create({
-        products: [productId],
-        allowDiscountCodes: false,
-        customerId: polarCustomer.id,
-        metadata: {
-          teamId: ctx.workspace.id,
-          companyName: workspace.name ?? "",
-        },
+  createCheckout: protectedProcedure
+    .input(createCheckoutSchema)
+    .mutation(async ({ ctx, input }) => {
+      const db = ctx.db ?? getDbClient();
+      requireOwnerOrAdmin(ctx);
+      await assertQaExternalEffectAllowed({
+        effect: "payment",
+        workspaceId: ctx.workspace.id,
       });
 
-      return { checkoutUrl: checkout.url };
-    } catch (e) {
-      console.error(e);
-      return { checkoutUrl: "/billing?checkout=error" };
-    }
-  }),
+      if (!input)
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "Choose a plan and billing interval.",
+        });
+      const pricing = ctx.billing?.pricing ?? resolvePricingRegion({});
+      let quote: ReturnType<typeof getCheckoutQuote>;
+      try {
+        quote = getCheckoutQuote(input.plan, input.interval, pricing);
+      } catch {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message:
+            "This billing interval is unavailable in this currency. Choose monthly billing.",
+        });
+      }
+      if (
+        input.currency !== quote.currency ||
+        input.countryCode !== quote.countryCode ||
+        input.expectedAmountMinor !== quote.amountMinor
+      ) {
+        throw new TRPCError({
+          code: "CONFLICT",
+          message:
+            "Pricing has changed. Refresh billing before starting checkout.",
+        });
+      }
+      const workspace = await getWorkspaceForLimits(ctx.workspace.id, db);
+      if (workspace.hasBusinessAccess)
+        throw new TRPCError({
+          code: "CONFLICT",
+          message:
+            "Business is already active. Manage it in the billing portal.",
+        });
+      if (!isPolarBillingConfigured())
+        throw new TRPCError({
+          code: "PRECONDITION_FAILED",
+          message:
+            "Payments are temporarily unavailable. Please try again later.",
+        });
+      try {
+        const config = getPolarBillingConfig();
+        return await createVerifiedPolarCheckout(
+          {
+            plan: input.plan,
+            interval: input.interval,
+            pricing,
+            productId: config.productId,
+            organizationId: config.organizationId,
+            workspaceId: ctx.workspace.id,
+            customerEmail: ctx.user?.email ?? "",
+            customerName: workspace.name,
+            customerIpAddress: ctx.billing?.customerIpAddress,
+            returnUrl: buildDashboardUrl({ path: "/billing" }),
+          },
+          getPolarClient(),
+        );
+      } catch {
+        throw new TRPCError({
+          code: "PRECONDITION_FAILED",
+          message:
+            "Checkout pricing could not be verified. Please try again later.",
+        });
+      }
+    }),
   getCurrentPlan: protectedProcedure.query(async ({ ctx }) => {
     const db = ctx.db ?? getDbClient();
     const workspace = await getWorkspaceForLimits(ctx.workspace.id, db);
@@ -1707,11 +1737,11 @@ const billingRouter = t.router({
 
     return {
       item: {
-        isCheckoutEnabled:
-          process.env.AFTERSERVICE_PAID_CHECKOUT_ENABLED === "true",
+        isCheckoutEnabled: isPolarBillingConfigured(),
+        hasBusinessAccess: workspace.hasBusinessAccess,
         limits: workspace.limits,
         plan: workspace.plan,
-        planDisplayName: publicPlanName(workspace.plan, workspace.planStatus),
+        planDisplayName: workspace.hasBusinessAccess ? "Business" : "Free",
         planStatus: workspace.planStatus,
         subscription,
         usage,
@@ -1727,21 +1757,20 @@ const billingRouter = t.router({
     });
 
     try {
+      const polarApi = getPolarClient();
       let polarCustomer: { id: string };
       try {
-        polarCustomer = await polarApi.customers.getExternal({
-          externalId: ctx.workspace.id,
-        });
+        polarCustomer = await polarApi.customers.getExternal(ctx.workspace.id);
       } catch {
         return { portalUrl: null };
       }
 
       const result = await polarApi.customerSessions.create({
-        customerId: polarCustomer.id,
+        customer_id: polarCustomer.id,
       });
 
       return {
-        portalUrl: result.customerPortalUrl ?? null,
+        portalUrl: result.customer_portal_url ?? null,
       };
     } catch {
       return { portalUrl: null };

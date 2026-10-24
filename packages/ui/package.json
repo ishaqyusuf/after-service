@@ -18,6 +18,8 @@
   },
   "exports": {
     ".": "./src/index.ts",
+    "./brand": "./src/brand.ts",
+    "./brand-mark": "./src/components/brand-mark.tsx",
     "./animated-size-container": "./src/components/animated-size-container.tsx",
     "./accordion": "./src/components/accordion.tsx",
     "./alert-dialog": "./src/components/alert-dialog.tsx",

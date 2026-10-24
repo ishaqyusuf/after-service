@@ -83,6 +83,15 @@ export async function selectOption(page: Page, label: string, option: string) {
   await page.getByRole("option", { name: option, exact: true }).click();
 }
 
+export async function showBoardStage(page: Page, stage: string) {
+  const stages = page.getByRole("group", { name: "Show follow-up stage" });
+  if (await stages.isVisible()) {
+    await stages
+      .getByRole("button", { name: new RegExp(`^${stage}\\s`) })
+      .click();
+  }
+}
+
 export async function signOut(page: Page) {
   // Finish background preference writes before leaving the authenticated page.
   await page.waitForLoadState("networkidle");
@@ -93,7 +102,7 @@ export async function signOut(page: Page) {
     if (!(await item.isVisible())) {
       await page
         .getByRole("banner")
-        .getByRole("button", { name: "U", exact: true })
+        .getByRole("button", { name: "Open account menu", exact: true })
         .click();
     }
     await expect(item).toBeVisible({ timeout: 750 });

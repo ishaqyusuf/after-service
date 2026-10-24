@@ -1,3 +1,22 @@
+# Adoption reporting population
+
+Adoption population (2026-10-24): the reviewed server-only
+`ADOPTION_EXCLUDED_WORKSPACE_IDS` list excludes exact internal/test workspace
+IDs from Oversight totals, directories, membership counts and daily series.
+Malformed config makes these reads unavailable; it never silently broadens
+the reporting population. Registration without a workspace remains distinct
+from activation. ADR 0024 records the independent reporting/purge boundary.
+
+# Password recovery contract
+
+Password recovery (2026-10-24): the typed client uses
+`requestPasswordReset({email, redirectTo})` with the current dashboard origin;
+reset uses `resetPassword({newPassword, token})`. Public recovery replies remain
+generic, including email callback failures. Provider acceptance and actual
+delivery require separate verification. Tokens expire after one hour, are
+single-use, and successful reset revokes existing sessions. Missing, expired or
+reused tokens fail without changing credentials.
+
 # Standalone API deployment contract
 
 Oversight v1 (2026-10-24): private summaries use 7/30/90 UTC days and explicit
@@ -111,3 +130,12 @@ country through `x-logly-country` using the trusted product-edge policy in
 event body, derived from language, or inferred from the collector's network.
 Logly owns country normalization, persistence, deduplication and reads; no
 Afterservice database/API business contract changes are required.
+
+# Email delivery environment aliases
+
+2026-10-24 source fix: `AFTERSERVICE_ENV_MODE=prod` and `production` both
+default ordinary recipients to provider delivery. Explicit `EMAIL_DELIVERY_MODE`
+still wins; local/development/preview default to console, and exact QA-domain
+routing remains independent. No endpoint or notification payload changed. The
+worker rollout and delivered-email acceptance passed in the Zeroes & One
+replacement project on 2026-10-24; see `features/trigger-project-migration.md`.

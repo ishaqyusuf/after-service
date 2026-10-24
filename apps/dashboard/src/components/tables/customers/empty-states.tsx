@@ -12,9 +12,9 @@ export function EmptyState() {
 
   return (
     <TableEmptyState
-      title="No customers"
-      description="Create a customer record to attach jobs, follow-ups, and message history."
-      actionLabel="Create customer"
+      title="No customers yet"
+      description="Add the people you've done work for. Each customer keeps their jobs, follow-ups and message history together."
+      actionLabel="Add customer"
       onAction={() => setParams({ createCustomer: true })}
     />
   );

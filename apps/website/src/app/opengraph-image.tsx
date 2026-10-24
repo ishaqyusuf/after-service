@@ -1,3 +1,4 @@
+import { BrandMark } from "@afterservice/ui/brand-mark";
 import { ImageResponse } from "next/og";
 
 export const alt =
@@ -75,30 +76,15 @@ export default async function Image() {
               width: 47,
             }}
           >
-            <svg
-              aria-hidden="true"
-              fill="none"
-              height="32"
-              viewBox="0 0 64 64"
-              width="32"
-            >
-              <path
-                d="M50 51V29C50 18.5 41.5 10 31 10S12 18.5 12 29s8.5 19 19 19c5.1 0 9.8-2 13.2-5.3"
-                stroke="currentColor"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="12"
-              />
-              <circle cx="31" cy="29" fill="#62c6aa" r="6.5" />
-            </svg>
+            <BrandMark height={32} width={32} />
           </div>
           <div
             style={{
               display: "flex",
               fontFamily: "Inter",
               fontSize: 32,
-              fontWeight: 700,
-              letterSpacing: -1,
+              fontWeight: 600,
+              letterSpacing: -0.64,
             }}
           >
             afterservice

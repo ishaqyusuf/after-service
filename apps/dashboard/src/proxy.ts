@@ -1,3 +1,4 @@
+import {parsePricingPreference,pricingCookieName,serializePricingPreference} from "@afterservice/plans/checkout";
 import { type NextRequest, NextResponse } from "next/server";
 import { createI18nMiddleware } from "next-international/middleware";
 import {
@@ -64,6 +65,9 @@ export const config = {
 
 export default async function proxy(request: NextRequest) {
   const response = I18nMiddleware(request);
+  const preference=parsePricingPreference(request.nextUrl.searchParams.get("pricing"));
+  if(preference)response.cookies.set(pricingCookieName,serializePricingPreference({currency:preference.currency,countryCode:preference.countryCode}),{httpOnly:true,sameSite:"lax",secure:request.nextUrl.protocol==="https:",path:"/",maxAge:60*60*24*30});
+
   const { search } = request.nextUrl;
   const authenticated = hasAcceptedSessionCookie(request);
   const normalizedPathname = stripSupportedLocale(request.nextUrl.pathname);

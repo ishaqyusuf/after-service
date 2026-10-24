@@ -1,7 +1,6 @@
 "use client";
 
-import { cn } from "@afterservice/ui";
-import { TableCell, TableRow } from "@afterservice/ui";
+import { cn, TableCell, TableRow } from "@afterservice/ui";
 import type {
   Cell,
   ColumnOrderState,
@@ -54,7 +53,7 @@ function VirtualRowInner<TData>({
       data-index={row.index}
       className={cn(
         "group cursor-pointer select-text",
-        "hover:bg-[#F2F1EF] hover:dark:bg-[#0f0f0f]",
+        "hover:bg-[color:var(--wp-hover)]",
         "flex items-center border-0",
         "absolute top-0 left-0 w-full min-w-full",
       )}
@@ -89,7 +88,7 @@ function VirtualRowInner<TData>({
           <TableCell
             key={cell.id}
             className={cn(
-              "h-full flex items-center border-b border-border",
+              "h-full flex items-center border-r-0 border-b border-border",
               cellClassName,
               isActions && "justify-center",
             )}

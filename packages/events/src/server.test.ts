@@ -4,6 +4,7 @@ import { setupAnalytics } from "./server";
 
 const originalFetch = globalThis.fetch;
 const originalEnv = {
+  ADOPTION_EXCLUDED_WORKSPACE_IDS: process.env.ADOPTION_EXCLUDED_WORKSPACE_IDS,
   LOGLY_COLLECTOR_URL: process.env.LOGLY_COLLECTOR_URL,
   LOGLY_ENABLED: process.env.LOGLY_ENABLED,
   LOGLY_PROJECT: process.env.LOGLY_PROJECT,
@@ -17,6 +18,7 @@ const restoreEnv = (key: keyof typeof originalEnv) => {
 };
 
 beforeEach(() => {
+  delete process.env.ADOPTION_EXCLUDED_WORKSPACE_IDS;
   process.env.LOGLY_COLLECTOR_URL = "https://collector.logly.test";
   process.env.LOGLY_ENABLED = "true";
   process.env.LOGLY_PROJECT = "afterservice";
@@ -24,6 +26,7 @@ beforeEach(() => {
 });
 
 afterEach(() => {
+  restoreEnv("ADOPTION_EXCLUDED_WORKSPACE_IDS");
   globalThis.fetch = originalFetch;
   restoreEnv("LOGLY_COLLECTOR_URL");
   restoreEnv("LOGLY_ENABLED");
@@ -32,6 +35,42 @@ afterEach(() => {
 });
 
 describe("Afterservice server analytics", () => {
+  test("malformed exclusions suppress optional analytics without breaking the product", async () => {
+    process.env.ADOPTION_EXCLUDED_WORKSPACE_IDS = "*";
+    let count = 0;
+    globalThis.fetch = (async () => {
+      count += 1;
+      return Response.json({ accepted: 1 }, { status: 202 });
+    }) as typeof fetch;
+    const analytics = await setupAnalytics();
+    expect(() =>
+      analytics.track({
+        event: "customer_created",
+        workspaceId: "live-workspace",
+      }),
+    ).not.toThrow();
+    await new Promise((resolve) => setTimeout(resolve, 0));
+    expect(count).toBe(0);
+  });
+  test("excludes explicitly reviewed internal workspaces without dropping live activity", async () => {
+    process.env.ADOPTION_EXCLUDED_WORKSPACE_IDS = "internal-workspace";
+    const requests: RequestInit[] = [];
+    globalThis.fetch = (async (_input, init) => {
+      if (init) requests.push(init);
+      return Response.json({ accepted: 1 }, { status: 202 });
+    }) as typeof fetch;
+    const analytics = await setupAnalytics();
+    analytics.track({
+      event: "customer_created",
+      workspaceId: "internal-workspace",
+    });
+    analytics.track({
+      event: "customer_created",
+      workspaceId: "live-workspace",
+    });
+    await new Promise((resolve) => setTimeout(resolve, 0));
+    expect(requests).toHaveLength(1);
+  });
   test("tracks in local development when explicitly enabled", async () => {
     const requests: Array<{ input: string; init?: RequestInit }> = [];
     globalThis.fetch = (async (input, init) => {

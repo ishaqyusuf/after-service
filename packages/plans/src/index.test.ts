@@ -11,6 +11,25 @@ function resolveHeaders(values: Record<string, string>) {
 
 describe("country-based pricing", () => {
   test.each([
+    ["NG", "NGN", 5000, "₦5,000"],
+    ["US", "USD", 7, "$7"],
+    ["GB", "GBP", 5, "£5"],
+    ["DE", "EUR", 7, "€7"],
+    ["CA", "CAD", 10, "$10"],
+    ["AU", "USD", 7, "$7"],
+  ] as const)("Business uses the fixed %s price with monthly billing only", (country, currency, monthly, formattedMonthly) => {
+    const pricing = resolvePricingRegion({ country });
+    expect(getLocalizedPlanPrice("business", pricing)).toMatchObject({
+      currency,
+      monthly,
+      formattedMonthly,
+      yearly: null,
+      formattedYearly: null,
+    });
+    expect(getLocalizedPlanPrice("free_beta", pricing).monthly).toBe(0);
+  });
+
+  test.each([
     ["NG", "NGN", "₦44,950"],
     ["GB", "GBP", "£25"],
     ["US", "USD", "$29"],

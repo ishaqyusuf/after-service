@@ -1,1 +1,370 @@
 @import "@afterservice/ui/globals.css";
+
+/*
+ * Wall planner · dashboard theme
+ * Teal paper surfaces, a pale rail and labelled stage stickers.
+ * shadcn variables are remapped here (not in packages/ui) so every portal
+ * (sheets, dialogs, menus, popovers) inherits the same theme from :root/.dark.
+ */
+
+:root {
+  color-scheme: light;
+  --font-hedvig-sans:
+    -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue",
+    Arial, sans-serif;
+
+  --background: 0 0% 100%;
+  --foreground: 169 35% 9%;
+  --card: 0 0% 100%;
+  --card-foreground: 169 35% 9%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 169 35% 9%;
+  --primary: 179 100% 24.5%;
+  --primary-foreground: 0 0% 100%;
+  --secondary: 160 20% 94%;
+  --secondary-foreground: 169 35% 9%;
+  --muted: 160 20% 94%;
+  --muted-foreground: 167 9% 41%;
+  --accent: 173 36% 91%;
+  --accent-foreground: 169 35% 9%;
+  --destructive: 9 75% 40%;
+  --destructive-foreground: 0 0% 100%;
+  --border: 164 17% 88%;
+  --input: 166 16% 79%;
+  --ring: 178 100% 21%;
+  --radius: 0.75rem;
+
+  --wp-paper: #ffffff;
+  --wp-ground: #f4f8f7;
+  --wp-rail: #edf3f1;
+  --wp-hover: #f1f6f5;
+  --wp-ink: #0f1f1c;
+  --wp-ink-2: #435652;
+  --wp-ink-3: #5f716d;
+  --wp-line: #dae5e2;
+  --wp-line-2: #c2d3cf;
+  --wp-teal: #007d7a;
+  --wp-teal-ink: #006966;
+  --wp-teal-soft: #e1f1ef;
+  --wp-on-teal: #ffffff;
+
+  --wp-due: #e0482f;
+  --wp-due-ink: #b23119;
+  --wp-due-soft: #fdebe7;
+  --wp-upcoming: #b97f00;
+  --wp-upcoming-ink: #7f5600;
+  --wp-upcoming-soft: #fff3d1;
+  --wp-waiting: #2f63cc;
+  --wp-waiting-ink: #2553b0;
+  --wp-waiting-soft: #e6eefc;
+  --wp-replied: #1d8148;
+  --wp-replied-ink: #136238;
+  --wp-replied-soft: #e2f4e9;
+  --wp-closed: #84948f;
+  --wp-closed-ink: #5f716d;
+  --wp-closed-soft: #f4f8f7;
+
+  --wp-shadow: 0 1px 2px rgb(15 31 28 / 0.06), 0 4px 14px rgb(15 31 28 / 0.05);
+  --wp-shadow-pop: 0 12px 32px rgb(15 31 28 / 0.16);
+  --wp-radius: 14px;
+  --wp-radius-sm: 10px;
+  --wp-sidebar-expanded: 236px;
+  --wp-sidebar-collapsed: 72px;
+  --wp-display:
+    var(--font-display, "Cal Sans"), var(--font-hedvig-sans), system-ui,
+    sans-serif;
+
+  --chart-grid-stroke: #dae5e2;
+  --chart-axis-text: #5f716d;
+  --chart-reference-line-stroke: #dae5e2;
+  --chart-reference-label: #5f716d;
+  --chart-actual-line: #007d7a;
+  --chart-bar-fill: #007d7a;
+  --chart-tooltip-cursor: #5f716d;
+}
+
+.dark {
+  color-scheme: dark;
+
+  --background: 173 18% 9%;
+  --foreground: 167 22% 92%;
+  --card: 173 18% 9%;
+  --card-foreground: 167 22% 92%;
+  --popover: 175 20% 11%;
+  --popover-foreground: 167 22% 92%;
+  --primary: 177 56% 45%;
+  --primary-foreground: 178 80% 6%;
+  --secondary: 167 17% 16%;
+  --secondary-foreground: 167 22% 92%;
+  --muted: 167 17% 16%;
+  --muted-foreground: 164 9% 58%;
+  --accent: 174 48% 13%;
+  --accent-foreground: 167 22% 92%;
+  --destructive: 9 100% 66%;
+  --destructive-foreground: 11 77% 7%;
+  --border: 167 17% 16%;
+  --input: 162 14% 23%;
+  --ring: 176 54% 63%;
+
+  --wp-paper: #121a19;
+  --wp-ground: #0c1312;
+  --wp-rail: #0f1716;
+  --wp-hover: #172220;
+  --wp-ink: #e6efed;
+  --wp-ink-2: #a8b9b5;
+  --wp-ink-3: #8b9e99;
+  --wp-line: #22302d;
+  --wp-line-2: #33443f;
+  --wp-teal: #33b5af;
+  --wp-teal-ink: #6dd3cd;
+  --wp-teal-soft: #11302d;
+  --wp-on-teal: #031b1a;
+
+  --wp-due: #ff6a50;
+  --wp-due-ink: #ff8c78;
+  --wp-due-soft: #3a1a14;
+  --wp-upcoming: #e3ae38;
+  --wp-upcoming-ink: #f0c869;
+  --wp-upcoming-soft: #33280e;
+  --wp-waiting: #719cff;
+  --wp-waiting-ink: #9ab8ff;
+  --wp-waiting-soft: #18233d;
+  --wp-replied: #4cc681;
+  --wp-replied-ink: #74d9a0;
+  --wp-replied-soft: #10301f;
+  --wp-closed: #6c7d78;
+  --wp-closed-ink: #8b9e99;
+  --wp-closed-soft: #0c1312;
+
+  --wp-shadow: 0 1px 2px rgb(0 0 0 / 0.3), 0 6px 18px rgb(0 0 0 / 0.25);
+  --wp-shadow-pop: 0 12px 32px rgb(0 0 0 / 0.45);
+
+  --chart-grid-stroke: #22302d;
+  --chart-axis-text: #8b9e99;
+  --chart-reference-line-stroke: #33443f;
+  --chart-reference-label: #8b9e99;
+  --chart-actual-line: #33b5af;
+  --chart-bar-fill: #33b5af;
+  --chart-tooltip-cursor: #8b9e99;
+}
+
+/* Browser surfaces */
+
+::selection {
+  background: var(--wp-teal-soft);
+  color: var(--wp-ink);
+}
+
+input,
+textarea {
+  caret-color: var(--wp-teal);
+}
+
+* {
+  scrollbar-color: var(--wp-line-2) transparent;
+  scrollbar-width: thin;
+}
+
+a {
+  text-underline-offset: 3px;
+}
+
+input[type="checkbox"] {
+  accent-color: var(--wp-teal);
+}
+
+/* Shared primitives remove the browser outline; restore one visible ring. */
+:root
+  :focus-visible:not(
+    [role="dialog"],
+    [role="alertdialog"],
+    [role="menu"],
+    [role="listbox"],
+    [tabindex="-1"]
+  ) {
+  outline: 2px solid hsl(var(--ring));
+  outline-offset: 2px;
+}
+
+:root :is(input, textarea):focus-visible:not([tabindex="-1"]) {
+  outline-offset: 0;
+}
+
+/* Type */
+
+.wp-display {
+  font-family: var(--wp-display);
+  font-weight: 400;
+  letter-spacing: -0.01em;
+}
+
+.wp-numerals {
+  font-variant-numeric: tabular-nums;
+}
+
+/*
+ * Stage stickers: shape plus label, never colour alone.
+ * <span class="wp-stage wp-stage-due"><span class="wp-stage-dot" aria-hidden="true"></span>Due today</span>
+ * Each modifier also exposes --wp-stage-color / -ink / -soft for other surfaces.
+ */
+
+.wp-stage-due {
+  --wp-stage-color: var(--wp-due);
+  --wp-stage-ink: var(--wp-due-ink);
+  --wp-stage-soft: var(--wp-due-soft);
+}
+
+.wp-stage-upcoming {
+  --wp-stage-color: var(--wp-upcoming);
+  --wp-stage-ink: var(--wp-upcoming-ink);
+  --wp-stage-soft: var(--wp-upcoming-soft);
+}
+
+.wp-stage-waiting {
+  --wp-stage-color: var(--wp-waiting);
+  --wp-stage-ink: var(--wp-waiting-ink);
+  --wp-stage-soft: var(--wp-waiting-soft);
+}
+
+.wp-stage-replied {
+  --wp-stage-color: var(--wp-replied);
+  --wp-stage-ink: var(--wp-replied-ink);
+  --wp-stage-soft: var(--wp-replied-soft);
+}
+
+.wp-stage-closed {
+  --wp-stage-color: var(--wp-closed);
+  --wp-stage-ink: var(--wp-closed-ink);
+  --wp-stage-soft: var(--wp-closed-soft);
+}
+
+.wp-stage {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.2;
+  white-space: nowrap;
+  color: hsl(var(--foreground));
+}
+
+.wp-stage.wp-stage-closed {
+  color: var(--wp-ink-3);
+}
+
+.wp-stage-pill {
+  height: 24px;
+  padding: 0 9px 0 8px;
+  border-radius: 999px;
+  background: var(--wp-stage-soft, var(--wp-rail));
+  color: var(--wp-stage-ink, var(--wp-ink-2));
+}
+
+.wp-stage-dot {
+  width: 11px;
+  height: 11px;
+  flex: none;
+  box-sizing: border-box;
+  border-radius: 50%;
+}
+
+.wp-stage-due .wp-stage-dot {
+  background: var(--wp-due);
+}
+
+.wp-stage-upcoming .wp-stage-dot {
+  border: 2px solid var(--wp-upcoming);
+  background: var(--wp-upcoming-soft);
+}
+
+.wp-stage-waiting .wp-stage-dot {
+  border: 2px solid var(--wp-waiting);
+  background: linear-gradient(90deg, var(--wp-waiting) 50%, transparent 50%);
+}
+
+.wp-stage-replied .wp-stage-dot {
+  background: var(--wp-replied);
+  box-shadow:
+    inset 0 0 0 2px var(--wp-paper),
+    0 0 0 1.5px var(--wp-replied);
+}
+
+.wp-stage-closed .wp-stage-dot {
+  border: 1.5px solid var(--wp-closed);
+  background: transparent;
+}
+
+/* Tables: horizontal overflow stays inside the framed table. */
+
+.wp-table-frame {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid var(--wp-line);
+  border-radius: var(--wp-radius);
+  background: var(--wp-paper);
+}
+
+/* --wp-table-top approximates header + page head + toolbar above the table. */
+.wp-table-viewport {
+  --wp-table-top: 360px;
+  height: calc(100dvh - var(--wp-table-top) + var(--header-offset, 0px));
+  min-height: 320px;
+  overscroll-behavior-x: contain;
+}
+
+@media (min-width: 768px) {
+  .wp-table-viewport {
+    --wp-table-top: 264px;
+  }
+}
+
+/* The frame clips overflow, so draw the region's focus ring inside it. */
+:root .wp-table-viewport:focus-visible {
+  outline-offset: -2px;
+}
+
+.wp-table-hint {
+  display: none;
+}
+
+@media (max-width: 767px) {
+  .wp-table-hint {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 14px;
+    border-bottom: 1px solid var(--wp-line);
+    color: var(--wp-ink-2);
+    font-size: 12px;
+    line-height: 1.3;
+  }
+}
+
+/* Low-specificity defaults compose primitives; explicit utility shapes win. */
+:where(
+  button,
+  input:not([type="checkbox"]):not([type="radio"]),
+  textarea,
+  [role="combobox"]
+) {
+  border-radius: var(--wp-radius-sm);
+}
+@media (max-width: 767px) {
+  :where(
+    input:not([type="checkbox"]):not([type="radio"]),
+    form button[type="submit"]
+  ) {
+    min-height: 44px;
+  }
+  :root form input:not([type="checkbox"]):not([type="radio"]) {
+    font-size: 16px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  :root [role="dialog"],
+  :root [role="alertdialog"] {
+    animation: none;
+    transition: none;
+  }
+}

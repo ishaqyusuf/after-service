@@ -7,6 +7,9 @@ Implemented and verified on 2026-05-30.
 Signing in could redirect back to `/sign-in` even after Better Auth created a valid session. The dashboard proxy only recognized non-secure cookie names, while local env could make Better Auth emit `__Secure-better-auth.session_token`.
 
 ## Fix
+- Password recovery now has exact anonymous page access and a complete typed
+  request/token-reset flow. See `brain/features/password-recovery.md` for
+  delivery rules, session revocation, acceptance and rollout status.
 - Dashboard auth endpoints are mounted same-origin at `/api/auth/**`.
 - Dashboard sign-in/sign-up call same-origin auth routes.
 - Proxy session detection accepts secure-prefixed Better Auth cookie names.

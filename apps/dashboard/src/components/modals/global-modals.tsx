@@ -1,9 +1,7 @@
 "use client";
 
+import { SearchModal } from "@/components/search/search-modal";
+
 export function GlobalModals() {
-  return (
-    <>
-      {/* Add global modals here */}
-    </>
-  );
+  return <SearchModal />;
 }

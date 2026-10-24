@@ -3,6 +3,22 @@ import { Icons } from "@afterservice/ui/icons";
 import { format, parseISO } from "date-fns";
 import type { ReactNode } from "react";
 
+/** Shared Wall planner presentation for the domain search + filter controls. */
+export const SEARCH_ROW_CLASS =
+  "flex min-w-0 flex-1 flex-col items-stretch gap-2 sm:flex-row sm:flex-wrap sm:items-center sm:gap-3";
+export const SEARCH_FORM_CLASS =
+  "relative w-full min-w-0 sm:w-[360px] sm:max-w-full";
+export const SEARCH_ICON_CLASS =
+  "pointer-events-none absolute left-3 top-1/2 size-[18px] -translate-y-1/2 text-muted-foreground";
+export const SEARCH_INPUT_CLASS =
+  "h-11 w-full rounded-[10px] border-[color:var(--wp-line-2)] bg-[color:var(--wp-paper)] pl-10 pr-12 text-base transition-colors hover:border-[color:var(--wp-ink-3)] focus-visible:border-primary md:h-10 md:text-sm";
+export const FILTER_TRIGGER_CLASS =
+  "absolute right-1 top-1/2 z-10 grid size-9 -translate-y-1/2 place-items-center rounded-lg text-muted-foreground transition-colors hover:bg-accent hover:text-foreground md:size-8";
+export const FILTER_TRIGGER_ACTIVE_CLASS =
+  "bg-accent text-[color:var(--wp-teal-ink)]";
+export const FILTER_MENU_CLASS =
+  "w-[min(350px,calc(100vw-24px))] rounded-xl shadow-[var(--wp-shadow-pop)]";
+
 type FilterKey =
   | "status"
   | "categories"
@@ -62,7 +78,9 @@ export function FilterList({
       case "categories": {
         if (!Array.isArray(value) || value.length === 0) return null;
         const names = value
-          .map((id) => categoryFilters?.find((filter) => filter.id === id)?.name)
+          .map(
+            (id) => categoryFilters?.find((filter) => filter.id === id)?.name,
+          )
           .filter(Boolean);
         if (names.length === 0) return null;
         if (names.length === 1) return names[0];
@@ -118,7 +136,7 @@ export function FilterList({
   };
 
   return (
-    <ul className="flex flex-wrap gap-2">
+    <ul className="flex flex-wrap gap-2 empty:hidden">
       {Object.entries(filters)
         .filter(
           ([key, value]) =>
@@ -136,11 +154,13 @@ export function FilterList({
           return (
             <li key={key}>
               <Button
-                className="h-9 px-2 bg-secondary hover:bg-secondary font-normal text-[#878787] flex space-x-1 items-center group rounded-none"
+                variant="outline"
+                aria-label={`Remove filter: ${displayValue}`}
+                className="h-9 gap-1.5 rounded-full border-[color:var(--wp-line-2)] bg-[color:var(--wp-paper)] pl-3 pr-2 text-[13px] font-medium text-[color:var(--wp-ink-2)] hover:border-primary hover:bg-[color:var(--wp-paper)] hover:text-[color:var(--wp-teal-ink)]"
                 onClick={() => handleOnRemove(filterKey)}
               >
-                <Icons.Clear className="scale-0 group-hover:scale-100 transition-all w-0 group-hover:w-4" />
                 <span>{displayValue}</span>
+                <Icons.Clear className="size-4 shrink-0" />
               </Button>
             </li>
           );
@@ -151,8 +171,6 @@ export function FilterList({
 
 export function FilterMenuEmptyState({ children }: { children: ReactNode }) {
   return (
-    <div className="px-2 py-1.5 text-xs text-muted-foreground">
-      {children}
-    </div>
+    <div className="px-2 py-1.5 text-xs text-muted-foreground">{children}</div>
   );
 }

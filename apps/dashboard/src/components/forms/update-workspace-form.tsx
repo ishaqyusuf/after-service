@@ -136,10 +136,10 @@ export function UpdateWorkspaceForm() {
   }
 
   return (
-    <Card>
+    <Card className="rounded-[14px] bg-card">
       <CardHeader>
         <CardTitle>Workspace profile</CardTitle>
-        <CardDescription>
+        <CardDescription className="text-muted-foreground">
           Manage workspace identity, service context, and default follow-up
           cadence.
         </CardDescription>
@@ -275,7 +275,7 @@ export function UpdateWorkspaceForm() {
 
 function WorkspaceSettingsSkeleton() {
   return (
-    <Card>
+    <Card className="rounded-[14px] bg-card">
       <CardHeader>
         <Skeleton className="h-6 w-40" />
         <Skeleton className="h-4 w-full max-w-[520px]" />

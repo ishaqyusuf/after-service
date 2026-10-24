@@ -7,6 +7,7 @@
     "packages/*"
   ],
   "scripts": {
+    "brand:icons": "bun scripts/generate-brand-icons.mjs",
     "api:deploy": "vercel deploy . --project prj_AFjHpqFEKDEJU8Wivz3REePoR0rc --scope team_BV5rgKHJH4fMyFL1YfscZIZK --prod --yes && bun run smoke:api",
     "build": "bun --env-file=/dev/null ../../local-infra-kit/bin/with-env.ts --profile afterservice --mode prod -- turbo build",
     "clean": "git clean -xdf node_modules .turbo apps/*/.next apps/*/.turbo packages/*/.turbo",
@@ -35,6 +36,7 @@
     "start:dashboard:prod": "bun --cwd apps/dashboard ../../scripts/with-workspace-env.mjs --mode production -- bun run next start -p 4101",
     "start:website:prod": "bun --cwd apps/website ../../scripts/with-workspace-env.mjs --mode production -- bun run next start -p 4100",
     "terminal": "bun scripts/terminal.mjs",
+    "test:password-recovery": "bun --env-file=/dev/null test apps/dashboard/src/proxy.test.ts packages/auth/src/password-reset-email.test.ts && bun --env-file=/dev/null ../../local-infra-kit/bin/with-env.ts --profile afterservice --mode local -- bun test ./tests/integration/password-recovery.integration.ts",
     "test:e2e": "bun --env-file=/dev/null ../../local-infra-kit/bin/with-env.ts --profile afterservice --mode local -- bunx playwright test",
     "test:integration": "bun --env-file=/dev/null ../../local-infra-kit/bin/with-env.ts --profile afterservice --mode local -- bun test ./tests/integration/mvp.integration.ts ./tests/integration/qa-access.integration.ts",
     "test:typecheck": "tsc --noEmit -p tests/tsconfig.json",

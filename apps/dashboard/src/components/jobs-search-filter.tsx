@@ -25,7 +25,17 @@ import {
 } from "@/hooks/use-job-filter-params";
 import { useTRPC } from "@/trpc/client";
 import { DateRangeFilter } from "./date-range-filter";
-import { FilterList, FilterMenuEmptyState } from "./filter-list";
+import {
+  FILTER_MENU_CLASS,
+  FILTER_TRIGGER_ACTIVE_CLASS,
+  FILTER_TRIGGER_CLASS,
+  FilterList,
+  FilterMenuEmptyState,
+  SEARCH_FORM_CLASS,
+  SEARCH_ICON_CLASS,
+  SEARCH_INPUT_CLASS,
+  SEARCH_ROW_CLASS,
+} from "./filter-list";
 
 export function JobsSearchFilter() {
   const trpc = useTRPC();
@@ -118,41 +128,44 @@ export function JobsSearchFilter() {
 
   return (
     <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
-      <div className="flex flex-col sm:flex-row sm:space-x-4 space-y-4 sm:space-y-0 items-start sm:items-center w-full">
-        <form
-          className="relative w-full sm:w-auto"
-          onSubmit={(e) => {
-            e.preventDefault();
-            handleSubmit();
-          }}
-        >
-          <Icons.Search className="absolute pointer-events-none left-3 top-[11px]" />
-          <Input
-            ref={inputRef}
-            placeholder="Search jobs..."
-            className="pl-9 w-full sm:w-[350px] pr-8"
-            value={input}
-            onChange={handleSearch}
-            autoComplete="off"
-            autoCapitalize="none"
-            autoCorrect="off"
-            spellCheck="false"
-          />
+      <div className={SEARCH_ROW_CLASS}>
+        <search className={SEARCH_FORM_CLASS}>
+          <form
+            className="relative"
+            onSubmit={(e) => {
+              e.preventDefault();
+              handleSubmit();
+            }}
+          >
+            <Icons.Search className={SEARCH_ICON_CLASS} />
+            <Input
+              ref={inputRef}
+              aria-label="Search jobs by title or customer"
+              placeholder="Search jobs"
+              className={SEARCH_INPUT_CLASS}
+              value={input}
+              onChange={handleSearch}
+              autoComplete="off"
+              autoCapitalize="none"
+              autoCorrect="off"
+              spellCheck="false"
+            />
 
-          <DropdownMenuTrigger asChild>
-            <button
-              onClick={() => setIsOpen((prev) => !prev)}
-              type="button"
-              className={cn(
-                "absolute z-10 right-3 top-[10px] opacity-50 transition-opacity duration-300 hover:opacity-100",
-                hasValidFilters && "opacity-100",
-                isOpen && "opacity-100",
-              )}
-            >
-              <Icons.Filter />
-            </button>
-          </DropdownMenuTrigger>
-        </form>
+            <DropdownMenuTrigger asChild>
+              <button
+                onClick={() => setIsOpen((prev) => !prev)}
+                type="button"
+                aria-label="Filter jobs"
+                className={cn(
+                  FILTER_TRIGGER_CLASS,
+                  (hasValidFilters || isOpen) && FILTER_TRIGGER_ACTIVE_CLASS,
+                )}
+              >
+                <Icons.Filter />
+              </button>
+            </DropdownMenuTrigger>
+          </form>
+        </search>
 
         <FilterList
           filters={validFilters}
@@ -164,7 +177,7 @@ export function JobsSearchFilter() {
       </div>
 
       <DropdownMenuContent
-        className="w-[350px]"
+        className={FILTER_MENU_CLASS}
         sideOffset={19}
         alignOffset={-11}
         side="bottom"

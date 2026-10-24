@@ -11,16 +11,16 @@ import { ThemeSwitch } from "@/components/theme-switch";
 
 export function ChangeTheme() {
   return (
-    <Card>
+    <Card className="rounded-[14px] bg-card">
       <CardHeader>
         <CardTitle>Appearance</CardTitle>
-        <CardDescription>
+        <CardDescription className="text-muted-foreground">
           Customize how afterservice looks on this device.
         </CardDescription>
       </CardHeader>
 
       <CardContent>
-        <div className="w-[240px]">
+        <div className="w-full max-w-[240px]">
           <ThemeSwitch />
         </div>
       </CardContent>

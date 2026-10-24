@@ -103,3 +103,15 @@ DB query modules own persistence and deterministic reads. Dashboard shell owns
 one assistant provider with actor/workspace identity, and global record sheets
 live inside it. Canonical form operations accept server-owned transactional
 context for reviewed commands. See ADR 0024 and assistant verification.
+
+## Trigger replacement binding — 2026-10-24
+
+Manual email dispatch now targets the Zeroes & One project recorded in
+`packages/jobs/trigger-project.json` (ADR 0025). Runtime production app keys
+are server-only Vercel Sensitive variables. DB/Resend values are non-revealable
+Trigger secrets; automatic deployment sync handles only non-secret config.
+The existing Vercel production housekeeping cron is unchanged. The old Trigger
+project/history remains available. Following explicit founder approval, the two
+Trigger connection assignments in root `.env` and `.env.production` were aligned
+with the replacement development and production environments; all other config
+was preserved.

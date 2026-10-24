@@ -18,6 +18,10 @@ This file defines authorization rules.
 ## Public Routes
 - Website pages.
 - Sign-up/sign-in pages.
+- Exact forgot-password and reset-password pages (including supported locales).
+- Recovery requests need no session; password changes require a valid, unexpired,
+  one-use Better Auth reset token. Callback origins remain validated, including
+  in integration tests. Successful resets revoke the account's sessions.
 - API health.
 - Lemon Squeezy webhook endpoint with signature verification.
 - Internal QA capability and credential exchange routes exist only in enabled

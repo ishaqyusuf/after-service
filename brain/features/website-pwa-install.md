@@ -5,6 +5,10 @@ Track the marketing website install path for supported mobile browsers.
 
 ## Current Behavior
 - The website exposes `/manifest.webmanifest` from `apps/website/src/app/manifest.ts`.
+- As of 2026-10-24, normal/maskable install icons use the selected Follow-through
+  identity. `bun run brand:icons` regenerates them from shared brand geometry,
+  together with both apps' favicons and Apple touch icons. The website cache
+  version is `afterservice-shell-v3`; ADR 0021 records the identity decision.
 - The website registers `/sw.js` from `apps/website/src/components/pwa-service-worker-register.tsx` on secure origins, `localhost`, and `127.0.0.1`.
 - The service worker in `apps/website/public/sw.js` caches the app shell, manifest, and icons, claims clients on activation, serves same-origin cached assets, and returns a 200 HTML offline response for navigations when the network and cached shell are unavailable.
 - The mobile landing install sheet in `apps/website/src/components/landing/mobile-install-top-sheet.tsx` only calls `beforeinstallprompt.prompt()` when a deferred browser prompt exists.

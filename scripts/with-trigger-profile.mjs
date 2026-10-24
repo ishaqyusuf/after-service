@@ -1,7 +1,13 @@
 #!/usr/bin/env node
 
 import { spawn } from "node:child_process";
-import { existsSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
+import {
+  existsSync,
+  mkdtempSync,
+  readFileSync,
+  rmSync,
+  writeFileSync,
+} from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 
@@ -49,11 +55,25 @@ let finalCommand =
 
 if (
   finalCommand[0] === "trigger" &&
-  (finalCommand[1] === "deploy" || finalCommand[1] === "dev") &&
-  !process.env.TRIGGER_PROJECT_ID?.trim()
+  ["deploy", "dev", "whoami"].includes(finalCommand[1]) &&
+  !finalCommand.some(
+    (arg) =>
+      arg === "-p" ||
+      arg === "--project-ref" ||
+      arg.startsWith("--project-ref="),
+  )
 ) {
-  console.error("TRIGGER_PROJECT_ID is required to configure jobs.");
-  process.exit(1);
+  // The checked-in project binding wins over stale IDs in shared dotenv profiles.
+  const binding = JSON.parse(
+    readFileSync(
+      new URL("../packages/jobs/trigger-project.json", import.meta.url),
+      "utf8",
+    ),
+  );
+  if (!/^proj_[a-z0-9]+$/.test(binding.projectId)) {
+    throw new Error("The jobs project binding is invalid.");
+  }
+  finalCommand.push("--project-ref", binding.projectId);
 }
 
 let temporaryEnvDirectory;

@@ -6,9 +6,12 @@ This file captures the MVP observability baseline for afterservice production re
 ## MVP Logging
 - 2026-10-24: Private Oversight v1 read endpoints and the matching portfolio
   adapter are implemented. Logly owns traffic; Oversight owns operational
-  summaries/directories. Initial live inspection found Afterservice registered
-  but not connected. Source verification and production activation are tracked
-  separately in `brain/features/oversight-integration.md`.
+  summaries/directories. After explicit approval, the scoped reader and both
+  deployments are live. In-app desktop/mobile snapshots and all directories
+  passed; 7/30/90-day HTTP summaries return 200/no-store and unauthenticated
+  reads return 401. See `brain/features/oversight-integration.md` for rollout
+  provenance and access limits. Reporting-only exclusions now remove the four
+  confirmed internal/test workspaces without changing purge classification.
 - The daily Vercel follow-up cron emits `follow-up-cron` with aggregate
   processed/missed counts and completion time. It records no recipients or
   customer data. Check function errors/5xx responses; failed runs require

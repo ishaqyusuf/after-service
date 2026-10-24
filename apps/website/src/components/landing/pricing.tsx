@@ -6,160 +6,198 @@ import {
   getLocalizedPlanPrice,
   type PricingResolution,
 } from "@afterservice/plans";
-import { Button, Card } from "@afterservice/ui";
-import { Check } from "lucide-react";
+import {
+  getPricingBusinessPath,
+  getPricingSignupPath,
+} from "@afterservice/plans/checkout";
+import { Button, cn } from "@afterservice/ui";
+import { Check, Clock3, Info } from "lucide-react";
 import { publicPlans } from "./pricing-data";
+import { SectionHeading, SectionLede } from "./section-heading";
 
 type LandingPricingProps = {
   initialPricing: PricingResolution;
+  showIntro?: boolean;
 };
 
-export function LandingPricing({ initialPricing }: LandingPricingProps) {
+export function LandingPricing({
+  initialPricing,
+  showIntro = true,
+}: LandingPricingProps) {
   const pricing = initialPricing;
   const track = useTrack();
 
   return (
     <section
       id="pricing"
-      className="relative z-10 max-w-7xl mx-auto w-full px-6 sm:px-8 py-24"
+      aria-labelledby={showIntro ? "pricing-title" : undefined}
+      aria-label={showIntro ? undefined : "Plans"}
+      className="py-[clamp(56px,8vw,104px)]"
     >
-      <div className="text-center mb-14">
-        <span className="text-xs font-bold text-primary tracking-widest uppercase">
-          Free beta now
-        </span>
-        <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-foreground mt-3 mb-4">
-          Start free while afterservice is in early access.
-        </h2>
-        <p className="text-muted-foreground max-w-2xl mx-auto">
-          Paid plans are planned for teams that need more volume, integrations,
-          automation, reporting, and support. Beta users get founder-rate
-          pricing when paid plans launch.
-        </p>
-        <p className="mt-4 text-sm text-muted-foreground">
-          Prices shown in {pricing.currency}.
-        </p>
-        {pricing.note && (
-          <p className="mt-6 text-xs text-muted-foreground">{pricing.note}</p>
-        )}
-      </div>
+      <div className="wp-wrap grid gap-8">
+        {showIntro ? (
+          <div>
+            <SectionHeading id="pricing-title">
+              Free to start. Business when your team needs room.
+            </SectionHeading>
+            <SectionLede>
+              Free covers the whole follow-up workflow for one person. Business
+              gives a small team more room, for one monthly price per business.
+            </SectionLede>
+          </div>
+        ) : null}
 
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-5 items-stretch max-w-7xl mx-auto">
-        {publicPlans.map((plan) => {
-          const price = getLocalizedPlanPrice(plan.id, pricing);
+        <div
+          className={cn(
+            "flex max-w-[70ch] items-start gap-2.5 text-[15px] text-muted-foreground",
+            pricing.region === "OTHER" &&
+              "rounded-[10px] border border-dashed border-input px-3.5 py-2.5",
+          )}
+        >
+          <Info
+            className="mt-[3px] size-[18px] flex-none text-accent-foreground"
+            aria-hidden="true"
+          />
+          <p>
+            Prices shown in {pricing.currency}, including applicable taxes.
+            {pricing.region === "OTHER" && pricing.note ? (
+              <> {pricing.note}</>
+            ) : null}
+          </p>
+        </div>
 
-          return (
-            <Card
-              key={plan.name}
-              className={`p-6 rounded-2xl flex flex-col justify-between shadow-sm dark:shadow-none backdrop-blur-sm ${
-                plan.current
-                  ? "border-2 border-[#009b98] bg-primary/5"
-                  : "bg-card"
-              }`}
-            >
-              <div>
-                <div className="flex items-center justify-between gap-3">
-                  <span className="text-xs font-bold text-primary tracking-widest uppercase">
-                    {plan.current ? "Current" : "Planned"}
-                  </span>
-                  <span className="rounded-full border border-border bg-background px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+        <div className="grid max-w-[920px] gap-5 md:grid-cols-2">
+          {publicPlans.map((plan) => {
+            const price = getLocalizedPlanPrice(plan.id, pricing);
+
+            return (
+              <article
+                key={plan.name}
+                aria-labelledby={`plan-${plan.id}`}
+                className={cn(
+                  "grid content-start gap-3.5 rounded-[14px] border bg-card p-5 text-card-foreground sm:p-[26px]",
+                  plan.current
+                    ? "border-primary shadow-[0_0_0_1px_hsl(var(--primary)),var(--wp-shadow)]"
+                    : "border-border",
+                )}
+              >
+                <header className="flex items-center justify-between gap-3">
+                  <h3
+                    id={`plan-${plan.id}`}
+                    className="wp-display text-[28px] leading-[1.1]"
+                  >
+                    {plan.name}
+                  </h3>
+                  <span
+                    className={cn(
+                      "inline-flex h-6 items-center whitespace-nowrap rounded-full px-2.5 text-xs font-semibold",
+                      plan.current
+                        ? "bg-accent text-accent-foreground"
+                        : "border border-input text-muted-foreground",
+                    )}
+                  >
                     {plan.buyer}
                   </span>
-                </div>
+                </header>
 
-                <h3 className="text-2xl font-bold mt-4 text-foreground">
-                  {plan.name}
-                </h3>
-                <p className="text-sm text-muted-foreground mt-2 min-h-16">
-                  {plan.description}
-                </p>
+                <p className="text-muted-foreground">{plan.description}</p>
 
-                <div className="my-6">
-                  <span className="text-5xl font-extrabold text-foreground">
+                <p className="flex flex-wrap items-baseline gap-x-2 gap-y-1">
+                  <span className="wp-display text-[44px] leading-none tracking-[-0.02em] [font-variant-numeric:tabular-nums]">
                     {price.formattedMonthly}
                   </span>
-                  <span className="block text-sm text-muted-foreground mt-1">
+                  <span className="wp-tertiary w-full text-sm">
                     {plan.priceNote}
+                    {plan.current ? null : " · Monthly billing only"}
                   </span>
-                  {!plan.current && price.formattedYearly && (
-                    <span className="block text-xs text-muted-foreground mt-1">
-                      {price.formattedYearly}/year planned
-                    </span>
-                  )}
-                </div>
+                </p>
 
-                <div className="border-t border-border pt-5">
-                  <p className="text-xs font-bold text-foreground uppercase tracking-wider mb-3">
-                    Includes
-                  </p>
-                  <ul className="space-y-3 text-sm text-muted-foreground">
-                    {plan.features.map((feature) => (
-                      <li key={feature} className="flex items-start gap-2.5">
-                        <Check
-                          className="w-4 h-4 text-primary shrink-0 mt-0.5"
-                          strokeWidth={3}
-                        />
-                        <span>{feature}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-
-                <div className="border-t border-border pt-5 mt-5">
-                  <p className="text-xs font-bold text-foreground uppercase tracking-wider mb-3">
-                    Limits
-                  </p>
-                  <ul className="space-y-2 text-xs text-muted-foreground">
-                    {plan.limits.map((limit) => (
-                      <li key={limit}>{limit}</li>
-                    ))}
-                  </ul>
-                </div>
-              </div>
-
-              <div className="mt-8 space-y-3">
                 {plan.current ? (
-                  <a
-                    href="/signup"
-                    className="block w-full"
-                    onClick={() =>
-                      track({
-                        event: LogEvents.JoinFreeBeta.name,
-                        channel: LogEvents.JoinFreeBeta.channel,
-                        location: "pricing_card",
-                        plan: plan.name,
-                      })
-                    }
+                  <Button
+                    asChild
+                    className="h-11 w-full rounded-[10px] text-[15px] font-semibold"
                   >
-                    <Button className="w-full h-12 font-bold shadow-md shadow-[#009b98]/20">
+                    <a
+                      href={getPricingSignupPath(pricing)}
+                      onClick={() =>
+                        track({
+                          event: LogEvents.JoinFreeBeta.name,
+                          channel: LogEvents.JoinFreeBeta.channel,
+                          location: "pricing_card",
+                          plan: plan.name,
+                        })
+                      }
+                    >
                       {plan.cta}
-                    </Button>
-                  </a>
+                    </a>
+                  </Button>
                 ) : (
                   <Button
-                    type="button"
+                    asChild
                     variant="outline"
-                    className="w-full h-12 text-primary font-bold"
-                    onClick={() =>
-                      track({
-                        event: LogEvents.PlannedPaidPlanInterest.name,
-                        channel: LogEvents.PlannedPaidPlanInterest.channel,
-                        currency: price.currency,
-                        location: "pricing_card",
-                        plan: plan.name,
-                        pricingRegion: pricing.region,
-                      })
-                    }
+                    className="h-11 w-full rounded-[10px] border-input bg-card text-[15px] font-semibold text-foreground"
                   >
-                    {plan.cta}
+                    <a href={getPricingBusinessPath(pricing)}>{plan.cta}</a>
                   </Button>
                 )}
-                <p className="text-xs text-center text-muted-foreground">
-                  {plan.billingNote}
-                </p>
-              </div>
-            </Card>
-          );
-        })}
+                <p className="wp-tertiary text-[13.5px]">{plan.billingNote}</p>
+
+                <ul className="grid gap-2.5 pt-1.5">
+                  {plan.features.map((feature) => (
+                    <li className="flex items-start gap-2.5" key={feature.name}>
+                      {feature.comingSoon ? (
+                        <Clock3
+                          className="wp-tertiary mt-[3px] size-[18px] flex-none"
+                          aria-hidden="true"
+                        />
+                      ) : (
+                        <Check
+                          className="mt-[3px] size-[18px] flex-none text-accent-foreground"
+                          aria-hidden="true"
+                        />
+                      )}
+                      <div className="min-w-0 text-[15.5px]">
+                        <span className="inline-flex flex-wrap items-center gap-x-2.5 gap-y-1">
+                          {feature.name}
+                          {feature.comingSoon ? (
+                            <span className="inline-flex h-6 items-center whitespace-nowrap rounded-full border border-dashed border-input px-2.5 text-xs font-semibold text-muted-foreground">
+                              Coming soon
+                            </span>
+                          ) : null}
+                        </span>
+                        {feature.description ? (
+                          <p className="mt-1 text-sm text-muted-foreground">
+                            {feature.description}
+                          </p>
+                        ) : null}
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+
+                <ul className="grid" aria-label={`${plan.name} limits`}>
+                  {plan.limits.map((limit) => (
+                    <li
+                      className="border-t border-border py-[9px] text-[15px] text-muted-foreground [font-variant-numeric:tabular-nums]"
+                      key={limit}
+                    >
+                      {limit}
+                    </li>
+                  ))}
+                </ul>
+              </article>
+            );
+          })}
+        </div>
+
+        <div className="grid max-w-[70ch] gap-2 text-sm text-muted-foreground">
+          <p>Limits count stored records, not messages sent each month.</p>
+          <p>
+            AI and WhatsApp features are coming soon. Business will include a
+            shared AI usage allowance, with limits announced before launch.
+            Customer-message delivery, when available, is charged separately.
+          </p>
+        </div>
       </div>
     </section>
   );

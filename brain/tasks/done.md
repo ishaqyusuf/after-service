@@ -6,6 +6,60 @@ This file records completed work.
 
 ## Completed
 
+### Wall Planner Marketing And Dashboard Redesign — 2026-10-24
+
+Implemented both exact owner-selected Workshop revisions with three
+Claude `claude-opus-5-5` workers and Codex integration review. Preserved existing
+architecture/components, real typed data, country pricing, Assistant and auth/
+onboarding recovery. Midday-aligned sheets and short confirmation modals,
+responsive navigation/tables and the real week planner pass conformance audit.
+
+Local implementation verification: 15-package typecheck, test typecheck, scoped
+Biome, 180 unit tests,
+both optimized builds, static PWA checks, zero Impeccable findings; all 20
+Chromium/Pixel cases covered after targeted reruns. Manual desktop light/dark and
+320/390px acceptance passes. Both exact local QA fixtures cleaned. Workshop
+implementation receipts: marketing `6da342ba-9a03-4758-a385-52eb11eb5637`;
+dashboard `d90c1bf2-baa7-4d62-b78e-2047b09ad2e7`.
+
+Implementation commits `80a2079` and `ea0aa45` are pushed to
+`codex/wall-planner-redesign`. Final application source `7f51ea0` is live on both domains in PR #3. See
+[feature and verification record](../features/complete-ui-redesign-workshop.md),
+[migration audit](../plans/2026-10-24-wall-planner-migration.md) and ADR 0026.
+
+
+
+Production: 177 unit tests / 458 assertions, full typechecks, optimized Vercel
+builds, desktop and 320/390px browser acceptance, regional pricing handoff and
+PWA response checks pass. Pending password recovery is excluded. See
+[production handoff](../handoffs/2026-10-24-wall-planner-production.md).
+
+### Apply Follow-through Logo Across Product Surfaces — 2026-10-24
+
+- Recorded the user's selection of workshop option 01 v2 before implementation.
+- Updated shared lockups, compact dashboard/mobile/search marks, and social
+  artwork. Added repeatable SVG/ICO/Apple/PWA asset generation and refreshed the
+  website's service-worker cache version.
+- Full typecheck, website/dashboard builds, website/sign-in visual checks,
+  PWA runtime checks, icon metadata, dimensions, opacity, and maskable safe-area
+  validation pass.
+- After user approval, authenticated desktop/sidebar and mobile-menu checks
+  passed using the configured local QA origin. Revoked the temporary grant,
+  verified zero derived sessions, and removed the exact isolated test fixture.
+  Committed as a dedicated logo changeset; no production deployment or push.
+- Brain impact: ADR 0021, brand identity feature, logo workshop record, website
+  PWA feature, and this completed implementation record.
+
+### Logo Redesign Exploration — 2026-10-24
+
+- Generated three identity directions with Claude Opus 5.5 at high effort and
+  published them to the shared Workshop catalog with immutable revisions.
+- Rendered all three boards in the in-app browser and checked comparison
+  navigation, logo applications, and color/monochrome controls. Refined the
+  lowercase a geometry after visual review.
+- Exploration deliverable is complete. Production selection and implementation
+  remain open; no existing product logo or application code changed.
+- Brain record: `brain/marketing/logo-redesign-workshop.md`.
 ### Operations Assistant Production Rollout — 2026-10-24
 
 Merged PR #2 and deployed the assistant to dashboard/API production. Applied the
@@ -2754,3 +2808,47 @@ Files changed:
   dashboard visits show Nigeria (NG). See
   `brain/handoffs/2026-10-24-country-tracking-release.md`.
 - Details: `brain/features/visit-country-tracking.md`; ADR 0018.
+
+## 2026-10-24: Reconcile internal/test adoption reporting
+
+- Founder confirmed all four workspaces are internal/test. Exact-ID reporting
+  exclusions are deployed independently of QA classification/purge eligibility.
+- Live Oversight summary and all three directories verified: zero external
+  businesses/jobs/customers/follow-ups; three registrations without businesses.
+- API/dashboard source overlays preserve the newest verified parallel releases;
+  production builds, isolated typechecks, regression/integration and compiled
+  smoke pass. No workspace data, authentication or read grants changed.
+- Historic anonymous Logly traffic remains traffic and cannot be relabelled as
+  verified adoption. Feature: `brain/features/adoption-data-reconciliation.md`.
+
+## 2026-10-24: Replace blocked Trigger project and verify delivery
+
+- Created afterservice in Zeroes & One, deployed six tasks as `20261024.2`,
+  protected DB/Resend as non-revealable secrets, and updated both production
+  dispatch keys through exact-source API/dashboard rebuilds.
+- Production no-recipient probe completed with no writes/messages. One explicit
+  dashboard follow-up then completed and arrived in the founder Gmail inbox.
+  The internal follow-up is closed; reporting exclusions remain in place.
+- Worker typecheck, nine routing tests and production build/alias checks pass.
+  Old project/history is retained. No purchase. With explicit founder approval,
+  the two Trigger assignments in `.env` and `.env.production` were aligned;
+  all other settings were preserved.
+- Feature: `brain/features/trigger-project-migration.md`; ADR 0025.
+
+## 2026-10-24: Complete ordered adoption, email and legal/support priorities
+
+- Reporting-only exclusion removes all four founder-confirmed internal/test
+  workspaces from adoption without altering product access or purgeability.
+  Oversight shows zero external businesses and three incomplete registrations.
+- Replacement Trigger project in Zeroes & One, production app cutover and one
+  actual inbox-delivered follow-up verified. Approved local dev/prod connection
+  assignments are aligned; old project/history retained.
+- Founder confirmed Zeroes and One Hi-Tech (Nigeria) and monitored support at
+  hello@afterservice.app. Privacy/terms placeholders replaced and published.
+  Website production `dpl_DUhi4yXDmJjw1xWsy1C1zRUcmbjU` preserves prior pricing.
+- Website typechecks, scoped Biome, production build and in-app desktop checks
+  pass. Public page navigation, support targets, canonical metadata and existing
+  NGN pricing verified; no captured page errors. No API/database changes.
+- Details: `brain/features/legal-and-support-readiness.md`,
+  `brain/features/trigger-project-migration.md` and
+  `brain/features/adoption-data-reconciliation.md`.

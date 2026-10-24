@@ -8,9 +8,9 @@ export function LaunchedPage({
   initialPricing: PricingResolution;
 }) {
   return (
-    <div className="care-site">
+    <>
       <CareLanding initialPricing={initialPricing} />
       <MobileLandingPrompts />
-    </div>
+    </>
   );
 }

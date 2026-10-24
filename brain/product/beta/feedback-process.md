@@ -10,9 +10,10 @@ onboarded the operator. Explicitly confirm that channel during onboarding.
 The founder checks it each business day during the pilot. A forwarded invite
 must identify the founder's real reply destination before it is sent.
 
-The public website lists `hello@afterservice.app`, but mailbox delivery and
-monitoring have not been verified by this task. Do not make it the sole beta
-support route until the founder confirms it is monitored.
+The founder confirmed on 2026-10-24 that `hello@afterservice.app` works and is
+monitored. This is the public support and privacy-request address. The existing
+onboarding conversation remains available during the pilot; no fixed response
+SLA is promised.
 
 No new external inbox, group, form, or notification automation was created.
 
